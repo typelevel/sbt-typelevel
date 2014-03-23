@@ -1,0 +1,5 @@
+$ exec git init
+$ exec git add -A
+$ exec git commit -m init
+
+> release
