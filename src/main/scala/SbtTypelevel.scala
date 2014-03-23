@@ -12,7 +12,7 @@ object Typelevel extends Plugin {
   type Sett = Def.Setting[_]
 
   def versioningSettings: Seq[Sett] = List(
-    version := Version(TypelevelKeys.currentSeries.value, TypelevelKeys.currentVersion.value).id
+    version in ThisBuild := Version(TypelevelKeys.currentSeries.value, TypelevelKeys.currentVersion.value).id
   )
 
   def releaseSettings: Seq[Sett] = sbtrelease.ReleasePlugin.releaseSettings ++ List(

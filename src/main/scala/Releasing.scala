@@ -78,8 +78,9 @@ object Releasing {
 
   private def setVersions(select: Versions => Version.Relative): ReleaseStep = { st: State =>
     val version = select(st.get(versions).getOrElse(sys.error("versions must be set")))
+    val series = Project.extract(st).get(TypelevelKeys.currentSeries)
 
-    st.log.info(s"Setting version to ${version.id}")
+    st.log.info(s"Setting version to ${series.id}.${version.id}")
 
     writeVersion(st, version)
 
