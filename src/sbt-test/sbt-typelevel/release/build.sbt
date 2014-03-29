@@ -4,7 +4,7 @@ import org.typelevel.sbt.Releasing.Stages
 
 organization := "org.example"
 
-name := "simple"
+name := "release"
 
 publishTo := Some(Resolver.file("repo", new File("./repo")))
 

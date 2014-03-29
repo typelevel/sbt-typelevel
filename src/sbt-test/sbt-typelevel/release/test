@@ -1,0 +1,18 @@
+$ exec mkdir repo
+
+$ exec git init
+$ exec git add -A
+$ exec git commit -m init
+
+> release cross
+$ exists repo/org/example/release_2.10/2.3.4/release_2.10-2.3.4.jar
+$ exists repo/org/example/release_2.9.3/2.3.4/release_2.9.3-2.3.4.jar
+
+> publish
+$ exists repo/org/example/release_2.10/2.3.5-SNAPSHOT/release_2.10-2.3.5-SNAPSHOT.jar
+
+$ copy-file new/A.scala A.scala
+-> mimaReportBinaryIssues
+
+$ exec git checkout A.scala
+> mimaReportBinaryIssues
