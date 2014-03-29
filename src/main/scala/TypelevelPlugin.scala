@@ -15,7 +15,8 @@ object TypelevelPlugin extends Plugin {
   type Sett = Def.Setting[_]
 
   def versioningSettings: Seq[Sett] = List(
-    version in ThisBuild := Version(TypelevelKeys.currentSeries.value, TypelevelKeys.currentVersion.value).id
+    version in ThisBuild := Version(TypelevelKeys.series.value, TypelevelKeys.relativeVersion.value).id,
+    TypelevelKeys.stability := Stability.Development
   )
 
   def releaseSettings: Seq[Sett] = releaseDefaultSettings ++ List(
@@ -30,16 +31,16 @@ object TypelevelPlugin extends Plugin {
 
   def mimaSettings: Seq[Sett] = mimaDefaultSettings ++ List(
     MimaKeys.previousArtifact := {
-      TypelevelKeys.currentSeries.value.stability match {
-        case ReleaseSeries.Stable =>
+      TypelevelKeys.stability.value match {
+        case Stability.Stable =>
           TypelevelKeys.lastRelease.?.value match {
             case Some(lR) =>
-              val ver = Version(TypelevelKeys.currentSeries.value, lR)
+              val ver = Version(TypelevelKeys.series.value, lR)
               Some(organization.value % (name.value + "_" + scalaBinaryVersion.value) % ver.id)
             case None =>
               None
           }
-        case ReleaseSeries.Development =>
+        case Stability.Development =>
           None
       }
     }

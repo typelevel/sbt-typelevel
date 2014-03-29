@@ -17,6 +17,8 @@ crossScalaVersions := Seq("2.9.3", "2.10.3")
 
 TypelevelPlugin.typelevelDefaultSettings
 
+TypelevelKeys.stability := Stability.Stable
+
 TypelevelKeys.signArtifacts := false
 
 val testVersions = List[sbtrelease.ReleaseStep]({ st: State =>

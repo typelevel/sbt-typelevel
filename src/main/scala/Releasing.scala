@@ -62,16 +62,16 @@ object Releasing {
     val extracted = Project.extract(st)
 
     val file = extracted.get(versionFile)
-    val series = extracted.get(TypelevelKeys.currentSeries)
+    val series = extracted.get(TypelevelKeys.series)
 
     val contents = s"""|
     |import org.typelevel.sbt._
     |import org.typelevel.sbt.ReleaseSeries._
     |import org.typelevel.sbt.Version._
     |
-    |TypelevelKeys.currentSeries in ThisBuild := $series
+    |TypelevelKeys.series in ThisBuild := $series
     |
-    |TypelevelKeys.currentVersion in ThisBuild := $version
+    |TypelevelKeys.relativeVersion in ThisBuild := $version
     |""".stripMargin
 
     IO.write(file, contents, append = false)
@@ -79,13 +79,13 @@ object Releasing {
 
   private def setVersions(select: Versions => Version.Relative): ReleaseStep = { st: State =>
     val version = select(st.get(versions).getOrElse(sys.error("versions must be set")))
-    val series = Project.extract(st).get(TypelevelKeys.currentSeries)
+    val series = Project.extract(st).get(TypelevelKeys.series)
 
     st.log.info(s"Setting version to ${series.id}.${version.id}")
 
     writeVersion(st, version)
 
-    reapply(Seq(TypelevelKeys.currentVersion in ThisBuild := version), st)
+    reapply(Seq(TypelevelKeys.relativeVersion in ThisBuild := version), st)
   }
 
   val setReleaseVersion: ReleaseStep = setVersions(_._1)
