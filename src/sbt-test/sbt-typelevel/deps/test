@@ -1,0 +1,6 @@
+$ copy-file good/deps.sbt deps.sbt
+> checkDependencies
+
+$ copy-file bad/deps.sbt deps.sbt
+> reload
+-> checkDependencies
