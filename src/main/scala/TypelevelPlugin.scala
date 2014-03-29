@@ -3,10 +3,10 @@ package org.typelevel.sbt
 import sbt._
 import sbt.Keys._
 
-import sbtrelease.ReleasePlugin.{releaseSettings => releaseDefaultSettings}
+import sbtrelease.ReleasePlugin
 import sbtrelease.ReleasePlugin.ReleaseKeys
-import com.typesafe.tools.mima.plugin.MimaPlugin.mimaDefaultSettings
-import com.typesafe.tools.mima.plugin.MimaKeys
+import com.typesafe.tools.mima.plugin.{MimaPlugin, MimaKeys}
+import net.virtualvoid.sbt.graph.{Plugin => GraphPlugin}
 
 import Releasing.Stages
 
@@ -19,7 +19,7 @@ object TypelevelPlugin extends Plugin {
     TypelevelKeys.stability := Stability.Development
   )
 
-  def releaseSettings: Seq[Sett] = releaseDefaultSettings ++ List(
+  def releaseSettings: Seq[Sett] = ReleasePlugin.releaseSettings ++ List(
     TypelevelKeys.signArtifacts := true,
     ReleaseKeys.releaseProcess :=
       Stages.checks ++
@@ -29,7 +29,7 @@ object TypelevelPlugin extends Plugin {
       Stages.post
   )
 
-  def mimaSettings: Seq[Sett] = mimaDefaultSettings ++ List(
+  def mimaSettings: Seq[Sett] = MimaPlugin.mimaDefaultSettings ++ List(
     MimaKeys.previousArtifact := {
       TypelevelKeys.stability.value match {
         case Stability.Stable =>
@@ -46,9 +46,16 @@ object TypelevelPlugin extends Plugin {
     }
   )
 
+  def dependencySettings: Seq[Sett] = GraphPlugin.graphSettings ++ List(
+    TypelevelKeys.knownDependencies := Dependencies.known.all,
+    TypelevelKeys.checkDependencies :=
+      Dependencies.check(TypelevelKeys.knownDependencies.value, streams.value.log, (GraphPlugin.moduleGraph in Compile).value.nodes)
+  )
+
   def typelevelDefaultSettings: Seq[Sett] =
     versioningSettings ++
     releaseSettings ++
-    mimaSettings
+    mimaSettings ++
+    dependencySettings
 
 }

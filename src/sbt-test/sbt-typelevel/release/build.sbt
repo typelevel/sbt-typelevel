@@ -1,4 +1,4 @@
-import org.typelevel.sbt._
+import org.typelevel.sbt.{Version => TVersion, _}
 import org.typelevel.sbt.Releasing.Stages
 
 
@@ -22,7 +22,7 @@ TypelevelKeys.stability := Stability.Stable
 TypelevelKeys.signArtifacts := false
 
 val testVersions = List[sbtrelease.ReleaseStep]({ st: State =>
-  st.put(Releasing.versions, ((Version.Relative(4, Version.Final), Version.Relative(5, Version.Snapshot))))
+  st.put(Releasing.versions, ((TVersion.Relative(4, TVersion.Final), TVersion.Relative(5, TVersion.Snapshot))))
 })
 
 ReleaseKeys.releaseProcess :=

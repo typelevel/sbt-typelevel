@@ -16,4 +16,8 @@ object TypelevelKeys {
 
   lazy val signArtifacts = SettingKey[Boolean]("signArtifacts", "Sign artifacts before publishing")
 
+  lazy val knownDependencies = SettingKey[List[Dependency]]("knownDependencies", "List of dependencies known to satisfy binary compatibility")
+
+  lazy val checkDependencies = TaskKey[Unit]("checkDependencies", "Check that there are no conflicting dependencies")
+
 }

@@ -4,12 +4,12 @@ import scala.util.control.Exception._
 
 object Version {
   object Relative {
-    val SnapshotR = """(\d+)-SNAPSHOT""".r
-    val MilestoneR = """(\d+)-M(\d+)""".r
-    val RCR = """(\d+)-RC(\d+)""".r
-    val FinalR = """(\d+)""".r
+    private val SnapshotR = """(\d+)-SNAPSHOT""".r
+    private val MilestoneR = """(\d+)-M(\d+)""".r
+    private val RCR = """(\d+)-RC(\d+)""".r
+    private val FinalR = """(\d+)""".r
 
-    def fromString(str: String) = catching(classOf[NumberFormatException]) opt {
+    def fromString(str: String): Option[Relative] = allCatch opt {
       val (value, suffix) =
         str match {
           case SnapshotR(value) => (value, Snapshot)
@@ -21,8 +21,26 @@ object Version {
     }
   }
 
+  private val VersionR = """(\d+)\.(\d+)\.(.*)""".r
+
+  def fromString(str: String): Option[Version] = {
+    val parsed = allCatch opt {
+      str match {
+        case VersionR(major, minor, rest) => (ReleaseSeries(major.toInt, minor.toInt), rest)
+      }
+    }
+    
+    for {
+      (series, rest) <- parsed
+      relative <- Relative.fromString(rest)
+    } yield Version(series, relative)
+  }
+
   case class Relative(value: Int, suffix: Suffix) {
     def id = suffix.id.fold(value.toString)(s => s"$value-$s")
+
+    def isStable: Boolean =
+      value > 0 || suffix == Final
   }
 
   sealed trait Suffix {
@@ -42,4 +60,8 @@ object Version {
 
 case class Version(series: ReleaseSeries, relative: Version.Relative) {
   def id = s"${series.id}.${relative.id}"
+
+  def compatible(that: Version) =
+    (this.series == that.series) && this.relative.isStable && that.relative.isStable
+      
 }
