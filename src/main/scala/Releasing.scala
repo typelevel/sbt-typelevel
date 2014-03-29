@@ -29,11 +29,12 @@ object Releasing {
     )
 
     val publish: Seq[ReleaseStep] = List(
-      publishSignedArtifacts
+      publishArtifacts
     )
 
     val post: Seq[ReleaseStep] = List(
       setNextVersion,
+      setMimaVersion,
       commitNextVersion
     )
   }
@@ -90,12 +91,28 @@ object Releasing {
   val setReleaseVersion: ReleaseStep = setVersions(_._1)
   val setNextVersion: ReleaseStep = setVersions(_._2)
 
+  val setMimaVersion: ReleaseStep = { st: State =>
+    val extracted = Project.extract(st)
 
-  val publishSignedArtifacts: ReleaseStep = ReleaseStep(
+    val file = extracted.get(versionFile)
+    val (version, _) = st.get(versions).getOrElse(sys.error("versions must be set"))
+
+    val contents = s"""|
+    |TypelevelKeys.lastRelease in ThisBuild := $version
+    |""".stripMargin
+
+    IO.write(file, contents, append = true)
+
+    reapply(Seq(TypelevelKeys.lastRelease in ThisBuild := version), st)
+  }
+
+
+  val publishArtifacts: ReleaseStep = ReleaseStep(
     action = st => {
       val extracted = Project.extract(st)
       val ref = extracted.get(thisProjectRef)
-      extracted.runAggregated(publishSigned in Global in ref, st)
+      val task = if (extracted.get(TypelevelKeys.signArtifacts)) publishSigned else publish
+      extracted.runAggregated(task in ref, st)
     },
     check = st => {
       // getPublishTo fails if no publish repository is set up.

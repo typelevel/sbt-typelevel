@@ -12,4 +12,6 @@ object TypelevelKeys {
   // can be left unset
   lazy val lastRelease = SettingKey[Version.Relative]("last-release", "The last release in the series of this branch")
 
+  lazy val signArtifacts = SettingKey[Boolean]("sign-artifacts", "Sign artifacts before publishing")
+
 }
