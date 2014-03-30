@@ -7,6 +7,8 @@ import sbtrelease.ReleasePlugin
 import sbtrelease.ReleasePlugin.ReleaseKeys
 import com.typesafe.tools.mima.plugin.{MimaPlugin, MimaKeys}
 import net.virtualvoid.sbt.graph.{Plugin => GraphPlugin}
+import sbtbuildinfo.{Plugin => BuildInfoPlugin}
+import sbtbuildinfo.Plugin.BuildInfoKey
 
 import Releasing.Stages
 
@@ -103,7 +105,17 @@ object TypelevelPlugin extends Plugin {
             Seq()
         }
       }
+    )
 
+  def typelevelMainModuleSettings: Seq[Def.Setting[_]] =
+    BuildInfoPlugin.buildInfoSettings ++
+    List(
+      sourceGenerators in Compile <+= BuildInfoPlugin.buildInfo,
+      BuildInfoPlugin.buildInfoKeys ++= List[BuildInfoKey](
+        scalaBinaryVersion,
+        ("vcsHash", ReleaseKeys.versionControlSystem.value.map(_.currentHash))
+      ),
+      BuildInfoPlugin.buildInfoPackage := name.value
     )
 
 }

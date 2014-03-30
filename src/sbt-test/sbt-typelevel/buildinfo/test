@@ -1,0 +1,12 @@
+> test
+
+$ exec git init
+$ exec git config user.email "typelevel@example.org"
+$ exec git config user.name "Typelevel"
+$ exec git add -A
+$ exec git commit -m init
+
+$ copy-file new/package.scala src/main/scala/package.scala
+
+> reload
+> test
