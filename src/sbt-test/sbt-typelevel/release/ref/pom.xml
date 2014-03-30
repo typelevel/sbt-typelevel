@@ -5,7 +5,7 @@
     <artifactId>release_2.10</artifactId>
     <packaging>jar</packaging>
     <description>release</description>
-    <version>2.3.4</version>
+    <version>2.3.0</version>
     <name>release</name>
     <organization>
         <name>org.example</name>

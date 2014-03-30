@@ -69,7 +69,12 @@ object TypelevelPlugin extends Plugin {
     List(
       version in ThisBuild :=
         Version(TypelevelKeys.series.value, TypelevelKeys.relativeVersion.value).id,
-      TypelevelKeys.stability := Stability.Development,
+      TypelevelKeys.stability := {
+        if (TypelevelKeys.relativeVersion.value.isStable)
+          Stability.Stable
+        else
+          Stability.Development
+      },
 
       TypelevelKeys.signArtifacts :=
         TypelevelKeys.relativeVersion.value.suffix != Version.Snapshot,

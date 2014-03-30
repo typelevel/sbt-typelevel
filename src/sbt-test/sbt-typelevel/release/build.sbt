@@ -15,8 +15,6 @@ crossScalaVersions := Seq("2.9.3", "2.10.3")
 
 typelevelDefaultSettings
 
-TypelevelKeys.stability := Stability.Stable
-
 TypelevelKeys.signArtifacts := false
 
 TypelevelKeys.githubDevs += Developer("Lars Hupel", "larsrh")
@@ -24,7 +22,7 @@ TypelevelKeys.githubDevs += Developer("Lars Hupel", "larsrh")
 TypelevelKeys.githubProject := ("typelevel", "sbt-typelevel")
 
 val testVersions = List[sbtrelease.ReleaseStep]({ st: State =>
-  st.put(Releasing.versions, ((TVersion.Relative(4, TVersion.Final), TVersion.Relative(5, TVersion.Snapshot))))
+  st.put(Releasing.versions, ((TVersion.Relative(0, TVersion.Final), TVersion.Relative(1, TVersion.Snapshot))))
 })
 
 ReleaseKeys.releaseProcess :=

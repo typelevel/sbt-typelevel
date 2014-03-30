@@ -8,15 +8,15 @@ $ exec git commit -m init
 
 > reload
 > release cross
-$ exists repo/org/example/release_2.10/2.3.4/release_2.10-2.3.4.jar
-$ exists repo/org/example/release_2.9.3/2.3.4/release_2.9.3-2.3.4.jar
+$ exists repo/org/example/release_2.10/2.3.0/release_2.10-2.3.0.jar
+$ exists repo/org/example/release_2.9.3/2.3.0/release_2.9.3-2.3.0.jar
 
-$ exec cmp ref/pom.xml repo/org/example/release_2.10/2.3.4/release_2.10-2.3.4.pom
+$ exec cmp ref/pom.xml repo/org/example/release_2.10/2.3.0/release_2.10-2.3.0.pom
 
 $ exec cmp ref/version.sbt version.sbt
 
 > publish
-$ exists repo/org/example/release_2.10/2.3.5-SNAPSHOT/release_2.10-2.3.5-SNAPSHOT.jar
+$ exists repo/org/example/release_2.10/2.3.1-SNAPSHOT/release_2.10-2.3.1-SNAPSHOT.jar
 
 $ copy-file new/A.scala A.scala
 -> mimaReportBinaryIssues
