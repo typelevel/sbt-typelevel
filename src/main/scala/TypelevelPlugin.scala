@@ -101,6 +101,12 @@ object TypelevelPlugin extends Plugin {
         }
       },
 
+      MimaKeys.reportBinaryIssues := {
+        if (TypelevelKeys.stability.value == Stability.Stable && MimaKeys.previousArtifact.value == None)
+          streams.value.log.warn("Suspicious `previousArtifact` setting: no previous artifact set, but branch is stable")
+        MimaKeys.reportBinaryIssues.value
+      },
+
       TypelevelKeys.githubDevs := List(),
       pomExtra := pomExtra.value ++ {
         <developers>
