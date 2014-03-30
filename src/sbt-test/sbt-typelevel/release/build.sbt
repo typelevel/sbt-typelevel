@@ -21,6 +21,10 @@ TypelevelKeys.stability := Stability.Stable
 
 TypelevelKeys.signArtifacts := false
 
+TypelevelKeys.githubDevs += Developer("Lars Hupel", "larsrh")
+
+TypelevelKeys.githubProject := ("typelevel", "sbt-typelevel")
+
 val testVersions = List[sbtrelease.ReleaseStep]({ st: State =>
   st.put(Releasing.versions, ((TVersion.Relative(4, TVersion.Final), TVersion.Relative(5, TVersion.Snapshot))))
 })

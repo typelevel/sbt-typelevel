@@ -11,6 +11,8 @@ $ exec git commit -m init
 $ exists repo/org/example/release_2.10/2.3.4/release_2.10-2.3.4.jar
 $ exists repo/org/example/release_2.9.3/2.3.4/release_2.9.3-2.3.4.jar
 
+$ exec cmp ref/pom.xml repo/org/example/release_2.10/2.3.4/release_2.10-2.3.4.pom
+
 > publish
 $ exists repo/org/example/release_2.10/2.3.5-SNAPSHOT/release_2.10-2.3.5-SNAPSHOT.jar
 

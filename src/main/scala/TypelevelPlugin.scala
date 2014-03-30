@@ -32,10 +32,17 @@ object TypelevelPlugin extends Plugin {
       SettingKey[Boolean]("signArtifacts", "Sign artifacts before publishing")
 
     lazy val knownDependencies =
-      SettingKey[List[Dependency]]("knownDependencies", "List of dependencies known to satisfy binary compatibility")
+      SettingKey[Seq[Dependency]]("knownDependencies", "List of dependencies known to satisfy binary compatibility")
 
     lazy val checkDependencies =
       TaskKey[Unit]("checkDependencies", "Check that there are no conflicting dependencies")
+
+    lazy val githubDevs =
+      SettingKey[Seq[Developer]]("githubDevs", "Developers of this project")
+
+    // can be left unset
+    lazy val githubProject =
+      SettingKey[(String, String)]("githubProject", "User/organization and project name")
 
   }
 
@@ -74,10 +81,29 @@ object TypelevelPlugin extends Plugin {
       TypelevelKeys.knownDependencies := Dependencies.known.all,
       TypelevelKeys.checkDependencies :=
         Dependencies.check(
-          TypelevelKeys.knownDependencies.value,
+          TypelevelKeys.knownDependencies.value.toList,
           streams.value.log,
           (GraphPlugin.moduleGraph in Compile).value.nodes
-        )
+        ),
+
+      TypelevelKeys.githubDevs := List(),
+      pomExtra := pomExtra.value ++ {
+        <developers>
+          { TypelevelKeys.githubDevs.value.map(_.pomExtra) }
+        </developers>
+      } ++ {
+        TypelevelKeys.githubProject.?.value match {
+          case Some((org, project)) =>
+            <scm>
+              <connection>scm:git:github.com/{ org }/{ project }.git</connection>
+              <developerConnection>scm:git:git@github.com:{ org }/{ project }.git</developerConnection>
+              <url>https://github.com/{ org }/{ project }</url>
+            </scm>
+          case None =>
+            Seq()
+        }
+      }
+
     )
 
 }
