@@ -6,8 +6,6 @@ organization := "org.example"
 
 name := "release"
 
-publishTo := Some(Resolver.file("repo", new File("./repo")))
-
 resolvers := Seq("r-repo" at s"file://${System.getProperty("user.dir")}/repo")
 
 scalaVersion := "2.10.3"
@@ -35,3 +33,5 @@ ReleaseKeys.releaseProcess :=
   Stages.pre ++
   Stages.publish ++
   Stages.post
+
+publishTo := Some(Resolver.file("repo", new File("./repo")))

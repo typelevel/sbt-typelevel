@@ -9,6 +9,7 @@ import com.typesafe.tools.mima.plugin.{MimaPlugin, MimaKeys}
 import net.virtualvoid.sbt.graph.{Plugin => GraphPlugin}
 import sbtbuildinfo.{Plugin => BuildInfoPlugin}
 import sbtbuildinfo.Plugin.BuildInfoKey
+import xerial.sbt.{Sonatype => SonatypePlugin}
 
 import Releasing.Stages
 
@@ -52,6 +53,7 @@ object TypelevelPlugin extends Plugin {
     ReleasePlugin.releaseSettings ++
     MimaPlugin.mimaDefaultSettings ++
     GraphPlugin.graphSettings ++
+    SonatypePlugin.sonatypeSettings ++
     List(
       version in ThisBuild :=
         Version(TypelevelKeys.series.value, TypelevelKeys.relativeVersion.value).id,
@@ -104,7 +106,16 @@ object TypelevelPlugin extends Plugin {
           case None =>
             Seq()
         }
-      }
+      },
+
+      publishMavenStyle := true,
+      publishArtifact in Test := false,
+
+      credentials ++= {
+        Publishing.fromFile orElse
+        Publishing.fromUserPass orElse
+        Publishing.fromFallbackFile
+      }.toList
     )
 
   def typelevelMainModuleSettings: Seq[Def.Setting[_]] =
