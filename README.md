@@ -40,7 +40,7 @@ addSbtPlugin("org.typelevel" % "sbt-typelevel" % "0.1-SNAPSHOT")
 ```
 
 
-The plugin provides three settings, which you can add to your `build.sbt`:
+The plugin provides three settings, which you can add to your `build.sbt`. *Read this carefully in order to not bloat your build or produce conflicts with other plugins.*
 
 ```scala
 // useful if you're just consuming libraries, but don't publish yourself,
@@ -56,11 +56,13 @@ typelevelDefaultSettings
 typelevelMainModuleSettings
 ```
 
+*If in doubt, only use `typelevelConsumerSettings`.*
+
 Please read on for further instructions, since some of these settings require additional settings to work properly.
 
 ### Versioning & Releasing
 
-If you choose to us `typelevelDefaultSettings`, the version number of your project will be computed from a release series and a patch number. It is expected that these settings live in a file `version.sbt` in the root of your project.
+If you choose to use `typelevelDefaultSettings`, the version number of your project will be computed from a release series and a patch number. It is expected that these settings live in a file `version.sbt` in the root of your project:
 
 ```scala
 import org.typelevel.sbt.ReleaseSeries
@@ -72,6 +74,7 @@ TypelevelKeys.relativeVersion in ThisBuild := Relative(0,Snapshot)
 ```
 
 By default, the `release` command will perform the following steps:
+
 1. Check if all dependencies are non-`SNAPSHOT`.
 2. Run tests.
 3. Ask for the patch number of the version which is to be released, and the following patch number.
@@ -87,10 +90,10 @@ Note that this will not automatically push the two commits and the tag to the re
 If you don't want tests to run, pass the `skip-tests` option to `release`. If you're publishing a cross-Scala-versioned project, pass the `cross` option to `release`. Both options can be combined:
 
 ```
-release skip-tests cross
+sbt> release skip-tests cross
 ```
 
-Typically, after a release, the `Version.sbt` file will look like this:
+Typically, after a release, the `version.sbt` file will look like this:
 
 ```scala
 import org.typelevel.sbt.ReleaseSeries
@@ -120,6 +123,7 @@ libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.10.0"
 Then, the plugin will tell you:
 
 ```
+sbt> checkDependencies
 [info] Compatible versions in org.scalacheck#scalacheck_2.10: 1.10.0 and 1.10.1
 [info] Compatible versions in org.scala-lang#scala-library: 2.10.1 and 2.10.3
 ```
@@ -129,6 +133,7 @@ It can do that because it knows that both the Scala library and Scalacheck adher
 However, changing the Scalacheck version to `1.11.0` will print:
 
 ```
+sbt> checkDependencies
 [error] Version mismatch in org.scalacheck#scalacheck_2.10: 1.10.1 and 1.11.0 are different
 [info] Compatible versions in org.scala-lang#scala-library: 2.10.1 and 2.10.3
 [error] (*:checkDependencies) Dependency check failed, found 1 version mismatch(es)
