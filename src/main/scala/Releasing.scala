@@ -10,6 +10,8 @@ import sbtrelease.ReleasePlugin._
 import sbtrelease.ReleasePlugin.ReleaseKeys._
 import sbtrelease.ReleaseStateTransformations._
 
+import org.typelevel.sbt.TypelevelPlugin.TypelevelKeys
+
 object Releasing {
 
   object Stages {
@@ -65,8 +67,7 @@ object Releasing {
     val series = extracted.get(TypelevelKeys.series)
 
     val contents = s"""|
-    |import org.typelevel.sbt._
-    |import org.typelevel.sbt.ReleaseSeries._
+    |import org.typelevel.sbt.ReleaseSeries
     |import org.typelevel.sbt.Version._
     |
     |TypelevelKeys.series in ThisBuild := $series

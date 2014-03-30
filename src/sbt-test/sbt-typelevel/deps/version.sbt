@@ -1,6 +1,5 @@
 
-import org.typelevel.sbt._
-import org.typelevel.sbt.ReleaseSeries._
+import org.typelevel.sbt.ReleaseSeries
 import org.typelevel.sbt.Version._
 
 TypelevelKeys.series in ThisBuild := ReleaseSeries(2,3)
