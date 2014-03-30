@@ -49,11 +49,23 @@ object TypelevelPlugin extends Plugin {
 
   }
 
+  def typelevelConsumerSettings: Seq[Def.Setting[_]] =
+    GraphPlugin.graphSettings ++
+    List(
+      TypelevelKeys.knownDependencies := Dependencies.known.all,
+      TypelevelKeys.checkDependencies :=
+        Dependencies.check(
+          TypelevelKeys.knownDependencies.value.toList,
+          streams.value.log,
+          (GraphPlugin.moduleGraph in Compile).value.nodes
+        )
+    )
+
   def typelevelDefaultSettings: Seq[Def.Setting[_]] =
     ReleasePlugin.releaseSettings ++
     MimaPlugin.mimaDefaultSettings ++
-    GraphPlugin.graphSettings ++
     SonatypePlugin.sonatypeSettings ++
+    typelevelConsumerSettings ++
     List(
       version in ThisBuild :=
         Version(TypelevelKeys.series.value, TypelevelKeys.relativeVersion.value).id,
@@ -81,14 +93,6 @@ object TypelevelPlugin extends Plugin {
             None
         }
       },
-
-      TypelevelKeys.knownDependencies := Dependencies.known.all,
-      TypelevelKeys.checkDependencies :=
-        Dependencies.check(
-          TypelevelKeys.knownDependencies.value.toList,
-          streams.value.log,
-          (GraphPlugin.moduleGraph in Compile).value.nodes
-        ),
 
       TypelevelKeys.githubDevs := List(),
       pomExtra := pomExtra.value ++ {
@@ -118,7 +122,8 @@ object TypelevelPlugin extends Plugin {
       }.toList
     )
 
-  def typelevelMainModuleSettings: Seq[Def.Setting[_]] =
+  def typelevelBuildInfoSettings: Seq[Def.Setting[_]] =
+    ReleasePlugin.releaseSettings ++
     BuildInfoPlugin.buildInfoSettings ++
     List(
       sourceGenerators in Compile <+= BuildInfoPlugin.buildInfo,

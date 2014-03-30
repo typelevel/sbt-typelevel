@@ -9,7 +9,7 @@ object BuildInfoTest extends Properties("buildinfo") {
     property(str) = { accessor(BuildInfo) ?= ref }
 
   field("name", "binfo") { _.name }
-  field("version", "2.3.4-SNAPSHOT") { _.version }
+  field("version", "0.1-SNAPSHOT") { _.version }
   field("scalaVersion", "2.10.3") { _.scalaVersion }
   field("sbtVersion", "0.13.1") { _.sbtVersion }
   field("scalaBinaryVersion", "2.10") { _.scalaBinaryVersion }
