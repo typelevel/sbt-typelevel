@@ -6,6 +6,7 @@ $ exec git config user.name "Typelevel"
 $ exec git add -A
 $ exec git commit -m init
 
+> reload
 > release cross
 $ exists repo/org/example/release_2.10/2.3.4/release_2.10-2.3.4.jar
 $ exists repo/org/example/release_2.9.3/2.3.4/release_2.9.3-2.3.4.jar
