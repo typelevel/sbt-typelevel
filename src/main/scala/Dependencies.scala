@@ -1,14 +1,13 @@
 package org.typelevel.sbt
 
 import sbt._
-import sbt.impl.GroupArtifactID
 
 import net.virtualvoid.sbt.graph.IvyGraphMLDependencies.{Module, ModuleId}
 
 object Dependencies {
 
   object known {
-    val scala = Dependency("org.scala-lang", "scala-library", ReleaseSeries(2, 10))
+    val scala = Dependency("org.scala-lang", "scala-library", ReleaseSeries(2, 10), false)
 
     private def scalaz(module: String) = Dependency("org.scalaz", s"scalaz-$module", ReleaseSeries(7, 0))
     val scalazCore = scalaz("core")
@@ -20,17 +19,15 @@ object Dependencies {
     val all = List(scala, scalazCore, scalazScalacheckBinding, scodec, scalacheck)
   }
 
-  def findFromIDs(all: List[Dependency], groupID: String, rawArtifactID: String): Option[Dependency] = {
-    val ScalaSuffix = """(.*)_[.0-9]*""".r
-    val artifactID = rawArtifactID match {
-      case ScalaSuffix(artifactID) => artifactID
-      case _ => rawArtifactID
+  def findFromIDs(all: List[Dependency], groupID: String, rawArtifactID: String): Option[Dependency] =
+    all.filter(_.matches(groupID, rawArtifactID)) match {
+      case head :: Nil => Some(head)
+      case Nil => None
+      case _ => sys.error(s"Internal error: found more than one match for $groupID:$rawArtifactID; check your `knownDependencies` setting")
     }
-    all.find(d => d.groupID == groupID && d.artifactID == artifactID)
-  }
 
   def check(all: List[Dependency], logger: Logger, modules: Seq[Module]) = {
-    val problems = modules.collect {
+    val notices = modules.collect {
       case Module(ModuleId(groupID, artifactID, olderV), _, _, Some(newerV), _) =>
         val msg = s"Version mismatch in $groupID#$artifactID: $olderV and $newerV are different"
 
@@ -38,29 +35,39 @@ object Dependencies {
           case Some(dep) =>
             (Version.fromString(olderV), Version.fromString(newerV)) match {
               case (Some(o), Some(n)) =>
-                if (dep.minCompatible <= o.series && o.compatible(n)) {
-                  logger.info(s"Compatible versions in $groupID#$artifactID: $olderV and $newerV")
-                  false
-                }
-                else {
-                  logger.error(msg)
-                  true
-                }
+                if (dep.minCompatible <= o.series && o.compatible(n))
+                  Right(s"Compatible versions in $groupID#$artifactID: $olderV and $newerV")
+                else
+                  Left(msg)
               case _ =>
-                logger.error(msg + ", and version numbers cannot be parsed")
-                true
+                Left("$msg, and version numbers cannot be parsed")
             }
           case None =>
-            logger.error(msg + ", and no dependency information available")
-            true
+            Left(s"$msg, and no dependency information available")
         }
     }
 
-    val count = problems.filter(identity).length
+    notices.foreach(_.fold(logger.error(_), logger.info(_)))
+
+    val count = notices.filter(_.isLeft).length
     if (count > 0)
       sys.error(s"Dependency check failed, found $count version mismatch(es)")
   }
 
 }
 
-case class Dependency(groupID: String, artifactID: String, minCompatible: ReleaseSeries)
+case class Dependency(groupID: String, artifactID: String, minCompatible: ReleaseSeries, scalaSuffix: Boolean = true) {
+
+  def matches(thatGroupID: String, thatArtifactID: String): Boolean = {
+    val ScalaSuffix = """(.*)_[.0-9]*""".r
+    if (groupID != thatGroupID)
+      false
+    else
+      thatArtifactID match {
+        case ScalaSuffix(`artifactID`) if scalaSuffix => true
+        case `artifactID` if !scalaSuffix => true
+        case _ => false
+      }
+  }
+
+}
