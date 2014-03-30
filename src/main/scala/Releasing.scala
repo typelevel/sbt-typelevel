@@ -54,8 +54,8 @@ object Releasing {
 
     st.log.info(s"Current version is: ${extracted.get(version)}")
 
-    val releaseV = readVersion("Release version: ")
-    val nextV = readVersion("Next version: ")
+    val releaseV = readVersion("Release (relative) version: ")
+    val nextV = readVersion("Next (relative) version: ")
 
     st.put(versions, (releaseV, nextV))
   }
@@ -95,16 +95,23 @@ object Releasing {
   val setMimaVersion: ReleaseStep = { st: State =>
     val extracted = Project.extract(st)
 
-    val file = extracted.get(versionFile)
-    val (version, _) = st.get(versions).getOrElse(sys.error("versions must be set"))
+    extracted.get(TypelevelKeys.stability) match {
+      case Stability.Stable =>
+        val file = extracted.get(versionFile)
+        val (version, _) = st.get(versions).getOrElse(sys.error("versions must be set"))
 
-    val contents = s"""|
-    |TypelevelKeys.lastRelease in ThisBuild := $version
-    |""".stripMargin
+        val contents = s"""|
+        |TypelevelKeys.lastRelease in ThisBuild := $version
+        |""".stripMargin
 
-    IO.write(file, contents, append = true)
+        IO.write(file, contents, append = true)
 
-    reapply(Seq(TypelevelKeys.lastRelease in ThisBuild := version), st)
+        reapply(Seq(TypelevelKeys.lastRelease in ThisBuild := version), st)
+
+      case Stability.Development =>
+        st.log.info("Unstable branch; not setting `lastRelease`")
+        st
+    }
   }
 
 

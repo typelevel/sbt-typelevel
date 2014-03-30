@@ -71,7 +71,9 @@ object TypelevelPlugin extends Plugin {
         Version(TypelevelKeys.series.value, TypelevelKeys.relativeVersion.value).id,
       TypelevelKeys.stability := Stability.Development,
 
-      TypelevelKeys.signArtifacts := true,
+      TypelevelKeys.signArtifacts :=
+        TypelevelKeys.relativeVersion.value.suffix != Version.Snapshot,
+
       ReleaseKeys.releaseProcess :=
         Stages.checks ++
         Stages.versions ++
