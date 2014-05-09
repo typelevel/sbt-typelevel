@@ -6,6 +6,10 @@ organization := "org.typelevel"
 
 version := "0.1-SNAPSHOT"
 
+licenses := Seq("Apache 2" → url("https://www.apache.org/licenses/LICENSE-2.0.html"))
+
+homepage := Some(url("http://typelevel.org/"))
+
 // This is both a plugin and a meta-plugin
 
 addSbtPlugin("com.typesafe.sbt" % "sbt-pgp" % "0.8.1")
