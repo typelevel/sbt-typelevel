@@ -19,3 +19,33 @@ addSbtPlugin("net.virtual-void" % "sbt-dependency-graph" % "0.7.4")
 addSbtPlugin("com.eed3si9n" % "sbt-buildinfo" % "0.3.1")
 
 addSbtPlugin("org.xerial.sbt" % "sbt-sonatype" % "0.2.1")
+
+// Publishing
+
+publishTo <<= (version).apply { v =>
+  val nexus = "https://oss.sonatype.org/"
+  if (v.trim.endsWith("SNAPSHOT"))
+    Some("Snapshots" at nexus + "content/repositories/snapshots")
+  else
+    Some("Releases" at nexus + "service/local/staging/deploy/maven2")
+}
+
+credentials += Credentials(
+  Option(System.getProperty("build.publish.credentials")) map (new File(_)) getOrElse (Path.userHome / ".ivy2" / ".credentials")
+)
+
+pomIncludeRepository := Function.const(false)
+
+pomExtra := (
+  <scm>
+    <url>https://github.com/typelevel/sbt-typelevel</url>
+    <connection>scm:git:git://github.com/typelevel/sbt-typelevel.git</connection>
+  </scm>
+  <developers>
+    <developer>
+      <id>larsrh</id>
+      <name>Lars Hupel</name>
+      <url>https://github.com/larsrh</url>
+    </developer>
+  </developers>
+)
