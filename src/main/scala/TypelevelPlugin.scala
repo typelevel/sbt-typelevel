@@ -51,15 +51,8 @@ object TypelevelPlugin extends Plugin {
 
   def typelevelConsumerSettings: Seq[Def.Setting[_]] =
     GraphPlugin.graphSettings ++
-    List(
-      TypelevelKeys.knownDependencies := Dependencies.known.all,
-      TypelevelKeys.checkDependencies :=
-        Dependencies.check(
-          TypelevelKeys.knownDependencies.value.toList,
-          streams.value.log,
-          (GraphPlugin.moduleGraph in Compile).value.nodes
-        )
-    )
+    List(TypelevelKeys.knownDependencies := Dependencies.known.all) ++
+    List(Compile, Test, Runtime, Provided, Optional).flatMap(Dependencies.checkSettings)
 
   def typelevelDefaultSettings: Seq[Def.Setting[_]] =
     ReleasePlugin.releaseSettings ++

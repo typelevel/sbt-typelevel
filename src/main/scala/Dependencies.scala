@@ -1,7 +1,11 @@
 package org.typelevel.sbt
 
 import sbt._
+import sbt.Keys._
 
+import org.typelevel.sbt.TypelevelPlugin.TypelevelKeys
+
+import net.virtualvoid.sbt.graph.{Plugin => GraphPlugin}
 import net.virtualvoid.sbt.graph.IvyGraphMLDependencies.{Module, ModuleId}
 
 object Dependencies {
@@ -53,6 +57,15 @@ object Dependencies {
     if (count > 0)
       sys.error(s"Dependency check failed, found $count version mismatch(es)")
   }
+
+  def checkSettings(config: Configuration) = inConfig(config)(seq(
+    TypelevelKeys.checkDependencies :=
+      check(
+        TypelevelKeys.knownDependencies.value.toList,
+        streams.value.log,
+        GraphPlugin.moduleGraph.value.nodes
+      )
+  ))
 
 }
 
