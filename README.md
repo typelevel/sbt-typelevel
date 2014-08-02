@@ -33,10 +33,10 @@ Because of that, `sbt-typelevel` is a meta-plugin and pulls in the following plu
 Usage
 -----
 
-`sbt-typelevel` is not published yet. To use it locally, perform `sbt publishLocal`. Then, add it to your `project/plugins.sbt`:
+`sbt-typelevel` is available for SBT 0.13.x. To use it, add it to your `project/plugins.sbt`:
 
 ```scala
-addSbtPlugin("org.typelevel" % "sbt-typelevel" % "0.1-SNAPSHOT")
+addSbtPlugin("org.typelevel" % "sbt-typelevel" % "0.2")
 ```
 
 
