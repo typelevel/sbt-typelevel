@@ -69,6 +69,7 @@ object TypelevelPlugin extends Plugin {
     List(
       version in ThisBuild :=
         Version(TypelevelKeys.series.value, TypelevelKeys.relativeVersion.value).id,
+
       TypelevelKeys.stability := {
         if (TypelevelKeys.relativeVersion.value.isStable)
           Stability.Stable
@@ -78,6 +79,24 @@ object TypelevelPlugin extends Plugin {
 
       TypelevelKeys.signArtifacts :=
         TypelevelKeys.relativeVersion.value.suffix != Version.Snapshot,
+
+      scalacOptions in (Compile, doc) ++= {
+        (for {
+          (org, project) <- TypelevelKeys.githubProject.?.value
+          vcs <- ReleaseKeys.versionControlSystem.value
+        } yield {
+          val tagOrBranch =
+            if (version.value endsWith "SNAPSHOT")
+              vcs.currentHash
+            else
+              "v" + version.value
+
+          Seq(
+            "-sourcepath", vcs.baseDir.getAbsolutePath(),
+            "-doc-source-url", s"https://github.com/$org/$project/blob/$tagOrBranch€{FILE_PATH}.scala"
+          )
+        }).getOrElse(Seq())
+      },
 
       ReleaseKeys.releaseProcess :=
         Stages.checks ++
@@ -108,6 +127,7 @@ object TypelevelPlugin extends Plugin {
       },
 
       TypelevelKeys.githubDevs := List(),
+
       pomExtra := pomExtra.value ++ {
         <developers>
           { TypelevelKeys.githubDevs.value.map(_.pomExtra) }
@@ -127,6 +147,7 @@ object TypelevelPlugin extends Plugin {
 
       publishMavenStyle := true,
       publishArtifact in Test := false,
+      pomIncludeRepository := Function.const(false),
 
       credentials ++= {
         Publishing.fromFile orElse

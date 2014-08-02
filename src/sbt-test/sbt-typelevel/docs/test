@@ -1,0 +1,27 @@
+> doc
+
+$ exec grep --silent --invert -F "github" target/scala-2.10/api/Code.html
+
+> clean
+
+
+$ exec git init
+$ exec git config user.email "typelevel@example.org"
+$ exec git config user.name "Typelevel"
+$ exec git add -A
+$ exec git commit -m init
+
+> reload
+> doc
+
+$ exec grep --silent -E "[0-9a-f]{40}" target/scala-2.10/api/Code.html
+
+> clean
+
+
+$ copy-file new/version.sbt version.sbt
+
+> reload
+> doc
+
+$ exec grep --silent -F "v2.3.0" target/scala-2.10/api/Code.html
