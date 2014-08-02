@@ -106,6 +106,18 @@ TypelevelKeys.relativeVersion in ThisBuild := Relative(1,Snapshot)
 TypelevelKeys.lastRelease in ThisBuild := Relative(0,Final)
 ```
 
+### Scaladoc
+
+If you're hosting your project on GitHub, this plugin can automatically instruct Scaladoc to link to the sources.
+
+```scala
+// (user name, repository name)
+TypelevelKeys.githubProject := ("example", "example-docs")
+```
+
+A released version (i.e. not a snapshot version) will link to the appropriate tag (which is assumed to be of the form `v0.1.2`).
+Snapshot versions will be linked using their commit hash.
+
 ### Binary compatibility
 
 To check if there are any problems with binary compatibility, run the command `mimaReportBinaryIssues`. This will work out of the box, no configuration needed.
@@ -141,10 +153,17 @@ sbt> checkDependencies
 
 It is important that you do not overwrite the `conflictManager` key in SBT. It will only give reliable results with the `latest` strategy, which is enabled by default.
 
+Make sure to run `checkDependencies` in all relevant configurations, e.g. for your test dependencies:
+
+```
+sbt> test:checkDependencies
+```
+
+By default, it will only check the `compile` configuration.
+
 
 Limitations
 -----------
 
 * The `typelevelConsumerSettings` pull the `release` command into your build, but it is not configured properly. You don't have to use that command.
-* The `checkDependencies` task will *only* check `compile` dependencies, but not `test` dependencies.
 * Both the build info and the releasing will only work if you're using either Git or Mercurial.
