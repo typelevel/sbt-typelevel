@@ -11,7 +11,7 @@ object BuildInfoTest extends Properties("buildinfo") {
   field("name", "binfo") { _.name }
   field("version", "0.1-SNAPSHOT") { _.version }
   field("scalaVersion", "2.10.3") { _.scalaVersion }
-  field("sbtVersion", "0.13.1") { _.sbtVersion }
+  field("sbtVersion", "0.13.5") { _.sbtVersion }
   field("scalaBinaryVersion", "2.10") { _.scalaBinaryVersion }
   field("vcsHash", vcsHash) { _.vcsHash }
 }

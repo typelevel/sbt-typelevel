@@ -10,6 +10,8 @@ licenses := Seq("Apache 2" → url("https://www.apache.org/licenses/LICENSE-2.0.
 
 homepage := Some(url("http://typelevel.org/"))
 
+resolvers += Resolver.sonatypeRepo("releases")
+
 // This is both a plugin and a meta-plugin
 
 addSbtPlugin("com.typesafe.sbt" % "sbt-pgp" % "0.8.1")
