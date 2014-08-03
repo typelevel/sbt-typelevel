@@ -36,7 +36,7 @@ Usage
 `sbt-typelevel` is available for SBT 0.13.x. To use it, add it to your `project/plugins.sbt`:
 
 ```scala
-addSbtPlugin("org.typelevel" % "sbt-typelevel" % "0.2")
+addSbtPlugin("org.typelevel" % "sbt-typelevel" % "0.2.1")
 ```
 
 
