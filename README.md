@@ -53,7 +53,7 @@ typelevelDefaultSettings
 
 // should only be used for one submodule in the build
 // configures `sbt-buildinfo`
-typelevelMainModuleSettings
+typelevelBuildInfoSettings
 ```
 
 *If in doubt, only use `typelevelConsumerSettings`.*
