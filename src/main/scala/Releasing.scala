@@ -72,7 +72,7 @@ object Releasing {
         st.log.info("Not bumping release series")
         (releaseS, readVersion("Next (relative) version: "))
       case Some(series) =>
-        st.log.info("Bumping release series to ${series.id}, setting next relative version to 0-SNAPSHOT")
+        st.log.info(s"Bumping release series to ${series.id}, setting next relative version to 0-SNAPSHOT")
         (series, Version.Relative(0, Version.Snapshot))
     }
 
