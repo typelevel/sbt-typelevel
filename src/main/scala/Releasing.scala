@@ -43,50 +43,70 @@ object Releasing {
 
   lazy val versions = AttributeKey[Versions]("typelevel-release-versions")
 
+  private def readSeries(prompt: String): Option[ReleaseSeries] =
+    SimpleReader.readLine(prompt) match {
+      case Some(input) =>
+        Some(ReleaseSeries.fromString(input).getOrElse(sys.error("version format error")))
+      case None =>
+        None
+    }
+
   private def readVersion(prompt: String): Version.Relative =
     SimpleReader.readLine(prompt) match {
-      case Some(input) => Version.Relative.fromString(input).getOrElse(sys.error("version format error"))
-      case None => sys.error("no version provided")
+      case Some(input) =>
+        Version.Relative.fromString(input).getOrElse(sys.error("version format error"))
+      case None =>
+        sys.error("no version provided")
     }
 
   val inquireVersions: ReleaseStep = { st: State =>
     val extracted = Project.extract(st)
+    val releaseS = extracted.get(TypelevelKeys.series)
 
     st.log.info(s"Current version is: ${extracted.get(version)}")
 
     val releaseV = readVersion("Release (relative) version: ")
-    val nextV = readVersion("Next (relative) version: ")
 
-    st.put(versions, (releaseV, nextV))
+    val (nextS, nextV) = readSeries(s"Next release series [${releaseS.id}]: ") match {
+      case None =>
+        st.log.info("Not bumping release series")
+        (releaseS, readVersion("Next (relative) version: "))
+      case Some(series) =>
+        st.log.info("Bumping release series to ${series.id}, setting next relative version to 0-SNAPSHOT")
+        (series, Version.Relative(0, Version.Snapshot))
+    }
+
+    st.put(versions, (Version(releaseS, releaseV), Version(nextS, nextV)))
   }
 
-  private def writeVersion(st: State, version: Version.Relative): Unit = {
+  private def writeVersion(st: State, version: Version): Unit = {
     val extracted = Project.extract(st)
 
     val file = extracted.get(versionFile)
-    val series = extracted.get(TypelevelKeys.series)
 
     val contents = s"""|
     |import org.typelevel.sbt.ReleaseSeries
     |import org.typelevel.sbt.Version._
     |
-    |TypelevelKeys.series in ThisBuild := $series
+    |TypelevelKeys.series in ThisBuild := ${version.series}
     |
-    |TypelevelKeys.relativeVersion in ThisBuild := $version
+    |TypelevelKeys.relativeVersion in ThisBuild := ${version.relative}
     |""".stripMargin
 
     IO.write(file, contents, append = false)
   }
 
-  private def setVersions(select: Versions => Version.Relative): ReleaseStep = { st: State =>
+  private def setVersions(select: Versions => Version): ReleaseStep = { st: State =>
     val version = select(st.get(versions).getOrElse(sys.error("versions must be set")))
-    val series = Project.extract(st).get(TypelevelKeys.series)
 
-    st.log.info(s"Setting version to ${series.id}.${version.id}")
+    st.log.info(s"Setting version to ${version.id}")
 
     writeVersion(st, version)
 
-    reapply(Seq(TypelevelKeys.relativeVersion in ThisBuild := version), st)
+    reapply(Seq(
+      TypelevelKeys.series in ThisBuild := version.series,
+      TypelevelKeys.relativeVersion in ThisBuild := version.relative
+    ), st)
   }
 
   val setReleaseVersion: ReleaseStep = setVersions(_._1)
@@ -95,18 +115,23 @@ object Releasing {
   val setMimaVersion: ReleaseStep = { st: State =>
     val extracted = Project.extract(st)
 
+    val (releaseV, nextV) = st.get(versions).getOrElse(sys.error("versions must be set"))
+
     extracted.get(TypelevelKeys.stability) match {
-      case Stability.Stable =>
+      case Stability.Stable if releaseV.series == nextV.series =>
         val file = extracted.get(versionFile)
-        val (version, _) = st.get(versions).getOrElse(sys.error("versions must be set"))
 
         val contents = s"""|
-        |TypelevelKeys.lastRelease in ThisBuild := $version
+        |TypelevelKeys.lastRelease in ThisBuild := ${releaseV.relative}
         |""".stripMargin
 
         IO.write(file, contents, append = true)
 
-        reapply(Seq(TypelevelKeys.lastRelease in ThisBuild := version), st)
+        reapply(Seq(TypelevelKeys.lastRelease in ThisBuild := releaseV.relative), st)
+
+      case Stability.Stable =>
+        st.log.info("Bumped release series; not setting `lastRelease`")
+        st
 
       case Stability.Development =>
         st.log.info("Unstable branch; not setting `lastRelease`")
