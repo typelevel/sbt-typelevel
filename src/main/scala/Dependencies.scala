@@ -11,16 +11,19 @@ import net.virtualvoid.sbt.graph.IvyGraphMLDependencies.{Module, ModuleId}
 object Dependencies {
 
   object known {
-    val scala = Dependency("org.scala-lang", "scala-library", ReleaseSeries(2, 10), false)
+    def scala(module: String) = Dependency("org.scala-lang", s"scala-$module", ReleaseSeries(2, 10), false)
 
-    private def scalaz(module: String) = Dependency("org.scalaz", s"scalaz-$module", ReleaseSeries(7, 0))
-    val scalazCore = scalaz("core")
-    val scalazScalacheckBinding = scalaz("scalacheck-binding")
+    def scalaz(module: String) = Dependency("org.scalaz", s"scalaz-$module", ReleaseSeries(7, 0))
 
     val scodec = Dependency("org.typelevel", "scodec-core", ReleaseSeries(1, 0))
     val scalacheck = Dependency("org.scalacheck", "scalacheck", ReleaseSeries(1, 10))
 
-    val all = List(scala, scalazCore, scalazScalacheckBinding, scodec, scalacheck)
+    val all = List(
+      scala("library"), scala("reflect"),
+      scalaz("core"), scalaz("scalacheck-binding"),
+      scodec,
+      scalacheck
+    )
   }
 
   def findFromIDs(all: List[Dependency], groupID: String, rawArtifactID: String): Option[Dependency] =
