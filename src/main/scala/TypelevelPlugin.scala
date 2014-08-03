@@ -3,7 +3,7 @@ package org.typelevel.sbt
 import sbt._
 import sbt.Keys._
 
-import sbtrelease.ReleasePlugin
+import sbtrelease.{ReleasePlugin, Vcs}
 import sbtrelease.ReleasePlugin.ReleaseKeys
 import com.typesafe.tools.mima.plugin.{MimaPlugin, MimaKeys}
 import net.virtualvoid.sbt.graph.{Plugin => GraphPlugin}
@@ -150,9 +150,9 @@ object TypelevelPlugin extends Plugin {
     )
 
   def typelevelBuildInfoSettings: Seq[Def.Setting[_]] =
-    ReleasePlugin.releaseSettings ++
     BuildInfoPlugin.buildInfoSettings ++
     List(
+      ReleaseKeys.versionControlSystem := Vcs.detect(baseDirectory.value),
       sourceGenerators in Compile <+= BuildInfoPlugin.buildInfo,
       BuildInfoPlugin.buildInfoKeys ++= List[BuildInfoKey](
         scalaBinaryVersion,
