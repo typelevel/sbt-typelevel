@@ -73,7 +73,7 @@ object Releasing {
     st.log.info(s"Current version is: ${extracted.get(version)}")
 
     val defaultReleaseV = Version.Relative(currentV.value, Final)
-    val releaseV = readVersion(s"Release (relative) version [${currentV.value}]: ").getOrElse(defaultReleaseV)
+    val releaseV = readVersion(s"Release (relative) version [${defaultReleaseV.id}]: ").getOrElse(defaultReleaseV)
 
     val (nextS, nextV) = readSeries(s"Next release series [${releaseS.id}]: ") match {
       case None | Some(`releaseS`) =>
