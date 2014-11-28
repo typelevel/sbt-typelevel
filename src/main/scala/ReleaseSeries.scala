@@ -18,4 +18,6 @@ case class ReleaseSeries(major: Int, minor: Int) {
 
   def <=(that: ReleaseSeries) =
     this.major < that.major || (this.major == that.major && this.minor <= that.minor)
+
+  override def toString = s"ReleaseSeries($major, $minor)"
 }

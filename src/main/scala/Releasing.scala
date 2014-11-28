@@ -84,14 +84,13 @@ object Releasing {
 
     val file = extracted.get(versionFile)
 
-    val contents = s"""|
-    |import org.typelevel.sbt.ReleaseSeries
-    |import org.typelevel.sbt.Version._
-    |
-    |TypelevelKeys.series in ThisBuild := ${version.series}
-    |
-    |TypelevelKeys.relativeVersion in ThisBuild := ${version.relative}
-    |""".stripMargin
+    val contents = s"""|import org.typelevel.sbt.ReleaseSeries
+                       |import org.typelevel.sbt.Version._
+                       |
+                       |TypelevelKeys.series in ThisBuild := ${version.series}
+                       |
+                       |TypelevelKeys.relativeVersion in ThisBuild := ${version.relative}
+                       |""".stripMargin
 
     IO.write(file, contents, append = false)
   }
