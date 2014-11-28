@@ -68,7 +68,7 @@ object Releasing {
     val releaseV = readVersion("Release (relative) version: ")
 
     val (nextS, nextV) = readSeries(s"Next release series [${releaseS.id}]: ") match {
-      case None =>
+      case None | Some(`releaseS`) =>
         st.log.info("Not bumping release series")
         (releaseS, readVersion("Next (relative) version: "))
       case Some(series) =>
