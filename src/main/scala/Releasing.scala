@@ -45,6 +45,8 @@ object Releasing {
 
   private def readSeries(prompt: String): Option[ReleaseSeries] =
     SimpleReader.readLine(prompt) match {
+      case Some("") =>
+        None
       case Some(input) =>
         Some(ReleaseSeries.fromString(input).getOrElse(sys.error("version format error")))
       case None =>
