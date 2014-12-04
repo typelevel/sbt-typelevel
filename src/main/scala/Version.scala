@@ -41,6 +41,8 @@ object Version {
 
     def isStable: Boolean =
       value > 0 || suffix == Final
+
+    override def toString = s"Relative($value, $suffix)"
   }
 
   sealed trait Suffix {
