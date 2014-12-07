@@ -11,6 +11,7 @@ import sbtrelease.ReleasePlugin.ReleaseKeys._
 import sbtrelease.ReleaseStateTransformations._
 
 import org.typelevel.sbt.TypelevelPlugin.TypelevelKeys
+import org.typelevel.sbt.Version.{Final, Snapshot}
 
 object Releasing {
 
@@ -45,32 +46,40 @@ object Releasing {
 
   private def readSeries(prompt: String): Option[ReleaseSeries] =
     SimpleReader.readLine(prompt) match {
+      case Some("") =>
+        None
       case Some(input) =>
         Some(ReleaseSeries.fromString(input).getOrElse(sys.error("version format error")))
       case None =>
         None
     }
 
-  private def readVersion(prompt: String): Version.Relative =
+  private def readVersion(prompt: String): Option[Version.Relative] =
     SimpleReader.readLine(prompt) match {
+      case Some("") =>
+        None
       case Some(input) =>
-        Version.Relative.fromString(input).getOrElse(sys.error("version format error"))
+        Some(Version.Relative.fromString(input).getOrElse(sys.error("version format error")))
       case None =>
-        sys.error("no version provided")
+        None
     }
 
   val inquireVersions: ReleaseStep = { st: State =>
     val extracted = Project.extract(st)
     val releaseS = extracted.get(TypelevelKeys.series)
 
+    val currentV = extracted.get(TypelevelKeys.relativeVersion)
+
     st.log.info(s"Current version is: ${extracted.get(version)}")
 
-    val releaseV = readVersion("Release (relative) version: ")
+    val defaultReleaseV = Version.Relative(currentV.value, Final)
+    val releaseV = readVersion(s"Release (relative) version [${defaultReleaseV.id}]: ").getOrElse(defaultReleaseV)
 
     val (nextS, nextV) = readSeries(s"Next release series [${releaseS.id}]: ") match {
-      case None =>
+      case None | Some(`releaseS`) =>
         st.log.info("Not bumping release series")
-        (releaseS, readVersion("Next (relative) version: "))
+        val defaultNextV = Version.Relative(currentV.value + 1, Snapshot)
+        (releaseS, readVersion(s"Next (relative) version [${defaultNextV.id}]: ").getOrElse(defaultNextV))
       case Some(series) =>
         st.log.info(s"Bumping release series to ${series.id}, setting next relative version to 0-SNAPSHOT")
         (series, Version.Relative(0, Version.Snapshot))
