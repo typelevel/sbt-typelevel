@@ -6,7 +6,7 @@ import sbt.Keys._
 import sbtrelease.{ReleasePlugin, Vcs}
 import sbtrelease.ReleasePlugin.ReleaseKeys
 import com.typesafe.tools.mima.plugin.{MimaPlugin, MimaKeys}
-import net.virtualvoid.sbt.graph.{Plugin => GraphPlugin}
+import net.virtualvoid.sbt.graph.DependencyGraphSettings
 import sbtbuildinfo.{Plugin => BuildInfoPlugin}
 import sbtbuildinfo.Plugin.BuildInfoKey
 import xerial.sbt.{Sonatype => SonatypePlugin}
@@ -50,7 +50,7 @@ object TypelevelPlugin extends Plugin {
   }
 
   def typelevelConsumerSettings: Seq[Def.Setting[_]] =
-    GraphPlugin.graphSettings ++
+    DependencyGraphSettings.graphSettings ++
     List(TypelevelKeys.knownDependencies := Dependencies.known.all) ++
     List(Compile, Test, Runtime, Provided, Optional).flatMap(Dependencies.checkSettings)
 

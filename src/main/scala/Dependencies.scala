@@ -5,8 +5,7 @@ import sbt.Keys._
 
 import org.typelevel.sbt.TypelevelPlugin.TypelevelKeys
 
-import net.virtualvoid.sbt.graph.{Plugin => GraphPlugin}
-import net.virtualvoid.sbt.graph.IvyGraphMLDependencies.{Module, ModuleId}
+import net.virtualvoid.sbt.graph.{DependencyGraphKeys, Module, ModuleId}
 
 object Dependencies {
 
@@ -35,7 +34,7 @@ object Dependencies {
 
   def check(all: List[Dependency], logger: Logger, modules: Seq[Module]) = {
     val notices = modules.collect {
-      case Module(ModuleId(groupID, artifactID, olderV), _, _, Some(newerV), _) =>
+      case Module(ModuleId(groupID, artifactID, olderV), _, _, Some(newerV), _, _) =>
         val msg = s"Version mismatch in $groupID#$artifactID: $olderV and $newerV are different"
 
         findFromIDs(all, groupID, artifactID) match {
@@ -66,7 +65,7 @@ object Dependencies {
       check(
         TypelevelKeys.knownDependencies.value.toList,
         streams.value.log,
-        GraphPlugin.moduleGraph.value.nodes
+        DependencyGraphKeys.moduleGraph.value.nodes
       )
   ))
 
