@@ -4,7 +4,7 @@ name := "sbt-typelevel"
 
 organization := "org.typelevel"
 
-version := "0.4-SNAPSHOT"
+version := "0.3.2"
 
 licenses := Seq("Apache 2" → url("https://www.apache.org/licenses/LICENSE-2.0.html"))
 
