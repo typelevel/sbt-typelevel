@@ -1,4 +1,0 @@
-language: scala
-
-script:
-  - sbt scripted
