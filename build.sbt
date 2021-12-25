@@ -9,7 +9,7 @@ lazy val root = project.in(file("."))
 
 lazy val noPublish = project
   .in(file("no-publish"))
-  .enablePlugins(SbtPlugin)
+  .enablePlugins(SbtPlugin, NoPublishPlugin)
   .settings(
     name := "sbt-typlevel-no-publish"
   )
