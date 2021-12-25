@@ -1,5 +1,6 @@
 name := "sbt-typelevel"
 
+ThisBuild / tlBaseVersion := "0.4"
 ThisBuild / organization := "org.typelevel"
 ThisBuild / organizationName := "Typelevel"
 
@@ -12,4 +13,11 @@ lazy val noPublish = project
   .enablePlugins(SbtPlugin)
   .settings(
     name := "sbt-typelevel-no-publish"
+  )
+
+lazy val versioning = project
+  .in(file("versioning"))
+  .enablePlugins(SbtPlugin)
+  .settings(
+    name := "sbt-typelevel-versioning"
   )
