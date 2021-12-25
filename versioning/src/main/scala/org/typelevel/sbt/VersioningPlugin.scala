@@ -31,7 +31,7 @@ object VersioningPlugin extends AutoPlugin {
       val taggedVersion = git.gitCurrentTags.value.find(ReleaseTag.unapplySeq(_).isDefined)
       taggedVersion.getOrElse {
         var version = tlBaseVersion.value
-        git.gitHeadCommit.value.foreach { head => version += s"-${head.take(7)}" }
+        git.gitHeadCommit.value.foreach { sha => version += s"-${sha.take(7)}" }
         if (git.gitUncommittedChanges.value) {
           import java.time.Instant
           // Drop the sub-second precision
