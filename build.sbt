@@ -1,6 +1,7 @@
 name := "sbt-typelevel"
 
 ThisBuild / tlBaseVersion := "0.4"
+ThisBuild / versionScheme := Some("early-semver")
 ThisBuild / organization := "org.typelevel"
 ThisBuild / organizationName := "Typelevel"
 

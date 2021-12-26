@@ -17,10 +17,16 @@ object TypelevelMimaPlugin extends AutoPlugin {
       settingKey[Option[String]]("The version in which this module was introduced.")
   }
 
-  override def buildSettings: Seq[Setting[_]] = Seq(
+  import autoImport._
+
+  override def projectSettings: Seq[Setting[_]] = Seq(
+    tlVersionIntroduced := None,
     mimaPreviousArtifacts := {
+      require(
+        versionScheme.value.contains("early-semver"),
+        "Only early-semver versioning scheme supported.")
       if (publishArtifact.value) {
-        Set.empty
+        Set(projectID.value)
       } else {
         Set.empty
       }
