@@ -5,7 +5,7 @@ import org.scalajs.sbtplugin.ScalaJSPlugin
 
 object ScalaJSSettingsPlugin extends AutoPlugin {
   override def trigger = allRequirements
-  override def requires = ScalaJSPlugin
+  override def requires = ScalaJSPlugin && TypelevelSettingsPlugin
 
   override def projectSettings = Seq(
   )
