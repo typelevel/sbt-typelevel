@@ -31,6 +31,7 @@ lazy val settings = project
   .settings(
     name := "sbt-typelevel-settings"
   )
+  .dependsOn(kernel)
 
 lazy val versioning = project
   .in(file("versioning"))
