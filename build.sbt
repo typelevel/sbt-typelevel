@@ -45,3 +45,4 @@ lazy val mima = project
   .settings(
     name := "sbt-typelevel-mima"
   )
+  .dependsOn(kernel)

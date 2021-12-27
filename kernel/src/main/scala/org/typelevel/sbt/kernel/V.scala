@@ -10,7 +10,7 @@ final case class V(
 ) extends Ordered[V] {
 
   override def toString: String =
-    s"v$major.$minor${patch.fold("")(p => s".$p")}${prerelease.fold("")(p => s"-$p")}"
+    s"$major.$minor${patch.fold("")(p => s".$p")}${prerelease.fold("")(p => s"-$p")}"
 
   def isPrerelease: Boolean = prerelease.nonEmpty
 
@@ -43,14 +43,13 @@ final case class V(
 }
 
 object V {
-  val version = """^v(0|[1-9]\d*)\.(0|[1-9]\d*)(?:\.(0|[1-9]\d*))?(?:-(.+))?$""".r
+  val version = """^(0|[1-9]\d*)\.(0|[1-9]\d*)(?:\.(0|[1-9]\d*))?(?:-(.+))?$""".r
 
-  def apply(v: String): Option[V] = v match {
-    case version(major, minor) => Try(V(major.toInt, minor.toInt, None, None)).toOption
-    case version(major, minor, patch) =>
-      Try(V(major.toInt, minor.toInt, Some(patch.toInt), None)).toOption
+  def apply(v: String): Option[V] = V.unapply(v)
+
+  def unapply(v: String): Option[V] = v match {
     case version(major, minor, patch, prerelease) =>
-      Try(V(major.toInt, minor.toInt, Some(patch.toInt), Some(prerelease))).toOption
+      Try(V(major.toInt, minor.toInt, Option(patch).map(_.toInt), Option(prerelease))).toOption
     case _ => None
   }
 }
