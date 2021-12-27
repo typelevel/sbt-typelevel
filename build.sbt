@@ -10,7 +10,13 @@ ThisBuild / scalaVersion := "2.12.15"
 lazy val root = project
   .in(file("."))
   .enablePlugins(NoPublishPlugin)
-  .aggregate(noPublish, settings, versioning, mima)
+  .aggregate(kernel, noPublish, settings, versioning, mima)
+
+lazy val kernel = project
+  .in(file("kernel"))
+  .settings(
+    name := "sbt-typelevel-kernel"
+  )
 
 lazy val noPublish = project
   .in(file("no-publish"))
