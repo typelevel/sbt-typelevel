@@ -5,6 +5,8 @@ import com.typesafe.sbt.GitPlugin
 import com.typesafe.sbt.SbtGit.git
 import org.typelevel.sbt.kernel.V
 
+import scala.util.Try
+
 object VersioningPlugin extends AutoPlugin {
 
   override def requires = GitPlugin
@@ -27,9 +29,21 @@ object VersioningPlugin extends AutoPlugin {
       !isVersionTagged && (tlHashSnapshots.value || dirty)
     },
     version := {
+      import scala.sys.process._
+
       val taggedVersion = getTaggedVersion(git.gitCurrentTags.value)
       taggedVersion.getOrElse {
         var version = tlBaseVersion.value
+
+        // Looks for the distance to the first stable release in this series
+        val firstInSeries = V
+          .unapply(tlBaseVersion.value)
+          .map(_.copy(patch = Some(0), prerelease = None))
+          .getOrElse(sys.error(s"tlBaseVersion must be semver format: ${tlBaseVersion.value}"))
+        Try(s"git describe --tags --match v$firstInSeries".!!.trim)
+          .collect { case Description(distance) => distance }
+          .foreach { distance => version += s"-$distance" }
+
         git.gitHeadCommit.value.foreach { sha => version += s"-${sha.take(7)}" }
         if (git.gitUncommittedChanges.value) {
           import java.time.Instant
@@ -43,6 +57,8 @@ object VersioningPlugin extends AutoPlugin {
       }
     }
   )
+
+  val Description = """^.*-(\d+)-[a-zA-Z0-9]+$""".r
 
   def getTaggedVersion(tags: Seq[String]): Option[String] =
     tags.collect { case v @ V.Tag(_) => v }.headOption
