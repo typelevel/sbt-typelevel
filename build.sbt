@@ -24,7 +24,8 @@ lazy val root = project
     ciSigning,
     sonatypeCiRelease,
     ci,
-    core)
+    core,
+    ciRelease)
 
 lazy val kernel = project
   .in(file("kernel"))
