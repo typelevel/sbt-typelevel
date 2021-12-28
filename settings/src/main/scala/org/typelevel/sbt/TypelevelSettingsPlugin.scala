@@ -31,6 +31,8 @@ object TypelevelSettingsPlugin extends AutoPlugin {
   )
 
   override def projectSettings = Seq(
+    versionScheme := Some("early-semver"),
+
     libraryDependencies ++= {
       if (tlIsScala3.value)
         Nil
