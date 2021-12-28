@@ -6,6 +6,8 @@ import com.typesafe.sbt.GitPlugin
 import com.typesafe.sbt.SbtGit.git
 import org.typelevel.sbt.kernel.V
 
+import scala.util.Try
+
 object TypelevelSettingsPlugin extends AutoPlugin {
   override def trigger = allRequirements
   override def requires = JvmPlugin && GitPlugin
@@ -22,6 +24,10 @@ object TypelevelSettingsPlugin extends AutoPlugin {
     tlFatalWarnings := false,
     Def.derive(scalaVersion := crossScalaVersions.value.last, default = true),
     Def.derive(tlIsScala3 := scalaVersion.value.startsWith("3."))
+  )
+
+  override def buildSettings = Seq(
+    scmInfo := getScmInfo()
   )
 
   override def projectSettings = Seq(
@@ -161,5 +167,25 @@ object TypelevelSettingsPlugin extends AutoPlugin {
 
   def getTagOrHash(tags: Seq[String], hash: Option[String]): Option[String] =
     tags.collect { case v @ V.Tag(_) => v }.headOption.orElse(hash)
+
+  def getScmInfo(): Option[ScmInfo] = {
+    import scala.sys.process._
+
+    val identifier = """([^\/]+)"""
+
+    val GitHubHttps = s"https://github.com/$identifier/$identifier".r
+    val SSHConnection = s"git@github.com:$identifier/$identifier.git".r
+
+    Try(List("git", "ls-remote", "--get-url", "origin").!!.trim())
+      .collect {
+        case GitHubHttps(user, repo) => (user, repo)
+        case SSHConnection(user, repo) => (user, repo)
+      }
+      .map {
+        case (user, repo) =>
+          ScmInfo(url(s"https://github.com/$user/$repo"), s"git@github.com:$user/$repo.git")
+      }
+      .toOption
+  }
 
 }
