@@ -26,8 +26,8 @@ object TypelevelCiReleasePlugin extends AutoPlugin {
 
   override def buildSettings = Seq(
     githubWorkflowEnv ++= Map(
-      "SONATYPE_USERNAME" -> "$${{ secrets.SONATYPE_USERNAME }}",
-      "SONATYPE_PASSWORD" -> "$${{ secrets.SONATYPE_PASSWORD }}"
+      "SONATYPE_USERNAME" -> s"$${{ secrets.SONATYPE_USERNAME }}",
+      "SONATYPE_PASSWORD" -> s"$${{ secrets.SONATYPE_PASSWORD }}"
     ),
     githubWorkflowPublishTargetBranches := {
       val seed =
