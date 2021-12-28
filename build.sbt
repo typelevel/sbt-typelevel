@@ -14,7 +14,17 @@ ThisBuild / tlCiReleaseBranches := Seq("series/armanbilge")
 lazy val root = project
   .in(file("."))
   .enablePlugins(NoPublishPlugin)
-  .aggregate(kernel, noPublish, settings, versioning, mima, sonatype, ciSigning, ciRelease, ci, core)
+  .aggregate(
+    kernel,
+    noPublish,
+    settings,
+    versioning,
+    mima,
+    sonatype,
+    ciSigning,
+    sonatypeCiRelease,
+    ci,
+    core)
 
 lazy val kernel = project
   .in(file("kernel"))
@@ -68,11 +78,11 @@ lazy val ciSigning = project
     name := "sbt-typelevel-ci-signing"
   )
 
-lazy val ciRelease = project
-  .in(file("ci-release"))
+lazy val sonatypeCiRelease = project
+  .in(file("sonatype-ci-release"))
   .enablePlugins(SbtPlugin)
   .settings(
-    name := "sbt-typelevel-ci-release"
+    name := "sbt-typelevel-sonatype-ci-release"
   )
   .dependsOn(sonatype)
 
@@ -96,6 +106,6 @@ lazy val core = project
     mima,
     sonatype,
     ciSigning,
-    ciRelease,
+    sonatypeCiRelease,
     ci
   )

@@ -5,7 +5,7 @@ import sbtghactions.GenerativePlugin
 import sbtghactions.GitHubActionsPlugin
 import sbtghactions.GenerativePlugin.autoImport._
 
-object TypelevelCiReleasePlugin extends AutoPlugin {
+object TypelevelSonatypeCiReleasePlugin extends AutoPlugin {
 
   object autoImport {
     lazy val tlCiReleaseSnapshots = settingKey[Boolean](
