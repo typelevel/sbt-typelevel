@@ -77,3 +77,20 @@ lazy val ci = project
   .settings(
     name := "sbt-typelevel-ci"
   )
+
+lazy val core = project
+  .in(file("core"))
+  .enablePlugins(SbtPlugin)
+  .settings(
+    name := "sbt-typelevel"
+  )
+  .dependsOn(
+    noPublish,
+    settings,
+    versioning,
+    mima,
+    sonatype,
+    ciSigning,
+    ciRelease,
+    ci
+  )
