@@ -1,7 +1,6 @@
 package org.typelevel.sbt
 
 import sbt._, Keys._
-import sbt.plugins.JvmPlugin
 import com.typesafe.sbt.GitPlugin
 import com.typesafe.sbt.SbtGit.git
 import org.typelevel.sbt.kernel.V
