@@ -56,6 +56,13 @@ lazy val sonatype = project
     name := "sbt-typelevel-sonatype"
   )
 
+lazy val ciSigning = project
+  .in(file("ci-signing"))
+  .enablePlugins(SbtPlugin)
+  .settings(
+    name := "sbt-typelevel-ci-signing"
+  )
+
 lazy val ciRelease = project
   .in(file("ci-release"))
   .enablePlugins(SbtPlugin)
