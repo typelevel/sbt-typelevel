@@ -1,15 +1,20 @@
 name := "sbt-typelevel"
 
 ThisBuild / tlBaseVersion := "0.4"
-ThisBuild / organization := "org.typelevel"
+// ThisBuild / organization := "org.typelevel"
+ThisBuild / organization := "com.armanbilge"
 ThisBuild / organizationName := "Typelevel"
 
 ThisBuild / scalaVersion := "2.12.15"
 
+enablePlugins(TypelevelCiReleasePlugin)
+ThisBuild / tlCiReleaseSnapshots := true
+ThisBuild / tlCiReleaseBranches := Seq("series/armanbilge")
+
 lazy val root = project
   .in(file("."))
   .enablePlugins(NoPublishPlugin)
-  .aggregate(kernel, noPublish, settings, versioning, mima)
+  .aggregate(kernel, noPublish, settings, versioning, mima, sonatype, ciSigning, ciRelease, ci, core)
 
 lazy val kernel = project
   .in(file("kernel"))
