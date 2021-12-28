@@ -38,7 +38,7 @@ object TypelevelVersioningPlugin extends AutoPlugin {
         val baseV = V(tlBaseVersion.value)
           .getOrElse(sys.error(s"tlBaseVersion must be semver format: ${tlBaseVersion.value}"))
 
-        val latestInSeries = GitHelper.previousReleases().headOption.flatMap { previous =>
+        val latestInSeries = GitHelper.previousReleases(true).headOption.flatMap { previous =>
           if (previous > baseV)
             sys.error(s"Your tlBaseVersion $baseV is behind the latest tag $previous")
           else if (baseV.isSameSeries(previous))
