@@ -4,7 +4,7 @@ import sbt._, Keys._
 import org.scalajs.sbtplugin.ScalaJSPlugin
 import com.typesafe.sbt.SbtGit.git
 
-object ScalaJSSettingsPlugin extends AutoPlugin {
+object TypelevelScalaJSSettingsPlugin extends AutoPlugin {
   override def trigger = allRequirements
   override def requires = ScalaJSPlugin && TypelevelSettingsPlugin
 

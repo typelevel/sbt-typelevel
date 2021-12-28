@@ -7,7 +7,7 @@ import org.typelevel.sbt.kernel.V
 
 import scala.util.Try
 
-object VersioningPlugin extends AutoPlugin {
+object TypelevelVersioningPlugin extends AutoPlugin {
 
   override def requires = GitPlugin
   override def trigger = allRequirements
