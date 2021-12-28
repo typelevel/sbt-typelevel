@@ -13,6 +13,7 @@ lazy val root = project
 
 lazy val kernel = project
   .in(file("kernel"))
+  .enablePlugins(SbtPlugin)
   .settings(
     name := "sbt-typelevel-kernel"
   )
