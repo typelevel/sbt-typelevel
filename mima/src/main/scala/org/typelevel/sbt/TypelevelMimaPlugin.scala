@@ -46,12 +46,9 @@ object TypelevelMimaPlugin extends AutoPlugin {
   def previousReleases(): List[V] = {
     import scala.sys.process._
     Try {
-      "git tag --list"
-        .!!
-        .split("\n")
-        .toList
-        .map(_.trim)
-        .collect { case V.Tag(version) => version }
+      "git tag --list".!!.split("\n").toList.map(_.trim).collect {
+        case V.Tag(version) => version
+      }
     }.getOrElse(List.empty)
   }
 
