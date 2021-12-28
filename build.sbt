@@ -70,3 +70,10 @@ lazy val ciRelease = project
     name := "sbt-typelevel-ci-release"
   )
   .dependsOn(sonatype)
+
+lazy val ci = project
+  .in(file("ci"))
+  .enablePlugins(SbtPlugin)
+  .settings(
+    name := "sbt-typelevel-ci"
+  )
