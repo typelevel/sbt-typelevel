@@ -11,7 +11,7 @@ object GitHelper {
       "git tag --list".!!.split("\n").toList.map(_.trim).collect {
         case V.Tag(version) => version
       }
-    }.getOrElse(List.empty)
+    }.getOrElse(List.empty).sorted.reverse
   }
 
 }

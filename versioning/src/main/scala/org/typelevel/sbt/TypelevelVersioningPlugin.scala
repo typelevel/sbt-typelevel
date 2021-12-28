@@ -6,6 +6,7 @@ import com.typesafe.sbt.SbtGit.git
 import org.typelevel.sbt.kernel.V
 
 import scala.util.Try
+import org.typelevel.sbt.kernel.GitHelper
 
 object TypelevelVersioningPlugin extends AutoPlugin {
 
@@ -34,16 +35,26 @@ object TypelevelVersioningPlugin extends AutoPlugin {
 
       val taggedVersion = getTaggedVersion(git.gitCurrentTags.value)
       taggedVersion.getOrElse {
-        var version = tlBaseVersion.value
-
-        // Looks for the distance to the first stable release in this series
-        val firstInSeries = V
-          .unapply(tlBaseVersion.value)
-          .map(_.copy(patch = Some(0), prerelease = None))
+        val baseV = V(tlBaseVersion.value)
           .getOrElse(sys.error(s"tlBaseVersion must be semver format: ${tlBaseVersion.value}"))
-        Try(s"git describe --tags --match v$firstInSeries".!!.trim)
-          .collect { case Description(distance) => distance }
-          .foreach { distance => version += s"-$distance" }
+
+        val latestInSeries = GitHelper.previousReleases().headOption.flatMap { previous =>
+          if (previous > baseV)
+            sys.error(s"Your tlBaseVersion $baseV is behind the latest tag $previous")
+          else if (baseV.isSameSeries(previous))
+            Some(previous)
+          else
+            None
+        }
+
+        var version = latestInSeries.fold(tlBaseVersion.value)(_.toString)
+
+        // Looks for the distance to latest release in this series
+        latestInSeries.foreach { latestInSeries =>
+          Try(s"git describe --tags --match v$latestInSeries".!!.trim)
+            .collect { case Description(distance) => distance }
+            .foreach { distance => version += s"-$distance" }
+        }
 
         git.gitHeadCommit.value.foreach { sha => version += s"-${sha.take(7)}" }
         if (git.gitUncommittedChanges.value) {
