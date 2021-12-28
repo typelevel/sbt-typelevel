@@ -3,9 +3,8 @@ package org.typelevel.sbt
 import sbt._, Keys._
 import com.typesafe.tools.mima.plugin.MimaPlugin
 import MimaPlugin.autoImport._
+import org.typelevel.sbt.kernel.GitHelper
 import org.typelevel.sbt.kernel.V
-
-import scala.util.Try
 
 object TypelevelMimaPlugin extends AutoPlugin {
 
@@ -32,7 +31,7 @@ object TypelevelMimaPlugin extends AutoPlugin {
         val introduced = tlVersionIntroduced
           .value
           .map(v => V(v).getOrElse(sys.error(s"Version must be semver format: $v")))
-        val previous = previousReleases()
+        val previous = GitHelper.previousReleases()
           .filterNot(_.isPrerelease)
           .filter(v => introduced.forall(v >= _))
           .filter(current.mustBeBinCompatWith(_))
@@ -42,14 +41,5 @@ object TypelevelMimaPlugin extends AutoPlugin {
       }
     }
   )
-
-  def previousReleases(): List[V] = {
-    import scala.sys.process._
-    Try {
-      "git tag --list".!!.split("\n").toList.map(_.trim).collect {
-        case V.Tag(version) => version
-      }
-    }.getOrElse(List.empty)
-  }
 
 }
