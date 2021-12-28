@@ -8,6 +8,7 @@ object TypelevelKernelPlugin extends AutoPlugin {
   override def trigger = allRequirements
 
   object autoImport {
+    lazy val tlIsScala3 = settingKey[Boolean]("True if building with Scala 3")
     def replaceCommandAlias(name: String, contents: String): Seq[Setting[State => State]] =
       Seq(GlobalScope / onLoad ~= { (f: State => State) =>
         f andThen { s: State =>
@@ -15,5 +16,11 @@ object TypelevelKernelPlugin extends AutoPlugin {
         }
       })
   }
+
+  import autoImport._
+
+  override def globalSettings = Seq(
+    Def.derive(tlIsScala3 := scalaVersion.value.startsWith("3."))
+  )
 
 }

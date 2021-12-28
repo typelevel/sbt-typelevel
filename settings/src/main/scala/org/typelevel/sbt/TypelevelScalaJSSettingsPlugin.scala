@@ -8,7 +8,7 @@ object TypelevelScalaJSSettingsPlugin extends AutoPlugin {
   override def trigger = allRequirements
   override def requires = ScalaJSPlugin && TypelevelSettingsPlugin
 
-  import TypelevelSettingsPlugin.autoImport._
+  import TypelevelKernelPlugin.autoImport._
 
   override def projectSettings = Seq(
     scalacOptions ++= {

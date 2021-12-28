@@ -13,17 +13,16 @@ object TypelevelSettingsPlugin extends AutoPlugin {
   override def requires = JvmPlugin && GitPlugin
 
   object autoImport {
-    lazy val tlIsScala3 = settingKey[Boolean]("True if building with Scala 3")
     lazy val tlFatalWarnings =
       settingKey[Boolean]("Convert compiler warnings into errors (default: false)")
   }
 
   import autoImport._
+  import TypelevelKernelPlugin.autoImport._
 
   override def globalSettings = Seq(
     tlFatalWarnings := false,
     Def.derive(scalaVersion := crossScalaVersions.value.last, default = true),
-    Def.derive(tlIsScala3 := scalaVersion.value.startsWith("3."))
   )
 
   override def buildSettings = Seq(
