@@ -12,7 +12,7 @@ addSbtPlugin("org.typelevel" % "sbt-typelevel" % "<version>") // plugins.sbt
 
 ## Customization
 
-sbt-typelevel is made up of several independent plugins. If you don't like some of them, you can create your own top-level plugin by mixing and matching.
+sbt-typelevel is made up of several independent plugins. If you don't like some of them, you can create your own super-plugin by mixing and matching.
 
 - `NoPublishPlugin`: Straightforward no-publish settings. No dependencies.
 - `TypelevelKernelPlugin`: Shared basic settings/utilities. No dependencies.
@@ -23,5 +23,5 @@ sbt-typelevel is made up of several independent plugins. If you don't like some 
 - `TypelevelSonatypeCiReleasePlugin`: Integrates sonatype publishing into your GitHub workflow. Depends on sbt-typelevel-sonatype, sbt-github-actions.
 - `TypelevelCiSigningPlugin`: Sign your artifacts in CI, with your choice of a password-protected or non-password protected key. Depends on sbt-gpg, sbt-github-actions.
 - `TypelevelCiPlugin`: Run tests and check binary-compatibility in CI. Depends on sbt-mima-plugin, sbt-github-actions.
-- `TypelevelPlugin`: The top-level plugin for non-ci-publishing projects. Brings together the no-publish, settings, versioning, mima, and CI plugins.
-- `TypelevelCiReleasePlugin`: The top-level plugin for ci-publishing projects. Brings together the `TypelevelPlugin`, CI signing plugin, and sonatype CI release plugin.
+- `TypelevelPlugin`: The super-plugin for non-ci-publishing projects. Brings together the no-publish, settings, versioning, mima, and CI plugins.
+- `TypelevelCiReleasePlugin`: The super-plugin for ci-publishing projects. Brings together the `TypelevelPlugin`, CI signing plugin, and sonatype CI release plugin.
