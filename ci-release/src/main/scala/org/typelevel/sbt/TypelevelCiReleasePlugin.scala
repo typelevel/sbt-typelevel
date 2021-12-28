@@ -1,6 +1,6 @@
 package org.typelevel.sbt
 
-import sbt._, Keys._
+import sbt._
 import sbtghactions.GenerativePlugin
 import sbtghactions.GitHubActionsPlugin
 import sbtghactions.GenerativePlugin.autoImport._
@@ -39,6 +39,12 @@ object TypelevelCiReleasePlugin extends AutoPlugin {
       RefPredicate.StartsWith(Ref.Tag("v")) +: seed
     },
     githubWorkflowTargetTags += "v*",
-    githubWorkflowPublish := Seq(WorkflowStep.Sbt(List("release")))
+    githubWorkflowPublish := Seq(
+      WorkflowStep.Sbt(
+        List("release"),
+        cond = Some( // NEVER release a tag on a non-tag workflow run
+          "(startsWith(github.ref, 'refs/tags/v') && github.ref_type == 'tag') || (!startsWith(github.ref, 'refs/tags/v') && github.ref_type != 'tag')")
+      )
+    )
   )
 }
