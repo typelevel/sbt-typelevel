@@ -16,12 +16,13 @@ object TypelevelVersioningPlugin extends AutoPlugin {
     lazy val tlBaseVersion =
       settingKey[String]("The base version for the series your project is in. e.g., 0.2, 3.5")
     lazy val tlHashSnapshots =
-      settingKey[Boolean]("If true, a hash version implies this is a snapshot.")
+      settingKey[Boolean]("If true, a hash version implies this is a snapshot (default: true).")
   }
 
   import autoImport._
 
   override def buildSettings: Seq[Setting[_]] = Seq(
+    versionScheme := Some("early-semver"),
     tlHashSnapshots := true,
     isSnapshot := {
       val isVersionTagged = getTaggedVersion(git.gitCurrentTags.value).isDefined
