@@ -11,8 +11,6 @@ object TypelevelCiPlugin extends AutoPlugin {
   override def requires = GitHubActionsPlugin && GenerativePlugin && MimaPlugin
   override def trigger = allRequirements
 
-  object autoImport {}
-
   override def buildSettings =
     addCommandAlias(
       "ci",
@@ -24,7 +22,8 @@ object TypelevelCiPlugin extends AutoPlugin {
       ).mkString("; ", "; ", "")
     ) ++ addCommandAlias("releaseLocal", "; reload; project /; +publishLocal") ++ Seq(
       githubWorkflowPublishTargetBranches := Seq(),
-      githubWorkflowBuild := Seq(WorkflowStep.Sbt(List("ci")))
+      githubWorkflowBuild := Seq(WorkflowStep.Sbt(List("ci"))),
+      githubWorkflowJavaVersions := Seq(JavaSpec.temurin("8"))
     )
 
 }
