@@ -1,10 +1,11 @@
 package org.typelevel.sbt
 
 import sbt._, Keys._
+import sbt.plugins.JvmPlugin
 
 object TypelevelKernelPlugin extends AutoPlugin {
 
-  override def requires = sbt.plugins.CorePlugin
+  override def requires = JvmPlugin
   override def trigger = allRequirements
 
   object autoImport {

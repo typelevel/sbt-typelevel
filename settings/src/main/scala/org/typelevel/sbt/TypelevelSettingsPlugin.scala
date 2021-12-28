@@ -10,7 +10,7 @@ import scala.util.Try
 
 object TypelevelSettingsPlugin extends AutoPlugin {
   override def trigger = allRequirements
-  override def requires = JvmPlugin && GitPlugin
+  override def requires = TypelevelKernelPlugin && GitPlugin
 
   object autoImport {
     lazy val tlFatalWarnings =
