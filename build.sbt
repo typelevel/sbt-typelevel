@@ -39,6 +39,7 @@ lazy val versioning = project
   .settings(
     name := "sbt-typelevel-versioning"
   )
+  .dependsOn(kernel)
 
 lazy val mima = project
   .in(file("mima"))

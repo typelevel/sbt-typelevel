@@ -3,6 +3,7 @@ package org.typelevel.sbt
 import sbt._, Keys._
 import com.typesafe.sbt.GitPlugin
 import com.typesafe.sbt.SbtGit.git
+import org.typelevel.sbt.kernel.V
 
 object VersioningPlugin extends AutoPlugin {
 
@@ -18,17 +19,15 @@ object VersioningPlugin extends AutoPlugin {
 
   import autoImport._
 
-  val ReleaseTag = """^v((?:\d+\.){2}\d+(?:-.*)?)$""".r
-
   override def buildSettings: Seq[Setting[_]] = Seq(
     tlHashSnapshots := true,
     isSnapshot := {
-      val isVersionTagged = findVersionTag(git.gitCurrentTags.value).isDefined
+      val isVersionTagged = getTaggedVersion(git.gitCurrentTags.value).isDefined
       val dirty = git.gitUncommittedChanges.value
       !isVersionTagged && (tlHashSnapshots.value || dirty)
     },
     version := {
-      val taggedVersion = git.gitCurrentTags.value.find(ReleaseTag.unapplySeq(_).isDefined)
+      val taggedVersion = getTaggedVersion(git.gitCurrentTags.value)
       taggedVersion.getOrElse {
         var version = tlBaseVersion.value
         git.gitHeadCommit.value.foreach { sha => version += s"-${sha.take(7)}" }
@@ -45,7 +44,7 @@ object VersioningPlugin extends AutoPlugin {
     }
   )
 
-  def findVersionTag(tags: Seq[String]): Option[String] =
-    tags.find(ReleaseTag.unapplySeq(_).isDefined)
+  def getTaggedVersion(tags: Seq[String]): Option[String] =
+    tags.collect { case v @ V.Tag(_) => v }.headOption
 
 }
