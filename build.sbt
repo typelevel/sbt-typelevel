@@ -48,3 +48,10 @@ lazy val mima = project
     name := "sbt-typelevel-mima"
   )
   .dependsOn(kernel)
+
+lazy val sonatype = project
+  .in(file("sonatype"))
+  .enablePlugins(SbtPlugin)
+  .settings(
+    name := "sbt-typelevel-sonatype"
+  )
