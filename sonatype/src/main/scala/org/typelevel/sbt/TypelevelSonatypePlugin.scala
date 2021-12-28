@@ -38,9 +38,9 @@ object TypelevelSonatypePlugin extends AutoPlugin {
 
   private def sonatypeBundleReleaseIfRelevant: Command =
     Command.command("sonatypeBundleReleaseIfRelevant") { state =>
-      if (!state.getSetting(isSnapshot).getOrElse(false))
+      if (state.getSetting(isSnapshot).getOrElse(false))
+        state // a snapshot is good-to-go
+      else // a non-snapshot releases as a bundle
         Command.process("sonatypeBundleRelease", state)
-      else
-        state
     }
 }
