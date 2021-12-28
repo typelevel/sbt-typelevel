@@ -104,8 +104,19 @@ lazy val core = project
     settings,
     versioning,
     mima,
+    ci
+  )
+
+lazy val ciRelease = project
+  .in(file("ci-release"))
+  .enablePlugins(SbtPlugin)
+  .settings(
+    name := "sbt-typelevel-ci-release"
+  )
+  .dependsOn(
+    core,
     sonatype,
     ciSigning,
     sonatypeCiRelease,
-    ci
   )
+

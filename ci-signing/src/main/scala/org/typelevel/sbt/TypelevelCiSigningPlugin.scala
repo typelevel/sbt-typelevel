@@ -10,7 +10,7 @@ object TypelevelCiSigningPlugin extends AutoPlugin {
 
   override def requires = SbtGpg && GitHubActionsPlugin && GenerativePlugin
 
-  override def trigger = noTrigger
+  override def trigger = allRequirements
 
   override def buildSettings = Seq(
     githubWorkflowEnv ++= Map(
