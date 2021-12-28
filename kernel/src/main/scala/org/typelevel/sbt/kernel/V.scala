@@ -52,4 +52,9 @@ object V {
       Try(V(major.toInt, minor.toInt, Option(patch).map(_.toInt), Option(prerelease))).toOption
     case _ => None
   }
+
+  object Tag {
+    def unapply(v: String): Option[V] =
+      if (v.startsWith("v")) V.unapply(v.substring(1)) else None
+  }
 }

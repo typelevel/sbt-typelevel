@@ -2,22 +2,24 @@ package org.typelevel.sbt
 
 import sbt._, Keys._
 import sbt.plugins.JvmPlugin
+import com.typesafe.sbt.GitPlugin
+import com.typesafe.sbt.SbtGit.git
 import org.typelevel.sbt.kernel.V
 
 object TypelevelSettingsPlugin extends AutoPlugin {
   override def trigger = allRequirements
-  override def requires = JvmPlugin
+  override def requires = JvmPlugin && GitPlugin
 
   object autoImport {
     lazy val tlIsScala3 = settingKey[Boolean]("True if building with Scala 3")
-    lazy val tlFatalWarningsInCI = settingKey[Boolean](
-      "Convert compiler warnings into errors under CI builds (default: true)")
+    lazy val tlFatalWarnings =
+      settingKey[Boolean]("Convert compiler warnings into errors (default: false)")
   }
 
   import autoImport._
 
   override def globalSettings = Seq(
-    tlFatalWarningsInCI := true,
+    tlFatalWarnings := false,
     Def.derive(scalaVersion := crossScalaVersions.value.last, default = true),
     Def.derive(tlIsScala3 := scalaVersion.value.startsWith("3."))
   )
@@ -47,6 +49,12 @@ object TypelevelSettingsPlugin extends AutoPlugin {
         case _ =>
           Seq.empty
       }
+    },
+    scalacOptions ++= {
+      if (tlFatalWarnings.value)
+        Seq("-Xfatal-warnings")
+      else
+        Seq.empty
     },
     scalacOptions ++= {
       val warningsNsc = Seq("-Xlint", "-Ywarn-dead-code")
@@ -90,6 +98,68 @@ object TypelevelSettingsPlugin extends AutoPlugin {
 
         case _ => Seq.empty
       }
+    },
+    scalacOptions ++= {
+      if (tlIsScala3.value && crossScalaVersions.value.forall(_.startsWith("3.")))
+        Seq("-Ykind-projector:underscores")
+      else if (tlIsScala3.value)
+        Seq("-language:implicitConversions", "-Ykind-projector", "-source:3.0-migration")
+      else
+        Seq("-language:_")
+    },
+    Test / scalacOptions ++= {
+      if (tlIsScala3.value)
+        Seq()
+      else
+        Seq("-Yrangepos")
+    },
+    Compile / console / scalacOptions --= Seq(
+      "-Xlint",
+      "-Ywarn-unused-import",
+      "-Wextra-implicit",
+      "-Wunused:implicits",
+      "-Wunused:explicits",
+      "-Wunused:imports",
+      "-Wunused:locals",
+      "-Wunused:params",
+      "-Wunused:patvars",
+      "-Wunused:privates"
+    ),
+    Test / console / scalacOptions := (Compile / console / scalacOptions).value,
+    Compile / doc / scalacOptions ++= {
+      if (tlIsScala3.value)
+        Seq("-sourcepath", (LocalRootProject / baseDirectory).value.getAbsolutePath)
+      else {
+
+        val tagOrHash = getTagOrHash(git.gitCurrentTags.value, git.gitHeadCommit.value)
+
+        val infoOpt = scmInfo.value
+        tagOrHash.toSeq flatMap { vh =>
+          infoOpt.toSeq flatMap { info =>
+            val path = s"${info.browseUrl}/blob/$vh€{FILE_PATH}.scala"
+            Seq(
+              "-doc-source-url",
+              path,
+              "-sourcepath",
+              (LocalRootProject / baseDirectory).value.getAbsolutePath)
+          }
+        }
+      }
+    },
+    javacOptions ++= Seq(
+      "-encoding",
+      "utf8",
+      "-Xlint:all"
+    ),
+    javacOptions ++= {
+      if (tlFatalWarnings.value)
+        Seq("-Werror")
+      else
+        Seq.empty
     }
   )
+
+  def getTagOrHash(tags: Seq[String], hash: Option[String]): Option[String] =
+    tags.collect { case v @ V.Tag(_) => v }.headOption.orElse(hash)
+
 }

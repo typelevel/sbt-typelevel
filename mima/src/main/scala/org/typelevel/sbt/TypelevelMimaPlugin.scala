@@ -51,8 +51,7 @@ object TypelevelMimaPlugin extends AutoPlugin {
         .split("\n")
         .toList
         .map(_.trim)
-        .collect { case v if v.startsWith("v") => v.substring(1) }
-        .collect { case V(version) => version }
+        .collect { case V.Tag(version) => version }
     }.getOrElse(List.empty)
   }
 
