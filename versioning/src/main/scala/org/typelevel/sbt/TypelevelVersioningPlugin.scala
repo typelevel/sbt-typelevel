@@ -38,14 +38,18 @@ object TypelevelVersioningPlugin extends AutoPlugin {
         val baseV = V(tlBaseVersion.value)
           .getOrElse(sys.error(s"tlBaseVersion must be semver format: ${tlBaseVersion.value}"))
 
-        val latestInSeries = GitHelper.previousReleases(true).headOption.flatMap { previous =>
-          if (previous > baseV)
-            sys.error(s"Your tlBaseVersion $baseV is behind the latest tag $previous")
-          else if (baseV.isSameSeries(previous))
-            Some(previous)
-          else
-            None
-        }
+        val latestInSeries = GitHelper
+          .previousReleases(true)
+          .filterNot(_.isPrerelease) // TODO Ordering of pre-releases is arbitrary
+          .headOption
+          .flatMap { previous =>
+            if (previous > baseV)
+              sys.error(s"Your tlBaseVersion $baseV is behind the latest tag $previous")
+            else if (baseV.isSameSeries(previous))
+              Some(previous)
+            else
+              None
+          }
 
         var version = latestInSeries.fold(tlBaseVersion.value)(_.toString)
 
