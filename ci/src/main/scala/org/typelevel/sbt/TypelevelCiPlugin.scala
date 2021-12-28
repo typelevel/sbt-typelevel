@@ -1,6 +1,6 @@
 package org.typelevel.sbt
 
-import sbt._, Keys._
+import sbt._
 import sbtghactions.GenerativePlugin
 import sbtghactions.GitHubActionsPlugin
 import sbtghactions.GenerativePlugin.autoImport._
