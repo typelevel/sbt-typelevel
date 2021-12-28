@@ -33,9 +33,12 @@ final case class V(
         val z = thisPatch.compare(thatPatch)
         if (z != 0) return z
         (this.prerelease, that.prerelease) match {
-          case (None, None) | (Some(_), Some(_)) => 0
+          case (None, None) => 0
           case (None, Some(_)) => 1
           case (Some(_), None) => -1
+          case (Some(_), Some(_)) =>
+             // TODO not great, but not everyone uses Ms and RCs
+            x.compare(y)
         }
     }
   }
