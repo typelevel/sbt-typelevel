@@ -11,6 +11,13 @@ enablePlugins(TypelevelCiReleasePlugin)
 ThisBuild / tlCiReleaseSnapshots := true
 ThisBuild / tlCiReleaseBranches := Seq("series/armanbilge")
 
+ThisBuild / tlHashSnapshots := false
+ThisBuild / developers := List(
+  Developer("armanbilge", "Arman Bilge", "@armanbilge", url("https://github.com/armanbilge"))
+)
+ThisBuild / homepage := Some(url("https://github.com/typelevel/sbt-typelevel"))
+ThisBuild / licenses += "Apache-2.0" -> url("http://www.apache.org/licenses/")
+
 lazy val root = project
   .in(file("."))
   .enablePlugins(NoPublishPlugin)
@@ -118,6 +125,5 @@ lazy val ciRelease = project
     core,
     sonatype,
     ciSigning,
-    sonatypeCiRelease,
+    sonatypeCiRelease
   )
-
