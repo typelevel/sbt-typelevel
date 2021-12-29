@@ -114,7 +114,7 @@ jobs:
           tar xf targets.tar
           rm targets.tar
 
-      - name: Directly import signing key
+      - name: Import signing key
         if: env.PGP_SECRET != '' && env.PGP_PASSPHRASE == ''
         run: echo $PGP_SECRET | base64 -d | gpg --import
 
