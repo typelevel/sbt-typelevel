@@ -31,11 +31,15 @@ object TypelevelMimaPlugin extends AutoPlugin {
         val introduced = tlVersionIntroduced
           .value
           .map(v => V(v).getOrElse(sys.error(s"Version must be semver format: $v")))
-        val previous = GitHelper.previousReleases()
+        val previous = GitHelper
+          .previousReleases()
           .filterNot(_.isPrerelease)
           .filter(v => introduced.forall(v >= _))
           .filter(current.mustBeBinCompatWith(_))
-        previous.map(v => projectID.value.withRevision(v.toString)).toSet
+        previous
+          .map(v =>
+            projectID.value.withRevision(v.toString).withExplicitArtifacts(Vector.empty))
+          .toSet
       } else {
         Set.empty
       }
