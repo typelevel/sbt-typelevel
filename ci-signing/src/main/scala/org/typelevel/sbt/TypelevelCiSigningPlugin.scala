@@ -23,11 +23,11 @@ object TypelevelCiSigningPlugin extends AutoPlugin {
         name = Some("Directly import signing key"),
         cond = Some("env.PGP_SECRET != '' && env.PGP_PASSPHRASE == ''")
       ),
-      WorkflowStep.Run( // if your key is passphrase protected
+      WorkflowStep.Run( // if your key is passphrase-protected
         List(
           "echo \"$PGP_SECRET\" | base64 -d > /tmp/signing-key.gpg",
           "echo \"$PGP_PASSPHRASE\" | gpg --pinentry-mode loopback --passphrase-fd 0 --import /tmp/signing-key.gpg",
-          "(echo \"$PGP_PASSPHRASE\"; echo; echo) | gpg --command-fd 0 --pinentry-mode loopback --change-passphrase 5EBC14B0F6C55083" // TODO
+          "(echo \"$PGP_PASSPHRASE\"; echo; echo) | gpg --command-fd 0 --pinentry-mode loopback --change-passphrase $(gpg --list-secret-keys --with-colons 2> /dev/null | grep '^sec:' | cut --delimiter ':' --fields 5 | tail -n 1)"
         ),
         name = Some("Import signing key and strip passphrase"),
         cond = Some("env.PGP_SECRET != '' && env.PGP_PASSPHRASE != ''")
