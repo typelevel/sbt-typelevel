@@ -27,6 +27,8 @@ object TypelevelMimaPlugin extends AutoPlugin {
         "Only early-semver versioning scheme supported.")
       if (publishArtifact.value) {
         val current = V(version.value)
+          // Consider it as a real release, for purposes of compat-checking
+          .map(_.copy(prerelease = None))
           .getOrElse(sys.error(s"Version must be semver format: ${version.value}"))
         val introduced = tlVersionIntroduced
           .value
