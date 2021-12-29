@@ -21,7 +21,7 @@ object TypelevelSettingsPlugin extends AutoPlugin {
 
   override def globalSettings = Seq(
     tlFatalWarnings := false,
-    Def.derive(scalaVersion := crossScalaVersions.value.last, default = true),
+    Def.derive(scalaVersion := crossScalaVersions.value.last, default = true)
   )
 
   override def buildSettings = Seq(
@@ -31,7 +31,6 @@ object TypelevelSettingsPlugin extends AutoPlugin {
   override def projectSettings = Seq(
     versionScheme := Some("early-semver"),
     pomIncludeRepository := { _ => false },
-
     libraryDependencies ++= {
       if (tlIsScala3.value)
         Nil
@@ -172,21 +171,26 @@ object TypelevelSettingsPlugin extends AutoPlugin {
   def getScmInfo(): Option[ScmInfo] = {
     import scala.sys.process._
 
-    val identifier = """([^\/]+)"""
+    def gitHubScmInfo(user: String, repo: String) =
+      ScmInfo(
+        url(s"https://github.com/$user/$repo"),
+        s"scm:git:https://github.com/$user/$repo.git",
+        s"scm:git:git@github.com:$user/$repo.git"
+      )
 
-    val GitHubHttps = s"https://github.com/$identifier/$identifier".r
-    val SSHConnection = s"git@github.com:$identifier/$identifier.git".r
-
-    Try(List("git", "ls-remote", "--get-url", "origin").!!.trim())
-      .collect {
-        case GitHubHttps(user, repo) => (user, repo)
-        case SSHConnection(user, repo) => (user, repo)
+    val identifier = """([^\/]+?)"""
+    val GitHubHttps = s"https://github.com/$identifier/$identifier(?:\\.git)?".r
+    val GitHubGit = s"git://github.com:$identifier/$identifier(?:\\.git)?".r
+    val GitHubSsh = s"git@github.com:$identifier/$identifier(?:\\.git)?".r
+    Try {
+      val remote = List("git", "ls-remote", "--get-url", "origin").!!.trim()
+      remote match {
+        case GitHubHttps(user, repo) => Some(gitHubScmInfo(user, repo))
+        case GitHubGit(user, repo) => Some(gitHubScmInfo(user, repo))
+        case GitHubSsh(user, repo) => Some(gitHubScmInfo(user, repo))
+        case _ => None
       }
-      .map {
-        case (user, repo) =>
-          ScmInfo(url(s"https://github.com/$user/$repo"), s"git@github.com:$user/$repo.git")
-      }
-      .toOption
+    }.toOption.flatten
   }
 
 }
