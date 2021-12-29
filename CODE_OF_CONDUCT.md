@@ -8,7 +8,7 @@ Everyone is expected to follow the [Scala Code of Conduct] when discussing the p
 
 Any questions, concerns, or moderation requests please contact a member of the project.
 
-- Ross A. Baker: [gitter](https://gitter.im/rossabaker) | [twitter](https://twitter.com/rossabaker) | [email](mailto:ross@rossabaker.com)
+- Ross A. Baker: [twitter](https://twitter.com/rossabaker) | [email](mailto:ross@rossabaker.com)
 - Arman Bilge: [twitter](https://twitter.com/armanbilge) | [email](mailto:arman@armanbilge.com)
 
 [Scala Code of Conduct]: https://typelevel.org/code-of-conduct.html
