@@ -11,7 +11,7 @@ enablePlugins(TypelevelCiReleasePlugin)
 ThisBuild / tlCiReleaseSnapshots := true
 ThisBuild / tlCiReleaseBranches := Seq("series/armanbilge")
 
-ThisBuild / tlHashSnapshots := false
+ThisBuild / tlHashSnapshots := true
 ThisBuild / developers := List(
   Developer("armanbilge", "Arman Bilge", "@armanbilge", url("https://github.com/armanbilge"))
 )
