@@ -36,9 +36,9 @@ final case class V(
           case (None, None) => 0
           case (Some(_), None) => 1
           case (None, Some(_)) => -1
-          case (Some(x), Some(y)) =>
+          case (Some(thisPrerelease), Some(thatPrerelease)) =>
             // TODO not great, but not everyone uses Ms and RCs
-            x.compare(y)
+            thisPrerelease.compare(thatPrerelease)
         }
     }
   }
