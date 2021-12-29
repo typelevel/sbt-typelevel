@@ -1,6 +1,6 @@
 name := "sbt-typelevel"
 
-ThisBuild / tlBaseVersion := "0.3"
+ThisBuild / tlBaseVersion := "0.4"
 // ThisBuild / organization := "org.typelevel"
 ThisBuild / organization := "com.armanbilge"
 ThisBuild / organizationName := "Typelevel"
