@@ -16,19 +16,20 @@ object TypelevelVersioningPlugin extends AutoPlugin {
   object autoImport {
     lazy val tlBaseVersion =
       settingKey[String]("The base version for the series your project is in. e.g., 0.2, 3.5")
-    lazy val tlHashSnapshots =
-      settingKey[Boolean]("If true, a hash version implies this is a snapshot (default: true).")
+    lazy val tlUntaggedAreSnapshots =
+      settingKey[Boolean](
+        "If true, an untagged commit is given a snapshot version, e.g. 0.4-00218f9-SNAPSHOT. If false, it is given a release version, e.g. 0.4-00218f9. (default: true)")
   }
 
   import autoImport._
 
   override def buildSettings: Seq[Setting[_]] = Seq(
     versionScheme := Some("early-semver"),
-    tlHashSnapshots := true,
+    tlUntaggedAreSnapshots := true,
     isSnapshot := {
       val isVersionTagged = getTaggedVersion(git.gitCurrentTags.value).isDefined
       val dirty = git.gitUncommittedChanges.value
-      !isVersionTagged && (tlHashSnapshots.value || dirty)
+      !isVersionTagged && (tlUntaggedAreSnapshots.value || dirty)
     },
     version := {
       import scala.sys.process._
