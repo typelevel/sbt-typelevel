@@ -1,8 +1,7 @@
 name := "sbt-typelevel"
 
 ThisBuild / tlBaseVersion := "0.4"
-// ThisBuild / organization := "org.typelevel"
-ThisBuild / organization := "com.armanbilge"
+ThisBuild / organization := "org.typelevel"
 ThisBuild / organizationName := "Typelevel"
 
 ThisBuild / scalaVersion := "2.12.15"
@@ -11,7 +10,6 @@ enablePlugins(TypelevelCiReleasePlugin)
 ThisBuild / tlCiReleaseSnapshots := true
 ThisBuild / tlCiReleaseBranches := Seq("series/armanbilge")
 
-ThisBuild / tlUntaggedAreSnapshots := false
 ThisBuild / developers := List(
   Developer("armanbilge", "Arman Bilge", "@armanbilge", url("https://github.com/armanbilge")),
   Developer("rossabaker", "Ross A. Baker", "@rossabaker", url("https://github.com/rossabaker")),
