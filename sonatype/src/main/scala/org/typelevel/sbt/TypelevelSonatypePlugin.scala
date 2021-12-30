@@ -12,13 +12,13 @@ object TypelevelSonatypePlugin extends AutoPlugin {
 
   object autoImport {
     lazy val tlSonatypeUseLegacyHost =
-      settingKey[Boolean]("Publish to oss.sonatype.org instead of s01")
+      settingKey[Boolean]("Publish to oss.sonatype.org instead of s01 (default: true)")
   }
 
   import autoImport._
 
   override def buildSettings =
-    Seq(tlSonatypeUseLegacyHost := false) ++
+    Seq(tlSonatypeUseLegacyHost := true) ++
       addCommandAlias(
         "release",
         "; reload; project /; +mimaReportBinaryIssues; +publish; sonatypeBundleReleaseIfRelevant")
