@@ -14,13 +14,14 @@ object TypelevelMimaPlugin extends AutoPlugin {
 
   object autoImport {
     lazy val tlVersionIntroduced =
-      settingKey[Option[String]]("The version in which this module was introduced.")
+      settingKey[Map[String, String]](
+        "A map scalaBinaryVersion -> version e.g. Map('2.13' -> '1.5.2', '3' -> '1.7.1') used to indicate that a particular crossScalaVersions value was introduced in a given version (default: empty).")
   }
 
   import autoImport._
 
-  override def projectSettings: Seq[Setting[_]] = Seq(
-    tlVersionIntroduced := None,
+  override def projectSettings = Seq[Setting[_]](
+    tlVersionIntroduced := Map.empty,
     mimaPreviousArtifacts := {
       require(
         versionScheme.value.contains("early-semver"),
@@ -32,6 +33,7 @@ object TypelevelMimaPlugin extends AutoPlugin {
           .getOrElse(sys.error(s"Version must be semver format: ${version.value}"))
         val introduced = tlVersionIntroduced
           .value
+          .get(scalaBinaryVersion.value)
           .map(v => V(v).getOrElse(sys.error(s"Version must be semver format: $v")))
         val previous = GitHelper
           .previousReleases()
