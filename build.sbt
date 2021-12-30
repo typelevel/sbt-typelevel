@@ -13,7 +13,14 @@ ThisBuild / tlCiReleaseBranches := Seq("series/armanbilge")
 
 ThisBuild / tlHashSnapshots := false
 ThisBuild / developers := List(
-  Developer("armanbilge", "Arman Bilge", "@armanbilge", url("https://github.com/armanbilge"))
+  Developer("armanbilge", "Arman Bilge", "@armanbilge", url("https://github.com/armanbilge")),
+  Developer("rossabaker", "Ross A. Baker", "@rossabaker", url("https://github.com/rossabaker")),
+  Developer(
+    "ChristopherDavenport",
+    "Christopher Davenport",
+    "@ChristopherDavenport",
+    url("https://github.com/ChristopherDavenport")),
+  Developer("djspiewak", "Daniel Spiewak", "@djspiewak", url("https://github.com/djspiewak"))
 )
 ThisBuild / homepage := Some(url("https://github.com/typelevel/sbt-typelevel"))
 ThisBuild / licenses += "Apache-2.0" -> url("http://www.apache.org/licenses/")
