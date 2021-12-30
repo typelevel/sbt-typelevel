@@ -1,6 +1,7 @@
 package org.typelevel.sbt
 
 import sbt._
+import sbtghactions.GenerativePlugin
 import sbtghactions.GitHubActionsPlugin
 
 object TypelevelPlugin extends AutoPlugin {
@@ -17,6 +18,7 @@ object TypelevelPlugin extends AutoPlugin {
 
   import autoImport._
   import TypelevelSettingsPlugin.autoImport._
+  import GenerativePlugin.autoImport._
   import GitHubActionsPlugin.autoImport._
 
   override def globalSettings = Seq(
@@ -24,7 +26,14 @@ object TypelevelPlugin extends AutoPlugin {
   )
 
   override def buildSettings = Seq(
-    Def.derive(tlFatalWarnings := (tlFatalWarningsInCi.value && githubIsWorkflowBuild.value))
+    Def.derive(tlFatalWarnings := (tlFatalWarningsInCi.value && githubIsWorkflowBuild.value)),
+    githubWorkflowBuildMatrixExclusions ++= {
+      for {
+        // default scala is last in the list, default java first
+        scala <- (ThisBuild / githubWorkflowScalaVersions).value.init
+        java <- (ThisBuild / githubWorkflowJavaVersions).value.tail
+      } yield MatrixExclude(Map("scala" -> scala, "java" -> java.render))
+    }
   )
 
 }
