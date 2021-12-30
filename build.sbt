@@ -9,6 +9,7 @@ ThisBuild / scalaVersion := "2.12.15"
 enablePlugins(TypelevelCiReleasePlugin)
 ThisBuild / tlCiReleaseSnapshots := true
 ThisBuild / tlCiReleaseBranches := Seq("series/armanbilge")
+ThisBuild / tlSonatypeUseLegacyHost := true
 
 ThisBuild / developers := List(
   Developer("armanbilge", "Arman Bilge", "@armanbilge", url("https://github.com/armanbilge")),
