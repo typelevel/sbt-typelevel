@@ -1,17 +1,19 @@
-*.class
-*.log
-
-# sbt specific
-.lib/
-dist/*
 target/
-lib_managed/
-src_managed/
-project/boot/
-project/plugins/project/
 
-# IDE specific
-.scala_dependencies
-.*.swp
-.*.swo
-.idea*
+.sbtopts
+
+# vim
+*.sw?
+
+# intellij
+.idea/
+
+# Ignore [ce]tags files
+tags
+
+# Metals
+.metals/
+.bsp/
+.bloop/
+metals.sbt
+.vscode

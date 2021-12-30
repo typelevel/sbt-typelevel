@@ -1,0 +1,1 @@
+../ci-signing/build.sbt
