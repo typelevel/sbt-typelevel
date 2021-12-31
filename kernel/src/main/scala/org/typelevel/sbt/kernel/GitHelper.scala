@@ -19,4 +19,7 @@ object GitHelper {
     }.getOrElse(List.empty).sorted.reverse
   }
 
+  def getTagOrHash(tags: Seq[String], hash: Option[String]): Option[String] =
+    tags.collect { case v @ V.Tag(_) => v }.headOption.orElse(hash)
+
 }

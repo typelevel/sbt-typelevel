@@ -3,8 +3,9 @@ package org.typelevel.sbt
 import sbt._, Keys._
 import org.scalajs.sbtplugin.ScalaJSPlugin
 import com.typesafe.sbt.SbtGit.git
+import org.typelevel.sbt.kernel.GitHelper
 
-object TypelevelScalaJSSettingsPlugin extends AutoPlugin {
+object TypelevelScalaJSGitHubPlugin extends AutoPlugin {
   override def trigger = allRequirements
   override def requires = ScalaJSPlugin && TypelevelSettingsPlugin
 
@@ -15,7 +16,7 @@ object TypelevelScalaJSSettingsPlugin extends AutoPlugin {
       val flag = if (tlIsScala3.value) "-scalajs-mapSourceURI:" else "-P:scalajs:mapSourceURI:"
 
       val tagOrHash =
-        TypelevelSettingsPlugin.getTagOrHash(git.gitCurrentTags.value, git.gitHeadCommit.value)
+        GitHelper.getTagOrHash(git.gitCurrentTags.value, git.gitHeadCommit.value)
 
       val l = (LocalRootProject / baseDirectory).value.toURI.toString
 

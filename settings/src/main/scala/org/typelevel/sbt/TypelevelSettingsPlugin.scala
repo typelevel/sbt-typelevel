@@ -4,6 +4,7 @@ import sbt._, Keys._
 import com.typesafe.sbt.GitPlugin
 import com.typesafe.sbt.SbtGit.git
 import org.typelevel.sbt.kernel.V
+import org.typelevel.sbt.kernel.GitHelper
 
 object TypelevelSettingsPlugin extends AutoPlugin {
   override def trigger = allRequirements
@@ -131,7 +132,8 @@ object TypelevelSettingsPlugin extends AutoPlugin {
         Seq("-sourcepath", (LocalRootProject / baseDirectory).value.getAbsolutePath)
       else {
 
-        val tagOrHash = getTagOrHash(git.gitCurrentTags.value, git.gitHeadCommit.value)
+        val tagOrHash =
+          GitHelper.getTagOrHash(git.gitCurrentTags.value, git.gitHeadCommit.value)
 
         val infoOpt = scmInfo.value
         tagOrHash.toSeq flatMap { vh =>
@@ -158,8 +160,5 @@ object TypelevelSettingsPlugin extends AutoPlugin {
         Seq.empty
     }
   )
-
-  def getTagOrHash(tags: Seq[String], hash: Option[String]): Option[String] =
-    tags.collect { case v @ V.Tag(_) => v }.headOption.orElse(hash)
 
 }
