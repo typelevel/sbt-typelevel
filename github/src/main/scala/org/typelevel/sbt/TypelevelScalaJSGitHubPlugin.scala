@@ -7,7 +7,7 @@ import org.typelevel.sbt.kernel.GitHelper
 
 object TypelevelScalaJSGitHubPlugin extends AutoPlugin {
   override def trigger = allRequirements
-  override def requires = ScalaJSPlugin && TypelevelSettingsPlugin
+  override def requires = ScalaJSPlugin && TypelevelKernelPlugin
 
   import TypelevelKernelPlugin.autoImport._
 
