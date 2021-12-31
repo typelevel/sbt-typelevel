@@ -20,7 +20,8 @@ object TypelevelGitHubPlugin extends AutoPlugin {
   }
 
   override def buildSettings = Seq(
-    scmInfo := getScmInfo()
+    scmInfo := getScmInfo(),
+    homepage := homepage.value.orElse(scmInfo.value.map(_.browseUrl))
   )
 
   def getScmInfo(): Option[ScmInfo] = {
