@@ -4,7 +4,7 @@ ThisBuild / tlBaseVersion := "0.4"
 ThisBuild / organization := "org.typelevel"
 ThisBuild / organizationName := "Typelevel"
 
-ThisBuild / scalaVersion := "2.12.15"
+ThisBuild / scalaVersion := "2.13.7"
 
 enablePlugins(TypelevelCiReleasePlugin)
 ThisBuild / tlCiReleaseSnapshots := true
