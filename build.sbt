@@ -26,6 +26,7 @@ lazy val root = project
     kernel,
     noPublish,
     settings,
+    github,
     versioning,
     mima,
     sonatype,
