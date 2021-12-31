@@ -16,7 +16,6 @@ ThisBuild / developers := List(
   tlGitHubDev("ChristopherDavenport", "Christopher Davenport"),
   tlGitHubDev("djspiewak", "Daniel Spiewak")
 )
-ThisBuild / homepage := Some(url("https://github.com/typelevel/sbt-typelevel"))
 
 lazy val root = project
   .in(file("."))
