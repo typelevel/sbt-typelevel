@@ -20,7 +20,7 @@ object TypelevelCiPlugin extends AutoPlugin {
         "test",
         "mimaReportBinaryIssues"
       ).mkString("; ", "; ", "")
-    ) ++ addCommandAlias("releaseLocal", "; reload; project /; +publishLocal") ++ Seq(
+    ) ++ Seq(
       githubWorkflowPublishTargetBranches := Seq(),
       githubWorkflowBuild := Seq(WorkflowStep.Sbt(List("ci"))),
       githubWorkflowJavaVersions := Seq(JavaSpec.temurin("8"))

@@ -24,4 +24,7 @@ object TypelevelKernelPlugin extends AutoPlugin {
     Def.derive(tlIsScala3 := scalaVersion.value.startsWith("3."))
   )
 
+  override def buildSettings =
+    addCommandAlias("releaseLocal", "; reload; project /; +publishLocal")
+
 }
