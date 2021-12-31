@@ -111,20 +111,6 @@ lazy val ci = project
     name := "sbt-typelevel-ci"
   )
 
-lazy val core = project
-  .in(file("core"))
-  .enablePlugins(SbtPlugin)
-  .settings(
-    name := "sbt-typelevel"
-  )
-  .dependsOn(
-    noPublish,
-    settings,
-    versioning,
-    mima,
-    ci
-  )
-
 lazy val ciRelease = project
   .in(file("ci-release"))
   .enablePlugins(SbtPlugin)
@@ -132,8 +118,22 @@ lazy val ciRelease = project
     name := "sbt-typelevel-ci-release"
   )
   .dependsOn(
-    core,
-    sonatype,
-    ciSigning,
-    sonatypeCiRelease
+    noPublish,
+    github,
+    versioning,
+    mima,
+    ci,
+    sonatypeCiRelease,
+    ciSigning
+  )
+
+lazy val core = project
+  .in(file("core"))
+  .enablePlugins(SbtPlugin)
+  .settings(
+    name := "sbt-typelevel"
+  )
+  .dependsOn(
+    ciRelease,
+    settings
   )

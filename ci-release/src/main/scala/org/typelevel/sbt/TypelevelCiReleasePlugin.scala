@@ -5,7 +5,11 @@ import sbt._
 object TypelevelCiReleasePlugin extends AutoPlugin {
 
   override def requires =
-    TypelevelSonatypeCiReleasePlugin && TypelevelCiSigningPlugin && TypelevelPlugin
+    TypelevelVersioningPlugin &&
+      TypelevelMimaPlugin &&
+      TypelevelCiPlugin &&
+      TypelevelSonatypeCiReleasePlugin &&
+      TypelevelCiSigningPlugin
 
   override def trigger = noTrigger
 
