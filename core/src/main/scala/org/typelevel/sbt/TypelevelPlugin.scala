@@ -42,6 +42,7 @@ object TypelevelPlugin extends AutoPlugin {
   import autoImport._
   import TypelevelKernelPlugin.autoImport._
   import TypelevelSettingsPlugin.autoImport._
+  import TypelevelSonatypeCiReleasePlugin.autoImport._
   import GenerativePlugin.autoImport._
   import GitHubActionsPlugin.autoImport._
 
@@ -54,6 +55,7 @@ object TypelevelPlugin extends AutoPlugin {
     organizationName := "Typelevel",
     startYear := Some(java.time.YearMonth.now().getYear()),
     licenses += "Apache-2.0" -> url("http://www.apache.org/licenses/"),
+    tlCiReleaseBranches := Seq("main"),
     Def.derive(tlFatalWarnings := (tlFatalWarningsInCi.value && githubIsWorkflowBuild.value)),
     githubWorkflowBuildMatrixExclusions ++= {
       for {
