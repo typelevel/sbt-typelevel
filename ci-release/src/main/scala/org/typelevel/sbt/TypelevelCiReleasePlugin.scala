@@ -25,8 +25,7 @@ object TypelevelCiReleasePlugin extends AutoPlugin {
       TypelevelMimaPlugin &&
       TypelevelCiPlugin &&
       TypelevelSonatypeCiReleasePlugin &&
-      TypelevelCiSigningPlugin &&
-      TypelevelGitHubPlugin
+      TypelevelCiSigningPlugin
 
   override def trigger = noTrigger
 
