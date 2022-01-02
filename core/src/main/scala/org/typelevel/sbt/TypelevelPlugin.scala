@@ -20,7 +20,7 @@ import sbt._, Keys._
 import sbtghactions.GenerativePlugin
 import sbtghactions.GitHubActionsPlugin
 
-import de.heikoseeberger.sbtheader.{AutomateHeaderPlugin, HeaderPlugin, License, SpdxLicense}
+import de.heikoseeberger.sbtheader.AutomateHeaderPlugin
 
 object TypelevelPlugin extends AutoPlugin {
 
