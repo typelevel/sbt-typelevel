@@ -24,8 +24,10 @@ import sbtghactions.GenerativePlugin.autoImport._
 object TypelevelSonatypeCiReleasePlugin extends AutoPlugin {
 
   object autoImport {
+    lazy val tlCiReleaseTags = settingKey[Boolean](
+      "Controls whether or not v-prefixed tags should be released from CI (default true)")
     lazy val tlCiReleaseSnapshots = settingKey[Boolean](
-      "Controls whether or not snapshots should be released (default: false)")
+      "Controls whether or not snapshots should be released from CI (default: false)")
     lazy val tlCiReleaseBranches =
       settingKey[Seq[String]]("The branches in your repository to release from (default: [])")
   }
@@ -38,7 +40,7 @@ object TypelevelSonatypeCiReleasePlugin extends AutoPlugin {
   override def trigger = noTrigger
 
   override def globalSettings =
-    Seq(tlCiReleaseSnapshots := false, tlCiReleaseBranches := Seq())
+    Seq(tlCiReleaseTags := true, tlCiReleaseSnapshots := false, tlCiReleaseBranches := Seq())
 
   override def buildSettings = Seq(
     githubWorkflowEnv ++= Map(
@@ -46,13 +48,19 @@ object TypelevelSonatypeCiReleasePlugin extends AutoPlugin {
       "SONATYPE_PASSWORD" -> s"$${{ secrets.SONATYPE_PASSWORD }}"
     ),
     githubWorkflowPublishTargetBranches := {
-      val seed =
+      val snapshots =
         if (tlCiReleaseSnapshots.value)
           tlCiReleaseBranches.value.map(b => RefPredicate.Equals(Ref.Branch(b)))
         else
           Seq.empty
 
-      RefPredicate.StartsWith(Ref.Tag("v")) +: seed
+      val tags =
+        if (tlCiReleaseTags.value)
+          Seq(RefPredicate.StartsWith(Ref.Tag("v")))
+        else
+          Seq.empty
+
+      tags ++ snapshots
     },
     githubWorkflowTargetTags += "v*",
     githubWorkflowPublish := Seq(
