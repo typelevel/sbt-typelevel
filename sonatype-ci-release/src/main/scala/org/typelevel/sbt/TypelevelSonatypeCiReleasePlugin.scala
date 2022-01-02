@@ -46,7 +46,7 @@ object TypelevelSonatypeCiReleasePlugin extends AutoPlugin {
       "SONATYPE_PASSWORD" -> s"$${{ secrets.SONATYPE_PASSWORD }}"
     ),
     githubWorkflowPublishTargetBranches := {
-      val snapshots =
+      val branches =
         tlCiReleaseBranches.value.map(b => RefPredicate.Equals(Ref.Branch(b)))
 
       val tags =
@@ -55,7 +55,7 @@ object TypelevelSonatypeCiReleasePlugin extends AutoPlugin {
         else
           Seq.empty
 
-      tags ++ snapshots
+      tags ++ branches
     },
     githubWorkflowTargetTags += "v*",
     githubWorkflowPublish := Seq(
