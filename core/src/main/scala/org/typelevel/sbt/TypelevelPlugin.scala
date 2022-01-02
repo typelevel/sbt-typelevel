@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Typelevel
+ * Copyright 2022 Typelevel
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,29 +68,6 @@ object TypelevelPlugin extends AutoPlugin {
     "; project /; headerCheckAll; scalafmtCheckAll; scalafmtSbtCheck; clean; test; mimaReportBinaryIssues"
   )
 
-  override def projectSettings = AutomateHeaderPlugin.projectSettings ++
-    Seq(
-      headerLicense := {
-        // the following was copied from sbt-header
-        val licenseName = licenses.value match {
-          case (name, _) :: Nil => Some(name)
-          case _ => None
-        }
-
-        val spdxMapping =
-          License
-            .asInstanceOf[{ val spdxLicenses: Vector[SpdxLicense] }]
-            .spdxLicenses
-            .foldLeft(Map[String, SpdxLicense]()) { (acc, lic) =>
-              acc + (lic.spdxIdentifier -> lic)
-            }
-
-        for {
-          name <- licenseName
-          license <- spdxMapping.get(name)
-          year <- startYear.value.map(_.toString)
-        } yield license(year, organizationName.value, headerLicenseStyle.value)
-      }
-    )
+  override def projectSettings = AutomateHeaderPlugin.projectSettings
 
 }
