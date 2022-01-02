@@ -7,7 +7,7 @@ ThisBuild / organizationName := "Typelevel"
 ThisBuild / scalaVersion := "2.12.15"
 
 enablePlugins(TypelevelCiReleasePlugin)
-ThisBuild / tlCiReleaseSnapshotBranches := Seq("main")
+ThisBuild / tlCiReleaseBranches := Seq("main")
 
 ThisBuild / developers := List(
   tlGitHubDev("armanbilge", "Arman Bilge"),
