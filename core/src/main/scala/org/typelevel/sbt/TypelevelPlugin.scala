@@ -44,7 +44,6 @@ object TypelevelPlugin extends AutoPlugin {
   import TypelevelSettingsPlugin.autoImport._
   import GenerativePlugin.autoImport._
   import GitHubActionsPlugin.autoImport._
-  import HeaderPlugin.autoImport._
 
   override def globalSettings = Seq(
     tlFatalWarningsInCi := true
