@@ -17,7 +17,6 @@
 package org.typelevel.sbt
 
 import sbt._
-import sbtcrossproject.CrossProject
 import org.scalajs.sbtplugin.ScalaJSPlugin
 import sbtghactions.GenerativePlugin.autoImport._
 import scala.scalanative.sbtplugin.ScalaNativePlugin
@@ -67,10 +66,10 @@ final class CrossRootProject private (
       rootNative.disablePlugins(ps: _*)
     )
 
-  def aggregate(projects: CrossProject*)(implicit dummy: DummyImplicit): CrossRootProject =
-    aggregate(projects.flatMap(_.componentProjects): _*)
+  def aggregate(projects: CompositeProject*): CrossRootProject =
+    aggregateImpl(projects.flatMap(_.componentProjects): _*)
 
-  def aggregate(projects: Project*): CrossRootProject = {
+  private def aggregateImpl(projects: Project*): CrossRootProject = {
 
     val jsProjects = projects.filter(p => Plugins.satisfied(p.plugins, Set(ScalaJSPlugin)))
 
