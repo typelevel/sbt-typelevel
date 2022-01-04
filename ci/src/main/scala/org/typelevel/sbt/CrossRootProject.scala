@@ -110,22 +110,7 @@ object TypelevelCiCrossPlugin extends AutoPlugin {
 
   override def buildSettings = Seq(
     githubWorkflowBuild := Seq(WorkflowStep.Sbt(List(s"$${{ matrix.ci }}"))),
-    githubWorkflowBuildMatrixAdditions += "ci" -> Nil,
-    githubWorkflowGeneratedUploadSteps ~= { steps =>
-      // hack hack hack until upstreamed
-      // workaround for https://github.com/djspiewak/sbt-github-actions/pull/66
-      val mkdirStep = steps.headOption match {
-        case Some(
-              WorkflowStep
-                .Run(command :: _, Some("Compress target directories"), _, _, _, _)) =>
-          WorkflowStep.Run(
-            commands = List(command.replace("tar cf targets.tar", "mkdir -p")),
-            name = Some("Make target directories")
-          )
-        case _ => sys.error("Can't generate make target dirs workflow step")
-      }
-      mkdirStep +: steps
-    }
+    githubWorkflowBuildMatrixAdditions += "ci" -> Nil
   )
 }
 

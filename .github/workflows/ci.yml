@@ -60,6 +60,9 @@ jobs:
 
       - run: sbt ++${{ matrix.scala }} ci
 
+      - name: Make target directories
+        run: mkdir -p github/target kernel/target versioning/target ci-release/target target ci-signing/target mima/target no-publish/target sonatype/target ci/target sonatype-ci-release/target core/target settings/target project/target
+
       - name: Compress target directories
         run: tar cf targets.tar github/target kernel/target versioning/target ci-release/target target ci-signing/target mima/target no-publish/target sonatype/target ci/target sonatype-ci-release/target core/target settings/target project/target
 
