@@ -156,6 +156,12 @@ object TypelevelCiJSPlugin extends AutoPlugin {
   ) ++ Seq(
     githubWorkflowBuildMatrixAdditions ~= { matrix =>
       matrix.updated("ci", matrix("ci") ::: "ciJS" :: Nil)
+    },
+    githubWorkflowBuildMatrixExclusions ++= {
+      githubWorkflowJavaVersions
+        .value
+        .tail
+        .map(java => MatrixExclude(Map("ci" -> "ciJS", "java" -> java.render)))
     }
   )
 }
@@ -175,6 +181,12 @@ object TypelevelCiNativePlugin extends AutoPlugin {
   ) ++ Seq(
     githubWorkflowBuildMatrixAdditions ~= { matrix =>
       matrix.updated("ci", matrix("ci") ::: "ciNative" :: Nil)
+    },
+    githubWorkflowBuildMatrixExclusions ++= {
+      githubWorkflowJavaVersions
+        .value
+        .tail
+        .map(java => MatrixExclude(Map("ci" -> "ciNative", "java" -> java.render)))
     }
   )
 }
