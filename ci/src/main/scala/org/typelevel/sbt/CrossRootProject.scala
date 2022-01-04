@@ -17,9 +17,7 @@
 package org.typelevel.sbt
 
 import sbt._
-import org.scalajs.sbtplugin.ScalaJSPlugin
 import sbtghactions.GenerativePlugin.autoImport._
-import scala.scalanative.sbtplugin.ScalaNativePlugin
 
 /**
  * Simultaneously creates a `root`, `rootJVM`, `rootJS`, and `rootNative` project, and
@@ -70,11 +68,12 @@ final class CrossRootProject private (
     aggregateImpl(projects.flatMap(_.componentProjects): _*)
 
   private def aggregateImpl(projects: Project*): CrossRootProject = {
-
-    val jsProjects = projects.filter(p => Plugins.satisfied(p.plugins, Set(ScalaJSPlugin)))
+    val jsProjects =
+      projects.filter(_.plugins.toString.contains("org.scalajs.sbtplugin.ScalaJSPlugin"))
 
     val nativeProjects =
-      projects.filter(p => Plugins.satisfied(p.plugins, Set(ScalaNativePlugin)))
+      projects.filter(
+        _.plugins.toString.contains("scala.scalanative.sbtplugin.ScalaNativePlugin"))
 
     val jvmProjects = projects.diff(jsProjects).diff(nativeProjects)
 
