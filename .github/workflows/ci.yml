@@ -59,6 +59,9 @@ jobs:
       - name: Check that workflows are up to date
         run: sbt ++${{ matrix.scala }} githubWorkflowCheck
 
+      - name: Check headers and formatting
+        run: sbt ++${{ matrix.scala }} 'project /' headerCheckAll scalafmtCheckAll scalafmtSbtCheck
+
       - run: sbt ++${{ matrix.scala }} '${{ matrix.ci }}'
 
       - name: Make target directories

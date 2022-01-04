@@ -109,7 +109,11 @@ object TypelevelCiCrossPlugin extends AutoPlugin {
   override def requires = TypelevelCiPlugin
 
   override def buildSettings = Seq(
-    githubWorkflowBuild := Seq(WorkflowStep.Sbt(List(s"$${{ matrix.ci }}"))),
+    githubWorkflowBuild ~= { steps =>
+      // remove the usual ci step and replace with matrix ci
+      steps.diff(Seq(WorkflowStep.Sbt(List("ci")))) :+
+        WorkflowStep.Sbt(List(s"$${{ matrix.ci }}"))
+    },
     githubWorkflowBuildMatrixAdditions += "ci" -> Nil
   )
 }

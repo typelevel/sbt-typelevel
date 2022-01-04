@@ -67,6 +67,21 @@ object TypelevelPlugin extends AutoPlugin {
   ) ++ replaceCommandAlias(
     "ci",
     "; project /; headerCheckAll; scalafmtCheckAll; scalafmtSbtCheck; clean; test; mimaReportBinaryIssues"
+  ) ++ Seq(
+    githubWorkflowBuild := {
+      val step =
+        if (githubWorkflowBuildMatrixAdditions.value.keySet.contains("ci"))
+          // the CI has been crossed for JVM/JS/Native
+          // Trying to detect and replace aliases conditionally seems scary so we just add an extra step
+          Seq(
+            WorkflowStep.Sbt(
+              List("project /", "headerCheckAll", "scalafmtCheckAll", "scalafmtSbtCheck"),
+              name = Some("Check headers and formatting"))
+          )
+        else
+          Seq.empty
+      step ++ githubWorkflowBuild.value
+    }
   )
 
   override def projectSettings = AutomateHeaderPlugin.projectSettings
