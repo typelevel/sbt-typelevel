@@ -66,24 +66,37 @@ object TypelevelPlugin extends AutoPlugin {
     }
   ) ++ tlReplaceCommandAlias(
     "ci",
-    (ciCommands.head :: fmtCheckCommands ::: ciCommands.tail).mkCommand) ++ Seq(
-    githubWorkflowBuild := {
-      val step =
-        if (githubWorkflowBuildMatrixAdditions.value.keySet.contains("ci"))
-          // the CI has been crossed for JVM/JS/Native
-          // Trying to detect and replace aliases conditionally seems scary so we just add an extra step
-          Seq(
-            WorkflowStep.Sbt(
-              List("project /", "headerCheckAll", "scalafmtCheckAll", "scalafmtSbtCheck"),
-              name = Some("Check headers and formatting"))
-          )
-        else
-          Seq.empty
-      step ++ githubWorkflowBuild.value
-    }
-  )
+    (ciCommands.head :: fmtCheckCommands ::: ciCommands.tail).mkCommand)
 
   override def projectSettings = AutomateHeaderPlugin.projectSettings
 
-  val fmtCheckCommands = List("headerCheckAll", "scalafmtCheckAll", "scalafmtSbtCheck")
+  val fmtCheckCommands =
+    List("project /", "headerCheckAll", "scalafmtCheckAll", "scalafmtSbtCheck")
+}
+
+import TypelevelKernelPlugin.autoImport._
+import TypelevelPlugin.fmtCheckCommands
+import TypelevelCiJVMPlugin.ciJVMCommands
+import TypelevelCiJSPlugin.ciJSCommands
+import TypelevelCiNativePlugin.ciNativeCommands
+
+object TypelevelJVMPlugin extends AutoPlugin {
+  override def requires = TypelevelCiJVMPlugin
+  override def trigger = allRequirements
+  override def buildSettings =
+    tlReplaceCommandAlias("ciJVM", (fmtCheckCommands ++ ciJVMCommands).mkCommand)
+}
+
+object TypelevelJSPlugin extends AutoPlugin {
+  override def requires = TypelevelCiJSPlugin
+  override def trigger = allRequirements
+  override def buildSettings =
+    tlReplaceCommandAlias("ciJS", (fmtCheckCommands ++ ciJSCommands).mkCommand)
+}
+
+object TypelevelNativePlugin extends AutoPlugin {
+  override def requires = TypelevelCiNativePlugin
+  override def trigger = allRequirements
+  override def buildSettings =
+    tlReplaceCommandAlias("ciNative", (fmtCheckCommands ++ ciNativeCommands).mkCommand)
 }
