@@ -64,9 +64,7 @@ object TypelevelPlugin extends AutoPlugin {
         java <- githubWorkflowJavaVersions.value.tail
       } yield MatrixExclude(Map("scala" -> scala, "java" -> java.render))
     }
-  ) ++ tlReplaceCommandAlias(
-    "ci",
-    (ciCommands.head :: fmtCheckCommands ::: ciCommands.tail).mkCommand)
+  ) ++ tlReplaceCommandAlias("ci", (fmtCheckCommands ::: ciCommands.tail).mkCommand)
 
   override def projectSettings = AutomateHeaderPlugin.projectSettings
 
