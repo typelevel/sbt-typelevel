@@ -47,6 +47,16 @@ object TypelevelVersioningPlugin extends AutoPlugin {
       val dirty = git.gitUncommittedChanges.value
       !isVersionTagged && (tlUntaggedAreSnapshots.value || dirty)
     },
+    git.gitCurrentTags := {
+      // https://docs.github.com/en/actions/learn-github-actions/environment-variables
+      // GITHUB_REF_TYPE is either `branch` or `tag`
+      if (sys.env.get("GITHUB_REF_TYPE").exists(_ == "branch"))
+        // we are running in a workflow job that was *not* triggered by a tag
+        // so, we pretend tags do not exist
+        Seq.empty
+      else
+        git.gitCurrentTags.value
+    },
     version := {
       import scala.sys.process._
 
