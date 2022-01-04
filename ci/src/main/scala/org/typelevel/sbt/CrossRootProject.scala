@@ -105,6 +105,9 @@ object CrossRootProject {
   ).enablePlugins(NoPublishPlugin, TypelevelCiCrossPlugin)
 }
 
+/**
+ * This plugin is used internally by CrossRootProject.
+ */
 object TypelevelCiCrossPlugin extends AutoPlugin {
   override def requires = TypelevelCiPlugin
 
@@ -117,6 +120,8 @@ object TypelevelCiCrossPlugin extends AutoPlugin {
     githubWorkflowBuildMatrixAdditions += "ci" -> Nil
   )
 }
+
+// The following plugins are used internally to support CrossRootProject.
 
 object TypelevelCiJVMPlugin extends AutoPlugin {
   override def requires = TypelevelCiCrossPlugin
