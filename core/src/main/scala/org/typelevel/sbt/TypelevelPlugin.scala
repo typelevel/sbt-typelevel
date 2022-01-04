@@ -64,7 +64,7 @@ object TypelevelPlugin extends AutoPlugin {
         java <- githubWorkflowJavaVersions.value.tail
       } yield MatrixExclude(Map("scala" -> scala, "java" -> java.render))
     }
-  ) ++ replaceCommandAlias(
+  ) ++ tlReplaceCommandAlias(
     "ci",
     (ciCommands.head :: fmtCheckCommands ::: ciCommands.tail).mkCommand) ++ Seq(
     githubWorkflowBuild := {

@@ -27,7 +27,7 @@ object TypelevelKernelPlugin extends AutoPlugin {
   object autoImport {
     lazy val tlIsScala3 = settingKey[Boolean]("True if building with Scala 3")
 
-    def replaceCommandAlias(name: String, contents: String): Seq[Setting[State => State]] =
+    def tlReplaceCommandAlias(name: String, contents: String): Seq[Setting[State => State]] =
       Seq(GlobalScope / onLoad ~= { (f: State => State) =>
         f andThen { s: State =>
           BasicCommands.addAlias(BasicCommands.removeAlias(s, name), name, contents)
