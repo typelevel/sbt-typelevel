@@ -15,22 +15,19 @@ ThisBuild / developers := List(
   tlGitHubDev("djspiewak", "Daniel Spiewak")
 )
 
-lazy val root = project
-  .in(file("."))
-  .enablePlugins(NoPublishPlugin)
-  .aggregate(
-    kernel,
-    noPublish,
-    settings,
-    github,
-    versioning,
-    mima,
-    sonatype,
-    ciSigning,
-    sonatypeCiRelease,
-    ci,
-    core,
-    ciRelease)
+lazy val root = tlCrossRootProject.aggregate(
+  kernel,
+  noPublish,
+  settings,
+  github,
+  versioning,
+  mima,
+  sonatype,
+  ciSigning,
+  sonatypeCiRelease,
+  ci,
+  core,
+  ciRelease)
 
 lazy val kernel = project
   .in(file("kernel"))
@@ -105,7 +102,8 @@ lazy val ci = project
   .enablePlugins(SbtPlugin)
   .settings(
     name := "sbt-typelevel-ci"
-  ).dependsOn(noPublish)
+  )
+  .dependsOn(noPublish)
 
 lazy val ciRelease = project
   .in(file("ci-release"))

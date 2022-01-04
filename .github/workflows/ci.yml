@@ -29,6 +29,7 @@ jobs:
         os: [ubuntu-latest]
         scala: [2.12.15]
         java: [temurin@8]
+        ci: [ciJVM]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout current branch (full)
@@ -58,13 +59,13 @@ jobs:
       - name: Check that workflows are up to date
         run: sbt ++${{ matrix.scala }} githubWorkflowCheck
 
-      - run: sbt ++${{ matrix.scala }} ci
+      - run: sbt ++${{ matrix.scala }} '${{ matrix.ci }}'
 
       - name: Make target directories
-        run: mkdir -p github/target kernel/target versioning/target ci-release/target target ci-signing/target mima/target no-publish/target sonatype/target ci/target sonatype-ci-release/target core/target settings/target project/target
+        run: mkdir -p github/target kernel/target versioning/target ci-release/target target .js/target ci-signing/target mima/target .jvm/target .native/target no-publish/target sonatype/target ci/target sonatype-ci-release/target core/target settings/target project/target
 
       - name: Compress target directories
-        run: tar cf targets.tar github/target kernel/target versioning/target ci-release/target target ci-signing/target mima/target no-publish/target sonatype/target ci/target sonatype-ci-release/target core/target settings/target project/target
+        run: tar cf targets.tar github/target kernel/target versioning/target ci-release/target target .js/target ci-signing/target mima/target .jvm/target .native/target no-publish/target sonatype/target ci/target sonatype-ci-release/target core/target settings/target project/target
 
       - name: Upload target directories
         uses: actions/upload-artifact@v2
