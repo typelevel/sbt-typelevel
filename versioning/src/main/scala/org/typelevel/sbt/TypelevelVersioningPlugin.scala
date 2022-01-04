@@ -52,8 +52,11 @@ object TypelevelVersioningPlugin extends AutoPlugin {
       // GITHUB_REF_TYPE is either `branch` or `tag`
       if (sys.env.get("GITHUB_REF_TYPE").exists(_ == "branch"))
         // we are running in a workflow job that was *not* triggered by a tag
-        // so, we pretend tags do not exist
-        Seq.empty
+        // so, we discard tags that would affect our versioning
+        git.gitCurrentTags.value.flatMap {
+          case V.Tag(_) => None
+          case other => Some(other)
+        }
       else
         git.gitCurrentTags.value
     },
