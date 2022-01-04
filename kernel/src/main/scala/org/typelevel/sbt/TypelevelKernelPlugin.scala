@@ -26,12 +26,15 @@ object TypelevelKernelPlugin extends AutoPlugin {
 
   object autoImport {
     lazy val tlIsScala3 = settingKey[Boolean]("True if building with Scala 3")
+
     def replaceCommandAlias(name: String, contents: String): Seq[Setting[State => State]] =
       Seq(GlobalScope / onLoad ~= { (f: State => State) =>
         f andThen { s: State =>
           BasicCommands.addAlias(BasicCommands.removeAlias(s, name), name, contents)
         }
       })
+
+    implicit def tlCommandOps(commands: List[String]): TlCommandOps = new TlCommandOps(commands)
   }
 
   import autoImport._
@@ -41,6 +44,10 @@ object TypelevelKernelPlugin extends AutoPlugin {
   )
 
   override def buildSettings =
-    addCommandAlias("releaseLocal", "; reload; project /; +publishLocal")
+    addCommandAlias("releaseLocal", List("reload", "project /", "+publishLocal").mkCommand)
+
+  final class TlCommandOps(commands: List[String]) {
+    def mkCommand: String = commands.mkString("; ", "; ", "")
+  }
 
 }

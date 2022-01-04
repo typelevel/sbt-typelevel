@@ -18,6 +18,8 @@ package org.typelevel.sbt
 
 import sbt._
 import sbtghactions.GenerativePlugin.autoImport._
+import TypelevelKernelPlugin.autoImport._
+import TypelevelCiPlugin.ciCommands
 
 /**
  * Simultaneously creates a `root`, `rootJVM`, `rootJS`, and `rootNative` project, and
@@ -125,67 +127,56 @@ object TypelevelCiCrossPlugin extends AutoPlugin {
 object TypelevelCiJVMPlugin extends AutoPlugin {
   override def requires = TypelevelCiCrossPlugin
 
-  override def buildSettings: Seq[Setting[_]] = addCommandAlias(
-    "ciJVM",
-    List(
-      "project rootJVM",
-      "clean",
-      "test",
-      "mimaReportBinaryIssues"
-    ).mkString("; ", "; ", "")
-  ) ++ Seq(
-    githubWorkflowBuildMatrixAdditions ~= { matrix =>
-      matrix.updated("ci", matrix("ci") ::: "ciJVM" :: Nil)
-    }
-  )
+  override def buildSettings: Seq[Setting[_]] =
+    addCommandAlias("ciJVM", ciJVMCommands.mkCommand) ++ Seq(
+      githubWorkflowBuildMatrixAdditions ~= { matrix =>
+        matrix.updated("ci", matrix("ci") ::: "ciJVM" :: Nil)
+      }
+    )
+
+  val ciJVMCommands = "project rootJVM" :: ciCommands.tail
 }
 
 object TypelevelCiJSPlugin extends AutoPlugin {
   override def requires = TypelevelCiCrossPlugin
 
-  override def buildSettings: Seq[Setting[_]] = addCommandAlias(
-    "ciJS",
-    List(
-      "project rootJS",
-      "clean",
-      "Test/fastOptJS",
-      "test",
-      "mimaReportBinaryIssues"
-    ).mkString("; ", "; ", "")
-  ) ++ Seq(
-    githubWorkflowBuildMatrixAdditions ~= { matrix =>
-      matrix.updated("ci", matrix("ci") ::: "ciJS" :: Nil)
-    },
-    githubWorkflowBuildMatrixExclusions ++= {
-      githubWorkflowJavaVersions
-        .value
-        .tail
-        .map(java => MatrixExclude(Map("ci" -> "ciJS", "java" -> java.render)))
-    }
-  )
+  override def buildSettings: Seq[Setting[_]] =
+    addCommandAlias("ciJS", ciJSCommands.mkCommand) ++ Seq(
+      githubWorkflowBuildMatrixAdditions ~= { matrix =>
+        matrix.updated("ci", matrix("ci") ::: "ciJS" :: Nil)
+      },
+      githubWorkflowBuildMatrixExclusions ++= {
+        githubWorkflowJavaVersions
+          .value
+          .tail
+          .map(java => MatrixExclude(Map("ci" -> "ciJS", "java" -> java.render)))
+      }
+    )
+
+  val ciJSCommands = "project rootJS" :: ciCommands.tail.flatMap {
+    case "test" => List("Test/fastOptJS", "test")
+    case x => List(x)
+  }
 }
 
 object TypelevelCiNativePlugin extends AutoPlugin {
   override def requires = TypelevelCiCrossPlugin
 
-  override def buildSettings: Seq[Setting[_]] = addCommandAlias(
-    "ciNative",
-    List(
-      "project rootNative",
-      "clean",
-      "Test/nativeLink",
-      "test",
-      "mimaReportBinaryIssues"
-    ).mkString("; ", "; ", "")
-  ) ++ Seq(
-    githubWorkflowBuildMatrixAdditions ~= { matrix =>
-      matrix.updated("ci", matrix("ci") ::: "ciNative" :: Nil)
-    },
-    githubWorkflowBuildMatrixExclusions ++= {
-      githubWorkflowJavaVersions
-        .value
-        .tail
-        .map(java => MatrixExclude(Map("ci" -> "ciNative", "java" -> java.render)))
-    }
-  )
+  override def buildSettings: Seq[Setting[_]] =
+    addCommandAlias("ciNative", ciNativeCommands.mkCommand) ++ Seq(
+      githubWorkflowBuildMatrixAdditions ~= { matrix =>
+        matrix.updated("ci", matrix("ci") ::: "ciNative" :: Nil)
+      },
+      githubWorkflowBuildMatrixExclusions ++= {
+        githubWorkflowJavaVersions
+          .value
+          .tail
+          .map(java => MatrixExclude(Map("ci" -> "ciNative", "java" -> java.render)))
+      }
+    )
+
+  val ciNativeCommands = "project rootNative" :: ciCommands.tail.flatMap {
+    case "test" => List("Test/nativeLink", "test")
+    case x => List(x)
+  }
 }

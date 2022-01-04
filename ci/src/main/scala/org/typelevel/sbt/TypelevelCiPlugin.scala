@@ -31,16 +31,10 @@ object TypelevelCiPlugin extends AutoPlugin {
     def tlCrossRootProject: CrossRootProject = CrossRootProject()
   }
 
+  import TypelevelKernelPlugin.autoImport._
+
   override def buildSettings =
-    addCommandAlias(
-      "ci",
-      List(
-        "project /",
-        "clean",
-        "test",
-        "mimaReportBinaryIssues"
-      ).mkString("; ", "; ", "")
-    ) ++ Seq(
+    addCommandAlias("ci", ciCommands.mkCommand) ++ Seq(
       githubWorkflowPublishTargetBranches := Seq(),
       githubWorkflowBuild := Seq(WorkflowStep.Sbt(List("ci"))),
       githubWorkflowJavaVersions := Seq(JavaSpec.temurin("8")),
@@ -60,5 +54,12 @@ object TypelevelCiPlugin extends AutoPlugin {
         }
       }
     )
+
+  val ciCommands = List(
+    "project /",
+    "clean",
+    "test",
+    "mimaReportBinaryIssues"
+  )
 
 }

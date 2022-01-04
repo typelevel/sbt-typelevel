@@ -19,8 +19,8 @@ package org.typelevel.sbt
 import sbt._, Keys._
 import sbtghactions.GenerativePlugin
 import sbtghactions.GitHubActionsPlugin
-
 import de.heikoseeberger.sbtheader.AutomateHeaderPlugin
+import TypelevelCiPlugin.ciCommands
 
 object TypelevelPlugin extends AutoPlugin {
 
@@ -66,8 +66,7 @@ object TypelevelPlugin extends AutoPlugin {
     }
   ) ++ replaceCommandAlias(
     "ci",
-    "; project /; headerCheckAll; scalafmtCheckAll; scalafmtSbtCheck; clean; test; mimaReportBinaryIssues"
-  ) ++ Seq(
+    (ciCommands.head :: fmtCheckCommands ::: ciCommands.tail).mkCommand) ++ Seq(
     githubWorkflowBuild := {
       val step =
         if (githubWorkflowBuildMatrixAdditions.value.keySet.contains("ci"))
@@ -86,4 +85,5 @@ object TypelevelPlugin extends AutoPlugin {
 
   override def projectSettings = AutomateHeaderPlugin.projectSettings
 
+  val fmtCheckCommands = List("headerCheckAll", "scalafmtCheckAll", "scalafmtSbtCheck")
 }
