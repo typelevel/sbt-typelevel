@@ -27,6 +27,10 @@ object TypelevelCiPlugin extends AutoPlugin {
   override def requires = GitHubActionsPlugin && GenerativePlugin && MimaPlugin
   override def trigger = allRequirements
 
+  object autoImport {
+    def tlCrossRootProject: CrossRootProject = CrossRootProject()
+  }
+
   override def buildSettings =
     addCommandAlias(
       "ci",
