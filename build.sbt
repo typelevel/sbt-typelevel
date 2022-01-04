@@ -105,7 +105,7 @@ lazy val ci = project
   .enablePlugins(SbtPlugin)
   .settings(
     name := "sbt-typelevel-ci"
-  )
+  ).dependsOn(noPublish)
 
 lazy val ciRelease = project
   .in(file("ci-release"))
