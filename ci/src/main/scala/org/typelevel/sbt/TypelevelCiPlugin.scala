@@ -21,6 +21,7 @@ import sbtghactions.GenerativePlugin
 import sbtghactions.GitHubActionsPlugin
 import sbtghactions.GenerativePlugin.autoImport._
 import com.typesafe.tools.mima.plugin.MimaPlugin
+import TypelevelKernelPlugin.mkCommand
 
 object TypelevelCiPlugin extends AutoPlugin {
 
@@ -31,10 +32,8 @@ object TypelevelCiPlugin extends AutoPlugin {
     def tlCrossRootProject: CrossRootProject = CrossRootProject()
   }
 
-  import TypelevelKernelPlugin.autoImport._
-
   override def buildSettings =
-    addCommandAlias("ci", ciCommands.mkCommand) ++ Seq(
+    addCommandAlias("ci", mkCommand(ciCommands)) ++ Seq(
       githubWorkflowPublishTargetBranches := Seq(),
       githubWorkflowBuild := Seq(WorkflowStep.Sbt(List("ci"))),
       githubWorkflowJavaVersions := Seq(JavaSpec.temurin("8")),

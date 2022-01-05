@@ -20,6 +20,7 @@ import sbt._
 import sbtghactions.GenerativePlugin.autoImport._
 import TypelevelKernelPlugin.autoImport._
 import TypelevelCiPlugin.ciCommands
+import TypelevelKernelPlugin.mkCommand
 
 /**
  * Simultaneously creates a `root`, `rootJVM`, `rootJS`, and `rootNative` project, and
@@ -128,7 +129,7 @@ object TypelevelCiJVMPlugin extends AutoPlugin {
   override def requires = TypelevelCiCrossPlugin
 
   override def buildSettings: Seq[Setting[_]] =
-    addCommandAlias("ciJVM", ciJVMCommands.mkCommand) ++ Seq(
+    addCommandAlias("ciJVM", mkCommand(ciJVMCommands)) ++ Seq(
       githubWorkflowBuildMatrixAdditions ~= { matrix =>
         matrix.updated("ci", matrix("ci") ::: "ciJVM" :: Nil)
       }
@@ -141,7 +142,7 @@ object TypelevelCiJSPlugin extends AutoPlugin {
   override def requires = TypelevelCiCrossPlugin
 
   override def buildSettings: Seq[Setting[_]] =
-    addCommandAlias("ciJS", ciJSCommands.mkCommand) ++ Seq(
+    addCommandAlias("ciJS", mkCommand(ciJSCommands)) ++ Seq(
       githubWorkflowBuildMatrixAdditions ~= { matrix =>
         matrix.updated("ci", matrix("ci") ::: "ciJS" :: Nil)
       },
@@ -163,7 +164,7 @@ object TypelevelCiNativePlugin extends AutoPlugin {
   override def requires = TypelevelCiCrossPlugin
 
   override def buildSettings: Seq[Setting[_]] =
-    addCommandAlias("ciNative", ciNativeCommands.mkCommand) ++ Seq(
+    addCommandAlias("ciNative", mkCommand(ciNativeCommands)) ++ Seq(
       githubWorkflowBuildMatrixAdditions ~= { matrix =>
         matrix.updated("ci", matrix("ci") ::: "ciNative" :: Nil)
       },

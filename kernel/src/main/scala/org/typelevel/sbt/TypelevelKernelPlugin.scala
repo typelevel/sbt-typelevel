@@ -33,8 +33,6 @@ object TypelevelKernelPlugin extends AutoPlugin {
           BasicCommands.addAlias(BasicCommands.removeAlias(s, name), name, contents)
         }
       })
-
-    implicit def tlCommandOps(commands: List[String]): TlCommandOps = new TlCommandOps(commands)
   }
 
   import autoImport._
@@ -44,10 +42,8 @@ object TypelevelKernelPlugin extends AutoPlugin {
   )
 
   override def buildSettings =
-    addCommandAlias("releaseLocal", List("reload", "project /", "+publishLocal").mkCommand)
+    addCommandAlias("releaseLocal", mkCommand(List("reload", "project /", "+publishLocal")))
 
-  final class TlCommandOps(commands: List[String]) {
-    def mkCommand: String = commands.mkString("; ", "; ", "")
-  }
+  def mkCommand(commands: List[String]): String = commands.mkString("; ", "; ", "")
 
 }
