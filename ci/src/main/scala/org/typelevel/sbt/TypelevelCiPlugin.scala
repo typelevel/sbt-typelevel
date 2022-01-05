@@ -40,16 +40,15 @@ object TypelevelCiPlugin extends AutoPlugin {
       githubWorkflowGeneratedUploadSteps ~= { steps =>
         // hack hack hack until upstreamed
         // workaround for https://github.com/djspiewak/sbt-github-actions/pull/66
-        steps.headOption match {
-          case Some(
-                WorkflowStep
-                  .Run(command :: _, _, Some("Compress target directories"), _, _, _)) =>
+        steps.flatMap {
+          case compressStep @ WorkflowStep
+                .Run(command :: _, _, Some("Compress target directories"), _, _, _) =>
             val mkdirStep = WorkflowStep.Run(
               commands = List(command.replace("tar cf targets.tar", "mkdir -p")),
               name = Some("Make target directories")
             )
-            mkdirStep +: steps
-          case _ => steps
+            List(mkdirStep, compressStep)
+          case step => List(step)
         }
       }
     )
