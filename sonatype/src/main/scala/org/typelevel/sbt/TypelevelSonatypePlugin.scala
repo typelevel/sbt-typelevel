@@ -19,6 +19,7 @@ package org.typelevel.sbt
 import sbt._, Keys._
 import com.typesafe.tools.mima.plugin.MimaPlugin
 import xerial.sbt.Sonatype, Sonatype.autoImport._
+import TypelevelKernelPlugin.mkCommand
 
 object TypelevelSonatypePlugin extends AutoPlugin {
 
@@ -37,7 +38,14 @@ object TypelevelSonatypePlugin extends AutoPlugin {
     Seq(tlSonatypeUseLegacyHost := true) ++
       addCommandAlias(
         "release",
-        "; reload; project /; +mimaReportBinaryIssues; +publish; sonatypeBundleReleaseIfRelevant")
+        mkCommand(
+          List(
+            "reload",
+            "project /",
+            "+mimaReportBinaryIssues",
+            "+publish",
+            "sonatypeBundleReleaseIfRelevant"))
+      )
 
   override def projectSettings = Seq(
     publishMavenStyle := true, // we want to do this unconditionally, even if publishing a plugin

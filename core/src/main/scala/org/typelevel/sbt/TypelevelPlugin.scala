@@ -19,8 +19,9 @@ package org.typelevel.sbt
 import sbt._, Keys._
 import sbtghactions.GenerativePlugin
 import sbtghactions.GitHubActionsPlugin
-
 import de.heikoseeberger.sbtheader.AutomateHeaderPlugin
+import TypelevelCiPlugin.ciCommands
+import TypelevelKernelPlugin.mkCommand
 
 object TypelevelPlugin extends AutoPlugin {
 
@@ -64,11 +65,37 @@ object TypelevelPlugin extends AutoPlugin {
         java <- githubWorkflowJavaVersions.value.tail
       } yield MatrixExclude(Map("scala" -> scala, "java" -> java.render))
     }
-  ) ++ replaceCommandAlias(
-    "ci",
-    "; project /; headerCheckAll; scalafmtCheckAll; scalafmtSbtCheck; clean; test; mimaReportBinaryIssues"
-  )
+  ) ++ tlReplaceCommandAlias("ci", mkCommand(fmtCheckCommands ::: ciCommands.tail))
 
   override def projectSettings = AutomateHeaderPlugin.projectSettings
 
+  val fmtCheckCommands =
+    List("project /", "headerCheckAll", "scalafmtCheckAll", "scalafmtSbtCheck")
+}
+
+import TypelevelKernelPlugin.autoImport._
+import TypelevelPlugin.fmtCheckCommands
+import TypelevelCiJVMPlugin.ciJVMCommands
+import TypelevelCiJSPlugin.ciJSCommands
+import TypelevelCiNativePlugin.ciNativeCommands
+
+object TypelevelJVMPlugin extends AutoPlugin {
+  override def requires = TypelevelCiJVMPlugin
+  override def trigger = allRequirements
+  override def buildSettings =
+    tlReplaceCommandAlias("ciJVM", mkCommand(fmtCheckCommands ++ ciJVMCommands))
+}
+
+object TypelevelJSPlugin extends AutoPlugin {
+  override def requires = TypelevelCiJSPlugin
+  override def trigger = allRequirements
+  override def buildSettings =
+    tlReplaceCommandAlias("ciJS", mkCommand(fmtCheckCommands ++ ciJSCommands))
+}
+
+object TypelevelNativePlugin extends AutoPlugin {
+  override def requires = TypelevelCiNativePlugin
+  override def trigger = allRequirements
+  override def buildSettings =
+    tlReplaceCommandAlias("ciNative", mkCommand(fmtCheckCommands ++ ciNativeCommands))
 }
