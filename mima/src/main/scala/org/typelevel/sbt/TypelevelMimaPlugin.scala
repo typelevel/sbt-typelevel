@@ -59,7 +59,7 @@ object TypelevelMimaPlugin extends AutoPlugin {
           .map(v => V(v).getOrElse(sys.error(s"Version must be semver format: $v")))
         val previous = GitHelper
           .previousReleases()
-          .filterNot(tlCursedVersions.value)
+          .filterNot(tlCursedVersions.value.flatMap(V.unapply(_)).contains(_))
           .filterNot(_.isPrerelease)
           .filter(v => introduced.forall(v >= _))
           .filter(current.mustBeBinCompatWith(_))
