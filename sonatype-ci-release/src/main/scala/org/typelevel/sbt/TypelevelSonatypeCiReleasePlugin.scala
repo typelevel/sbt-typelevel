@@ -57,13 +57,6 @@ object TypelevelSonatypeCiReleasePlugin extends AutoPlugin {
 
       tags ++ branches
     },
-    githubWorkflowTargetTags += "v*",
-    githubWorkflowPublish := Seq(
-      WorkflowStep.Sbt(
-        List("release"),
-        cond = Some( // NEVER release a tag on a non-tag workflow run
-          "(startsWith(github.ref, 'refs/tags/v') && github.ref_type == 'tag') || (!startsWith(github.ref, 'refs/tags/v') && github.ref_type != 'tag')")
-      )
-    )
+    githubWorkflowTargetTags += "v*"
   )
 }
