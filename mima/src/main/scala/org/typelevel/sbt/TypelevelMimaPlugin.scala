@@ -32,9 +32,15 @@ object TypelevelMimaPlugin extends AutoPlugin {
     lazy val tlVersionIntroduced =
       settingKey[Map[String, String]](
         "A map scalaBinaryVersion -> version e.g. Map('2.13' -> '1.5.2', '3' -> '1.7.1') used to indicate that a particular crossScalaVersions value was introduced in a given version (default: empty).")
+    lazy val tlCursedVersions =
+      settingKey[Set[String]]("Versions to exclude from bin-compat checks (default: empty)")
   }
 
   import autoImport._
+
+  override def buildSettings = Seq(
+    tlCursedVersions := Set.empty
+  )
 
   override def projectSettings = Seq[Setting[_]](
     tlVersionIntroduced := Map.empty,
