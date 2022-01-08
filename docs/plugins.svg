@@ -1,0 +1,313 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<svg width="1622pt" height="332pt" viewBox="0.00 0.00 1622.35 332.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 328)">
+<title>%0</title>
+<polygon fill="#ffffff" stroke="transparent" points="-4,4 -4,-328 1618.3541,-328 1618.3541,4 -4,4"/>
+<!-- fmt -->
+<g id="node1" class="node">
+<title>fmt</title>
+<ellipse fill="none" stroke="#000000" cx="58.229" cy="-234" rx="58.459" ry="18"/>
+<text text-anchor="middle" x="58.229" y="-229.8" font-family="Times,serif" font-size="14.00" fill="#000000">sbt-scalafmt</text>
+</g>
+<!-- gha -->
+<g id="node2" class="node">
+<title>gha</title>
+<ellipse fill="none" stroke="#000000" cx="1030.229" cy="-90" rx="80.5373" ry="18"/>
+<text text-anchor="middle" x="1030.229" y="-85.8" font-family="Times,serif" font-size="14.00" fill="#000000">sbt-github-actions</text>
+</g>
+<!-- git -->
+<g id="node3" class="node">
+<title>git</title>
+<ellipse fill="none" stroke="#000000" cx="471.229" cy="-90" rx="35.931" ry="18"/>
+<text text-anchor="middle" x="471.229" y="-85.8" font-family="Times,serif" font-size="14.00" fill="#000000">sbt-git</text>
+</g>
+<!-- gpg -->
+<g id="node4" class="node">
+<title>gpg</title>
+<ellipse fill="none" stroke="#000000" cx="1169.229" cy="-90" rx="40.0089" ry="18"/>
+<text text-anchor="middle" x="1169.229" y="-85.8" font-family="Times,serif" font-size="14.00" fill="#000000">sbt-gpg</text>
+</g>
+<!-- header -->
+<g id="node5" class="node">
+<title>header</title>
+<ellipse fill="none" stroke="#000000" cx="185.229" cy="-234" rx="51.003" ry="18"/>
+<text text-anchor="middle" x="185.229" y="-229.8" font-family="Times,serif" font-size="14.00" fill="#000000">sbt-header</text>
+</g>
+<!-- mima -->
+<g id="node6" class="node">
+<title>mima</title>
+<ellipse fill="none" stroke="#000000" cx="1503.229" cy="-18" rx="75.3195" ry="18"/>
+<text text-anchor="middle" x="1503.229" y="-13.8" font-family="Times,serif" font-size="14.00" fill="#000000">sbt-mima-plugin</text>
+</g>
+<!-- sonatype -->
+<g id="node7" class="node">
+<title>sonatype</title>
+<ellipse fill="none" stroke="#000000" cx="1325.229" cy="-18" rx="59.6916" ry="18"/>
+<text text-anchor="middle" x="1325.229" y="-13.8" font-family="Times,serif" font-size="14.00" fill="#000000">sbt-sonatype</text>
+</g>
+<!-- sjs -->
+<g id="node8" class="node">
+<title>sjs</title>
+<ellipse fill="none" stroke="#000000" cx="576.229" cy="-90" rx="51.0165" ry="18"/>
+<text text-anchor="middle" x="576.229" y="-85.8" font-family="Times,serif" font-size="14.00" fill="#000000">sbt-scalajs</text>
+</g>
+<!-- sjscp -->
+<g id="node9" class="node">
+<title>sjscp</title>
+<ellipse fill="none" stroke="#000000" cx="355.229" cy="-234" rx="101.2524" ry="18"/>
+<text text-anchor="middle" x="355.229" y="-229.8" font-family="Times,serif" font-size="14.00" fill="#000000">sbt-scalajs-crossproject</text>
+</g>
+<!-- tlkernel -->
+<g id="node10" class="node">
+<title>tlkernel</title>
+<ellipse fill="none" stroke="#ff4c61" cx="674.229" cy="-18" rx="88.0191" ry="18"/>
+<text text-anchor="middle" x="674.229" y="-13.8" font-family="Times,serif" font-size="14.00" fill="#000000">sbt-typelevel-kernel</text>
+</g>
+<!-- tlnopub -->
+<g id="node11" class="node">
+<title>tlnopub</title>
+<ellipse fill="none" stroke="#ff4c61" cx="826.229" cy="-90" rx="105.3779" ry="18"/>
+<text text-anchor="middle" x="826.229" y="-85.8" font-family="Times,serif" font-size="14.00" fill="#000000">sbt-typelevel-no-publish</text>
+</g>
+<!-- tlsettings -->
+<g id="node12" class="node">
+<title>tlsettings</title>
+<ellipse fill="none" stroke="#ff4c61" cx="231.229" cy="-162" rx="93.7726" ry="18"/>
+<text text-anchor="middle" x="231.229" y="-157.8" font-family="Times,serif" font-size="14.00" fill="#000000">sbt-typelevel-settings</text>
+</g>
+<!-- tlsettings&#45;&gt;git -->
+<g id="edge2" class="edge">
+<title>tlsettings-&gt;git</title>
+<path fill="none" stroke="#000000" d="M281.8336,-146.8186C326.1742,-133.5165 389.7745,-114.4364 430.7951,-102.1302"/>
+<polygon fill="#000000" stroke="#000000" points="431.8853,-105.4573 440.4578,-99.2314 429.8738,-98.7525 431.8853,-105.4573"/>
+</g>
+<!-- tlsettings&#45;&gt;tlkernel -->
+<g id="edge1" class="edge">
+<title>tlsettings-&gt;tlkernel</title>
+<path fill="none" stroke="#000000" d="M260.525,-144.8124C296.0331,-124.6633 358.2099,-91.5452 415.229,-72 472.5631,-52.3468 539.6036,-38.607 591.1118,-29.9061"/>
+<polygon fill="#000000" stroke="#000000" points="591.9065,-33.3222 601.1989,-28.2328 590.7609,-26.4165 591.9065,-33.3222"/>
+</g>
+<!-- tlgithub -->
+<g id="node13" class="node">
+<title>tlgithub</title>
+<ellipse fill="none" stroke="#ff4c61" cx="660.229" cy="-162" rx="88.6236" ry="18"/>
+<text text-anchor="middle" x="660.229" y="-157.8" font-family="Times,serif" font-size="14.00" fill="#000000">sbt-typelevel-github</text>
+</g>
+<!-- tlgithub&#45;&gt;git -->
+<g id="edge4" class="edge">
+<title>tlgithub-&gt;git</title>
+<path fill="none" stroke="#000000" d="M617.2897,-146.1756C588.6129,-135.5391 550.0885,-121.1187 516.229,-108 513.7404,-107.0358 511.1776,-106.0342 508.5973,-105.0192"/>
+<polygon fill="#000000" stroke="#000000" points="509.8637,-101.7563 499.2775,-101.3286 507.2863,-108.2646 509.8637,-101.7563"/>
+</g>
+<!-- tlgithub&#45;&gt;sjs -->
+<g id="edge5" class="edge">
+<title>tlgithub-&gt;sjs</title>
+<path fill="none" stroke="#000000" d="M639.465,-144.2022C628.6491,-134.9315 615.2834,-123.4751 603.6301,-113.4867"/>
+<polygon fill="#000000" stroke="#000000" points="605.7589,-110.7015 595.8885,-106.851 601.2033,-116.0163 605.7589,-110.7015"/>
+</g>
+<!-- tlgithub&#45;&gt;tlkernel -->
+<g id="edge3" class="edge">
+<title>tlgithub-&gt;tlkernel</title>
+<path fill="none" stroke="#000000" d="M662.0021,-143.7623C664.39,-119.201 668.6633,-75.2474 671.4724,-46.3541"/>
+<polygon fill="#000000" stroke="#000000" points="674.9861,-46.3814 672.4703,-36.0896 668.019,-45.704 674.9861,-46.3814"/>
+</g>
+<!-- tlversioning -->
+<g id="node14" class="node">
+<title>tlversioning</title>
+<ellipse fill="none" stroke="#ff4c61" cx="448.229" cy="-162" rx="104.7945" ry="18"/>
+<text text-anchor="middle" x="448.229" y="-157.8" font-family="Times,serif" font-size="14.00" fill="#000000">sbt-typelevel-versioning</text>
+</g>
+<!-- tlversioning&#45;&gt;git -->
+<g id="edge7" class="edge">
+<title>tlversioning-&gt;git</title>
+<path fill="none" stroke="#000000" d="M454.0329,-143.8314C456.5855,-135.8406 459.639,-126.2819 462.4598,-117.4514"/>
+<polygon fill="#000000" stroke="#000000" points="465.7977,-118.5043 465.5067,-107.9134 459.1296,-116.3741 465.7977,-118.5043"/>
+</g>
+<!-- tlversioning&#45;&gt;tlkernel -->
+<g id="edge6" class="edge">
+<title>tlversioning-&gt;tlkernel</title>
+<path fill="none" stroke="#000000" d="M435.5537,-143.8026C423.5303,-124.0808 409.5778,-92.667 426.229,-72 445.8699,-47.6223 520.1087,-33.6701 582.2868,-26.0802"/>
+<polygon fill="#000000" stroke="#000000" points="583.0259,-29.5174 592.5475,-24.8711 582.2066,-22.5655 583.0259,-29.5174"/>
+</g>
+<!-- tlmima -->
+<g id="node15" class="node">
+<title>tlmima</title>
+<ellipse fill="none" stroke="#ff4c61" cx="1528.229" cy="-90" rx="86.2503" ry="18"/>
+<text text-anchor="middle" x="1528.229" y="-85.8" font-family="Times,serif" font-size="14.00" fill="#000000">sbt-typelevel-mima</text>
+</g>
+<!-- tlmima&#45;&gt;mima -->
+<g id="edge9" class="edge">
+<title>tlmima-&gt;mima</title>
+<path fill="none" stroke="#000000" d="M1521.9205,-71.8314C1519.2173,-64.0463 1515.9974,-54.7729 1512.998,-46.1347"/>
+<polygon fill="#000000" stroke="#000000" points="1516.2091,-44.7119 1509.6225,-36.4133 1509.5963,-47.0081 1516.2091,-44.7119"/>
+</g>
+<!-- tlmima&#45;&gt;tlkernel -->
+<g id="edge8" class="edge">
+<title>tlmima-&gt;tlkernel</title>
+<path fill="none" stroke="#000000" d="M1466.6818,-77.3833C1455.2643,-75.3495 1443.4129,-73.4421 1432.229,-72 1196.1541,-41.5601 916.3398,-27.2047 771.6952,-21.3815"/>
+<polygon fill="#000000" stroke="#000000" points="771.648,-17.877 761.5169,-20.9769 771.3699,-24.8714 771.648,-17.877"/>
+</g>
+<!-- tlsonatype -->
+<g id="node16" class="node">
+<title>tlsonatype</title>
+<ellipse fill="none" stroke="#ff4c61" cx="1325.229" cy="-90" rx="98.4139" ry="18"/>
+<text text-anchor="middle" x="1325.229" y="-85.8" font-family="Times,serif" font-size="14.00" fill="#000000">sbt-typelevel-sonatype</text>
+</g>
+<!-- tlsonatype&#45;&gt;mima -->
+<g id="edge12" class="edge">
+<title>tlsonatype-&gt;mima</title>
+<path fill="none" stroke="#000000" d="M1366.0658,-73.4817C1392.6003,-62.7487 1427.3082,-48.7095 1455.1709,-37.4392"/>
+<polygon fill="#000000" stroke="#000000" points="1456.7583,-40.5727 1464.7162,-33.5782 1454.1334,-34.0835 1456.7583,-40.5727"/>
+</g>
+<!-- tlsonatype&#45;&gt;sonatype -->
+<g id="edge11" class="edge">
+<title>tlsonatype-&gt;sonatype</title>
+<path fill="none" stroke="#000000" d="M1325.229,-71.8314C1325.229,-64.131 1325.229,-54.9743 1325.229,-46.4166"/>
+<polygon fill="#000000" stroke="#000000" points="1328.7291,-46.4132 1325.229,-36.4133 1321.7291,-46.4133 1328.7291,-46.4132"/>
+</g>
+<!-- tlsonatype&#45;&gt;tlkernel -->
+<g id="edge10" class="edge">
+<title>tlsonatype-&gt;tlkernel</title>
+<path fill="none" stroke="#000000" d="M1254.5375,-77.4133C1242.4457,-75.4595 1229.9921,-73.5714 1218.229,-72 1060.3409,-50.908 875.6547,-34.2617 767.1725,-25.2977"/>
+<polygon fill="#000000" stroke="#000000" points="767.1688,-21.7857 756.9156,-24.4543 766.5951,-28.7622 767.1688,-21.7857"/>
+</g>
+<!-- tlcisigning -->
+<g id="node17" class="node">
+<title>tlcisigning</title>
+<ellipse fill="none" stroke="#ff4c61" cx="1030.229" cy="-162" rx="102.5053" ry="18"/>
+<text text-anchor="middle" x="1030.229" y="-157.8" font-family="Times,serif" font-size="14.00" fill="#000000">sbt-typelevel-ci-signing</text>
+</g>
+<!-- tlcisigning&#45;&gt;gha -->
+<g id="edge13" class="edge">
+<title>tlcisigning-&gt;gha</title>
+<path fill="none" stroke="#000000" d="M1030.229,-143.8314C1030.229,-136.131 1030.229,-126.9743 1030.229,-118.4166"/>
+<polygon fill="#000000" stroke="#000000" points="1033.7291,-118.4132 1030.229,-108.4133 1026.7291,-118.4133 1033.7291,-118.4132"/>
+</g>
+<!-- tlcisigning&#45;&gt;gpg -->
+<g id="edge14" class="edge">
+<title>tlcisigning-&gt;gpg</title>
+<path fill="none" stroke="#000000" d="M1063.1701,-144.937C1084.3845,-133.9482 1111.9521,-119.6686 1133.6639,-108.4222"/>
+<polygon fill="#000000" stroke="#000000" points="1135.3053,-111.5138 1142.5749,-103.8064 1132.0856,-105.2981 1135.3053,-111.5138"/>
+</g>
+<!-- tlsonatypecirelease -->
+<g id="node18" class="node">
+<title>tlsonatypecirelease</title>
+<ellipse fill="none" stroke="#ff4c61" cx="1289.229" cy="-162" rx="138.8159" ry="18"/>
+<text text-anchor="middle" x="1289.229" y="-157.8" font-family="Times,serif" font-size="14.00" fill="#000000">sbt-typelevel-sonatype-ci-release</text>
+</g>
+<!-- tlsonatypecirelease&#45;&gt;gha -->
+<g id="edge16" class="edge">
+<title>tlsonatypecirelease-&gt;gha</title>
+<path fill="none" stroke="#000000" d="M1230.4579,-145.6621C1188.7298,-134.062 1132.8684,-118.5329 1090.752,-106.8249"/>
+<polygon fill="#000000" stroke="#000000" points="1091.4742,-103.393 1080.9021,-104.0867 1089.5993,-110.1373 1091.4742,-103.393"/>
+</g>
+<!-- tlsonatypecirelease&#45;&gt;tlsonatype -->
+<g id="edge15" class="edge">
+<title>tlsonatypecirelease-&gt;tlsonatype</title>
+<path fill="none" stroke="#000000" d="M1298.3134,-143.8314C1302.2905,-135.8771 1307.0445,-126.369 1311.4429,-117.5723"/>
+<polygon fill="#000000" stroke="#000000" points="1314.6807,-118.9228 1316.0224,-108.4133 1308.4197,-115.7923 1314.6807,-118.9228"/>
+</g>
+<!-- tlci -->
+<g id="node19" class="node">
+<title>tlci</title>
+<ellipse fill="none" stroke="#ff4c61" cx="838.229" cy="-162" rx="71.2017" ry="18"/>
+<text text-anchor="middle" x="838.229" y="-157.8" font-family="Times,serif" font-size="14.00" fill="#000000">sbt-typelevel-ci</text>
+</g>
+<!-- tlci&#45;&gt;gha -->
+<g id="edge19" class="edge">
+<title>tlci-&gt;gha</title>
+<path fill="none" stroke="#000000" d="M878.4785,-146.9064C907.7765,-135.9197 947.6762,-120.9573 979.2098,-109.1322"/>
+<polygon fill="#000000" stroke="#000000" points="980.5721,-112.3594 988.7064,-105.571 978.1142,-105.8051 980.5721,-112.3594"/>
+</g>
+<!-- tlci&#45;&gt;tlkernel -->
+<g id="edge17" class="edge">
+<title>tlci-&gt;tlkernel</title>
+<path fill="none" stroke="#000000" d="M786.3826,-149.6161C761.3133,-141.3794 732.369,-128.2486 712.229,-108 695.399,-91.0792 685.5898,-65.569 680.1681,-46.0237"/>
+<polygon fill="#000000" stroke="#000000" points="683.5131,-44.9759 677.6547,-36.148 676.7293,-46.7024 683.5131,-44.9759"/>
+</g>
+<!-- tlci&#45;&gt;tlnopub -->
+<g id="edge18" class="edge">
+<title>tlci-&gt;tlnopub</title>
+<path fill="none" stroke="#000000" d="M835.2009,-143.8314C833.9175,-136.131 832.3914,-126.9743 830.9651,-118.4166"/>
+<polygon fill="#000000" stroke="#000000" points="834.3944,-117.7018 829.2979,-108.4133 827.4896,-118.8526 834.3944,-117.7018"/>
+</g>
+<!-- tlcirelease -->
+<g id="node20" class="node">
+<title>tlcirelease</title>
+<polygon fill="none" stroke="#ff4c61" points="911.3216,-252 765.1365,-252 765.1365,-216 911.3216,-216 911.3216,-252"/>
+<text text-anchor="middle" x="838.229" y="-229.8" font-family="Times,serif" font-size="14.00" fill="#000000">sbt-typelevel-ci-release</text>
+</g>
+<!-- tlcirelease&#45;&gt;tlgithub -->
+<g id="edge21" class="edge">
+<title>tlcirelease-&gt;tlgithub</title>
+<path fill="none" stroke="#000000" d="M793.3121,-215.8314C767.8124,-205.5169 735.8534,-192.5896 709.6455,-181.9887"/>
+<polygon fill="#000000" stroke="#000000" points="710.8555,-178.7027 700.2728,-178.1975 708.2306,-185.1919 710.8555,-178.7027"/>
+</g>
+<!-- tlcirelease&#45;&gt;tlversioning -->
+<g id="edge22" class="edge">
+<title>tlcirelease-&gt;tlversioning</title>
+<path fill="none" stroke="#000000" d="M764.873,-220.4574C697.995,-208.1106 599.333,-189.8961 529.9548,-177.0878"/>
+<polygon fill="#000000" stroke="#000000" points="530.4077,-173.6124 519.9385,-175.2387 529.1368,-180.4961 530.4077,-173.6124"/>
+</g>
+<!-- tlcirelease&#45;&gt;tlmima -->
+<g id="edge23" class="edge">
+<title>tlcirelease-&gt;tlmima</title>
+<path fill="none" stroke="#000000" d="M911.5813,-230.1697C1061.0172,-221.9641 1390.5915,-201.6656 1437.229,-180 1467.5158,-165.9302 1493.6055,-137.3608 1509.9874,-116.166"/>
+<polygon fill="#000000" stroke="#000000" points="1512.9979,-117.9849 1516.1913,-107.8827 1507.3951,-113.7886 1512.9979,-117.9849"/>
+</g>
+<!-- tlcirelease&#45;&gt;tlcisigning -->
+<g id="edge25" class="edge">
+<title>tlcirelease-&gt;tlcisigning</title>
+<path fill="none" stroke="#000000" d="M886.6787,-215.8314C914.2054,-205.5089 948.71,-192.5696 976.9914,-181.9641"/>
+<polygon fill="#000000" stroke="#000000" points="978.5794,-185.1067 986.7138,-178.3182 976.1215,-178.5524 978.5794,-185.1067"/>
+</g>
+<!-- tlcirelease&#45;&gt;tlsonatypecirelease -->
+<g id="edge24" class="edge">
+<title>tlcirelease-&gt;tlsonatypecirelease</title>
+<path fill="none" stroke="#000000" d="M911.4423,-222.3118C987.5497,-210.1617 1107.1014,-191.0758 1191.296,-177.6345"/>
+<polygon fill="#000000" stroke="#000000" points="1192.0599,-181.057 1201.383,-176.0242 1190.9563,-174.1445 1192.0599,-181.057"/>
+</g>
+<!-- tlcirelease&#45;&gt;tlci -->
+<g id="edge20" class="edge">
+<title>tlcirelease-&gt;tlci</title>
+<path fill="none" stroke="#000000" d="M838.229,-215.8314C838.229,-208.131 838.229,-198.9743 838.229,-190.4166"/>
+<polygon fill="#000000" stroke="#000000" points="841.7291,-190.4132 838.229,-180.4133 834.7291,-190.4133 841.7291,-190.4132"/>
+</g>
+<!-- tl -->
+<g id="node21" class="node">
+<title>tl</title>
+<polygon fill="none" stroke="#ff4c61" points="399.541,-324 310.9171,-324 310.9171,-288 399.541,-288 399.541,-324"/>
+<text text-anchor="middle" x="355.229" y="-301.8" font-family="Times,serif" font-size="14.00" fill="#000000">sbt-typelevel</text>
+</g>
+<!-- tl&#45;&gt;fmt -->
+<g id="edge28" class="edge">
+<title>tl-&gt;fmt</title>
+<path fill="none" stroke="#000000" d="M311.0353,-296.0638C264.6541,-285.5329 189.6664,-268.2158 125.229,-252 120.9073,-250.9124 116.4353,-249.7632 111.9467,-248.593"/>
+<polygon fill="#000000" stroke="#000000" points="112.7072,-245.174 102.1456,-246.013 110.9252,-251.9434 112.7072,-245.174"/>
+</g>
+<!-- tl&#45;&gt;header -->
+<g id="edge29" class="edge">
+<title>tl-&gt;header</title>
+<path fill="none" stroke="#000000" d="M312.3309,-287.8314C286.4268,-276.8602 253.5434,-262.9332 227.7141,-251.9937"/>
+<polygon fill="#000000" stroke="#000000" points="228.7626,-248.6368 218.1894,-247.9597 226.0326,-255.0825 228.7626,-248.6368"/>
+</g>
+<!-- tl&#45;&gt;sjscp -->
+<g id="edge30" class="edge">
+<title>tl-&gt;sjscp</title>
+<path fill="none" stroke="#000000" d="M355.229,-287.8314C355.229,-280.131 355.229,-270.9743 355.229,-262.4166"/>
+<polygon fill="#000000" stroke="#000000" points="358.7291,-262.4132 355.229,-252.4133 351.7291,-262.4133 358.7291,-262.4132"/>
+</g>
+<!-- tl&#45;&gt;tlsettings -->
+<g id="edge26" class="edge">
+<title>tl-&gt;tlsettings</title>
+<path fill="none" stroke="#000000" d="M399.4285,-296.3338C423.3284,-288.6117 450.8284,-275.1117 465.229,-252 473.6903,-238.4204 475.1899,-228.5213 465.229,-216 460.1293,-209.5894 373.0781,-190.6938 306.6325,-177.0612"/>
+<polygon fill="#000000" stroke="#000000" points="307.0747,-173.5793 296.5763,-175.0058 305.6728,-180.4375 307.0747,-173.5793"/>
+</g>
+<!-- tl&#45;&gt;tlcirelease -->
+<g id="edge27" class="edge">
+<title>tl-&gt;tlcirelease</title>
+<path fill="none" stroke="#000000" d="M399.8028,-299.3555C480.4886,-287.3278 651.9183,-261.773 754.8847,-246.424"/>
+<polygon fill="#000000" stroke="#000000" points="755.5627,-249.8617 764.9373,-244.9255 754.5306,-242.9382 755.5627,-249.8617"/>
+</g>
+</g>
+</svg>
