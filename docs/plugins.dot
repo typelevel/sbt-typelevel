@@ -49,6 +49,7 @@ digraph {
   tlci[label="sbt-typelevel-ci"];
   tlci -> tlkernel;
   tlci -> tlnopub;
+  tlci -> gha;
 
   node[shape="box"];
 
