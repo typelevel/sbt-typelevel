@@ -1,10 +1,7 @@
 name := "sbt-typelevel"
 
 ThisBuild / tlBaseVersion := "0.4"
-ThisBuild / organization := "org.typelevel"
-ThisBuild / organizationName := "Typelevel"
-
-ThisBuild / scalaVersion := "2.12.15"
+ThisBuild / crossScalaVersions := Seq("2.12.15")
 
 enablePlugins(TypelevelCiReleasePlugin)
 
