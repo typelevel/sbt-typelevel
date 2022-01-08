@@ -117,6 +117,33 @@ object TypelevelSettingsPlugin extends AutoPlugin {
       }
     },
     scalacOptions ++= {
+      scalaVersion.value match {
+        case V(V(2, 12, _, _)) =>
+          Seq("-Ypartial-unification")
+
+        case V(V(2, 11, Some(build), _)) if build >= 11 =>
+          Seq("-Ypartial-unification")
+
+        case _ =>
+          Seq.empty
+      }
+    },
+    scalacOptions ++= {
+      val numCPUs = java.lang.Runtime.getRuntime.availableProcessors()
+      val settings = Seq(s"-Ybackend-parallelism", scala.math.min(16, numCPUs).toString)
+
+      scalaVersion.value match {
+        case V(V(2, 12, Some(build), _)) if build >= 5 =>
+          settings
+
+        case V(V(2, 13, _, _)) =>
+          settings
+
+        case _ =>
+          Seq.empty
+      }
+    },
+    scalacOptions ++= {
       if (tlIsScala3.value && crossScalaVersions.value.forall(_.startsWith("3.")))
         Seq("-Ykind-projector:underscores")
       else if (tlIsScala3.value)
