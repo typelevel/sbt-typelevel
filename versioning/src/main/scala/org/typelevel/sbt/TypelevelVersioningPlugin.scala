@@ -63,7 +63,7 @@ object TypelevelVersioningPlugin extends AutoPlugin {
     version := {
       import scala.sys.process._
 
-      val taggedVersion = getTaggedVersion(git.gitCurrentTags.value)
+      val taggedVersion = getTaggedVersion(git.gitCurrentTags.value).map(_.toString)
       taggedVersion.getOrElse {
         val baseV = V(tlBaseVersion.value)
           .getOrElse(sys.error(s"tlBaseVersion must be semver format: ${tlBaseVersion.value}"))
@@ -106,7 +106,7 @@ object TypelevelVersioningPlugin extends AutoPlugin {
 
   val Description = """^.*-(\d+)-[a-zA-Z0-9]+$""".r
 
-  def getTaggedVersion(tags: Seq[String]): Option[String] =
-    tags.collect { case v @ V.Tag(_) => v }.headOption
+  def getTaggedVersion(tags: Seq[String]): Option[V] =
+    tags.collect { case V.Tag(v) => v }.headOption
 
 }
