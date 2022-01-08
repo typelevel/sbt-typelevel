@@ -89,7 +89,7 @@ ThisBuild / tlSonatypeUseLegacyHost := false
 
 ## Customization
 
-The complete list of plugins, settings, and utilities is given below. The `sbt-typelevel-ci-release` and `sbt-typelevel` super-plugins automatically load most of them. The diagram below shows their inter-dependencies.
+The complete list of plugins, settings, and utilities is given below. The **sbt-typelevel-ci-release** and **sbt-typelevel** super-plugins automatically load most of them. The diagram below shows their inter-dependencies.
 
 Instead of using the super-plugins, for finer-grained control you can always add plugins individually to your project and even build your own custom super-plugin.
 
