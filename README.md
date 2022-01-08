@@ -14,7 +14,8 @@ addSbtPlugin("org.typelevel" % "sbt-typelevel-ci-release" % "<version>")
 
 // Then, in your build.sbt
 ThisBuild / tlBaseVersion := "0.4" // your current series x.y
-ThisBuild / developers += tlGitHubDev("armanbilge", "Arman Bilge") // your GitHub handle and name
+ThisBuild / developers +=
+  tlGitHubDev("armanbilge", "Arman Bilge") // your GitHub handle and name
 enablePlugins(TypelevelCiReleasePlugin)
 ```
 
