@@ -7,10 +7,10 @@ sbt-typelevel helps Scala projects to publish early-semantically-versioned, bina
 // Pick one, for plugins.sbt
 
 // Full service, batteries-included, let's go!
-addSbtPlugin("org.typelevel" % "sbt-typelevel" % "<version>") // plugins.sbt
+addSbtPlugin("org.typelevel" % "sbt-typelevel" % "<version>")
 
 // Set me up for CI release, but don't touch my scalacOptions!
-addSbtPlugin("org.typelevel" % "sbt-typelevel-ci-release" % "<version>") // plugins.sbt
+addSbtPlugin("org.typelevel" % "sbt-typelevel-ci-release" % "<version>")
 
 // Then, in your build.sbt
 ThisBuild / tlBaseVersion := "0.4" // your current series x.y
