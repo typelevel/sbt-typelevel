@@ -43,9 +43,9 @@ object TypelevelVersioningPlugin extends AutoPlugin {
     versionScheme := Some("early-semver"),
     tlUntaggedAreSnapshots := true,
     isSnapshot := {
-      val isVersionTagged = getTaggedVersion(git.gitCurrentTags.value).isDefined
+      val isUntagged = getTaggedVersion(git.gitCurrentTags.value).isEmpty
       val dirty = git.gitUncommittedChanges.value
-      !isVersionTagged && (tlUntaggedAreSnapshots.value || dirty)
+      dirty || (isUntagged && tlUntaggedAreSnapshots.value)
     },
     git.gitCurrentTags := {
       // https://docs.github.com/en/actions/learn-github-actions/environment-variables
