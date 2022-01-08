@@ -97,14 +97,14 @@ Instead of using the super-plugins, for finer-grained control you can always add
 - **sbt-typelevel-kernel**, `TypelevelKernelPlugin`
   - `tlIsScala3` (setting): true if `scalaVersion` is 3.x
   - `tlReplaceCommandAlias` (method): replace a `addCommandAlias` definition
-  - `releaseLocal` (command): alias for `+publishLocal`
+  - `tlReleaseLocal` (command): alias for `+publishLocal`
 - **sbt-typelevel-versioning**, `TypelevelVersioningPlugin`: Establishes a git-based, early semantic versioning scheme
   - `tlBaseVersion` (setting): the series your project is in. e.g., 0.2, 3.5
   - `tlUntaggedAreSnapshots` (setting): If true, an untagged commit is given a snapshot version, e.g. `0.4-17-00218f9-SNAPSHOT`. If false, it is given a release version, e.g. `0.4-17-00218f9`. (default: true)
 - **sbt-typelevel-mima**, `TypelevelMimaPlugin`: Determines previous MiMa artifacts via your `version` setting and git tags.
   - `tlVersionIntroduced` (setting): A map `scalaBinaryVersion -> version` e.g. `Map("2.13" -> "1.5.2", "3" -> "1.7.1")` used to indicate that a particular `crossScalaVersions` value was introduced in a given version (default: empty).
 - **sbt-typelevel-sonatype**, `TypelevelSonatypePlugin`.
-  - `release` (command): check binary-compatibility and `+publish` to sonatype
+  - `tlRelease` (command): check binary-compatibility and `+publish` to sonatype
   - `tlSonatypeUseLegacyHost` (setting): publish to `oss.sonatype.org` instead of `s01.oss.sonatype.org` (default: true)
 - **sbt-typelevel-settings**, `TypelevelSettingsPlugin`: Good and/or opinionated defaults for scalac settings etc., inspired by sbt-tpolecat.
   - `tlFatalWarnings` (setting): Convert compiler warnings into errors (default: false).
