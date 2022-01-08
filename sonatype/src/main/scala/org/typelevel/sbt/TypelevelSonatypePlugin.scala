@@ -37,7 +37,7 @@ object TypelevelSonatypePlugin extends AutoPlugin {
   override def buildSettings =
     Seq(tlSonatypeUseLegacyHost := true) ++
       addCommandAlias(
-        "release",
+        "tlRelease",
         mkCommand(
           List(
             "reload",
