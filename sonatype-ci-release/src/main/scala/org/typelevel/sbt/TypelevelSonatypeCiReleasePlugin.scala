@@ -57,6 +57,9 @@ object TypelevelSonatypeCiReleasePlugin extends AutoPlugin {
 
       tags ++ branches
     },
-    githubWorkflowTargetTags += "v*"
+    githubWorkflowTargetTags += "v*",
+    githubWorkflowPublish := Seq(
+      WorkflowStep.Sbt(List("release"))
+    )
   )
 }
