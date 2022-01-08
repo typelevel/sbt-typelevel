@@ -63,8 +63,9 @@ object TypelevelVersioningPlugin extends AutoPlugin {
     version := {
       import scala.sys.process._
 
-      val taggedVersion = getTaggedVersion(git.gitCurrentTags.value)
-      taggedVersion.getOrElse {
+      var version = getTaggedVersion(git.gitCurrentTags.value).map(_.toString).getOrElse {
+        // No tag, so we build our version based on this commit
+
         val baseV = V(tlBaseVersion.value)
           .getOrElse(sys.error(s"tlBaseVersion must be semver format: ${tlBaseVersion.value}"))
 
@@ -91,22 +92,27 @@ object TypelevelVersioningPlugin extends AutoPlugin {
         }
 
         git.gitHeadCommit.value.foreach { sha => version += s"-${sha.take(7)}" }
-        if (git.gitUncommittedChanges.value) {
-          import java.time.Instant
-          // Drop the sub-second precision
-          val now = Instant.ofEpochSecond(Instant.now().getEpochSecond())
-          val formatted = now.toString.replace("-", "").replace(":", "")
-          version += s"-$formatted"
-        }
-        if (isSnapshot.value) version += "-SNAPSHOT"
         version
       }
+
+      // Even if version was provided by a tag, we check for uncommited changes
+      if (git.gitUncommittedChanges.value) {
+        import java.time.Instant
+        // Drop the sub-second precision
+        val now = Instant.ofEpochSecond(Instant.now().getEpochSecond())
+        val formatted = now.toString.replace("-", "").replace(":", "")
+        version += s"-$formatted"
+      }
+
+      if (isSnapshot.value) version += "-SNAPSHOT"
+
+      version
     }
   )
 
   val Description = """^.*-(\d+)-[a-zA-Z0-9]+$""".r
 
-  def getTaggedVersion(tags: Seq[String]): Option[String] =
-    tags.collect { case v @ V.Tag(_) => v }.headOption
+  def getTaggedVersion(tags: Seq[String]): Option[V] =
+    tags.collect { case V.Tag(v) => v }.headOption
 
 }
