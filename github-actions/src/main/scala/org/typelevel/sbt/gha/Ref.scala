@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package sbtghactions
+package org.typelevel.sbt.gha
 
 sealed trait Ref extends Product with Serializable
 

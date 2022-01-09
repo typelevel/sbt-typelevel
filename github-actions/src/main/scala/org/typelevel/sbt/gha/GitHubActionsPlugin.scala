@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package sbtghactions
+package org.typelevel.sbt.gha
 
 import sbt._, Keys._
 import sbt.io.Using

@@ -17,8 +17,8 @@
 package org.typelevel.sbt
 
 import sbt._, Keys._
-import sbtghactions.GenerativePlugin
-import sbtghactions.GitHubActionsPlugin
+import org.typelevel.sbt.gha.GenerativePlugin
+import org.typelevel.sbt.gha.GitHubActionsPlugin
 import de.heikoseeberger.sbtheader.AutomateHeaderPlugin
 import TypelevelCiPlugin.ciCommands
 import TypelevelKernelPlugin.mkCommand

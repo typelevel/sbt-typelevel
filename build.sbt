@@ -92,6 +92,7 @@ lazy val ciSigning = project
   .settings(
     name := "sbt-typelevel-ci-signing"
   )
+  .dependsOn(githubActions)
 
 lazy val sonatypeCiRelease = project
   .in(file("sonatype-ci-release"))
@@ -99,7 +100,7 @@ lazy val sonatypeCiRelease = project
   .settings(
     name := "sbt-typelevel-sonatype-ci-release"
   )
-  .dependsOn(sonatype)
+  .dependsOn(sonatype, githubActions)
 
 lazy val ci = project
   .in(file("ci"))
@@ -107,7 +108,7 @@ lazy val ci = project
   .settings(
     name := "sbt-typelevel-ci"
   )
-  .dependsOn(noPublish, kernel)
+  .dependsOn(noPublish, kernel, githubActions)
 
 lazy val ciRelease = project
   .in(file("ci-release"))

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package sbtghactions
+package org.typelevel.sbt.gha
 
 sealed trait PREventType extends Product with Serializable
 

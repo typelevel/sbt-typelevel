@@ -18,9 +18,9 @@ package org.typelevel.sbt
 
 import io.crashbox.gpg.SbtGpg
 import sbt._, Keys._
-import sbtghactions.GenerativePlugin
-import sbtghactions.GitHubActionsPlugin
-import sbtghactions.GenerativePlugin.autoImport._
+import org.typelevel.sbt.gha.GenerativePlugin
+import org.typelevel.sbt.gha.GitHubActionsPlugin
+import org.typelevel.sbt.gha.GenerativePlugin.autoImport._
 
 object TypelevelCiSigningPlugin extends AutoPlugin {
 

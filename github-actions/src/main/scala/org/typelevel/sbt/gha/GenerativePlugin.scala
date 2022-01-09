@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package sbtghactions
+package org.typelevel.sbt.gha
 
 import sbt.Keys._
 import sbt._
@@ -28,38 +28,38 @@ object GenerativePlugin extends AutoPlugin {
   override def trigger = allRequirements
 
   object autoImport extends GenerativeKeys {
-    type WorkflowJob = sbtghactions.WorkflowJob
-    val WorkflowJob = sbtghactions.WorkflowJob
+    type WorkflowJob = org.typelevel.sbt.gha.WorkflowJob
+    val WorkflowJob = org.typelevel.sbt.gha.WorkflowJob
 
-    type JobContainer = sbtghactions.JobContainer
-    val JobContainer = sbtghactions.JobContainer
+    type JobContainer = org.typelevel.sbt.gha.JobContainer
+    val JobContainer = org.typelevel.sbt.gha.JobContainer
 
-    type WorkflowStep = sbtghactions.WorkflowStep
-    val WorkflowStep = sbtghactions.WorkflowStep
+    type WorkflowStep = org.typelevel.sbt.gha.WorkflowStep
+    val WorkflowStep = org.typelevel.sbt.gha.WorkflowStep
 
-    type RefPredicate = sbtghactions.RefPredicate
-    val RefPredicate = sbtghactions.RefPredicate
+    type RefPredicate = org.typelevel.sbt.gha.RefPredicate
+    val RefPredicate = org.typelevel.sbt.gha.RefPredicate
 
-    type Ref = sbtghactions.Ref
-    val Ref = sbtghactions.Ref
+    type Ref = org.typelevel.sbt.gha.Ref
+    val Ref = org.typelevel.sbt.gha.Ref
 
-    type UseRef = sbtghactions.UseRef
-    val UseRef = sbtghactions.UseRef
+    type UseRef = org.typelevel.sbt.gha.UseRef
+    val UseRef = org.typelevel.sbt.gha.UseRef
 
-    type PREventType = sbtghactions.PREventType
-    val PREventType = sbtghactions.PREventType
+    type PREventType = org.typelevel.sbt.gha.PREventType
+    val PREventType = org.typelevel.sbt.gha.PREventType
 
-    type MatrixInclude = sbtghactions.MatrixInclude
-    val MatrixInclude = sbtghactions.MatrixInclude
+    type MatrixInclude = org.typelevel.sbt.gha.MatrixInclude
+    val MatrixInclude = org.typelevel.sbt.gha.MatrixInclude
 
-    type MatrixExclude = sbtghactions.MatrixExclude
-    val MatrixExclude = sbtghactions.MatrixExclude
+    type MatrixExclude = org.typelevel.sbt.gha.MatrixExclude
+    val MatrixExclude = org.typelevel.sbt.gha.MatrixExclude
 
-    type Paths = sbtghactions.Paths
-    val Paths = sbtghactions.Paths
+    type Paths = org.typelevel.sbt.gha.Paths
+    val Paths = org.typelevel.sbt.gha.Paths
 
-    type JavaSpec = sbtghactions.JavaSpec
-    val JavaSpec = sbtghactions.JavaSpec
+    type JavaSpec = org.typelevel.sbt.gha.JavaSpec
+    val JavaSpec = org.typelevel.sbt.gha.JavaSpec
   }
 
   import autoImport._
@@ -807,7 +807,7 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
     }
   )
 
-  private[sbtghactions] def diff(expected: String, actual: String): String = {
+  private[gha] def diff(expected: String, actual: String): String = {
     val expectedLines = expected.split("\n", -1)
     val actualLines = actual.split("\n", -1)
     val (lines, _) =

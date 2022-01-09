@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package sbtghactions
+package org.typelevel.sbt.gha
 
 sealed trait WorkflowStep extends Product with Serializable {
   def id: Option[String]

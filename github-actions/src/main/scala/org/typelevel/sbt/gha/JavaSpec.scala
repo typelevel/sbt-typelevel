@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package sbtghactions
+package org.typelevel.sbt.gha
 
 final case class JavaSpec(dist: JavaSpec.Distribution, version: String) {
   def render: String = dist match {
