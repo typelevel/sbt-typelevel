@@ -214,7 +214,7 @@ ${indent(rendered.mkString("\n"), 1)}"""
       case sbtStep: Sbt =>
         import sbtStep.commands
 
-        val version = "++${{ matrix.scala }}"
+        val version = s"++$${{ matrix.scala }}"
         val sbtClientMode = sbt.matches("""sbt.* --client($| .*)""")
         val safeCommands =
           if (sbtClientMode)
