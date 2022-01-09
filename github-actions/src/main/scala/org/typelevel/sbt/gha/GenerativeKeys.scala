@@ -56,6 +56,9 @@ trait GenerativeKeys {
     "A list of steps to insert after base setup but before compiling and testing (default: [])")
   lazy val githubWorkflowBuildPostamble = settingKey[Seq[WorkflowStep]](
     "A list of steps to insert after comping and testing but before the end of the build job (default: [])")
+  lazy val githubWorkflowBuildSbtStepPreamble =
+    settingKey[Seq[String]](
+      s"Commands automatically prepended to an SbtStep (default: ['++$${{ matrix.scala }}'])")
   lazy val githubWorkflowBuild = settingKey[Seq[WorkflowStep]](
     "A sequence of workflow steps which compile and test the project (default: [Sbt(List(\"test\"))])")
 
