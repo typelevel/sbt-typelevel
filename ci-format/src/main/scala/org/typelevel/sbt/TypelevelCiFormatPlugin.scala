@@ -20,7 +20,7 @@ import sbt._
 import org.scalafmt.sbt.ScalafmtPlugin
 import org.typelevel.sbt.gha.GenerativePlugin
 
-object TypelevelCiFormattingPlugin extends AutoPlugin {
+object TypelevelCiFormatPlugin extends AutoPlugin {
 
   import GenerativePlugin.autoImport._
 
