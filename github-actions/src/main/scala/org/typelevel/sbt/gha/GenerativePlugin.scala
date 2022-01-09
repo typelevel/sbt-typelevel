@@ -184,7 +184,11 @@ object GenerativePlugin extends AutoPlugin {
 ${indent(rendered.mkString("\n"), 1)}"""
     }
 
-  def compileStep(step: WorkflowStep, sbt: String, declareShell: Boolean = false): String = {
+  def compileStep(
+      step: WorkflowStep,
+      sbt: String,
+      sbtStepPreamble: List[String],
+      declareShell: Boolean = false): String = {
     import WorkflowStep._
 
     val renderedName = step.name.map(wrap).map("name: " + _ + "\n").getOrElse("")
@@ -214,20 +218,19 @@ ${indent(rendered.mkString("\n"), 1)}"""
       case sbtStep: Sbt =>
         import sbtStep.commands
 
-        val version = s"++$${{ matrix.scala }}"
         val sbtClientMode = sbt.matches("""sbt.* --client($| .*)""")
         val safeCommands =
           if (sbtClientMode)
-            s"'${(version :: commands).mkString("; ")}'"
+            s"'${(sbtStepPreamble ::: commands).mkString("; ")}'"
           else
-            commands
+            (sbtStepPreamble ::: commands)
               .map { c =>
                 if (c.indexOf(' ') >= 0)
                   s"'$c'"
                 else
                   c
               }
-              .mkString(version + " ", " ", "")
+              .mkString(" ")
 
         renderRunBody(
           commands = List(s"$sbt $safeCommands"),
@@ -425,6 +428,7 @@ ${indent(rendered.mkString("\n"), 1)}"""
 
     val renderedFailFast = job.matrixFailFast.fold("")("\n  fail-fast: " + _)
 
+    // format: off
     val body = s"""name: ${wrap(job.name)}${renderedNeeds}${renderedCond}
 strategy:${renderedFailFast}
   matrix:
@@ -433,9 +437,8 @@ strategy:${renderedFailFast}
     java:${compileList(job.javas.map(_.render), 3)}${renderedMatrices}
 runs-on: ${runsOn}${renderedEnvironment}${renderedContainer}${renderedEnv}
 steps:
-${indent(
-      job.steps.map(compileStep(_, sbt, declareShell = declareShell)).mkString("\n\n"),
-      1)}"""
+${indent(job.steps.map(compileStep(_, sbt, job.sbtStepPreamble, declareShell = declareShell)).mkString("\n\n"), 1)}"""
+    // format: on
 
     s"${job.id}:\n${indent(body, 1)}"
   }
