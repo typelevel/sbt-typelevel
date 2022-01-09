@@ -15,6 +15,7 @@ lazy val root = tlCrossRootProject.aggregate(
   noPublish,
   settings,
   github,
+  githubActions,
   versioning,
   mima,
   sonatype,
@@ -53,6 +54,13 @@ lazy val github = project
     name := "sbt-typelevel-github"
   )
   .dependsOn(kernel)
+
+lazy val githubActions = project
+  .in(file("github-actions"))
+  .enablePlugins(SbtPlugin)
+  .settings(
+    name := "sbt-typelevel-github-actions"
+  )
 
 lazy val versioning = project
   .in(file("versioning"))
