@@ -29,7 +29,7 @@ jobs:
         os: [ubuntu-latest]
         scala: [2.12.15]
         java: [temurin@8]
-        ci: [ciJVM]
+        project: [rootJVM]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout current branch (full)
@@ -57,9 +57,15 @@ jobs:
           key: ${{ runner.os }}-sbt-cache-v2-${{ hashFiles('**/*.sbt') }}-${{ hashFiles('project/build.properties') }}
 
       - name: Check that workflows are up to date
-        run: sbt '++${{ matrix.scala }}' 'project /' githubWorkflowCheck
+        run: sbt 'project ${{ matrix.project }}' '++${{ matrix.scala }}' 'project /' githubWorkflowCheck
 
-      - run: sbt '++${{ matrix.scala }}' '${{ matrix.ci }}'
+      - run: sbt 'project ${{ matrix.project }}' '++${{ matrix.scala }}' headerCheckAll scalafmtCheckAll scalafmtSbtCheck
+
+      - run: sbt 'project ${{ matrix.project }}' '++${{ matrix.scala }}' clean
+
+      - run: sbt 'project ${{ matrix.project }}' '++${{ matrix.scala }}' test
+
+      - run: sbt 'project ${{ matrix.project }}' '++${{ matrix.scala }}' mimaReportBinaryIssues
 
       - name: Make target directories
         run: mkdir -p github/target github-actions/target kernel/target versioning/target ci-release/target target .js/target ci-signing/target mima/target .jvm/target .native/target no-publish/target sonatype/target ci/target sonatype-ci-release/target core/target settings/target project/target
