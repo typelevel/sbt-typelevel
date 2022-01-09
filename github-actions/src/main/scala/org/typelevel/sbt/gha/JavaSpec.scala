@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 Daniel Spiewak
+ * Copyright 2022 Typelevel
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,8 @@ final case class JavaSpec(dist: JavaSpec.Distribution, version: String) {
 object JavaSpec {
 
   def temurin(version: String): JavaSpec = JavaSpec(Distribution.Temurin, version)
-  def graalvm(graal: String, version: String): JavaSpec = JavaSpec(Distribution.GraalVM(graal), version)
+  def graalvm(graal: String, version: String): JavaSpec =
+    JavaSpec(Distribution.GraalVM(graal), version)
 
   sealed abstract class Distribution(val rendering: String) extends Product with Serializable
 

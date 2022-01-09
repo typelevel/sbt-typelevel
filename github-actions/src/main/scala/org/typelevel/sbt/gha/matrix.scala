@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 Daniel Spiewak
+ * Copyright 2022 Typelevel
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,6 @@
 
 package sbtghactions
 
-final case class MatrixInclude(
-    matching: Map[String, String],
-    additions: Map[String, String])
+final case class MatrixInclude(matching: Map[String, String], additions: Map[String, String])
 
 final case class MatrixExclude(matching: Map[String, String])

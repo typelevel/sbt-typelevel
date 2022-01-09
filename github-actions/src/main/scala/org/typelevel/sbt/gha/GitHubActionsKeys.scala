@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 Daniel Spiewak
+ * Copyright 2022 Typelevel
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,11 +20,14 @@ import sbt._
 
 trait GitHubActionsKeys {
 
-  lazy val githubIsWorkflowBuild = settingKey[Boolean]("Indicates whether or not the current sbt session is running within a GitHub Actions Workflow")
+  lazy val githubIsWorkflowBuild = settingKey[Boolean](
+    "Indicates whether or not the current sbt session is running within a GitHub Actions Workflow")
 
-  lazy val githubWorkflowName = settingKey[String]("Contains the name of the currently-running workflow, if defined")
+  lazy val githubWorkflowName =
+    settingKey[String]("Contains the name of the currently-running workflow, if defined")
 
-  lazy val githubWorkflowDefinition = settingKey[Map[String, Any]]("The raw (parsed) contents of the workflow manifest file corresponding to this build, recursively converted to Scala")
+  lazy val githubWorkflowDefinition = settingKey[Map[String, Any]](
+    "The raw (parsed) contents of the workflow manifest file corresponding to this build, recursively converted to Scala")
 }
 
 object GitHubActionsKeys extends GitHubActionsKeys

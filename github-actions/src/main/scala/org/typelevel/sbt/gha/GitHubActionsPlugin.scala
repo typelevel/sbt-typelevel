@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 Daniel Spiewak
+ * Copyright 2022 Typelevel
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,7 +63,6 @@ object GitHubActionsPlugin extends AutoPlugin {
       case Some(workflowName) =>
         Seq(
           githubWorkflowName := workflowName,
-
           githubWorkflowDefinition := {
             val log = sLog.value
             val name = githubWorkflowName.value
@@ -75,14 +74,20 @@ object GitHubActionsPlugin extends AutoPlugin {
               if (workflowsDir.exists() && workflowsDir.isDirectory()) {
                 log.info(s"looking for workflow definition in $workflowsDir")
 
-                val results = workflowsDir.listFiles().filter(_.getName.endsWith(".yml")).toList.view flatMap { potential =>
+                val results = workflowsDir
+                  .listFiles()
+                  .filter(_.getName.endsWith(".yml"))
+                  .toList
+                  .view flatMap { potential =>
                   Using.fileInputStream(potential) { fis =>
                     Option(new Yaml().load[Any](fis)) collect {
                       case map: java.util.Map[_, _] =>
-                        map.asScala.toMap map { case (k, v) => k.toString -> recursivelyConvert(v) }
+                        map.asScala.toMap map {
+                          case (k, v) => k.toString -> recursivelyConvert(v)
+                        }
                     }
                   }
-                } filter ( _ get "name" match {
+                } filter (_ get "name" match {
                   case Some(nameValue) =>
                     nameValue == name
                   case None =>
@@ -97,15 +102,17 @@ object GitHubActionsPlugin extends AutoPlugin {
                   Map()
                 }
               } else {
-                Map()   // silently pretend nothing is wrong, because we're probably running in a meta-plugin or something random
+                Map() // silently pretend nothing is wrong, because we're probably running in a meta-plugin or something random
               }
             } else {
-              log.warn("sbt does not appear to be running within GitHub Actions ($GITHUB_WORKFLOW is undefined)")
+              log.warn(
+                "sbt does not appear to be running within GitHub Actions ($GITHUB_WORKFLOW is undefined)")
               log.warn("assuming the empty map for `githubWorkflowDefinition`")
 
               Map()
             }
-          })
+          }
+        )
 
       case None =>
         Seq()

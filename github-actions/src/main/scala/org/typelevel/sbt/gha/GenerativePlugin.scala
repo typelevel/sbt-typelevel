@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 Daniel Spiewak
+ * Copyright 2022 Typelevel
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,8 +70,8 @@ object GenerativePlugin extends AutoPlugin {
   }
 
   private def isSafeString(str: String): Boolean =
-    !(str.indexOf(':') >= 0 ||    // pretend colon is illegal everywhere for simplicity
-      str.indexOf('#') >= 0 ||    // same for comment
+    !(str.indexOf(':') >= 0 || // pretend colon is illegal everywhere for simplicity
+      str.indexOf('#') >= 0 || // same for comment
       str.indexOf('!') == 0 ||
       str.indexOf('*') == 0 ||
       str.indexOf('-') == 0 ||
@@ -99,7 +99,7 @@ object GenerativePlugin extends AutoPlugin {
 
   def compileList(items: List[String], level: Int): String = {
     val rendered = items.map(wrap)
-    if (rendered.map(_.length).sum < 40)   // just arbitrarily...
+    if (rendered.map(_.length).sum < 40) // just arbitrarily...
       rendered.mkString(" [", ", ", "]")
     else
       "\n" + indent(rendered.map("- " + _).mkString("\n"), level)
@@ -107,9 +107,7 @@ object GenerativePlugin extends AutoPlugin {
 
   def compileListOfSimpleDicts(items: List[Map[String, String]]): String =
     items map { dict =>
-      val rendered = dict map {
-        case (key, value) => s"$key: $value"
-      } mkString "\n"
+      val rendered = dict map { case (key, value) => s"$key: $value" } mkString "\n"
 
       "-" + indent(rendered, 1).substring(1)
     } mkString "\n"
@@ -164,7 +162,7 @@ object GenerativePlugin extends AutoPlugin {
     environment.url match {
       case Some(url) =>
         val fields = s"""name: ${wrap(environment.name)}
-           |url: ${wrap(url.toString)}""".stripMargin
+                        |url: ${wrap(url.toString)}""".stripMargin
         s"""environment:
            |${indent(fields, 1)}""".stripMargin
       case None =>
@@ -182,7 +180,7 @@ object GenerativePlugin extends AutoPlugin {
 
           s"""$key: ${wrap(value)}"""
       }
-s"""$prefix:
+      s"""$prefix:
 ${indent(rendered.mkString("\n"), 1)}"""
     }
 
@@ -195,17 +193,19 @@ ${indent(rendered.mkString("\n"), 1)}"""
     val renderedShell = if (declareShell) "shell: bash\n" else ""
 
     val renderedEnvPre = compileEnv(step.env)
-    val renderedEnv = if (renderedEnvPre.isEmpty)
-      ""
-    else
-      renderedEnvPre + "\n"
+    val renderedEnv =
+      if (renderedEnvPre.isEmpty)
+        ""
+      else
+        renderedEnvPre + "\n"
 
     val preamblePre = renderedName + renderedId + renderedCond + renderedEnv
 
-    val preamble = if (preamblePre.isEmpty)
-      ""
-    else
-      preamblePre
+    val preamble =
+      if (preamblePre.isEmpty)
+        ""
+      else
+        preamblePre
 
     val body = step match {
       case run: Run =>
@@ -216,14 +216,18 @@ ${indent(rendered.mkString("\n"), 1)}"""
 
         val version = "++${{ matrix.scala }}"
         val sbtClientMode = sbt.matches("""sbt.* --client($| .*)""")
-        val safeCommands = if (sbtClientMode)
-          s"'${(version :: commands).mkString("; ")}'"
-        else commands.map { c =>
-          if (c.indexOf(' ') >= 0)
-            s"'$c'"
+        val safeCommands =
+          if (sbtClientMode)
+            s"'${(version :: commands).mkString("; ")}'"
           else
-            c
-        }.mkString(version + " ", " ", "")
+            commands
+              .map { c =>
+                if (c.indexOf(' ') >= 0)
+                  s"'$c'"
+                else
+                  c
+              }
+              .mkString(version + " ", " ", "")
 
         renderRunBody(
           commands = List(s"$sbt $safeCommands"),
@@ -239,10 +243,11 @@ ${indent(rendered.mkString("\n"), 1)}"""
             s"uses: $owner/$repo@$ref"
 
           case UseRef.Local(path) =>
-            val cleaned = if (path.startsWith("./"))
-              path
-            else
-              "./" + path
+            val cleaned =
+              if (path.startsWith("./"))
+                path
+              else
+                "./" + path
 
             s"uses: $cleaned"
 
@@ -259,27 +264,32 @@ ${indent(rendered.mkString("\n"), 1)}"""
     indent(preamble + body, 1).updated(0, '-')
   }
 
-  def renderRunBody(commands: List[String], params: Map[String, String], renderedShell: String) =
-      renderedShell + "run: " + wrap(commands.mkString("\n")) + renderParams(params)
+  def renderRunBody(
+      commands: List[String],
+      params: Map[String, String],
+      renderedShell: String) =
+    renderedShell + "run: " + wrap(commands.mkString("\n")) + renderParams(params)
 
   def renderParams(params: Map[String, String]): String = {
     val renderedParamsPre = compileEnv(params, prefix = "with")
-    val renderedParams = if (renderedParamsPre.isEmpty)
-      ""
-    else
-      "\n" + renderedParamsPre
+    val renderedParams =
+      if (renderedParamsPre.isEmpty)
+        ""
+      else
+        "\n" + renderedParamsPre
 
     renderedParams
   }
 
-
   def compileJob(job: WorkflowJob, sbt: String): String = {
-    val renderedNeeds = if (job.needs.isEmpty)
-      ""
-    else
-      s"\nneeds: [${job.needs.mkString(", ")}]"
+    val renderedNeeds =
+      if (job.needs.isEmpty)
+        ""
+      else
+        s"\nneeds: [${job.needs.mkString(", ")}]"
 
-    val renderedEnvironment = job.environment.map(compileEnvironment).map("\n" + _).getOrElse("")
+    val renderedEnvironment =
+      job.environment.map(compileEnvironment).map("\n" + _).getOrElse("")
 
     val renderedCond = job.cond.map(wrap).map("\nif: " + _).getOrElse("")
 
@@ -298,25 +308,29 @@ ${indent(rendered.mkString("\n"), 1)}"""
               ""
           }
 
-          val renderedEnv = if (!env.isEmpty)
-            "\n" + compileEnv(env)
-          else
-            ""
+          val renderedEnv =
+            if (!env.isEmpty)
+              "\n" + compileEnv(env)
+            else
+              ""
 
-          val renderedVolumes = if (!volumes.isEmpty)
-            s"\nvolumes:${compileList(volumes.toList map { case (l, r) => s"$l:$r" }, 1)}"
-          else
-            ""
+          val renderedVolumes =
+            if (!volumes.isEmpty)
+              s"\nvolumes:${compileList(volumes.toList map { case (l, r) => s"$l:$r" }, 1)}"
+            else
+              ""
 
-          val renderedPorts = if (!ports.isEmpty)
-            s"\nports:${compileList(ports.map(_.toString), 1)}"
-          else
-            ""
+          val renderedPorts =
+            if (!ports.isEmpty)
+              s"\nports:${compileList(ports.map(_.toString), 1)}"
+            else
+              ""
 
-          val renderedOptions = if (!options.isEmpty)
-            s"\noptions: ${wrap(options.mkString(" "))}"
-          else
-            ""
+          val renderedOptions =
+            if (!options.isEmpty)
+              s"\noptions: ${wrap(options.mkString(" "))}"
+            else
+              ""
 
           s"\ncontainer:\n${indent(renderedImage + renderedCredentials + renderedEnv + renderedVolumes + renderedPorts + renderedOptions, 1)}"
         }
@@ -326,10 +340,11 @@ ${indent(rendered.mkString("\n"), 1)}"""
     }
 
     val renderedEnvPre = compileEnv(job.env)
-    val renderedEnv = if (renderedEnvPre.isEmpty)
-      ""
-    else
-      "\n" + renderedEnvPre
+    val renderedEnv =
+      if (renderedEnvPre.isEmpty)
+        ""
+      else
+        "\n" + renderedEnvPre
 
     List("include", "exclude") foreach { key =>
       if (job.matrixAdds.contains(key)) {
@@ -342,7 +357,10 @@ ${indent(rendered.mkString("\n"), 1)}"""
     } mkString "\n"
 
     // TODO refactor all of this stuff to use whitelist instead
-    val whitelist = Map("os" -> job.oses, "scala" -> job.scalas, "java" -> job.javas.map(_.render)) ++ job.matrixAdds
+    val whitelist = Map(
+      "os" -> job.oses,
+      "scala" -> job.scalas,
+      "java" -> job.javas.map(_.render)) ++ job.matrixAdds
 
     def checkMatching(matching: Map[String, String]): Unit = {
       matching foreach {
@@ -352,7 +370,8 @@ ${indent(rendered.mkString("\n"), 1)}"""
           }
 
           if (!whitelist(key).contains(value)) {
-            sys.error(s"inclusion key `$key` was present in matrix, but value `$value` was not in ${whitelist(key)}")
+            sys.error(
+              s"inclusion key `$key` was present in matrix, but value `$value` was not in ${whitelist(key)}")
           }
       }
     }
@@ -362,12 +381,14 @@ ${indent(rendered.mkString("\n"), 1)}"""
     } else {
       job.matrixIncs.foreach(inc => checkMatching(inc.matching))
 
-      val rendered = compileListOfSimpleDicts(job.matrixIncs.map(i => i.matching ++ i.additions))
+      val rendered = compileListOfSimpleDicts(
+        job.matrixIncs.map(i => i.matching ++ i.additions))
 
-      val renderedMatrices = if (renderedMatricesPre.isEmpty)
-        ""
-      else
-        renderedMatricesPre + "\n"
+      val renderedMatrices =
+        if (renderedMatricesPre.isEmpty)
+          ""
+        else
+          renderedMatricesPre + "\n"
 
       s"${renderedMatrices}include:\n${indent(rendered, 1)}"
     }
@@ -379,25 +400,28 @@ ${indent(rendered.mkString("\n"), 1)}"""
 
       val rendered = compileListOfSimpleDicts(job.matrixExcs.map(_.matching))
 
-      val renderedIncludes = if (renderedIncludesPre.isEmpty)
-        ""
-      else
-        renderedIncludesPre + "\n"
+      val renderedIncludes =
+        if (renderedIncludesPre.isEmpty)
+          ""
+        else
+          renderedIncludesPre + "\n"
 
       s"${renderedIncludes}exclude:\n${indent(rendered, 1)}"
     }
 
-    val renderedMatrices = if (renderedExcludesPre.isEmpty)
-      ""
-    else
-      "\n" + indent(renderedExcludesPre, 2)
+    val renderedMatrices =
+      if (renderedExcludesPre.isEmpty)
+        ""
+      else
+        "\n" + indent(renderedExcludesPre, 2)
 
     val declareShell = job.oses.exists(_.contains("windows"))
 
-    val runsOn = if (job.runsOnExtraLabels.isEmpty)
-      s"$${{ matrix.os }}"
-    else
-      job.runsOnExtraLabels.mkString(s"""[ "$${{ matrix.os }}", """, ", ", " ]" )
+    val runsOn =
+      if (job.runsOnExtraLabels.isEmpty)
+        s"$${{ matrix.os }}"
+      else
+        job.runsOnExtraLabels.mkString(s"""[ "$${{ matrix.os }}", """, ", ", " ]")
 
     val renderedFailFast = job.matrixFailFast.fold("")("\n  fail-fast: " + _)
 
@@ -409,7 +433,9 @@ strategy:${renderedFailFast}
     java:${compileList(job.javas.map(_.render), 3)}${renderedMatrices}
 runs-on: ${runsOn}${renderedEnvironment}${renderedContainer}${renderedEnv}
 steps:
-${indent(job.steps.map(compileStep(_, sbt, declareShell = declareShell)).mkString("\n\n"), 1)}"""
+${indent(
+      job.steps.map(compileStep(_, sbt, declareShell = declareShell)).mkString("\n\n"),
+      1)}"""
 
     s"${job.id}:\n${indent(body, 1)}"
   }
@@ -422,25 +448,27 @@ ${indent(job.steps.map(compileStep(_, sbt, declareShell = declareShell)).mkStrin
       prEventTypes: List[PREventType],
       env: Map[String, String],
       jobs: List[WorkflowJob],
-      sbt: String)
-      : String = {
+      sbt: String): String = {
 
     val renderedEnvPre = compileEnv(env)
-    val renderedEnv = if (renderedEnvPre.isEmpty)
-      ""
-    else
-      renderedEnvPre + "\n\n"
+    val renderedEnv =
+      if (renderedEnvPre.isEmpty)
+        ""
+      else
+        renderedEnvPre + "\n\n"
 
     val renderedTypesPre = prEventTypes.map(compilePREventType).mkString("[", ", ", "]")
-    val renderedTypes = if (prEventTypes.sortBy(_.toString) == PREventType.Defaults)
-      ""
-    else
-      "\n" + indent("types: " + renderedTypesPre, 2)
+    val renderedTypes =
+      if (prEventTypes.sortBy(_.toString) == PREventType.Defaults)
+        ""
+      else
+        "\n" + indent("types: " + renderedTypesPre, 2)
 
-    val renderedTags = if (tags.isEmpty)
-      ""
-    else
-s"""
+    val renderedTags =
+      if (tags.isEmpty)
+        ""
+      else
+        s"""
     tags: [${tags.map(wrap).mkString(", ")}]"""
 
     val renderedPaths = paths match {
@@ -470,7 +498,7 @@ on:
 ${renderedEnv}jobs:
 ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
 """
-}
+  }
 
   val settingDefaults = Seq(
     githubWorkflowSbtCommand := "sbt",
@@ -478,23 +506,20 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
     // This is currently set to false because of https://github.com/sbt/sbt/issues/6468. When a new SBT version is
     // released that fixes this issue then check for that SBT version (or higher) and set to true.
     githubWorkflowUseSbtThinClient := false,
-
     githubWorkflowBuildMatrixFailFast := None,
     githubWorkflowBuildMatrixAdditions := Map(),
     githubWorkflowBuildMatrixInclusions := Seq(),
     githubWorkflowBuildMatrixExclusions := Seq(),
     githubWorkflowBuildRunsOnExtraLabels := Seq(),
-
     githubWorkflowBuildPreamble := Seq(),
     githubWorkflowBuildPostamble := Seq(),
     githubWorkflowBuild := Seq(WorkflowStep.Sbt(List("test"), name = Some("Build project"))),
-
     githubWorkflowPublishPreamble := Seq(),
     githubWorkflowPublishPostamble := Seq(),
-    githubWorkflowPublish := Seq(WorkflowStep.Sbt(List("+publish"), name = Some("Publish project"))),
+    githubWorkflowPublish := Seq(
+      WorkflowStep.Sbt(List("+publish"), name = Some("Publish project"))),
     githubWorkflowPublishTargetBranches := Seq(RefPredicate.Equals(Ref.Branch("main"))),
     githubWorkflowPublishCond := None,
-
     githubWorkflowJavaVersions := Seq(JavaSpec.temurin("11")),
     githubWorkflowScalaVersions := crossScalaVersions.value,
     githubWorkflowOSes := Seq("ubuntu-latest"),
@@ -502,17 +527,18 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
     githubWorkflowTargetBranches := Seq("**"),
     githubWorkflowTargetTags := Seq(),
     githubWorkflowTargetPaths := Paths.None,
-
     githubWorkflowEnv := Map("GITHUB_TOKEN" -> s"$${{ secrets.GITHUB_TOKEN }}"),
-    githubWorkflowAddedJobs := Seq())
+    githubWorkflowAddedJobs := Seq()
+  )
 
-  private lazy val internalTargetAggregation = settingKey[Seq[File]]("Aggregates target directories from all subprojects")
+  private lazy val internalTargetAggregation =
+    settingKey[Seq[File]]("Aggregates target directories from all subprojects")
 
   private val windowsGuard = Some("contains(runner.os, 'windows')")
 
   private val PlatformSep = FileSystems.getDefault.getSeparator
   private def normalizeSeparators(pathStr: String): String = {
-    pathStr.replace(PlatformSep, "/")   // *force* unix separators
+    pathStr.replace(PlatformSep, "/") // *force* unix separators
   }
 
   private val pathStrs = Def setting {
@@ -528,17 +554,15 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
     }
   }
 
-  override def globalSettings = Seq(
-    internalTargetAggregation := Seq(),
-    githubWorkflowArtifactUpload := true)
+  override def globalSettings =
+    Seq(internalTargetAggregation := Seq(), githubWorkflowArtifactUpload := true)
 
   override def buildSettings = settingDefaults ++ Seq(
     githubWorkflowPREventTypes := PREventType.Defaults,
-
     githubWorkflowGeneratedUploadSteps := {
       if (githubWorkflowArtifactUpload.value) {
         val sanitized = pathStrs.value map { str =>
-          if (str.indexOf(' ') >= 0)    // TODO be less naive
+          if (str.indexOf(' ') >= 0) // TODO be less naive
             s"'$str'"
           else
             str
@@ -549,39 +573,31 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
           name = Some("Compress target directories"))
 
         val upload = WorkflowStep.Use(
-          UseRef.Public(
-            "actions",
-            "upload-artifact",
-            "v2"),
+          UseRef.Public("actions", "upload-artifact", "v2"),
           name = Some(s"Upload target directories"),
           params = Map(
             "name" -> s"target-$${{ matrix.os }}-$${{ matrix.scala }}-$${{ matrix.java }}",
-            "path" -> "targets.tar"))
+            "path" -> "targets.tar")
+        )
 
         Seq(tar, upload)
       } else {
         Seq()
       }
     },
-
     githubWorkflowGeneratedDownloadSteps := {
       val scalas = githubWorkflowScalaVersions.value
 
       if (githubWorkflowArtifactUpload.value) {
         scalas flatMap { v =>
           val download = WorkflowStep.Use(
-            UseRef.Public(
-              "actions",
-              "download-artifact",
-              "v2"),
+            UseRef.Public("actions", "download-artifact", "v2"),
             name = Some(s"Download target directories ($v)"),
-            params = Map(
-              "name" -> s"target-$${{ matrix.os }}-$v-$${{ matrix.java }}"))
+            params = Map("name" -> s"target-$${{ matrix.os }}-$v-$${{ matrix.java }}")
+          )
 
           val untar = WorkflowStep.Run(
-            List(
-              "tar xf targets.tar",
-              "rm targets.tar"),
+            List("tar xf targets.tar", "rm targets.tar"),
             name = Some(s"Inflate target directories ($v)"))
 
           Seq(download, untar)
@@ -590,7 +606,6 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
         Seq()
       }
     },
-
     githubWorkflowGeneratedCacheSteps := {
       val hashes = githubWorkflowDependencyPatterns.value map { glob =>
         s"$${{ hashFiles('$glob') }}"
@@ -598,10 +613,7 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
 
       Seq(
         WorkflowStep.Use(
-          UseRef.Public(
-            "actions",
-            "cache",
-            "v2"),
+          UseRef.Public("actions", "cache", "v2"),
           name = Some("Cache sbt"),
           params = Map(
             "path" -> Seq(
@@ -617,7 +629,6 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
         )
       )
     },
-
     githubWorkflowJobSetup := {
       val autoCrlfOpt = if (githubWorkflowOSes.value.exists(_.contains("windows"))) {
         List(
@@ -634,20 +645,25 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
         WorkflowStep.SetupJava(githubWorkflowJavaVersions.value.toList) :::
         githubWorkflowGeneratedCacheSteps.value.toList
     },
-
     githubWorkflowGeneratedCI := {
       val publicationCondPre =
-        githubWorkflowPublishTargetBranches.value.map(compileBranchPredicate("github.ref", _)).mkString("(", " || ", ")")
+        githubWorkflowPublishTargetBranches
+          .value
+          .map(compileBranchPredicate("github.ref", _))
+          .mkString("(", " || ", ")")
 
       val publicationCond = githubWorkflowPublishCond.value match {
         case Some(cond) => publicationCondPre + " && (" + cond + ")"
         case None => publicationCondPre
       }
 
-      val uploadStepsOpt = if (githubWorkflowPublishTargetBranches.value.isEmpty && githubWorkflowAddedJobs.value.isEmpty)
-        Nil
-      else
-        githubWorkflowGeneratedUploadSteps.value.toList
+      val uploadStepsOpt =
+        if (githubWorkflowPublishTargetBranches
+            .value
+            .isEmpty && githubWorkflowAddedJobs.value.isEmpty)
+          Nil
+        else
+          githubWorkflowGeneratedUploadSteps.value.toList
 
       val publishJobOpt = Seq(
         WorkflowJob(
@@ -661,7 +677,8 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
           cond = Some(s"github.event_name != 'pull_request' && $publicationCond"),
           scalas = List(scalaVersion.value),
           javas = List(githubWorkflowJavaVersions.value.head),
-          needs = List("build"))).filter(_ => !githubWorkflowPublishTargetBranches.value.isEmpty)
+          needs = List("build")
+        )).filter(_ => !githubWorkflowPublishTargetBranches.value.isEmpty)
 
       Seq(
         WorkflowJob(
@@ -682,8 +699,10 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
           matrixAdds = githubWorkflowBuildMatrixAdditions.value,
           matrixIncs = githubWorkflowBuildMatrixInclusions.value.toList,
           matrixExcs = githubWorkflowBuildMatrixExclusions.value.toList,
-          runsOnExtraLabels = githubWorkflowBuildRunsOnExtraLabels.value.toList )) ++ publishJobOpt ++ githubWorkflowAddedJobs.value
-    })
+          runsOnExtraLabels = githubWorkflowBuildRunsOnExtraLabels.value.toList
+        )) ++ publishJobOpt ++ githubWorkflowAddedJobs.value
+    }
+  )
 
   private val generateCiContents = Def task {
     val sbt = if (githubWorkflowUseSbtThinClient.value) {
@@ -699,7 +718,8 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
       githubWorkflowPREventTypes.value.toList,
       githubWorkflowEnv.value,
       githubWorkflowGeneratedCI.value.toList,
-      sbt)
+      sbt
+    )
   }
 
   private val readCleanContents = Def task {
@@ -741,10 +761,8 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
       else
         Seq()
     },
-
     githubWorkflowGenerate / aggregate := false,
     githubWorkflowCheck / aggregate := false,
-
     githubWorkflowGenerate := {
       val ciContents = generateCiContents.value
       val includeClean = githubWorkflowIncludeClean.value
@@ -755,10 +773,9 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
 
       IO.write(ciYml, ciContents)
 
-      if(includeClean)
+      if (includeClean)
         IO.write(cleanYml, cleanContents)
     },
-
     githubWorkflowCheck := {
       val expectedCiContents = generateCiContents.value
       val includeClean = githubWorkflowIncludeClean.value
@@ -772,7 +789,8 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
       def reportMismatch(file: File, expected: String, actual: String): Unit = {
         log.error(s"Expected:\n$expected")
         log.error(s"Actual:\n${diff(expected, actual)}")
-        sys.error(s"${file.getName} does not contain contents that would have been generated by sbt-github-actions; try running githubWorkflowGenerate")
+        sys.error(
+          s"${file.getName} does not contain contents that would have been generated by sbt-github-actions; try running githubWorkflowGenerate")
       }
 
       def compare(file: File, expected: String): Unit = {
@@ -786,34 +804,38 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
 
       if (includeClean)
         compare(cleanYml, expectedCleanContents)
-    })
+    }
+  )
 
   private[sbtghactions] def diff(expected: String, actual: String): String = {
     val expectedLines = expected.split("\n", -1)
     val actualLines = actual.split("\n", -1)
-    val (lines, _) = expectedLines.zipAll(actualLines, "", "").foldLeft((Vector.empty[String], false)) {
-      case ((acc, foundDifference), (expectedLine, actualLine)) if expectedLine == actualLine =>
-        (acc :+ actualLine, foundDifference)
-      case ((acc, false), ("", actualLine)) =>
-        val previousLineLength = acc.lastOption.map(_.length).getOrElse(0)
-        val padding = " " * previousLineLength
-        val highlight = s"$padding^ (additional lines)"
-        (acc :+ highlight :+ actualLine, true)
-      case ((acc, false), (_, "")) =>
-        val previousLineLength = acc.lastOption.map(_.length).getOrElse(0)
-        val padding = " " * previousLineLength
-        val highlight = s"$padding^ (missing lines)"
-        (acc :+ highlight, true)
-      case ((acc, false), (expectedLine, actualLine)) =>
-        val sameCount = expectedLine.zip(actualLine).takeWhile({ case (a, b) => a == b }).length
-        val padding = " " * sameCount
-        val highlight = s"$padding^ (different character)"
-        (acc :+ actualLine :+ highlight, true)
-      case ((acc, true), (_, "")) =>
-        (acc, true)
-      case ((acc, true), (_, actualLine)) =>
-        (acc :+ actualLine, true)
-    }
+    val (lines, _) =
+      expectedLines.zipAll(actualLines, "", "").foldLeft((Vector.empty[String], false)) {
+        case ((acc, foundDifference), (expectedLine, actualLine))
+            if expectedLine == actualLine =>
+          (acc :+ actualLine, foundDifference)
+        case ((acc, false), ("", actualLine)) =>
+          val previousLineLength = acc.lastOption.map(_.length).getOrElse(0)
+          val padding = " " * previousLineLength
+          val highlight = s"$padding^ (additional lines)"
+          (acc :+ highlight :+ actualLine, true)
+        case ((acc, false), (_, "")) =>
+          val previousLineLength = acc.lastOption.map(_.length).getOrElse(0)
+          val padding = " " * previousLineLength
+          val highlight = s"$padding^ (missing lines)"
+          (acc :+ highlight, true)
+        case ((acc, false), (expectedLine, actualLine)) =>
+          val sameCount =
+            expectedLine.zip(actualLine).takeWhile { case (a, b) => a == b }.length
+          val padding = " " * sameCount
+          val highlight = s"$padding^ (different character)"
+          (acc :+ actualLine :+ highlight, true)
+        case ((acc, true), (_, "")) =>
+          (acc, true)
+        case ((acc, true), (_, actualLine)) =>
+          (acc :+ actualLine, true)
+      }
     lines.mkString("\n")
   }
 }
