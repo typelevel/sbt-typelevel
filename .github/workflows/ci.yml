@@ -59,8 +59,6 @@ jobs:
       - name: Check that workflows are up to date
         run: sbt 'project ${{ matrix.project }}' '++${{ matrix.scala }}' 'project /' githubWorkflowCheck
 
-      - run: sbt 'project ${{ matrix.project }}' '++${{ matrix.scala }}' scalafmtCheckAll 'project /' scalafmtSbtCheck
-
       - run: sbt 'project ${{ matrix.project }}' '++${{ matrix.scala }}' headerCheckAll
 
       - run: sbt 'project ${{ matrix.project }}' '++${{ matrix.scala }}' clean
@@ -70,10 +68,10 @@ jobs:
       - run: sbt 'project ${{ matrix.project }}' '++${{ matrix.scala }}' mimaReportBinaryIssues
 
       - name: Make target directories
-        run: mkdir -p github/target github-actions/target kernel/target versioning/target ci-release/target target .js/target ci-signing/target mima/target .jvm/target .native/target no-publish/target sonatype/target ci/target sonatype-ci-release/target core/target settings/target project/target
+        run: mkdir -p github/target github-actions/target kernel/target versioning/target ci-release/target target .js/target ci-signing/target ci-formatting/target mima/target .jvm/target .native/target no-publish/target sonatype/target ci/target sonatype-ci-release/target core/target settings/target project/target
 
       - name: Compress target directories
-        run: tar cf targets.tar github/target github-actions/target kernel/target versioning/target ci-release/target target .js/target ci-signing/target mima/target .jvm/target .native/target no-publish/target sonatype/target ci/target sonatype-ci-release/target core/target settings/target project/target
+        run: tar cf targets.tar github/target github-actions/target kernel/target versioning/target ci-release/target target .js/target ci-signing/target ci-formatting/target mima/target .jvm/target .native/target no-publish/target sonatype/target ci/target sonatype-ci-release/target core/target settings/target project/target
 
       - name: Upload target directories
         uses: actions/upload-artifact@v2

@@ -1,0 +1,1 @@
+../ci-formatting/build.sbt

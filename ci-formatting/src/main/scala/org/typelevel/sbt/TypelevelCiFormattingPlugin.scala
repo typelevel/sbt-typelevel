@@ -18,17 +18,20 @@ package org.typelevel.sbt
 
 import sbt._
 import org.scalafmt.sbt.ScalafmtPlugin
-import org.typelevel.sbt.gha.GenerativePlugin.autoImport._
+import org.typelevel.sbt.gha.GenerativePlugin
 
-object TypelevelScalafmtPlugin extends AutoPlugin {
+object TypelevelCiFormattingPlugin extends AutoPlugin {
 
-  override def requires = TypelevelPlugin && ScalafmtPlugin
+  import GenerativePlugin.autoImport._
+
+  override def requires = GenerativePlugin && ScalafmtPlugin
   override def trigger = allRequirements
 
   override def buildSettings = Seq(
     githubWorkflowBuild ~= { steps =>
       val fmtstep = WorkflowStep.Sbt(
-        List("scalafmtCheckAll", "project /", "scalafmtSbtCheck")
+        List("scalafmtCheckAll", "project /", "scalafmtSbtCheck"),
+        name = Some("Check formatting")
       )
       fmtstep +: steps
     }
