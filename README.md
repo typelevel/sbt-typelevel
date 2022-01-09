@@ -111,8 +111,8 @@ Instead of using the super-plugins, for finer-grained control you can always add
   - `tlGitHubDev(user, fullName)` (method): Helper to create a `Developer` entry from a GitHub username.
 - **sbt-typelevel-ci**, `TypelevelCiPlugin`: Sets up GitHub actions to run tests and check binary-compatibility in CI.
   - `tlCrossRootProject` (method): helper to create a `root` project that can aggregate both `Project`s and `CrossProject`s. Automatically creates separate jobs in the CI matrix for each platform (JVM, JS, etc.).
-- **sbt-typelevel-format**, `TypelevelCiFormatPlugin`: Sets up GitHub actions to check formatting in CI.
-- **sbt-typelevel-header**, `TypelevelCiHeaderPlugin`: Sets up GitHub actions to check headers in CI.
+- **sbt-typelevel-ci-format**, `TypelevelCiFormatPlugin`: Sets up GitHub actions to check formatting in CI.
+- **sbt-typelevel-ci-header**, `TypelevelCiHeaderPlugin`: Sets up GitHub actions to check headers in CI.
 - **sbt-typelevel-sonatype-ci-release**, `TypelevelSonatypeCiReleasePlugin`: Sets up GitHub actions to publish to Sonatype in CI.
   - Requires the `SONATYPE_USERNAME` and `SONATYPE_PASSWORD` secrets
   - `tlCiReleaseTags` (setting): Controls whether or not v-prefixed tags should be released from CI (default true).
