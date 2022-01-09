@@ -26,6 +26,8 @@ object TypelevelPlugin extends AutoPlugin {
     TypelevelKernelPlugin &&
       TypelevelSettingsPlugin &&
       TypelevelCiReleasePlugin &&
+      TypelevelCiHeaderPlugin &&
+      TypelevelCiFormattingPlugin &&
       GitHubActionsPlugin
 
   override def trigger = allRequirements
