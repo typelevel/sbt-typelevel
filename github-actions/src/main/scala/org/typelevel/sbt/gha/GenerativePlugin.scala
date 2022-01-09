@@ -691,7 +691,7 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
           githubWorkflowJobSetup.value.toList :::
             githubWorkflowBuildPreamble.value.toList :::
             WorkflowStep.Sbt(
-              List("githubWorkflowCheck"),
+              List("project /", "githubWorkflowCheck"),
               name = Some("Check that workflows are up to date")) ::
             githubWorkflowBuild.value.toList :::
             githubWorkflowBuildPostamble.value.toList :::
