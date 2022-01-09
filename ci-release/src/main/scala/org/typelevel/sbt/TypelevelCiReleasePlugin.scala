@@ -27,6 +27,6 @@ object TypelevelCiReleasePlugin extends AutoPlugin {
       TypelevelSonatypeCiReleasePlugin &&
       TypelevelCiSigningPlugin
 
-  override def trigger = noTrigger
+  override def trigger = allRequirements
 
 }

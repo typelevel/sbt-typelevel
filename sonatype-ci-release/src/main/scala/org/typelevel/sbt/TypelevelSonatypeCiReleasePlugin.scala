@@ -35,7 +35,7 @@ object TypelevelSonatypeCiReleasePlugin extends AutoPlugin {
   override def requires = TypelevelSonatypePlugin && GitHubActionsPlugin &&
     GenerativePlugin
 
-  override def trigger = noTrigger
+  override def trigger = allRequirements
 
   override def globalSettings =
     Seq(tlCiReleaseTags := true, tlCiReleaseBranches := Seq())
