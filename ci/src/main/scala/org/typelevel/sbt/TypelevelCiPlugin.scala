@@ -36,7 +36,7 @@ object TypelevelCiPlugin extends AutoPlugin {
     addCommandAlias("ci", mkCommand(ciCommands)) ++ Seq(
       githubWorkflowPublishTargetBranches := Seq(),
       githubWorkflowBuild := Seq(WorkflowStep.Sbt(List("ci"))),
-      githubWorkflowJavaVersions := Seq(JavaSpec.temurin("8")),
+      githubWorkflowJavaVersions := Seq(JavaSpec.temurin("8"))
     )
 
   val ciCommands = List(
