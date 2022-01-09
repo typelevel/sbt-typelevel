@@ -21,7 +21,6 @@ import org.typelevel.sbt.gha.GenerativePlugin
 import org.typelevel.sbt.gha.GitHubActionsPlugin
 import org.typelevel.sbt.gha.GenerativePlugin.autoImport._
 import com.typesafe.tools.mima.plugin.MimaPlugin
-import TypelevelKernelPlugin.mkCommand
 
 object TypelevelCiPlugin extends AutoPlugin {
 
@@ -32,32 +31,28 @@ object TypelevelCiPlugin extends AutoPlugin {
     def tlCrossRootProject: CrossRootProject = CrossRootProject()
   }
 
-  override def buildSettings =
-    addCommandAlias("ci", mkCommand(ciCommands)) ++ Seq(
-      githubWorkflowPublishTargetBranches := Seq(),
-      githubWorkflowBuild := Seq(WorkflowStep.Sbt(List("ci"))),
-      githubWorkflowJavaVersions := Seq(JavaSpec.temurin("8")),
-      githubWorkflowGeneratedUploadSteps ~= { steps =>
-        // hack hack hack until upstreamed
-        // workaround for https://github.com/djspiewak/sbt-github-actions/pull/66
-        steps.flatMap {
-          case compressStep @ WorkflowStep
-                .Run(command :: _, _, Some("Compress target directories"), _, _, _) =>
-            val mkdirStep = WorkflowStep.Run(
-              commands = List(command.replace("tar cf targets.tar", "mkdir -p")),
-              name = Some("Make target directories")
-            )
-            List(mkdirStep, compressStep)
-          case step => List(step)
-        }
+  override def buildSettings = Seq(
+    githubWorkflowPublishTargetBranches := Seq(),
+    githubWorkflowBuild := Seq(
+      WorkflowStep.Sbt(List("clean")),
+      WorkflowStep.Sbt(List("test")),
+      WorkflowStep.Sbt(List("mimaReportBinaryIssues"))
+    ),
+    githubWorkflowJavaVersions := Seq(JavaSpec.temurin("8")),
+    githubWorkflowGeneratedUploadSteps ~= { steps =>
+      // hack hack hack until upstreamed
+      // workaround for https://github.com/djspiewak/sbt-github-actions/pull/66
+      steps.flatMap {
+        case compressStep @ WorkflowStep
+              .Run(command :: _, _, Some("Compress target directories"), _, _, _) =>
+          val mkdirStep = WorkflowStep.Run(
+            commands = List(command.replace("tar cf targets.tar", "mkdir -p")),
+            name = Some("Make target directories")
+          )
+          List(mkdirStep, compressStep)
+        case step => List(step)
       }
-    )
-
-  val ciCommands = List(
-    "project /",
-    "clean",
-    "test",
-    "mimaReportBinaryIssues"
+    }
   )
 
 }
