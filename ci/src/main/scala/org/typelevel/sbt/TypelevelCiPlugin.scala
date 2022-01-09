@@ -33,11 +33,16 @@ object TypelevelCiPlugin extends AutoPlugin {
 
   override def buildSettings = Seq(
     githubWorkflowPublishTargetBranches := Seq(),
-    githubWorkflowBuild := Seq(
-      WorkflowStep.Sbt(List("clean")),
-      WorkflowStep.Sbt(List("test")),
-      WorkflowStep.Sbt(List("mimaReportBinaryIssues"))
-    ),
+    githubWorkflowBuild ~= { steps =>
+      steps.map {
+        case testStep @ WorkflowStep.Sbt(List("test"), _, _, _, _, _) =>
+          testStep.copy(commands = List("clean", "test"), name = Some("Test"))
+        case step => step
+      } :+ WorkflowStep.Sbt(
+        List("mimaReportBinaryIssues"),
+        name = Some("Check binary compatibility")
+      )
+    },
     githubWorkflowJavaVersions := Seq(JavaSpec.temurin("8")),
     githubWorkflowGeneratedUploadSteps ~= { steps =>
       // hack hack hack until upstreamed

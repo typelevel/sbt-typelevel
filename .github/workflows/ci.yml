@@ -62,11 +62,14 @@ jobs:
       - name: Check headers
         run: sbt 'project ${{ matrix.project }}' '++${{ matrix.scala }}' headerCheckAll
 
-      - run: sbt 'project ${{ matrix.project }}' '++${{ matrix.scala }}' clean
+      - name: Check formatting
+        run: sbt 'project ${{ matrix.project }}' '++${{ matrix.scala }}' scalafmtCheckAll 'project /' scalafmtSbtCheck
 
-      - run: sbt 'project ${{ matrix.project }}' '++${{ matrix.scala }}' test
+      - name: Test
+        run: sbt 'project ${{ matrix.project }}' '++${{ matrix.scala }}' clean test
 
-      - run: sbt 'project ${{ matrix.project }}' '++${{ matrix.scala }}' mimaReportBinaryIssues
+      - name: Check binary compatibility
+        run: sbt 'project ${{ matrix.project }}' '++${{ matrix.scala }}' mimaReportBinaryIssues
 
       - name: Make target directories
         run: mkdir -p github/target github-actions/target kernel/target versioning/target ci-release/target target .js/target ci-signing/target ci-header/target ci-formatting/target mima/target .jvm/target .native/target no-publish/target sonatype/target ci/target sonatype-ci-release/target core/target settings/target project/target
