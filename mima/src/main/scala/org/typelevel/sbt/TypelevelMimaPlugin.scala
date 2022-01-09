@@ -36,8 +36,11 @@ object TypelevelMimaPlugin extends AutoPlugin {
 
   import autoImport._
 
+  override def buildSettings = Seq(
+    tlVersionIntroduced := Map.empty
+  )
+
   override def projectSettings = Seq[Setting[_]](
-    tlVersionIntroduced := Map.empty,
     mimaPreviousArtifacts := {
       require(
         versionScheme.value.contains("early-semver"),
