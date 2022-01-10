@@ -33,7 +33,7 @@ object TypelevelCiSigningPlugin extends AutoPlugin {
       "PGP_SECRET" -> s"$${{ secrets.PGP_SECRET }}",
       "PGP_PASSPHRASE" -> s"$${{ secrets.PGP_PASSPHRASE }}"
     ),
-    githubWorkflowPublishPreamble ++= Seq(
+    githubWorkflowPublishPreamble := Seq(
       WorkflowStep.Run( // if your key is not passphrase-protected
         List("echo $PGP_SECRET | base64 -d | gpg --import"),
         name = Some("Import signing key"),

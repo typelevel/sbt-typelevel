@@ -59,7 +59,7 @@ object TypelevelSonatypeCiReleasePlugin extends AutoPlugin {
     },
     githubWorkflowTargetTags += "v*",
     githubWorkflowPublish := Seq(
-      WorkflowStep.Sbt(List("tlRelease"))
+      WorkflowStep.Sbt(List("tlRelease"), name = Some("Publish"))
     )
   )
 }
