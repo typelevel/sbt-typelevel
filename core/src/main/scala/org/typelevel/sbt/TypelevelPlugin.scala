@@ -61,7 +61,10 @@ object TypelevelPlugin extends AutoPlugin {
       } yield MatrixExclude(Map("scala" -> scala, "java" -> java.render))
     },
     githubWorkflowBuild ~= { steps =>
-      WorkflowStep.Sbt(List("headerCheckAll", "scalafmtCheckAll", "scalafmtSbtCheck")) +: steps
+      WorkflowStep.Sbt(
+        List("headerCheckAll", "scalafmtCheckAll", "project /", "scalafmtSbtCheck"),
+        name = Some("Check headers and formatting")
+      ) +: steps
     }
   )
 
