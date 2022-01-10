@@ -143,8 +143,13 @@ object TypelevelCiJSPlugin extends AutoPlugin {
     },
     githubWorkflowBuild ~= { steps =>
       steps.flatMap {
-        case testStep @ WorkflowStep.Sbt(List("test"), _, _, _, _, _) =>
-          List(WorkflowStep.Sbt(List("Test/fastOptJS")), testStep)
+        case testStep @ WorkflowStep.Sbt(_, _, _, _, _, _) =>
+          val fastOptStep = WorkflowStep.Sbt(
+            List("Test/fastOptJS"),
+            name = Some("fastOptJS"),
+            cond = Some("matrix.project == rootJS")
+          )
+          List(fastOptStep, testStep)
         case step => List(step)
       }
     }
@@ -168,7 +173,12 @@ object TypelevelCiNativePlugin extends AutoPlugin {
     githubWorkflowBuild ~= { steps =>
       steps.flatMap {
         case testStep @ WorkflowStep.Sbt(List("test"), _, _, _, _, _) =>
-          List(WorkflowStep.Sbt(List("Test/nativeLink")), testStep)
+          val nativeLinkStep = WorkflowStep.Sbt(
+            List("Test/nativeLink"),
+            name = Some("nativeLink"),
+            cond = Some("matrix.project == rootNative")
+          )
+          List(nativeLinkStep, testStep)
         case step => List(step)
       }
     }
