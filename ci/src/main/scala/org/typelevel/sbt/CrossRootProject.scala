@@ -147,7 +147,7 @@ object TypelevelCiJSPlugin extends AutoPlugin {
           val fastOptStep = WorkflowStep.Sbt(
             List("Test/fastOptJS"),
             name = Some("fastOptJS"),
-            cond = Some("matrix.project == rootJS")
+            cond = Some("matrix.project == 'rootJS'")
           )
           List(fastOptStep, testStep)
         case step => List(step)
@@ -176,7 +176,7 @@ object TypelevelCiNativePlugin extends AutoPlugin {
           val nativeLinkStep = WorkflowStep.Sbt(
             List("Test/nativeLink"),
             name = Some("nativeLink"),
-            cond = Some("matrix.project == rootNative")
+            cond = Some("matrix.project == 'rootNative'")
           )
           List(nativeLinkStep, testStep)
         case step => List(step)
