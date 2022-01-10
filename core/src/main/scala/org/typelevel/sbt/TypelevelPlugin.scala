@@ -19,6 +19,7 @@ package org.typelevel.sbt
 import sbt._, Keys._
 import org.typelevel.sbt.gha.GenerativePlugin
 import org.typelevel.sbt.gha.GitHubActionsPlugin
+import de.heikoseeberger.sbtheader.AutomateHeaderPlugin
 
 object TypelevelPlugin extends AutoPlugin {
 
@@ -26,8 +27,6 @@ object TypelevelPlugin extends AutoPlugin {
     TypelevelKernelPlugin &&
       TypelevelSettingsPlugin &&
       TypelevelCiReleasePlugin &&
-      TypelevelCiHeaderPlugin &&
-      TypelevelCiFormatPlugin &&
       GitHubActionsPlugin
 
   override def trigger = allRequirements
@@ -60,7 +59,12 @@ object TypelevelPlugin extends AutoPlugin {
         scala <- githubWorkflowScalaVersions.value.init
         java <- githubWorkflowJavaVersions.value.tail
       } yield MatrixExclude(Map("scala" -> scala, "java" -> java.render))
+    },
+    githubWorkflowBuild ~= { steps =>
+      WorkflowStep.Sbt(List("headerCheckAll", "scalafmtCheckAll", "scalafmtSbtCheck")) +: steps
     }
   )
+
+  override def projectSettings = AutomateHeaderPlugin.projectSettings
 
 }

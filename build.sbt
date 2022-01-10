@@ -21,8 +21,6 @@ lazy val root = tlCrossRootProject.aggregate(
   sonatype,
   ciSigning,
   sonatypeCiRelease,
-  ciFormat,
-  ciHeader,
   ci,
   core,
   ciRelease)
@@ -104,22 +102,6 @@ lazy val sonatypeCiRelease = project
   )
   .dependsOn(sonatype, githubActions)
 
-lazy val ciFormat = project
-  .in(file("ci-format"))
-  .enablePlugins(SbtPlugin)
-  .settings(
-    name := "sbt-typelevel-ci-format"
-  )
-  .dependsOn(githubActions)
-
-lazy val ciHeader = project
-  .in(file("ci-header"))
-  .enablePlugins(SbtPlugin)
-  .settings(
-    name := "sbt-typelevel-ci-header"
-  )
-  .dependsOn(githubActions)
-
 lazy val ci = project
   .in(file("ci"))
   .enablePlugins(SbtPlugin)
@@ -152,7 +134,5 @@ lazy val core = project
   )
   .dependsOn(
     ciRelease,
-    ciFormat,
-    ciHeader,
     settings
   )

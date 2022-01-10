@@ -48,7 +48,7 @@ If you are only using **sbt-typelevel-ci-release**, you are completely in charge
 ### How do I publish snapshots in CI?
 
 ```scala
-// any branches you want snapshots of. Set to Seq.empty to disable
+// any branches you want snapshots of
 ThisBuild / tlCiReleaseBranches := Seq("main")
 ```
 
@@ -99,7 +99,7 @@ Instead of using the super-plugins, for finer-grained control you can always add
   - `tlReleaseLocal` (command): alias for `+publishLocal`
 - **sbt-typelevel-versioning**, `TypelevelVersioningPlugin`: Establishes a git-based, early semantic versioning scheme
   - `tlBaseVersion` (setting): the series your project is in. e.g., 0.2, 3.5
-  - `tlUntaggedAreSnapshots` (setting): If true, an untagged commit is given a snapshot version, e.g. `0.4.1-17-00218f9-SNAPSHOT`. If false, it is given a release version, e.g. `0.4.1-17-00218f9`. (default: true)
+  - `tlUntaggedAreSnapshots` (setting): If true, an untagged commit is given a snapshot version, e.g. `0.4-17-00218f9-SNAPSHOT`. If false, it is given a release version, e.g. `0.4-17-00218f9`. (default: true)
 - **sbt-typelevel-mima**, `TypelevelMimaPlugin`: Determines previous MiMa artifacts via your `version` setting and git tags.
   - `tlVersionIntroduced` (setting): A map `scalaBinaryVersion -> version` e.g. `Map("2.13" -> "1.5.2", "3" -> "1.7.1")` used to indicate that a particular `crossScalaVersions` value was introduced in a given version (default: empty).
 - **sbt-typelevel-sonatype**, `TypelevelSonatypePlugin`.
@@ -111,8 +111,6 @@ Instead of using the super-plugins, for finer-grained control you can always add
   - `tlGitHubDev(user, fullName)` (method): Helper to create a `Developer` entry from a GitHub username.
 - **sbt-typelevel-ci**, `TypelevelCiPlugin`: Sets up GitHub actions to run tests and check binary-compatibility in CI.
   - `tlCrossRootProject` (method): helper to create a `root` project that can aggregate both `Project`s and `CrossProject`s. Automatically creates separate jobs in the CI matrix for each platform (JVM, JS, etc.).
-- **sbt-typelevel-ci-format**, `TypelevelCiFormatPlugin`: Sets up GitHub actions to check formatting in CI.
-- **sbt-typelevel-ci-header**, `TypelevelCiHeaderPlugin`: Sets up GitHub actions to check headers in CI.
 - **sbt-typelevel-sonatype-ci-release**, `TypelevelSonatypeCiReleasePlugin`: Sets up GitHub actions to publish to Sonatype in CI.
   - Requires the `SONATYPE_USERNAME` and `SONATYPE_PASSWORD` secrets
   - `tlCiReleaseTags` (setting): Controls whether or not v-prefixed tags should be released from CI (default true).

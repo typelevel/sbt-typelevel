@@ -51,27 +51,20 @@ digraph {
   tlci -> tlnopub;
   tlci -> gha;
 
-  tlciformat[label="sbt-typelevel-ci-format"];
-  tlciformat -> fmt;
-  tlciformat -> gha;
-
-  tlciheader[label="sbt-typelevel-ci-header"];
-  tlciheader -> header;
-  tlciheader -> gha;
-
   node[shape="box"];
 
   tlcirelease[label="sbt-typelevel-ci-release"];
   tlcirelease -> tlci;
   tlcirelease -> tlgithub;
   tlcirelease -> tlversioning;
+  tlcirelease -> tlmima;
   tlcirelease -> tlsonatypecirelease;
   tlcirelease -> tlcisigning;
 
   tl[label="sbt-typelevel"];
   tl -> tlsettings;
   tl -> tlcirelease;
-  tl -> tlciformat;
-  tl -> tlciheader;
+  tl -> fmt;
+  tl -> header;
   tl -> sjscp;
 }
