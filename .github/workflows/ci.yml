@@ -68,6 +68,9 @@ jobs:
       - name: Check binary compatibility
         run: sbt 'project ${{ matrix.project }}' '++${{ matrix.scala }}' mimaReportBinaryIssues
 
+      - name: Generate API documentation
+        run: sbt 'project ${{ matrix.project }}' '++${{ matrix.scala }}' doc
+
       - name: Make target directories
         run: mkdir -p github/target github-actions/target kernel/target versioning/target ci-release/target target .js/target ci-signing/target mima/target .jvm/target .native/target no-publish/target sonatype/target ci/target sonatype-ci-release/target core/target settings/target project/target
 
