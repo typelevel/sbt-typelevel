@@ -143,7 +143,7 @@ object TypelevelCiJSPlugin extends AutoPlugin {
     },
     githubWorkflowBuild ~= { steps =>
       steps.flatMap {
-        case testStep @ WorkflowStep.Sbt(_, _, _, _, _, _) =>
+        case testStep @ WorkflowStep.Sbt(List("test"), _, _, _, _, _) =>
           val fastOptStep = WorkflowStep.Sbt(
             List("Test/fastOptJS"),
             name = Some("fastOptJS"),
