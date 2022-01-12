@@ -34,9 +34,7 @@ object TypelevelCiPlugin extends AutoPlugin {
   override def buildSettings = Seq(
     githubWorkflowPublishTargetBranches := Seq(),
     githubWorkflowBuild := Seq(
-      WorkflowStep.Sbt(List("test"), name = Some("Test"))
-    ),
-    githubWorkflowBuildPostamble ++= Seq(
+      WorkflowStep.Sbt(List("test"), name = Some("Test")),
       WorkflowStep.Sbt(
         List("mimaReportBinaryIssues"),
         name = Some("Check binary compatibility")
