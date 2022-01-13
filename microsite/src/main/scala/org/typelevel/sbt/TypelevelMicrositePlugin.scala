@@ -48,7 +48,7 @@ object TypelevelMicrositePlugin extends AutoPlugin {
             UseRef.Public("peaceiris", "actions-gh-pages", "v3"),
             Map(
               "github_token" -> s"$${{ secrets.GITHUB_TOKEN }}",
-              "publish_dir" -> s"${(Laika / target).value / "site"}",
+              "publish_dir" -> s"${file(".").toPath.toAbsolutePath.relativize(((Laika / target).value / "site").toPath)}",
               "publish_branch" -> "gh-pages"
             ),
             name = Some("Publish")

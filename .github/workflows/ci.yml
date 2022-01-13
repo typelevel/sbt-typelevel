@@ -173,5 +173,5 @@ jobs:
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: /workspace/sbt-typelevel/mdocs/target/docs/site
+          publish_dir: mdocs/target/docs/site
           publish_branch: gh-pages
