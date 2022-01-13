@@ -22,7 +22,10 @@ lazy val root = tlCrossRootProject.aggregate(
   sonatypeCiRelease,
   ci,
   core,
-  ciRelease)
+  ciRelease,
+  microsite,
+  docs
+)
 
 lazy val kernel = project
   .in(file("kernel"))
@@ -127,3 +130,12 @@ lazy val core = project
     ciRelease,
     settings
   )
+
+lazy val microsite = project
+  .in(file("microsite"))
+  .enablePlugins(SbtPlugin)
+  .settings(
+    name := "sbt-typelevel-microsite"
+  )
+
+lazy val docs = project.in(file("mdocs")).enablePlugins(TypelevelMicrositePlugin)
