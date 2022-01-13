@@ -133,7 +133,7 @@ jobs:
 
   publish-site:
     name: Publish Site
-    needs: [build, site]
+    needs: [build]
     if: github.event_name != 'pull_request'
     strategy:
       matrix:

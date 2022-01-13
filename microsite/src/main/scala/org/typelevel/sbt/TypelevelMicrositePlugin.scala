@@ -41,7 +41,7 @@ object TypelevelMicrositePlugin extends AutoPlugin {
         scalas = List(crossScalaVersions.value.head),
         javas = githubWorkflowJavaVersions.value.toList,
         cond = Some("github.event_name != 'pull_request'"),
-        needs = List("build", "site"),
+        needs = List("build"),
         steps = githubWorkflowJobSetup.value.toList ::: List(
           WorkflowStep.Sbt(List("docs/mdoc", "docs/laikaSite"), name = Some("Generate")),
           WorkflowStep.Use(
