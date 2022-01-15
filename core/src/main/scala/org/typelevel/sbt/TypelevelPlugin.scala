@@ -63,7 +63,24 @@ object TypelevelPlugin extends AutoPlugin {
         java <- githubWorkflowJavaVersions.value.tail
       } yield MatrixExclude(Map("scala" -> scala, "java" -> java.render))
     }
-  ) ++ tlReplaceCommandAlias("ci", mkCommand(fmtCheckCommands ::: ciCommands.tail))
+  ) ++ tlReplaceCommandAlias("ci", mkCommand(fmtCheckCommands ::: ciCommands.tail)) ++
+    addCommandAlias(
+      "tlPrePr",
+      mkCommand(
+        List(
+          "reload",
+          "project /",
+          "clean",
+          "githubWorkflowGenerate",
+          "headerCreateAll",
+          "scalafmtAll",
+          "scalafmtSbt",
+          "set ThisBuild / tlFatalWarnings := tlFatalWarningsInCi.value",
+          "Test / compile",
+          "reload"
+        )
+      )
+    )
 
   override def projectSettings = AutomateHeaderPlugin.projectSettings
 
