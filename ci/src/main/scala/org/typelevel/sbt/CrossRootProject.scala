@@ -17,7 +17,7 @@
 package org.typelevel.sbt
 
 import sbt._
-import sbtghactions.GenerativePlugin.autoImport._
+import org.typelevel.sbt.gha.GenerativePlugin.autoImport._
 import TypelevelCiPlugin.ciCommands
 import TypelevelKernelPlugin.mkCommand
 

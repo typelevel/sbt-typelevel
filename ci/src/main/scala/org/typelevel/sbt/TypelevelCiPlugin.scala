@@ -17,9 +17,9 @@
 package org.typelevel.sbt
 
 import sbt._
-import sbtghactions.GenerativePlugin
-import sbtghactions.GitHubActionsPlugin
-import sbtghactions.GenerativePlugin.autoImport._
+import org.typelevel.sbt.gha.GenerativePlugin
+import org.typelevel.sbt.gha.GitHubActionsPlugin
+import org.typelevel.sbt.gha.GenerativePlugin.autoImport._
 import com.typesafe.tools.mima.plugin.MimaPlugin
 import TypelevelKernelPlugin.mkCommand
 
