@@ -36,21 +36,7 @@ object TypelevelCiPlugin extends AutoPlugin {
     addCommandAlias("ci", mkCommand(ciCommands)) ++ Seq(
       githubWorkflowPublishTargetBranches := Seq(),
       githubWorkflowBuild := Seq(WorkflowStep.Sbt(List("ci"))),
-      githubWorkflowJavaVersions := Seq(JavaSpec.temurin("8")),
-      githubWorkflowGeneratedUploadSteps ~= { steps =>
-        // hack hack hack until upstreamed
-        // workaround for https://github.com/djspiewak/sbt-github-actions/pull/66
-        steps.flatMap {
-          case compressStep @ WorkflowStep
-                .Run(command :: _, _, Some("Compress target directories"), _, _, _) =>
-            val mkdirStep = WorkflowStep.Run(
-              commands = List(command.replace("tar cf targets.tar", "mkdir -p")),
-              name = Some("Make target directories")
-            )
-            List(mkdirStep, compressStep)
-          case step => List(step)
-        }
-      }
+      githubWorkflowJavaVersions := Seq(JavaSpec.temurin("8"))
     )
 
   val ciCommands = List(
