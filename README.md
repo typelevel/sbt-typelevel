@@ -52,6 +52,8 @@ If you are only using **sbt-typelevel-ci-release**, you are completely in charge
 ThisBuild / tlCiReleaseBranches := Seq("main")
 ```
 
+Make sure to `reload` sbt and run `githubWorkflowGenerate` after making a change to this setting.
+
 ### What happens if I push a tag and commit at the same time?
 
 It Just Works™.

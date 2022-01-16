@@ -572,6 +572,10 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
             str
         }
 
+        val mkdir = WorkflowStep.Run(
+          List(s"mkdir -p ${sanitized.mkString(" ")} project/target"),
+          name = Some("Make target directories"))
+
         val tar = WorkflowStep.Run(
           List(s"tar cf targets.tar ${sanitized.mkString(" ")} project/target"),
           name = Some("Compress target directories"))
@@ -584,7 +588,7 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
             "path" -> "targets.tar")
         )
 
-        Seq(tar, upload)
+        Seq(mkdir, tar, upload)
       } else {
         Seq()
       }
