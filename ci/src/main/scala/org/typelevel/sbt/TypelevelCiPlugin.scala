@@ -41,7 +41,7 @@ object TypelevelCiPlugin extends AutoPlugin {
       ),
       WorkflowStep.Sbt(List("doc"), name = Some("Generate API documentation"))
     ),
-    githubWorkflowJavaVersions := Seq(JavaSpec.temurin("8")),
+    githubWorkflowJavaVersions := Seq(JavaSpec.temurin("8"))
   )
 
 }
