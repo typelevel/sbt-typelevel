@@ -38,7 +38,7 @@ object TypelevelSitePlugin extends AutoPlugin {
     lazy val tlSitePublish = settingKey[Seq[WorkflowStep]](
       "A sequence of steps which publishes the site (default: peaceiris/actions-gh-pages)")
     lazy val tlSitePublishBranch = settingKey[Option[String]](
-      "The branch in your repository to publish the site from on every push. Set this to None if you only want to update the site on tag releases. (default: main)")
+      "The branch to publish the site from on every push. Set this to None if you only want to update the site on tag releases. (default: main)")
   }
 
   import autoImport._

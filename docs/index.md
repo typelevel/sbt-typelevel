@@ -127,6 +127,13 @@ Instead of using the super-plugins, for finer-grained control you can always add
 - **sbt-typelevel-ci-release**, `TypelevelCiReleasePlugin`: The super-plugin that sets you up with versioning, mima, signing, and sonatype publishing, all in GitHub actions.
 - **sbt-typelevel**, `TypelevelPlugin`: The super-super-plugin intended for bootstrapping the typical Typelevel project. Sets up CI release including snapshots, scalac settings, headers, and formatting.
     - `tlFatalWarningsInCi` (setting): Convert compiler warnings into errors under CI builds (default: true).
+- **sbt-typelevel-site**, `TypelevelSitePlugin`: Sets up an [mdoc](https://scalameta.org/mdoc/)/[Laika](https://planet42.github.io/Laika/)-generated microsite, automatically published to GitHub pages in CI.
+    - This plugin must be manually-enabled on your docs project. Place your `.md` files in the `docs/` directory.
+    ```scala
+    lazy val docs = project.in(file("site")).enablePlugins(TypelevelSitePlugin)
+    ```
+    - `tlSitePublishBranch` (setting): The branch to publish the site from on every push. Set this to `None` if you only want to update the site on tag releases. (default: `main`)
+    - `tlApiDocsUrl` (setting): URL to the API docs. (default: `None`)
 
 ### Dependency diagram
 
