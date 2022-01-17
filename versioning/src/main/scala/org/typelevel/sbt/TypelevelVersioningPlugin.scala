@@ -35,6 +35,8 @@ object TypelevelVersioningPlugin extends AutoPlugin {
     lazy val tlUntaggedAreSnapshots =
       settingKey[Boolean](
         "If true, an untagged commit is given a snapshot version, e.g. 0.4-00218f9-SNAPSHOT. If false, it is given a release version, e.g. 0.4-00218f9. (default: true)")
+    lazy val tlPreviousStableVersion =
+      settingKey[Option[String]]("The previous stable version of your project.")
   }
 
   import autoImport._
@@ -107,6 +109,9 @@ object TypelevelVersioningPlugin extends AutoPlugin {
       if (isSnapshot.value) version += "-SNAPSHOT"
 
       version
+    },
+    tlPreviousStableVersion := {
+      GitHelper.previousReleases().filterNot(_.isPrerelease).headOption.map(_.toString)
     }
   )
 
