@@ -24,7 +24,7 @@ lazy val root = tlCrossRootProject.aggregate(
   ci,
   core,
   ciRelease,
-  microsite,
+  site,
   docs
 )
 
@@ -140,15 +140,15 @@ lazy val core = project
     settings
   )
 
-lazy val microsite = project
-  .in(file("microsite"))
+lazy val site = project
+  .in(file("site"))
   .enablePlugins(SbtPlugin)
   .settings(
-    name := "sbt-typelevel-microsite"
+    name := "sbt-typelevel-site"
   )
   .dependsOn(kernel, githubActions)
 
 lazy val docs = project
   .in(file("mdocs"))
-  .enablePlugins(TypelevelMicrositePlugin)
+  .enablePlugins(TypelevelSitePlugin)
   .settings(laikaConfig ~= { _.withRawContent })

@@ -27,7 +27,7 @@ import gha.GenerativePlugin, GenerativePlugin.autoImport._
 import scala.io.Source
 import java.util.Base64
 
-object TypelevelMicrositePlugin extends AutoPlugin {
+object TypelevelSitePlugin extends AutoPlugin {
 
   object autoImport {
     lazy val tlHeliumConfig = settingKey[Helium]("The Helium configuration")
