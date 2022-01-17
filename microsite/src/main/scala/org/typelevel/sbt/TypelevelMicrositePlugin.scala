@@ -31,7 +31,7 @@ import laika.helium.config.{
   Teaser,
   TextLink
 }
-import sbtghactions.GenerativePlugin, GenerativePlugin.autoImport._
+import gha.GenerativePlugin, GenerativePlugin.autoImport._
 
 object TypelevelMicrositePlugin extends AutoPlugin {
 

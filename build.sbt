@@ -15,6 +15,7 @@ lazy val root = tlCrossRootProject.aggregate(
   noPublish,
   settings,
   github,
+  githubActions,
   versioning,
   mima,
   sonatype,
@@ -57,6 +58,13 @@ lazy val github = project
   )
   .dependsOn(kernel)
 
+lazy val githubActions = project
+  .in(file("github-actions"))
+  .enablePlugins(SbtPlugin)
+  .settings(
+    name := "sbt-typelevel-github-actions"
+  )
+
 lazy val versioning = project
   .in(file("versioning"))
   .enablePlugins(SbtPlugin)
@@ -87,6 +95,7 @@ lazy val ciSigning = project
   .settings(
     name := "sbt-typelevel-ci-signing"
   )
+  .dependsOn(githubActions)
 
 lazy val sonatypeCiRelease = project
   .in(file("sonatype-ci-release"))
@@ -94,7 +103,7 @@ lazy val sonatypeCiRelease = project
   .settings(
     name := "sbt-typelevel-sonatype-ci-release"
   )
-  .dependsOn(sonatype)
+  .dependsOn(sonatype, githubActions)
 
 lazy val ci = project
   .in(file("ci"))
@@ -102,7 +111,7 @@ lazy val ci = project
   .settings(
     name := "sbt-typelevel-ci"
   )
-  .dependsOn(noPublish, kernel)
+  .dependsOn(noPublish, kernel, githubActions)
 
 lazy val ciRelease = project
   .in(file("ci-release"))
@@ -137,5 +146,6 @@ lazy val microsite = project
   .settings(
     name := "sbt-typelevel-microsite"
   )
+  .dependsOn(githubActions)
 
 lazy val docs = project.in(file("mdocs")).enablePlugins(TypelevelMicrositePlugin)

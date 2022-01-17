@@ -53,6 +53,8 @@ If you are only using **sbt-typelevel-ci-release**, you are completely in charge
 ThisBuild / tlCiReleaseBranches := Seq("main")
 ```
 
+Make sure to `reload` sbt and run `githubWorkflowGenerate` after making a change to this setting.
+
 ### What happens if I push a tag and commit at the same time?
 
 It Just Works™.
@@ -120,7 +122,7 @@ Instead of using the super-plugins, for finer-grained control you can always add
   - Requires `PGP_SECRET` secret, with your base64-encoded PGP key
   - Optionally set the `PGP_PASSPHRASE` secret, but we do not recommend passphrase-protected keys for new projects. See discussion in [#9](https://github.com/typelevel/sbt-typelevel/discussions/9#discussioncomment-1251774).
 - **sbt-typelevel-ci-release**, `TypelevelCiReleasePlugin`: The super-plugin that sets you up with versioning, mima, signing, and sonatype publishing, all in GitHub actions.
-- **sbt-typelevel**, `TypelevelPlugin`: The super-super-plugin intended for bootstrapping the typical Typelevel project. Sets up CI release, scalac settings, headers, and formatting.
+- **sbt-typelevel**, `TypelevelPlugin`: The super-super-plugin intended for bootstrapping the typical Typelevel project. Sets up CI release including snapshots, scalac settings, headers, and formatting.
   - `tlFatalWarningsInCi` (setting): Convert compiler warnings into errors under CI builds (default: true).
 
 ### Dependency diagram
