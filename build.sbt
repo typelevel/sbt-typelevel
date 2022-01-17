@@ -146,7 +146,7 @@ lazy val microsite = project
   .settings(
     name := "sbt-typelevel-microsite"
   )
-  .dependsOn(githubActions)
+  .dependsOn(kernel, githubActions)
 
 lazy val docs = project
   .in(file("mdocs"))

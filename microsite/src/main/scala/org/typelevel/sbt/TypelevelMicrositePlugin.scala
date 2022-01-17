@@ -22,15 +22,7 @@ import laika.ast._
 import laika.ast.LengthUnit._
 import laika.sbt.LaikaPlugin, LaikaPlugin.autoImport._
 import laika.helium.Helium
-import laika.helium.config.{
-  Favicon,
-  HeliumIcon,
-  IconLink,
-  ImageLink,
-  ReleaseInfo,
-  Teaser,
-  TextLink
-}
+import laika.helium.config.{HeliumIcon, IconLink, ImageLink}
 import gha.GenerativePlugin, GenerativePlugin.autoImport._
 import scala.io.Source
 import java.util.Base64
@@ -40,9 +32,14 @@ object TypelevelMicrositePlugin extends AutoPlugin {
   object autoImport {
     lazy val tlHeliumConfig = settingKey[Helium]("The Helium configuration")
     lazy val tlApiUrl = settingKey[URL]("Url to the API scaladocs")
+    lazy val tlSiteGenerate = settingKey[Seq[WorkflowStep]](
+      "A sequence of steps which generates the site (default: [Sbt(List(\"tlSite\"))])")
+    lazy val tlSitePublish = settingKey[Seq[WorkflowStep]](
+      "A sequence of steps which publishes the site (default: peaceiris/actions-gh-pages)")
   }
 
   import autoImport._
+  import TypelevelKernelPlugin.mkCommand
 
   override def requires = MdocPlugin && LaikaPlugin && GenerativePlugin
 
@@ -95,28 +92,47 @@ object TypelevelMicrositePlugin extends AutoPlugin {
       laika.markdown.github.GitHubFlavor,
       laika.parse.code.SyntaxHighlighting
     ),
+    tlSiteGenerate := List(
+      WorkflowStep.Sbt(List("tlSite"), name = Some("Generate site"))
+    ),
+    tlSitePublish := List(
+      WorkflowStep.Use(
+        UseRef.Public("peaceiris", "actions-gh-pages", "v3"),
+        Map(
+          "github_token" -> s"$${{ secrets.GITHUB_TOKEN }}",
+          "publish_dir" -> (ThisBuild / baseDirectory)
+            .value
+            .toPath
+            .toAbsolutePath
+            .relativize(((Laika / target).value / "site").toPath)
+            .toString,
+          "publish_branch" -> "gh-pages"
+        ),
+        name = Some("Publish site"),
+        cond = {
+          val publicationCondPre =
+            githubWorkflowPublishTargetBranches
+              .value
+              .map(GenerativePlugin.compileBranchPredicate("github.ref", _))
+              .mkString("(", " || ", ")")
+          val publicationCond = githubWorkflowPublishCond.value match {
+            case Some(cond) => publicationCondPre + " && (" + cond + ")"
+            case None => publicationCondPre
+          }
+          Some(s"github.event_name != 'pull_request' && $publicationCond")
+        }
+      )
+    ),
     ThisBuild / githubWorkflowAddedJobs +=
       WorkflowJob(
-        "publish-site",
-        "Publish Site",
-        scalas = List(crossScalaVersions.value.head),
-        javas = githubWorkflowJavaVersions.value.toList,
-        cond = Some("github.event_name != 'pull_request'"),
-        needs = List("build"),
-        steps = githubWorkflowJobSetup.value.toList ::: List(
-          WorkflowStep.Sbt(List("mdoc", "laikaSite"), name = Some("Generate site")),
-          WorkflowStep.Use(
-            UseRef.Public("peaceiris", "actions-gh-pages", "v3"),
-            Map(
-              "github_token" -> s"$${{ secrets.GITHUB_TOKEN }}",
-              "publish_dir" -> s"${(ThisBuild / baseDirectory).value.toPath.toAbsolutePath.relativize(((Laika / target).value / "site").toPath)}",
-              "publish_branch" -> "gh-pages"
-            ),
-            name = Some("Publish")
-          )
-        )
+        "site",
+        "Generate Site",
+        scalas = List(crossScalaVersions.value.last),
+        javas = List(githubWorkflowJavaVersions.value.head),
+        steps =
+          githubWorkflowJobSetup.value.toList ++ tlSiteGenerate.value ++ tlSitePublish.value
       )
-  )
+  ) ++ addCommandAlias("tlSite", mkCommand(List("mdoc", "laikaSite")))
 
   private def getSvgLogo: String = {
     val src = Source.fromURL(getClass.getResource("/logo.svg"))
