@@ -23,6 +23,7 @@ import laika.ast.LengthUnit._
 import laika.sbt.LaikaPlugin, LaikaPlugin.autoImport._
 import laika.helium.Helium
 import laika.helium.config.{HeliumIcon, IconLink, ImageLink}
+import org.typelevel.sbt.kernel.GitHelper
 import gha.GenerativePlugin, GenerativePlugin.autoImport._
 import scala.io.Source
 import java.util.Base64
@@ -31,7 +32,7 @@ object TypelevelSitePlugin extends AutoPlugin {
 
   object autoImport {
     lazy val tlHeliumConfig = settingKey[Helium]("The Helium configuration")
-    lazy val tlApiUrl = settingKey[URL]("Url to the API scaladocs")
+    lazy val tlApiDocsUrl = settingKey[Option[URL]]("URL to the API docs")
     lazy val tlSiteGenerate = settingKey[Seq[WorkflowStep]](
       "A sequence of steps which generates the site (default: [Sbt(List(\"tlSite\"))])")
     lazy val tlSitePublish = settingKey[Seq[WorkflowStep]](
@@ -46,11 +47,15 @@ object TypelevelSitePlugin extends AutoPlugin {
   override def projectSettings = Seq(
     Laika / sourceDirectories := Seq(mdocOut.value),
     laikaTheme := tlHeliumConfig.value.build,
-    tlApiUrl := url(
-      s"https://www.javadoc.io/doc/" +
-        s"${projectID.value.organization}/" +
-        s"${(RootProject(file(".")) / projectID).value.name}_${scalaBinaryVersion.value}"
+    mdocVariables ++= Map(
+      "VERSION" -> GitHelper
+        .previousReleases()
+        .filterNot(_.isPrerelease)
+        .headOption
+        .fold(version.value)(_.toString),
+      "SNAPSHOT_VERSION" -> version.value
     ),
+    tlApiDocsUrl := None,
     tlHeliumConfig := {
       Helium
         .defaults
@@ -73,12 +78,13 @@ object TypelevelSitePlugin extends AutoPlugin {
             "https://typelevel.org",
             Image.external(s"data:image/svg+xml;base64,$getSvgLogo")
           ),
-          navLinks = Seq(
+          navLinks = tlApiDocsUrl.value.toList.map { url =>
             IconLink.external(
-              tlApiUrl.value.toString,
+              url.toString,
               HeliumIcon.api,
               options = Styles("svg-link")
-            ),
+            )
+          } ++ List(
             IconLink.external(
               scmInfo.value.fold("https://github.com/typelevel")(_.browseUrl.toString),
               HeliumIcon.github,
