@@ -37,6 +37,8 @@ object TypelevelSitePlugin extends AutoPlugin {
       "A sequence of steps which generates the site (default: [Sbt(List(\"tlSite\"))])")
     lazy val tlSitePublish = settingKey[Seq[WorkflowStep]](
       "A sequence of steps which publishes the site (default: peaceiris/actions-gh-pages)")
+    lazy val tlSitePublishBranch = settingKey[Option[String]](
+      "The branch in your repository to publish the site from on every push. Set this to None if you only want to update the site on tag releases. (default: main)")
   }
 
   import autoImport._
@@ -55,6 +57,7 @@ object TypelevelSitePlugin extends AutoPlugin {
         .fold(version.value)(_.toString),
       "SNAPSHOT_VERSION" -> version.value
     ),
+    tlSitePublishBranch := Some("main"),
     tlApiDocsUrl := None,
     tlHeliumConfig := {
       Helium
@@ -116,11 +119,12 @@ object TypelevelSitePlugin extends AutoPlugin {
         ),
         name = Some("Publish site"),
         cond = {
+          val predicate = tlSitePublishBranch
+            .value // Either publish from branch or on tags, not both
+            .fold[RefPredicate](RefPredicate.StartsWith(Ref.Tag("v")))(b =>
+              RefPredicate.Equals(Ref.Branch(b)))
           val publicationCondPre =
-            githubWorkflowPublishTargetBranches
-              .value
-              .map(GenerativePlugin.compileBranchPredicate("github.ref", _))
-              .mkString("(", " || ", ")")
+            GenerativePlugin.compileBranchPredicate("github.ref", predicate)
           val publicationCond = githubWorkflowPublishCond.value match {
             case Some(cond) => publicationCondPre + " && (" + cond + ")"
             case None => publicationCondPre
