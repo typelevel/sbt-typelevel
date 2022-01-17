@@ -43,7 +43,7 @@ object TypelevelMicrositePlugin extends AutoPlugin {
         cond = Some("github.event_name != 'pull_request'"),
         needs = List("build"),
         steps = githubWorkflowJobSetup.value.toList ::: List(
-          WorkflowStep.Sbt(List("docs/mdoc", "docs/laikaSite"), name = Some("Generate")),
+          WorkflowStep.Sbt(List("mdoc", "laikaSite"), name = Some("Generate site")),
           WorkflowStep.Use(
             UseRef.Public("peaceiris", "actions-gh-pages", "v3"),
             Map(
