@@ -105,7 +105,7 @@ object TypelevelSitePlugin extends AutoPlugin {
       laika.parse.code.SyntaxHighlighting
     ),
     tlSiteGenerate := List(
-      WorkflowStep.Sbt(List("docs/tlSite"), name = Some("Generate site"))
+      WorkflowStep.Sbt(List("tlSite"), name = Some("Generate site"))
     ),
     tlSitePublish := List(
       WorkflowStep.Use(
@@ -145,7 +145,7 @@ object TypelevelSitePlugin extends AutoPlugin {
         steps =
           githubWorkflowJobSetup.value.toList ++ tlSiteGenerate.value ++ tlSitePublish.value
       )
-  ) ++ addCommandAlias("tlSite", mkCommand(List("mdoc", "laikaSite")))
+  ) ++ addCommandAlias("tlSite", mkCommand(List("docs/mdoc", "docs/laikaSite")))
 
   private def getSvgLogo: String = {
     val src = Source.fromURL(getClass.getResource("/logo.svg"))
