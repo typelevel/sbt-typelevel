@@ -18,18 +18,66 @@ package org.typelevel.sbt
 
 import sbt._, Keys._
 import mdoc.MdocPlugin, MdocPlugin.autoImport._
+import laika.ast._
+import laika.ast.LengthUnit._
 import laika.sbt.LaikaPlugin, LaikaPlugin.autoImport._
+import laika.helium.Helium
+import laika.helium.config.{
+  Favicon,
+  HeliumIcon,
+  IconLink,
+  ImageLink,
+  ReleaseInfo,
+  Teaser,
+  TextLink
+}
 import sbtghactions.GenerativePlugin, GenerativePlugin.autoImport._
 
 object TypelevelMicrositePlugin extends AutoPlugin {
 
-  override def requires = MdocPlugin && LaikaPlugin && GenerativePlugin
+  object autoImport {
+    lazy val tlHeliumConfig = settingKey[Helium]("The Helium configuration")
+  }
 
-  override def buildSettings = Seq(
-  )
+  import autoImport._
+
+  override def requires = MdocPlugin && LaikaPlugin && GenerativePlugin
 
   override def projectSettings = Seq(
     Laika / sourceDirectories := Seq(mdocOut.value),
+    laikaTheme := tlHeliumConfig.value.build,
+    tlHeliumConfig := {
+      Helium
+        .defaults
+        .site
+        .layout(
+          contentWidth = px(860),
+          navigationWidth = px(275),
+          topBarHeight = px(35),
+          defaultBlockSpacing = px(10),
+          defaultLineHeight = 1.5,
+          anchorPlacement = laika.helium.config.AnchorPlacement.Right
+        )
+        .site
+        .topNavigationBar(
+          homeLink = ImageLink.external(
+            "https://typelevel.org",
+            Image.external("https://typelevel.org/img/logo.svg")
+          ),
+          navLinks = Seq(
+            IconLink.external(
+              "https://www.javadoc.io/doc/org.http4s/http4s-dom_sjs1_2.13/latest/org/http4s/dom/index.html",
+              HeliumIcon.api,
+              options = Styles("svg-link")),
+            IconLink.external(
+              scmInfo.value.fold("https://github.com/typelevel")(_.browseUrl.toString),
+              HeliumIcon.github,
+              options = Styles("svg-link")),
+            IconLink.external("https://discord.gg/XF3CXcMzqD", HeliumIcon.chat),
+            IconLink.external("https://twitter.com/typelevel", HeliumIcon.twitter)
+          )
+        )
+    },
     laikaExtensions ++= Seq(
       laika.markdown.github.GitHubFlavor,
       laika.parse.code.SyntaxHighlighting
