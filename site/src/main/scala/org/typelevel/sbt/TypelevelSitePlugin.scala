@@ -44,7 +44,7 @@ object TypelevelSitePlugin extends AutoPlugin {
   import autoImport._
   import TypelevelKernelPlugin.mkCommand
 
-  override def requires = MdocPlugin && LaikaPlugin && GenerativePlugin
+  override def requires = MdocPlugin && LaikaPlugin && GenerativePlugin && NoPublishPlugin
 
   override def buildSettings = Seq(
     tlSitePublishBranch := Some("main"),

@@ -145,7 +145,7 @@ lazy val site = project
   .settings(
     name := "sbt-typelevel-site"
   )
-  .dependsOn(kernel, githubActions)
+  .dependsOn(kernel, githubActions, noPublish)
 
 lazy val docs = project
   .in(file("mdocs"))
