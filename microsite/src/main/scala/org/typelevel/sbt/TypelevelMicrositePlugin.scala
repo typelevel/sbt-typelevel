@@ -32,6 +32,8 @@ import laika.helium.config.{
   TextLink
 }
 import gha.GenerativePlugin, GenerativePlugin.autoImport._
+import scala.io.Source
+import java.util.Base64
 
 object TypelevelMicrositePlugin extends AutoPlugin {
 
@@ -53,7 +55,7 @@ object TypelevelMicrositePlugin extends AutoPlugin {
         .layout(
           contentWidth = px(860),
           navigationWidth = px(275),
-          topBarHeight = px(35),
+          topBarHeight = px(50),
           defaultBlockSpacing = px(10),
           defaultLineHeight = 1.5,
           anchorPlacement = laika.helium.config.AnchorPlacement.Right
@@ -62,7 +64,7 @@ object TypelevelMicrositePlugin extends AutoPlugin {
         .topNavigationBar(
           homeLink = ImageLink.external(
             "https://typelevel.org",
-            Image.external("https://typelevel.org/img/logo.svg")
+            Image.external(s"data:image/svg+xml;base64,$getSvgLogo")
           ),
           navLinks = Seq(
             IconLink.external(
@@ -104,5 +106,14 @@ object TypelevelMicrositePlugin extends AutoPlugin {
         )
       )
   )
+
+  private def getSvgLogo: String = {
+    val src = Source.fromURL(getClass.getResource("/logo.svg"))
+    try {
+      Base64.getEncoder().encodeToString(src.mkString.getBytes)
+    } finally {
+      src.close()
+    }
+  }
 
 }
