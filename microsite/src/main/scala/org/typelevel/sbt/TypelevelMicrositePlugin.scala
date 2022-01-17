@@ -39,6 +39,7 @@ object TypelevelMicrositePlugin extends AutoPlugin {
 
   object autoImport {
     lazy val tlHeliumConfig = settingKey[Helium]("The Helium configuration")
+    lazy val tlApiUrl = settingKey[URL]("Url to the API scaladocs")
   }
 
   import autoImport._
@@ -48,6 +49,11 @@ object TypelevelMicrositePlugin extends AutoPlugin {
   override def projectSettings = Seq(
     Laika / sourceDirectories := Seq(mdocOut.value),
     laikaTheme := tlHeliumConfig.value.build,
+    tlApiUrl := url(
+      s"https://www.javadoc.io/doc/" +
+        s"${projectID.value.organization}/" +
+        s"${(RootProject(file(".")) / projectID).value.name}_${scalaBinaryVersion.value}"
+    ),
     tlHeliumConfig := {
       Helium
         .defaults
@@ -60,6 +66,10 @@ object TypelevelMicrositePlugin extends AutoPlugin {
           defaultLineHeight = 1.5,
           anchorPlacement = laika.helium.config.AnchorPlacement.Right
         )
+        // .site
+        // .favIcons( // TODO broken?
+        //   Favicon.external("https://typelevel.org/img/favicon.png", "32x32", "image/png")
+        // )
         .site
         .topNavigationBar(
           homeLink = ImageLink.external(
@@ -68,9 +78,10 @@ object TypelevelMicrositePlugin extends AutoPlugin {
           ),
           navLinks = Seq(
             IconLink.external(
-              "https://www.javadoc.io/doc/org.http4s/http4s-dom_sjs1_2.13/latest/org/http4s/dom/index.html",
+              tlApiUrl.value.toString,
               HeliumIcon.api,
-              options = Styles("svg-link")),
+              options = Styles("svg-link")
+            ),
             IconLink.external(
               scmInfo.value.fold("https://github.com/typelevel")(_.browseUrl.toString),
               HeliumIcon.github,
