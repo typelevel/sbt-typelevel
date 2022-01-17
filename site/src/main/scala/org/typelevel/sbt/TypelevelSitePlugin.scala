@@ -49,7 +49,7 @@ object TypelevelSitePlugin extends AutoPlugin {
   override def buildSettings = Seq(
     tlSitePublishBranch := Some("main"),
     tlApiDocsUrl := None
-  )
+  ) ++ addCommandAlias("tlSite", mkCommand(List("mdoc", "laikaSite")))
 
   override def projectSettings = Seq(
     Laika / sourceDirectories := Seq(mdocOut.value),
@@ -145,7 +145,7 @@ object TypelevelSitePlugin extends AutoPlugin {
         steps =
           githubWorkflowJobSetup.value.toList ++ tlSiteGenerate.value ++ tlSitePublish.value
       )
-  ) ++ addCommandAlias("tlSite", mkCommand(List("mdoc", "laikaSite")))
+  )
 
   private def getSvgLogo: String = {
     val src = Source.fromURL(getClass.getResource("/logo.svg"))
