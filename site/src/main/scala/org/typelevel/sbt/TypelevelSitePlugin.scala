@@ -46,6 +46,11 @@ object TypelevelSitePlugin extends AutoPlugin {
 
   override def requires = MdocPlugin && LaikaPlugin && GenerativePlugin
 
+  override def buildSettings = Seq(
+    tlSitePublishBranch := Some("main"),
+    tlApiDocsUrl := None
+  )
+
   override def projectSettings = Seq(
     Laika / sourceDirectories := Seq(mdocOut.value),
     laikaTheme := tlHeliumConfig.value.build,
@@ -57,8 +62,6 @@ object TypelevelSitePlugin extends AutoPlugin {
         .fold(version.value)(_.toString),
       "SNAPSHOT_VERSION" -> version.value
     ),
-    tlSitePublishBranch := Some("main"),
-    tlApiDocsUrl := None,
     tlHeliumConfig := {
       Helium
         .defaults
