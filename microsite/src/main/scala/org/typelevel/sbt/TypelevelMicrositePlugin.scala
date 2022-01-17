@@ -119,7 +119,7 @@ object TypelevelMicrositePlugin extends AutoPlugin {
             case Some(cond) => publicationCondPre + " && (" + cond + ")"
             case None => publicationCondPre
           }
-          Some(s"github.event_name != 'pull_request' && $publicationCond")
+          Some(s"$publicationCond")
         }
       )
     ),
