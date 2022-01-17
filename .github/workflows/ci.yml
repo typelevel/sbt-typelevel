@@ -72,10 +72,10 @@ jobs:
         run: sbt 'project ${{ matrix.project }}' '++${{ matrix.scala }}' doc
 
       - name: Make target directories
-        run: mkdir -p github/target github-actions/target kernel/target versioning/target ci-release/target target .js/target mdocs/target ci-signing/target microsite/target mima/target .jvm/target .native/target no-publish/target sonatype/target ci/target sonatype-ci-release/target core/target settings/target project/target
+        run: mkdir -p github/target github-actions/target kernel/target versioning/target ci-release/target target .js/target mdocs/target site/target ci-signing/target mima/target .jvm/target .native/target no-publish/target sonatype/target ci/target sonatype-ci-release/target core/target settings/target project/target
 
       - name: Compress target directories
-        run: tar cf targets.tar github/target github-actions/target kernel/target versioning/target ci-release/target target .js/target mdocs/target ci-signing/target microsite/target mima/target .jvm/target .native/target no-publish/target sonatype/target ci/target sonatype-ci-release/target core/target settings/target project/target
+        run: tar cf targets.tar github/target github-actions/target kernel/target versioning/target ci-release/target target .js/target mdocs/target site/target ci-signing/target mima/target .jvm/target .native/target no-publish/target sonatype/target ci/target sonatype-ci-release/target core/target settings/target project/target
 
       - name: Upload target directories
         uses: actions/upload-artifact@v2
