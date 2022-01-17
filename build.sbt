@@ -148,4 +148,7 @@ lazy val microsite = project
   )
   .dependsOn(githubActions)
 
-lazy val docs = project.in(file("mdocs")).enablePlugins(TypelevelMicrositePlugin)
+lazy val docs = project
+  .in(file("mdocs"))
+  .enablePlugins(TypelevelMicrositePlugin)
+  .settings(laikaConfig ~= { _.withRawContent })
