@@ -20,7 +20,7 @@ import scala.util.Try
 
 import scala.sys.process._
 
-object GitHelper {
+private[sbt] object GitHelper {
 
   /**
    * Returns a list of strictly previous releases (i.e. ignores tags on HEAD).

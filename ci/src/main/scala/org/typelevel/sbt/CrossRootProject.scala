@@ -24,44 +24,44 @@ import org.typelevel.sbt.gha.GenerativePlugin.autoImport._
  * automatically enables the `NoPublishPlugin`.
  */
 final class CrossRootProject private (
-    val root: Project,
-    val rootJVM: Project,
-    val rootJS: Project,
-    val rootNative: Project
+    val all: Project,
+    val jvm: Project,
+    val js: Project,
+    val native: Project
 ) extends CompositeProject {
 
-  override def componentProjects: Seq[Project] = Seq(root, rootJVM, rootJS, rootNative)
+  override def componentProjects: Seq[Project] = Seq(all, jvm, js, native)
 
   def settings(ss: Def.SettingsDefinition*): CrossRootProject =
     new CrossRootProject(
-      root.settings(ss: _*),
-      rootJVM.settings(ss: _*),
-      rootJS.settings(ss: _*),
-      rootNative.settings(ss: _*)
+      all.settings(ss: _*),
+      jvm.settings(ss: _*),
+      js.settings(ss: _*),
+      native.settings(ss: _*)
     )
 
   def configure(transforms: (Project => Project)*): CrossRootProject =
     new CrossRootProject(
-      root.configure(transforms: _*),
-      rootJVM.configure(transforms: _*),
-      rootJS.configure(transforms: _*),
-      rootNative.configure(transforms: _*)
+      all.configure(transforms: _*),
+      jvm.configure(transforms: _*),
+      js.configure(transforms: _*),
+      native.configure(transforms: _*)
     )
 
   def enablePlugins(ns: Plugins*): CrossRootProject =
     new CrossRootProject(
-      root.enablePlugins(ns: _*),
-      rootJVM.enablePlugins(ns: _*),
-      rootJS.enablePlugins(ns: _*),
-      rootNative.enablePlugins(ns: _*)
+      all.enablePlugins(ns: _*),
+      jvm.enablePlugins(ns: _*),
+      js.enablePlugins(ns: _*),
+      native.enablePlugins(ns: _*)
     )
 
   def disablePlugins(ps: AutoPlugin*): CrossRootProject =
     new CrossRootProject(
-      root.disablePlugins(ps: _*),
-      rootJVM.disablePlugins(ps: _*),
-      rootJS.disablePlugins(ps: _*),
-      rootNative.disablePlugins(ps: _*)
+      all.disablePlugins(ps: _*),
+      jvm.disablePlugins(ps: _*),
+      js.disablePlugins(ps: _*),
+      native.disablePlugins(ps: _*)
     )
 
   def aggregate(projects: CompositeProject*): CrossRootProject =
@@ -78,24 +78,27 @@ final class CrossRootProject private (
     val jvmProjects = projects.diff(jsProjects).diff(nativeProjects)
 
     new CrossRootProject(
-      root.aggregate(projects.map(_.project): _*),
+      all.aggregate(projects.map(_.project): _*),
       if (jvmProjects.nonEmpty)
-        rootJVM.aggregate(jvmProjects.map(_.project): _*).enablePlugins(TypelevelCiJVMPlugin)
-      else rootJVM,
+        jvm.aggregate(jvmProjects.map(_.project): _*).enablePlugins(TypelevelCiJVMPlugin)
+      else jvm,
       if (jsProjects.nonEmpty)
-        rootJS.aggregate(jsProjects.map(_.project): _*).enablePlugins(TypelevelCiJSPlugin)
-      else rootJS,
+        js.aggregate(jsProjects.map(_.project): _*).enablePlugins(TypelevelCiJSPlugin)
+      else js,
       if (nativeProjects.nonEmpty)
-        rootNative
+        native
           .aggregate(nativeProjects.map(_.project): _*)
           .enablePlugins(TypelevelCiNativePlugin)
-      else rootNative
+      else native
     )
   }
 
 }
 
 object CrossRootProject {
+  def unapply(root: CrossRootProject): Some[(Project, Project, Project, Project)] =
+    Some((root.all, root.jvm, root.js, root.native))
+
   private[sbt] def apply(): CrossRootProject = new CrossRootProject(
     Project("root", file(".")),
     Project("rootJVM", file(".jvm")),
