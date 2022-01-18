@@ -109,7 +109,7 @@ object TypelevelSitePlugin extends AutoPlugin {
     ),
     tlSitePublish := List(
       WorkflowStep.Use(
-        UseRef.Public("peaceiris", "actions-gh-pages", "v3"),
+        UseRef.Public("peaceiris", "actions-gh-pages", "v3.8.0"),
         Map(
           "github_token" -> s"$${{ secrets.GITHUB_TOKEN }}",
           "publish_dir" -> (ThisBuild / baseDirectory)
