@@ -134,7 +134,8 @@ Instead of using the super-plugins, for finer-grained control you can always add
     ```
     - `tlSitePublishBranch` (setting): The branch to publish the site from on every push. Set this to `None` if you only want to update the site on tag releases. (default: `main`)
     - `tlSiteApiUrl` (setting): URL to the API docs. (default: `None`)
-    - `tlSiteHeliumConfig` (setting): the Laika Helium config
+    - `tlSiteHeliumConfig` (setting): the Laika Helium config. (default: how the sbt-typelevel site looks)
+    - To preview locally, run `docs/mdoc` and then [`docs/laikaPreview`](https://planet42.github.io/Laika/0.18/02-running-laika/01-sbt-plugin.html#using-the-preview-server).
 
 ### Dependency diagram
 
