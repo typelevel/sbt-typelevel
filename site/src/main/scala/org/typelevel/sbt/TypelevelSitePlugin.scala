@@ -34,9 +34,9 @@ object TypelevelSitePlugin extends AutoPlugin {
     lazy val tlHeliumConfig = settingKey[Helium]("The Helium configuration")
     lazy val tlApiDocsUrl = settingKey[Option[URL]]("URL to the API docs")
     lazy val tlSiteGenerate = settingKey[Seq[WorkflowStep]](
-      "A sequence of steps which generates the site (default: [Sbt(List(\"tlSite\"))])")
+      "A sequence of workflow steps which generates the site (default: [Sbt(List(\"tlSite\"))])")
     lazy val tlSitePublish = settingKey[Seq[WorkflowStep]](
-      "A sequence of steps which publishes the site (default: peaceiris/actions-gh-pages)")
+      "A sequence of workflow steps which publishes the site (default: peaceiris/actions-gh-pages)")
     lazy val tlSitePublishBranch = settingKey[Option[String]](
       "The branch to publish the site from on every push. Set this to None if you only want to update the site on tag releases. (default: main)")
   }
