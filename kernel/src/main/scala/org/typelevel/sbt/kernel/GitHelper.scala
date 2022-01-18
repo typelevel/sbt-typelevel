@@ -29,9 +29,9 @@ object GitHelper {
    */
   def previousReleases(fromHead: Boolean = false): List[V] = {
     Try {
-      val merged = if (fromHead) " --merged" else ""
+      val merged = if (fromHead) " --merged HEAD" else ""
       // --no-contains omits tags on HEAD
-      s"git tag --no-contains$merged".!!.split("\n").toList.map(_.trim).collect {
+      s"git tag --no-contains HEAD$merged".!!.split("\n").toList.map(_.trim).collect {
         case V.Tag(version) => version
       }
     }.getOrElse(List.empty).sorted.reverse
