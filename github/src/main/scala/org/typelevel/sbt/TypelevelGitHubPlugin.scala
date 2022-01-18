@@ -40,7 +40,7 @@ object TypelevelGitHubPlugin extends AutoPlugin {
     homepage := homepage.value.orElse(scmInfo.value.map(_.browseUrl))
   )
 
-  def getScmInfo(): Option[ScmInfo] = {
+  private def getScmInfo(): Option[ScmInfo] = {
     import scala.sys.process._
 
     def gitHubScmInfo(user: String, repo: String) =

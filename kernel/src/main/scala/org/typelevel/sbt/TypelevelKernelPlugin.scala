@@ -44,6 +44,6 @@ object TypelevelKernelPlugin extends AutoPlugin {
   override def buildSettings =
     addCommandAlias("tlReleaseLocal", mkCommand(List("reload", "project /", "+publishLocal")))
 
-  def mkCommand(commands: List[String]): String = commands.mkString("; ", "; ", "")
+  private[sbt] def mkCommand(commands: List[String]): String = commands.mkString("; ", "; ", "")
 
 }

@@ -110,9 +110,9 @@ object TypelevelVersioningPlugin extends AutoPlugin {
     }
   )
 
-  val Description = """^.*-(\d+)-[a-zA-Z0-9]+$""".r
+  private val Description = """^.*-(\d+)-[a-zA-Z0-9]+$""".r
 
-  def getTaggedVersion(tags: Seq[String]): Option[V] =
+  private def getTaggedVersion(tags: Seq[String]): Option[V] =
     tags.collect { case V.Tag(v) => v }.headOption
 
 }

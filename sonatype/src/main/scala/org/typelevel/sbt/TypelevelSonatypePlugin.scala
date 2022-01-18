@@ -44,7 +44,7 @@ object TypelevelSonatypePlugin extends AutoPlugin {
             "project /",
             "+mimaReportBinaryIssues",
             "+publish",
-            "sonatypeBundleReleaseIfRelevant"))
+            "tlSonatypeBundleReleaseIfRelevant"))
       )
 
   override def projectSettings = Seq(
@@ -61,7 +61,7 @@ object TypelevelSonatypePlugin extends AutoPlugin {
   )
 
   private def sonatypeBundleReleaseIfRelevant: Command =
-    Command.command("sonatypeBundleReleaseIfRelevant") { state =>
+    Command.command("tlSonatypeBundleReleaseIfRelevant") { state =>
       if (state.getSetting(isSnapshot).getOrElse(false))
         state // a snapshot is good-to-go
       else // a non-snapshot releases as a bundle

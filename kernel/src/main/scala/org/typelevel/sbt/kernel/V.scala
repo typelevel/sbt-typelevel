@@ -18,7 +18,7 @@ package org.typelevel.sbt.kernel
 
 import scala.util.Try
 
-final case class V(
+private[sbt] final case class V(
     major: Int,
     minor: Int,
     patch: Option[Int],
@@ -61,7 +61,7 @@ final case class V(
 
 }
 
-object V {
+private[sbt] object V {
   val version = """^(0|[1-9]\d*)\.(0|[1-9]\d*)(?:\.(0|[1-9]\d*))?(?:-(.+))?$""".r
 
   def apply(v: String): Option[V] = V.unapply(v)
