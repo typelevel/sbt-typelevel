@@ -133,7 +133,8 @@ Instead of using the super-plugins, for finer-grained control you can always add
     lazy val docs = project.in(file("site")).enablePlugins(TypelevelSitePlugin)
     ```
     - `tlSitePublishBranch` (setting): The branch to publish the site from on every push. Set this to `None` if you only want to update the site on tag releases. (default: `main`)
-    - `tlApiDocsUrl` (setting): URL to the API docs. (default: `None`)
+    - `tlSiteApiUrl` (setting): URL to the API docs. (default: `None`)
+    - `tlSiteHeliumConfig` (setting): the Laika Helium config
 
 ### Dependency diagram
 

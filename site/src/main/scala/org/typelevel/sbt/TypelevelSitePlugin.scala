@@ -31,8 +31,8 @@ import java.util.Base64
 object TypelevelSitePlugin extends AutoPlugin {
 
   object autoImport {
-    lazy val tlHeliumConfig = settingKey[Helium]("The Helium configuration")
-    lazy val tlApiDocsUrl = settingKey[Option[URL]]("URL to the API docs")
+    lazy val tlSiteHeliumConfig = settingKey[Helium]("The Helium configuration")
+    lazy val tlSiteApiUrl = settingKey[Option[URL]]("URL to the API docs")
     lazy val tlSiteGenerate = settingKey[Seq[WorkflowStep]](
       "A sequence of workflow steps which generates the site (default: [Sbt(List(\"tlSite\"))])")
     lazy val tlSitePublish = settingKey[Seq[WorkflowStep]](
@@ -48,12 +48,12 @@ object TypelevelSitePlugin extends AutoPlugin {
 
   override def buildSettings = Seq(
     tlSitePublishBranch := Some("main"),
-    tlApiDocsUrl := None
+    tlSiteApiUrl := None
   )
 
   override def projectSettings = Seq(
     Laika / sourceDirectories := Seq(mdocOut.value),
-    laikaTheme := tlHeliumConfig.value.build,
+    laikaTheme := tlSiteHeliumConfig.value.build,
     mdocVariables ++= Map(
       "VERSION" -> GitHelper
         .previousReleases()
@@ -62,7 +62,7 @@ object TypelevelSitePlugin extends AutoPlugin {
         .fold(version.value)(_.toString),
       "SNAPSHOT_VERSION" -> version.value
     ),
-    tlHeliumConfig := {
+    tlSiteHeliumConfig := {
       Helium
         .defaults
         .site
@@ -84,7 +84,7 @@ object TypelevelSitePlugin extends AutoPlugin {
             "https://typelevel.org",
             Image.external(s"data:image/svg+xml;base64,$getSvgLogo")
           ),
-          navLinks = tlApiDocsUrl.value.toList.map { url =>
+          navLinks = tlSiteApiUrl.value.toList.map { url =>
             IconLink.external(
               url.toString,
               HeliumIcon.api,
