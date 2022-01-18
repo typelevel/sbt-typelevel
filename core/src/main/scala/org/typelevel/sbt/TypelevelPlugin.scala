@@ -66,6 +66,22 @@ object TypelevelPlugin extends AutoPlugin {
         name = Some("Check headers and formatting")
       ) +: steps
     }
+  ) ++ addCommandAlias(
+    "prePR",
+    TypelevelKernelPlugin.mkCommand(
+      List(
+        "reload",
+        "project /",
+        "clean",
+        "githubWorkflowGenerate",
+        "headerCreateAll",
+        "scalafmtAll",
+        "scalafmtSbt",
+        "set ThisBuild / tlFatalWarnings := tlFatalWarningsInCi.value",
+        "Test / compile",
+        "reload"
+      )
+    )
   )
 
   override def projectSettings = AutomateHeaderPlugin.projectSettings
