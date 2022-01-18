@@ -18,9 +18,9 @@ package org.typelevel.sbt
 
 import io.crashbox.gpg.SbtGpg
 import sbt._, Keys._
-import sbtghactions.GenerativePlugin
-import sbtghactions.GitHubActionsPlugin
-import sbtghactions.GenerativePlugin.autoImport._
+import org.typelevel.sbt.gha.GenerativePlugin
+import org.typelevel.sbt.gha.GitHubActionsPlugin
+import org.typelevel.sbt.gha.GenerativePlugin.autoImport._
 
 object TypelevelCiSigningPlugin extends AutoPlugin {
 
@@ -33,7 +33,7 @@ object TypelevelCiSigningPlugin extends AutoPlugin {
       "PGP_SECRET" -> s"$${{ secrets.PGP_SECRET }}",
       "PGP_PASSPHRASE" -> s"$${{ secrets.PGP_PASSPHRASE }}"
     ),
-    githubWorkflowPublishPreamble ++= Seq(
+    githubWorkflowPublishPreamble := Seq(
       WorkflowStep.Run( // if your key is not passphrase-protected
         List("echo $PGP_SECRET | base64 -d | gpg --import"),
         name = Some("Import signing key"),

@@ -17,9 +17,9 @@
 package org.typelevel.sbt
 
 import sbt._
-import sbtghactions.GenerativePlugin
-import sbtghactions.GitHubActionsPlugin
-import sbtghactions.GenerativePlugin.autoImport._
+import org.typelevel.sbt.gha.GenerativePlugin
+import org.typelevel.sbt.gha.GitHubActionsPlugin
+import org.typelevel.sbt.gha.GenerativePlugin.autoImport._
 
 object TypelevelSonatypeCiReleasePlugin extends AutoPlugin {
 
@@ -59,7 +59,7 @@ object TypelevelSonatypeCiReleasePlugin extends AutoPlugin {
     },
     githubWorkflowTargetTags += "v*",
     githubWorkflowPublish := Seq(
-      WorkflowStep.Sbt(List("tlRelease"))
+      WorkflowStep.Sbt(List("tlRelease"), name = Some("Publish"))
     )
   )
 }
