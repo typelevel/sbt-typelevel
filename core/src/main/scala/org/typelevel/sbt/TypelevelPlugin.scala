@@ -67,7 +67,7 @@ object TypelevelPlugin extends AutoPlugin {
       ) +: steps
     }
   ) ++ addCommandAlias(
-    "tlPrePr",
+    "prePR",
     mkCommand(
       List(
         "reload",
