@@ -68,7 +68,7 @@ object TypelevelPlugin extends AutoPlugin {
     }
   ) ++ addCommandAlias(
     "prePR",
-    mkCommand(
+    TypelevelKernelPlugin.mkCommand(
       List(
         "reload",
         "project /",
