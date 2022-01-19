@@ -39,6 +39,10 @@ Bump your `tlBaseVersion` to the next breaking-version according to early-semver
 ThisBuild / tlVersionIntroduced := Map("3" -> "0.4.2")
 ```
 
+### How do I locally prepare my PR for CI?
+
+**sbt-typelevel** comes with a `prePR` command, which updates the GitHub workflow, generates headers, runs `scalafmt`, and clean compiles your code.
+
 ### How do I disable fatal warnings in CI?
 
 If you are using **sbt-typelevel** fatal warnings are on by default in CI.
@@ -98,7 +102,7 @@ ThisBuild / tlSonatypeUseLegacyHost := false
 // project/plugins.sbt
 addSbtPlugin("org.typelevel" % "sbt-typelevel-site" % "@VERSION@")
 // build.sbt
-ThisBuild / tlSitePublishBranch := Some("main") // deploy docs from this branch (default: main)
+ThisBuild / tlSitePublishBranch := Some("main") // deploy docs from this branch
 lazy val docs = project.in(file("site")).enablePlugins(TypelevelSitePlugin)
 ```
 
