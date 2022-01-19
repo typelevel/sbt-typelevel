@@ -71,6 +71,7 @@
           <li class="level1"><a href="#faq">FAQ</a></li>
           <li class="level2"><a href="#how-do-i-introduce-breaking-changes-intended-for-my-next-version">How do I introduce breaking changes intended for my next version?</a></li>
           <li class="level2"><a href="#how-do-i-indicate-the-first-version-that-i-published-scala-3-artifacts-for">How do I indicate the first version that I published Scala 3 artifacts for?</a></li>
+          <li class="level2"><a href="#how-do-i-locally-prepare-my-pr-for-ci">How do I locally prepare my PR for CI?</a></li>
           <li class="level2"><a href="#how-do-i-disable-fatal-warnings-in-ci">How do I disable fatal warnings in CI?</a></li>
           <li class="level2"><a href="#how-do-i-publish-snapshots-in-ci">How do I publish snapshots in CI?</a></li>
           <li class="level2"><a href="#what-happens-if-i-push-a-tag-and-commit-at-the-same-time">What happens if I push a tag and commit at the same time?</a></li>
@@ -94,10 +95,10 @@
         <pre class="keep-together pdf epub"><code class="nohighlight"><span class="comment">// Pick one, for project/plugins.sbt
 </span><span>
 </span><span class="comment">// Full service, batteries-included, let&#39;s go!
-</span><span class="identifier">addSbtPlugin</span><span>(</span><span class="string-literal">&quot;org.typelevel&quot;</span><span> % </span><span class="string-literal">&quot;sbt-typelevel&quot;</span><span> % </span><span class="string-literal">&quot;0.3&quot;</span><span>)
+</span><span class="identifier">addSbtPlugin</span><span>(</span><span class="string-literal">&quot;org.typelevel&quot;</span><span> % </span><span class="string-literal">&quot;sbt-typelevel&quot;</span><span> % </span><span class="string-literal">&quot;0.4.0&quot;</span><span>)
 
 </span><span class="comment">// Set me up for CI release, but don&#39;t touch my scalacOptions!
-</span><span class="identifier">addSbtPlugin</span><span>(</span><span class="string-literal">&quot;org.typelevel&quot;</span><span> % </span><span class="string-literal">&quot;sbt-typelevel-ci-release&quot;</span><span> % </span><span class="string-literal">&quot;0.3&quot;</span><span>)
+</span><span class="identifier">addSbtPlugin</span><span>(</span><span class="string-literal">&quot;org.typelevel&quot;</span><span> % </span><span class="string-literal">&quot;sbt-typelevel-ci-release&quot;</span><span> % </span><span class="string-literal">&quot;0.4.0&quot;</span><span>)
 
 </span><span class="comment">// Then, in your build.sbt
 </span><span class="type-name">ThisBuild</span><span> / </span><span class="identifier">tlBaseVersion</span><span> := </span><span class="string-literal">&quot;0.4&quot;</span><span> </span><span class="comment">// your current series x.y
@@ -117,6 +118,9 @@
         
         <h3 id="how-do-i-indicate-the-first-version-that-i-published-scala-3-artifacts-for" class="section">How do I indicate the first version that I published Scala 3 artifacts for?<a class="anchor-link right" href="#how-do-i-indicate-the-first-version-that-i-published-scala-3-artifacts-for"><i class="icofont-laika">&#xef71;</i></a></h3>
         <pre class="keep-together pdf epub"><code class="nohighlight"><span class="type-name">ThisBuild</span><span> / </span><span class="identifier">tlVersionIntroduced</span><span> := </span><span class="type-name">Map</span><span>(</span><span class="string-literal">&quot;3&quot;</span><span> -&gt; </span><span class="string-literal">&quot;0.4.2&quot;</span><span>)</span></code></pre>
+        
+        <h3 id="how-do-i-locally-prepare-my-pr-for-ci" class="section">How do I locally prepare my PR for CI?<a class="anchor-link right" href="#how-do-i-locally-prepare-my-pr-for-ci"><i class="icofont-laika">&#xef71;</i></a></h3>
+        <p><strong>sbt-typelevel</strong> comes with a <code>prePR</code> command, which updates the GitHub workflow, generates headers, runs <code>scalafmt</code>, and clean compiles your code.</p>
         
         <h3 id="how-do-i-disable-fatal-warnings-in-ci" class="section">How do I disable fatal warnings in CI?<a class="anchor-link right" href="#how-do-i-disable-fatal-warnings-in-ci"><i class="icofont-laika">&#xef71;</i></a></h3>
         <p>If you are using <strong>sbt-typelevel</strong> fatal warnings are on by default in CI.</p>
@@ -158,9 +162,9 @@
         
         <h3 id="how-do-i-publish-a-site-like-this-one" class="section">How do I publish a site like this one?<a class="anchor-link right" href="#how-do-i-publish-a-site-like-this-one"><i class="icofont-laika">&#xef71;</i></a></h3>
         <pre class="keep-together pdf epub"><code class="nohighlight"><span class="comment">// project/plugins.sbt
-</span><span class="identifier">addSbtPlugin</span><span>(</span><span class="string-literal">&quot;org.typelevel&quot;</span><span> % </span><span class="string-literal">&quot;sbt-typelevel-site&quot;</span><span> % </span><span class="string-literal">&quot;0.3&quot;</span><span>)
+</span><span class="identifier">addSbtPlugin</span><span>(</span><span class="string-literal">&quot;org.typelevel&quot;</span><span> % </span><span class="string-literal">&quot;sbt-typelevel-site&quot;</span><span> % </span><span class="string-literal">&quot;0.4.0&quot;</span><span>)
 </span><span class="comment">// build.sbt
-</span><span class="type-name">ThisBuild</span><span> / </span><span class="identifier">tlSitePublishBranch</span><span> := </span><span class="type-name">Some</span><span>(</span><span class="string-literal">&quot;main&quot;</span><span>) </span><span class="comment">// deploy docs from this branch (default: main)
+</span><span class="type-name">ThisBuild</span><span> / </span><span class="identifier">tlSitePublishBranch</span><span> := </span><span class="type-name">Some</span><span>(</span><span class="string-literal">&quot;main&quot;</span><span>) </span><span class="comment">// deploy docs from this branch
 </span><span class="keyword">lazy</span><span> </span><span class="keyword">val</span><span> </span><span class="identifier">docs</span><span> = </span><span class="identifier">project</span><span>.</span><span class="identifier">in</span><span>(</span><span class="identifier">file</span><span>(</span><span class="string-literal">&quot;site&quot;</span><span>)).</span><span class="identifier">enablePlugins</span><span>(</span><span class="type-name">TypelevelSitePlugin</span><span>)</span></code></pre>
         <p>Place your <code>.md</code> files in the <code>docs/</code> directory of your project. The site is generated using <a href="https://scalameta.org/mdoc/">mdoc</a> and <a href="https://planet42.github.io/Laika/">Laika</a> and published to the <code>gh-pages</code> branch on every push to the specified branch. Make sure to enable GitHub pages in your repo settings. To preview locally, run <code>docs/mdoc</code> and then <code>docs/laikaPreview</code>.</p>
         
