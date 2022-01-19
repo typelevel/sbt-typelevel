@@ -2,7 +2,6 @@ name := "sbt-typelevel"
 
 ThisBuild / tlBaseVersion := "0.4"
 ThisBuild / crossScalaVersions := Seq("2.12.15")
-
 ThisBuild / developers := List(
   tlGitHubDev("armanbilge", "Arman Bilge"),
   tlGitHubDev("rossabaker", "Ross A. Baker"),
@@ -23,7 +22,10 @@ lazy val root = tlCrossRootProject.aggregate(
   sonatypeCiRelease,
   ci,
   core,
-  ciRelease)
+  ciRelease,
+  site,
+  docs
+)
 
 lazy val kernel = project
   .in(file("kernel"))
@@ -136,3 +138,16 @@ lazy val core = project
     ciRelease,
     settings
   )
+
+lazy val site = project
+  .in(file("site"))
+  .enablePlugins(SbtPlugin)
+  .settings(
+    name := "sbt-typelevel-site"
+  )
+  .dependsOn(kernel, githubActions, noPublish)
+
+lazy val docs = project
+  .in(file("mdocs"))
+  .enablePlugins(TypelevelSitePlugin)
+  .settings(laikaConfig ~= { _.withRawContent })
