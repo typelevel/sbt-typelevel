@@ -1,0 +1,70 @@
+digraph {
+
+  fmt[label="sbt-scalafmt"]
+  gha[label="sbt-github-actions"]
+  git[label="sbt-git"]
+  gpg[label="sbt-gpg"]
+  header[label="sbt-header"]
+  mima[label="sbt-mima-plugin"]
+  sonatype[label="sbt-sonatype"]
+  sjs[label="sbt-scalajs"]
+  sjscp[label="sbt-scalajs-crossproject"]
+
+  node[color="#FF4C61"];
+
+  tlkernel[label="sbt-typelevel-kernel"];
+
+  tlnopub[label="sbt-typelevel-no-publish"];
+
+  tlsettings[label="sbt-typelevel-settings"];
+  tlsettings -> tlkernel;
+  tlsettings -> git;
+
+  tlgithub[label="sbt-typelevel-github"];
+  tlgithub -> tlkernel;
+  tlgithub -> git;
+  tlgithub -> sjs;
+
+  tlversioning[label="sbt-typelevel-versioning"];
+  tlversioning -> tlkernel;
+  tlversioning -> git;
+
+  tlmima[label="sbt-typelevel-mima"];
+  tlmima -> tlkernel;
+  tlmima -> mima;
+
+  tlsonatype[label="sbt-typelevel-sonatype"];
+  tlsonatype -> tlkernel;
+  tlsonatype -> sonatype;
+  tlsonatype -> mima;
+
+  tlcisigning[label="sbt-typelevel-ci-signing"];
+  tlcisigning -> gha;
+  tlcisigning -> gpg;
+
+  tlsonatypecirelease[label="sbt-typelevel-sonatype-ci-release"];
+  tlsonatypecirelease -> tlsonatype;
+  tlsonatypecirelease -> gha;
+
+  tlci[label="sbt-typelevel-ci"];
+  tlci -> tlkernel;
+  tlci -> tlnopub;
+  tlci -> gha;
+
+  node[shape="box"];
+
+  tlcirelease[label="sbt-typelevel-ci-release"];
+  tlcirelease -> tlci;
+  tlcirelease -> tlgithub;
+  tlcirelease -> tlversioning;
+  tlcirelease -> tlmima;
+  tlcirelease -> tlsonatypecirelease;
+  tlcirelease -> tlcisigning;
+
+  tl[label="sbt-typelevel"];
+  tl -> tlsettings;
+  tl -> tlcirelease;
+  tl -> fmt;
+  tl -> header;
+  tl -> sjscp;
+}
