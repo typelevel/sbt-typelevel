@@ -7,13 +7,13 @@ sbt-typelevel helps Scala projects to publish early-semantically-versioned, bina
 [![sbt-typelevel Scala version support](https://index.scala-lang.org/typelevel/sbt-typelevel/sbt-typelevel/latest-by-scala-version.svg?targetType=Sbt)](https://index.scala-lang.org/typelevel/sbt-typelevel/sbt-typelevel)
 
 ```scala
-// Pick one, for plugins.sbt
+// Pick one, for project/plugins.sbt
 
 // Full service, batteries-included, let's go!
-addSbtPlugin("org.typelevel" % "sbt-typelevel" % "<version>")
+addSbtPlugin("org.typelevel" % "sbt-typelevel" % "@VERSION@")
 
 // Set me up for CI release, but don't touch my scalacOptions!
-addSbtPlugin("org.typelevel" % "sbt-typelevel-ci-release" % "<version>")
+addSbtPlugin("org.typelevel" % "sbt-typelevel-ci-release" % "@VERSION@")
 
 // Then, in your build.sbt
 ThisBuild / tlBaseVersion := "0.4" // your current series x.y
@@ -92,6 +92,18 @@ val root = tlCrossRootProject
 ThisBuild / tlSonatypeUseLegacyHost := false
 ```
 
+### How do I publish a site like this one?
+
+```scala
+// project/plugins.sbt
+addSbtPlugin("org.typelevel" % "sbt-typelevel-site" % "@VERSION@")
+// build.sbt
+ThisBuild / tlSitePublishBranch := Some("main") // deploy docs from this branch (default: main)
+lazy val docs = project.in(file("site")).enablePlugins(TypelevelSitePlugin)
+```
+
+Place your `.md` files in the `docs/` directory of your project. The site is generated using [mdoc](https://scalameta.org/mdoc/) and [Laika](https://planet42.github.io/Laika/) and published to the `gh-pages` branch on every push to the specified branch. Make sure to enable GitHub pages in your repo settings.
+
 ## Customization
 
 The complete list of plugins, settings, and utilities is given below. The **sbt-typelevel-ci-release** and **sbt-typelevel** super-plugins automatically load most of them. The diagram below shows their inter-dependencies.
@@ -128,10 +140,6 @@ Instead of using the super-plugins, for finer-grained control you can always add
 - **sbt-typelevel**, `TypelevelPlugin`: The super-super-plugin intended for bootstrapping the typical Typelevel project. Sets up CI release including snapshots, scalac settings, headers, and formatting.
     - `tlFatalWarningsInCi` (setting): Convert compiler warnings into errors under CI builds (default: true).
 - **sbt-typelevel-site**, `TypelevelSitePlugin`: Sets up an [mdoc](https://scalameta.org/mdoc/)/[Laika](https://planet42.github.io/Laika/)-generated microsite, automatically published to GitHub pages in CI.
-    - This plugin must be manually-enabled on your docs project. Place your `.md` files in the `docs/` directory.
-    ```scala
-    lazy val docs = project.in(file("site")).enablePlugins(TypelevelSitePlugin)
-    ```
     - `tlSitePublishBranch` (setting): The branch to publish the site from on every push. Set this to `None` if you only want to update the site on tag releases. (default: `main`)
     - `tlSiteApiUrl` (setting): URL to the API docs. (default: `None`)
     - `tlSiteHeliumConfig` (setting): the Laika Helium config. (default: how the sbt-typelevel site looks)

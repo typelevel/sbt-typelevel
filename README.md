@@ -4,7 +4,7 @@ sbt-typelevel helps Scala projects to publish early-semantically-versioned, bina
 
 ## Quick start
 ```scala
-// Pick one, for plugins.sbt
+// Pick one, for project/plugins.sbt
 
 // Full service, batteries-included, let's go!
 addSbtPlugin("org.typelevel" % "sbt-typelevel" % "<version>")
