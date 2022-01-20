@@ -21,6 +21,8 @@ import org.typelevel.sbt.gha.GenerativePlugin
 import org.typelevel.sbt.gha.GitHubActionsPlugin
 import de.heikoseeberger.sbtheader.HeaderPlugin
 
+import scala.collection.immutable
+
 object TypelevelPlugin extends AutoPlugin {
 
   override def requires =
@@ -86,6 +88,6 @@ object TypelevelPlugin extends AutoPlugin {
   )
 
   // override for bincompat
-  override def projectSettings = super.projectSettings
+  override def projectSettings = immutable.Seq.empty
 
 }
