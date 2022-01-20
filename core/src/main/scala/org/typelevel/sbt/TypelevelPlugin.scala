@@ -85,4 +85,7 @@ object TypelevelPlugin extends AutoPlugin {
     )
   )
 
+  // override for bincompat
+  override def projectSettings = super.projectSettings
+
 }
