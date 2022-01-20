@@ -19,7 +19,7 @@ package org.typelevel.sbt
 import sbt._, Keys._
 import org.typelevel.sbt.gha.GenerativePlugin
 import org.typelevel.sbt.gha.GitHubActionsPlugin
-import de.heikoseeberger.sbtheader.AutomateHeaderPlugin
+import de.heikoseeberger.sbtheader.HeaderPlugin
 
 object TypelevelPlugin extends AutoPlugin {
 
@@ -27,7 +27,8 @@ object TypelevelPlugin extends AutoPlugin {
     TypelevelKernelPlugin &&
       TypelevelSettingsPlugin &&
       TypelevelCiReleasePlugin &&
-      GitHubActionsPlugin
+      GitHubActionsPlugin &&
+      HeaderPlugin
 
   override def trigger = allRequirements
 
@@ -83,7 +84,5 @@ object TypelevelPlugin extends AutoPlugin {
       )
     )
   )
-
-  override def projectSettings = AutomateHeaderPlugin.projectSettings
 
 }
