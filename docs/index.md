@@ -29,6 +29,12 @@ Then, on GitHub set the following secrets on your repository:
 
 ## FAQ
 
+### How do I cut a release?
+
+Create a release on GitHub with a v-prefixed, semantically-versioned tag (or, tag a commit locally and push to GitHub). This will start a CI release. Example tags: `v0.4.2`, `v1.2.3`, `v1.0.0-M1`, `v1.2.0-RC2`. 
+
+It is also possible to run the release process entirely locally by invoking the `tlRelease` command, assuming that you have correctly configured your PGP keys and Sonatype credentials.
+
 ### How do I introduce breaking changes intended for my next version?
 
 Bump your `tlBaseVersion` to the next breaking-version according to early-semver, e.g. 0.7 to 0.8 or 4.2 to 5.0.
