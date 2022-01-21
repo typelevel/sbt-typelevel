@@ -29,6 +29,10 @@ Then, on GitHub set the following secrets on your repository:
 
 ## FAQ
 
+### How do I cut a release?
+
+Create a release on GitHub with a v-prefixed, semantically-versioned tag. Or, tag a commit locally and push to GitHub. Example tags: `v0.4.2`, `v1.2.3`, `v1.0.0-M1`, `v1.2.0-RC2`. 
+
 ### How do I introduce breaking changes intended for my next version?
 
 Bump your `tlBaseVersion` to the next breaking-version according to early-semver, e.g. 0.7 to 0.8 or 4.2 to 5.0.
