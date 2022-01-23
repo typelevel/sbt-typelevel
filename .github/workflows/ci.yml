@@ -52,6 +52,11 @@ jobs:
             ~/Library/Caches/Coursier/v1
           key: ${{ runner.os }}-sbt-cache-v2-${{ hashFiles('**/*.sbt') }}-${{ hashFiles('project/build.properties') }}
 
+      - if: env.TEST == 'itworked'
+        env:
+          TEST: itworked
+        run: exit
+
       - name: Check that workflows are up to date
         run: sbt 'project ${{ matrix.project }}' '++${{ matrix.scala }}' 'project /' githubWorkflowCheck
 
@@ -128,14 +133,14 @@ jobs:
           rm targets.tar
 
       - name: Import signing key
-        if: secrets.PGP_SECRET != '' && secrets.PGP_PASSPHRASE == ''
+        if: env.PGP_SECRET != '' && env.PGP_PASSPHRASE == ''
         env:
           PGP_SECRET: ${{ secrets.PGP_SECRET }}
           PGP_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
         run: echo $PGP_SECRET | base64 -d | gpg --import
 
       - name: Import signing key and strip passphrase
-        if: secrets.PGP_SECRET != '' && secrets.PGP_PASSPHRASE != ''
+        if: env.PGP_SECRET != '' && env.PGP_PASSPHRASE != ''
         env:
           PGP_SECRET: ${{ secrets.PGP_SECRET }}
           PGP_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
