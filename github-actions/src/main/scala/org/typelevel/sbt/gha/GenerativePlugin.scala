@@ -532,6 +532,7 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
     githubWorkflowTargetTags := Seq(),
     githubWorkflowTargetPaths := Paths.None,
     githubWorkflowEnv := Map("GITHUB_TOKEN" -> s"$${{ secrets.GITHUB_TOKEN }}"),
+    githubWorkflowPublishEnv := Map.empty,
     githubWorkflowAddedJobs := Seq()
   )
 
@@ -683,6 +684,7 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
             githubWorkflowPublish.value.toList :::
             githubWorkflowPublishPostamble.value.toList,
           cond = Some(s"github.event_name != 'pull_request' && $publicationCond"),
+          env = githubWorkflowPublishEnv.value,
           scalas = List(scalaVersion.value),
           javas = List(githubWorkflowJavaVersions.value.head),
           needs = List("build")

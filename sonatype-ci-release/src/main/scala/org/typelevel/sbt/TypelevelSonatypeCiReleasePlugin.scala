@@ -41,7 +41,7 @@ object TypelevelSonatypeCiReleasePlugin extends AutoPlugin {
     Seq(tlCiReleaseTags := true, tlCiReleaseBranches := Seq())
 
   override def buildSettings = Seq(
-    githubWorkflowEnv ++= Map(
+    githubWorkflowPublishEnv ++= Map(
       "SONATYPE_USERNAME" -> s"$${{ secrets.SONATYPE_USERNAME }}",
       "SONATYPE_PASSWORD" -> s"$${{ secrets.SONATYPE_PASSWORD }}"
     ),
