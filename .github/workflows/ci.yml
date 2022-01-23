@@ -129,7 +129,7 @@ jobs:
         with:
           name: target-${{ matrix.os }}-${{ matrix.java }}-2.12.15-rootJVM
 
-      - name: Inflate target directories (List(2.12.15, rootJVM))
+      - name: Inflate target directories (2.12.15, rootJVM)
         run: |
           tar xf targets.tar
           rm targets.tar

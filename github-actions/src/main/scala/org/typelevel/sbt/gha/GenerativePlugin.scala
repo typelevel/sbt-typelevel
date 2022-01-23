@@ -640,16 +640,18 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
 
       if (githubWorkflowArtifactUpload.value) {
         artifacts flatMap { v =>
+          val pretty = v.mkString(", ")
+
           val download = WorkflowStep.Use(
             UseRef.Public("actions", "download-artifact", "v2"),
-            name = Some(s"Download target directories (${v.mkString(", ")})"),
+            name = Some(s"Download target directories ($pretty)"),
             params = Map(
               "name" -> s"target-$${{ matrix.os }}-$${{ matrix.java }}${v.mkString("-", "-", "")}")
           )
 
           val untar = WorkflowStep.Run(
             List("tar xf targets.tar", "rm targets.tar"),
-            name = Some(s"Inflate target directories ($v)"))
+            name = Some(s"Inflate target directories ($pretty)"))
 
           Seq(download, untar)
         }
