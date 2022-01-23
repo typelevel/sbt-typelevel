@@ -29,7 +29,7 @@ object TypelevelCiSigningPlugin extends AutoPlugin {
   override def trigger = allRequirements
 
   override def buildSettings = Seq(
-    githubWorkflowPublishEnv ++= Map(
+    githubWorkflowEnv ++= Map(
       "PGP_SECRET" -> s"$${{ secrets.PGP_SECRET }}",
       "PGP_PASSPHRASE" -> s"$${{ secrets.PGP_PASSPHRASE }}"
     ),

@@ -98,8 +98,6 @@ trait GenerativeKeys {
 
   lazy val githubWorkflowEnv = settingKey[Map[String, String]](
     s"A map of static environment variable assignments global to the workflow (default: { GITHUB_TOKEN: $${{ secrets.GITHUB_TOKEN }} })")
-  lazy val githubWorkflowPublishEnv = settingKey[Map[String, String]](
-    s"A map of additional static environment variable assignments scoped to the publish job (default empty)")
   lazy val githubWorkflowAddedJobs = settingKey[Seq[WorkflowJob]](
     "A list of additional jobs to add to the CI workflow (default: [])")
 }
