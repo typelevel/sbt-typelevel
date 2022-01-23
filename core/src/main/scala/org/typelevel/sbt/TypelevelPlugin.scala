@@ -63,11 +63,12 @@ object TypelevelPlugin extends AutoPlugin {
         java <- githubWorkflowJavaVersions.value.tail
       } yield MatrixExclude(Map("scala" -> scala, "java" -> java.render))
     },
-    githubWorkflowBuild ~= { steps =>
+    githubWorkflowBuild := {
       WorkflowStep.Sbt(
         List("headerCheckAll", "scalafmtCheckAll", "project /", "scalafmtSbtCheck"),
-        name = Some("Check headers and formatting")
-      ) +: steps
+        name = Some("Check headers and formatting"),
+        cond = Some(primaryJavaCond.value)
+      ) +: githubWorkflowBuild.value
     }
   ) ++ addCommandAlias(
     "prePR",
@@ -89,5 +90,10 @@ object TypelevelPlugin extends AutoPlugin {
 
   // override for bincompat
   override def projectSettings = immutable.Seq.empty
+
+  private val primaryJavaCond = Def.setting {
+    val java = githubWorkflowJavaVersions.value.head
+    s"matrix.java == '${java.render}'"
+  }
 
 }

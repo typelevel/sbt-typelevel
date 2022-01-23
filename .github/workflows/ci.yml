@@ -60,15 +60,18 @@ jobs:
         run: sbt 'project ${{ matrix.project }}' '++${{ matrix.scala }}' 'project /' githubWorkflowCheck
 
       - name: Check headers and formatting
+        if: matrix.java == 'temurin@8'
         run: sbt 'project ${{ matrix.project }}' '++${{ matrix.scala }}' headerCheckAll scalafmtCheckAll 'project /' scalafmtSbtCheck
 
       - name: Test
         run: sbt 'project ${{ matrix.project }}' '++${{ matrix.scala }}' test
 
       - name: Check binary compatibility
+        if: matrix.java == 'temurin@8'
         run: sbt 'project ${{ matrix.project }}' '++${{ matrix.scala }}' mimaReportBinaryIssues
 
       - name: Generate API documentation
+        if: matrix.java == 'temurin@8'
         run: sbt 'project ${{ matrix.project }}' '++${{ matrix.scala }}' doc
 
       - name: Make target directories
