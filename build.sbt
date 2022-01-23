@@ -8,10 +8,6 @@ ThisBuild / developers := List(
   tlGitHubDev("ChristopherDavenport", "Christopher Davenport"),
   tlGitHubDev("djspiewak", "Daniel Spiewak")
 )
-ThisBuild / githubWorkflowBuildPreamble += WorkflowStep.Run(
-  List("exit"),
-  cond = Some("env.TEST == 'itworked'"),
-  env = Map("TEST" -> "itworked"))
 
 lazy val root = tlCrossRootProject.aggregate(
   kernel,
