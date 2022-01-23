@@ -575,18 +575,21 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
 
         val mkdir = WorkflowStep.Run(
           List(s"mkdir -p ${sanitized.mkString(" ")} project/target"),
-          name = Some("Make target directories"))
+          name = Some("Make target directories"),
+          cond = Some(publicationCond.value))
 
         val tar = WorkflowStep.Run(
           List(s"tar cf targets.tar ${sanitized.mkString(" ")} project/target"),
-          name = Some("Compress target directories"))
+          name = Some("Compress target directories"),
+          cond = Some(publicationCond.value))
 
         val upload = WorkflowStep.Use(
           UseRef.Public("actions", "upload-artifact", "v2"),
           name = Some(s"Upload target directories"),
           params = Map(
             "name" -> s"target-$${{ matrix.os }}-$${{ matrix.scala }}-$${{ matrix.java }}",
-            "path" -> "targets.tar")
+            "path" -> "targets.tar"),
+          cond = Some(publicationCond.value)
         )
 
         Seq(mkdir, tar, upload)
@@ -655,17 +658,6 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
         githubWorkflowGeneratedCacheSteps.value.toList
     },
     githubWorkflowGeneratedCI := {
-      val publicationCondPre =
-        githubWorkflowPublishTargetBranches
-          .value
-          .map(compileBranchPredicate("github.ref", _))
-          .mkString("(", " || ", ")")
-
-      val publicationCond = githubWorkflowPublishCond.value match {
-        case Some(cond) => publicationCondPre + " && (" + cond + ")"
-        case None => publicationCondPre
-      }
-
       val uploadStepsOpt =
         if (githubWorkflowPublishTargetBranches
             .value
@@ -683,7 +675,7 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
             githubWorkflowPublishPreamble.value.toList :::
             githubWorkflowPublish.value.toList :::
             githubWorkflowPublishPostamble.value.toList,
-          cond = Some(s"github.event_name != 'pull_request' && $publicationCond"),
+          cond = Some(publicationCond.value),
           env = githubWorkflowPublishEnv.value,
           scalas = List(scalaVersion.value),
           javas = List(githubWorkflowJavaVersions.value.head),
@@ -714,6 +706,20 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
         )) ++ publishJobOpt ++ githubWorkflowAddedJobs.value
     }
   )
+
+  private val publicationCond = Def setting {
+    val publicationCondPre =
+      githubWorkflowPublishTargetBranches
+        .value
+        .map(compileBranchPredicate("github.ref", _))
+        .mkString("(", " || ", ")")
+
+    val publicationCond = githubWorkflowPublishCond.value match {
+      case Some(cond) => publicationCondPre + " && (" + cond + ")"
+      case None => publicationCondPre
+    }
+    s"github.event_name != 'pull_request' && $publicationCond"
+  }
 
   private val generateCiContents = Def task {
     val sbt = if (githubWorkflowUseSbtThinClient.value) {
