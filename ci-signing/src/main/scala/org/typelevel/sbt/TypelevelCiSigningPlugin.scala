@@ -29,15 +29,12 @@ object TypelevelCiSigningPlugin extends AutoPlugin {
   override def trigger = allRequirements
 
   override def buildSettings = Seq(
-    githubWorkflowEnv ++= Map(
-      "PGP_SECRET" -> s"$${{ secrets.PGP_SECRET }}",
-      "PGP_PASSPHRASE" -> s"$${{ secrets.PGP_PASSPHRASE }}"
-    ),
     githubWorkflowPublishPreamble := Seq(
       WorkflowStep.Run( // if your key is not passphrase-protected
         List("echo $PGP_SECRET | base64 -d | gpg --import"),
         name = Some("Import signing key"),
-        cond = Some("env.PGP_SECRET != '' && env.PGP_PASSPHRASE == ''")
+        cond = Some("secrets.PGP_SECRET != '' && secrets.PGP_PASSPHRASE == ''"),
+        env = env
       ),
       WorkflowStep.Run( // if your key is passphrase-protected
         List(
@@ -46,7 +43,8 @@ object TypelevelCiSigningPlugin extends AutoPlugin {
           "(echo \"$PGP_PASSPHRASE\"; echo; echo) | gpg --command-fd 0 --pinentry-mode loopback --change-passphrase $(gpg --list-secret-keys --with-colons 2> /dev/null | grep '^sec:' | cut --delimiter ':' --fields 5 | tail -n 1)"
         ),
         name = Some("Import signing key and strip passphrase"),
-        cond = Some("env.PGP_SECRET != '' && env.PGP_PASSPHRASE != ''")
+        cond = Some("secrets.PGP_SECRET != '' && secrets.PGP_PASSPHRASE != ''"),
+        env = env
       )
     )
   )
@@ -55,6 +53,11 @@ object TypelevelCiSigningPlugin extends AutoPlugin {
 
   override def projectSettings = Seq(
     gpgWarnOnFailure := isSnapshot.value
+  )
+
+  private val env = Map(
+    "PGP_SECRET" -> s"$${{ secrets.PGP_SECRET }}",
+    "PGP_PASSPHRASE" -> s"$${{ secrets.PGP_PASSPHRASE }}"
   )
 
 }
