@@ -112,7 +112,10 @@ object TypelevelSitePlugin extends AutoPlugin {
       laika.parse.code.SyntaxHighlighting
     ),
     tlSiteGenerate := List(
-      WorkflowStep.Sbt(List("tlSite"), name = Some("Generate site"))
+      WorkflowStep.Sbt(
+        List(s"${thisProject.value.id}/${tlSite.key.toString}"),
+        name = Some("Generate site")
+      )
     ),
     tlSitePublish := List(
       WorkflowStep.Use(
