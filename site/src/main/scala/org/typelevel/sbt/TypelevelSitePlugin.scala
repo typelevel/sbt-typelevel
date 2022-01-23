@@ -27,6 +27,7 @@ import org.typelevel.sbt.kernel.GitHelper
 import gha.GenerativePlugin, GenerativePlugin.autoImport._
 import scala.io.Source
 import java.util.Base64
+import scala.annotation.nowarn
 
 object TypelevelSitePlugin extends AutoPlugin {
 
@@ -39,10 +40,10 @@ object TypelevelSitePlugin extends AutoPlugin {
       "A sequence of workflow steps which publishes the site (default: peaceiris/actions-gh-pages)")
     lazy val tlSitePublishBranch = settingKey[Option[String]](
       "The branch to publish the site from on every push. Set this to None if you only want to update the site on tag releases. (default: main)")
+    lazy val tlSite = taskKey[Unit]("Generate the site (default: runs mdoc then laika)")
   }
 
   import autoImport._
-  import TypelevelKernelPlugin.mkCommand
 
   override def requires = MdocPlugin && LaikaPlugin && GenerativePlugin && NoPublishPlugin
 
@@ -52,6 +53,12 @@ object TypelevelSitePlugin extends AutoPlugin {
   )
 
   override def projectSettings = Seq(
+    tlSite := Def
+      .sequential(
+        mdoc.toTask(""),
+        laikaSite
+      )
+      .value: @nowarn("cat=other-pure-statement"),
     Laika / sourceDirectories := Seq(mdocOut.value),
     laikaTheme := tlSiteHeliumConfig.value.build,
     mdocVariables ++= Map(
@@ -140,7 +147,7 @@ object TypelevelSitePlugin extends AutoPlugin {
         steps =
           githubWorkflowJobSetup.value.toList ++ tlSiteGenerate.value ++ tlSitePublish.value
       )
-  ) ++ addCommandAlias("tlSite", mkCommand(List("docs/mdoc", "docs/laikaSite")))
+  )
 
   private def getSvgLogo: String = {
     val src = Source.fromURL(getClass.getResource("/logo.svg"))
