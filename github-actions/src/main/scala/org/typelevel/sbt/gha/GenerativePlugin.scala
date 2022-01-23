@@ -642,7 +642,7 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
         artifacts flatMap { v =>
           val download = WorkflowStep.Use(
             UseRef.Public("actions", "download-artifact", "v2"),
-            name = Some(s"Download target directories (${v.mkString(",")})"),
+            name = Some(s"Download target directories (${v.mkString(", ")})"),
             params = Map(
               "name" -> s"target-$${{ matrix.os }}-$${{ matrix.java }}${v.mkString("-", "-", "")}")
           )
