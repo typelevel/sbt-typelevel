@@ -37,11 +37,21 @@ object TypelevelCiPlugin extends AutoPlugin {
       WorkflowStep.Sbt(List("test"), name = Some("Test")),
       WorkflowStep.Sbt(
         List("mimaReportBinaryIssues"),
-        name = Some("Check binary compatibility")
+        name = Some("Check binary compatibility"),
+        cond = Some(primaryJavaCond.value)
       ),
-      WorkflowStep.Sbt(List("doc"), name = Some("Generate API documentation"))
+      WorkflowStep.Sbt(
+        List("doc"),
+        name = Some("Generate API documentation"),
+        cond = Some(primaryJavaCond.value)
+      )
     ),
     githubWorkflowJavaVersions := Seq(JavaSpec.temurin("8"))
   )
+
+  private val primaryJavaCond = Def.setting {
+    val java = githubWorkflowJavaVersions.value.head
+    s"matrix.java == '${java.render}'"
+  }
 
 }
