@@ -56,15 +56,18 @@ jobs:
         run: sbt 'project ${{ matrix.project }}' '++${{ matrix.scala }}' 'project /' githubWorkflowCheck
 
       - name: Check headers and formatting
+        if: matrix.java == 'temurin@8'
         run: sbt 'project ${{ matrix.project }}' '++${{ matrix.scala }}' headerCheckAll scalafmtCheckAll 'project /' scalafmtSbtCheck
 
       - name: Test
         run: sbt 'project ${{ matrix.project }}' '++${{ matrix.scala }}' test
 
       - name: Check binary compatibility
+        if: matrix.java == 'temurin@8'
         run: sbt 'project ${{ matrix.project }}' '++${{ matrix.scala }}' mimaReportBinaryIssues
 
       - name: Generate API documentation
+        if: matrix.java == 'temurin@8'
         run: sbt 'project ${{ matrix.project }}' '++${{ matrix.scala }}' doc
 
       - name: Make target directories
@@ -184,7 +187,7 @@ jobs:
           key: ${{ runner.os }}-sbt-cache-v2-${{ hashFiles('**/*.sbt') }}-${{ hashFiles('project/build.properties') }}
 
       - name: Generate site
-        run: sbt '++${{ matrix.scala }}' tlSite
+        run: sbt '++${{ matrix.scala }}' docs/tlSite
 
       - name: Publish site
         if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
