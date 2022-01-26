@@ -625,7 +625,7 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
         .toList
         .sortBy(_._1)
         .map(_._2)
-        .foldLeft(List(scalas)) { (artifacts, values) =>
+        .foldLeft(scalas.map(List(_))) { (artifacts, values) =>
           for {
             artifact <- artifacts
             value <- values
