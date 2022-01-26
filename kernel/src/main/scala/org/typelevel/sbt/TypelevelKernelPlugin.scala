@@ -71,7 +71,7 @@ object TypelevelKernelPlugin extends AutoPlugin {
           streams
             .value
             .log
-            .warn(s"skipping `${delegate.key.label}` in ${name.value}: $ver is not in $cross"))
+            .info(s"skipping `${delegate.key.label}` in ${name.value}: $ver is not in $cross"))
     }
 
 }
