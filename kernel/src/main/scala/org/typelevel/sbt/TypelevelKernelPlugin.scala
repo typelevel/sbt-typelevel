@@ -27,6 +27,12 @@ object TypelevelKernelPlugin extends AutoPlugin {
   object autoImport {
     lazy val tlIsScala3 = settingKey[Boolean]("True if building with Scala 3")
 
+    lazy val tlPublishIfRelevant = taskKey[Unit](
+      "A wrapper around the `publish` task which checks to ensure the current scalaVersion is in crossScalaVersions")
+
+    lazy val tlPublishLocalIfRelevant = taskKey[Unit](
+      "A wrapper around the `publishLocal` task which checks to ensure the current scalaVersion is in crossScalaVersions")
+
     def tlReplaceCommandAlias(name: String, contents: String): Seq[Setting[State => State]] =
       Seq(GlobalScope / onLoad ~= { (f: State => State) =>
         f andThen { s: State =>
@@ -42,8 +48,30 @@ object TypelevelKernelPlugin extends AutoPlugin {
   )
 
   override def buildSettings =
-    addCommandAlias("tlReleaseLocal", mkCommand(List("reload", "project /", "+publishLocal")))
+    addCommandAlias(
+      "tlReleaseLocal",
+      mkCommand(List("reload", "project /", "+tlPublishLocalIfRelevant")))
+
+  override def projectSettings = Seq(
+    tlPublishIfRelevant := filterTaskWhereRelevant(publish).value,
+    tlPublishLocalIfRelevant := filterTaskWhereRelevant(publishLocal).value
+  )
 
   private[sbt] def mkCommand(commands: List[String]): String = commands.mkString("; ", "; ", "")
+
+  private[sbt] def filterTaskWhereRelevant(delegate: TaskKey[Unit]) =
+    Def.taskDyn {
+      val cross = crossScalaVersions.value
+      val ver = (ThisBuild / scalaVersion).value
+
+      if (cross.contains(ver))
+        Def.task(delegate.value)
+      else
+        Def.task(
+          streams
+            .value
+            .log
+            .warn(s"skipping `${delegate.key.label}` in ${name.value}: $ver is not in $cross"))
+    }
 
 }

@@ -19,7 +19,7 @@ package org.typelevel.sbt
 import sbt._, Keys._
 import com.typesafe.tools.mima.plugin.MimaPlugin
 import xerial.sbt.Sonatype, Sonatype.autoImport._
-import TypelevelKernelPlugin.mkCommand
+import TypelevelKernelPlugin._
 
 object TypelevelSonatypePlugin extends AutoPlugin {
 
@@ -30,9 +30,13 @@ object TypelevelSonatypePlugin extends AutoPlugin {
   object autoImport {
     lazy val tlSonatypeUseLegacyHost =
       settingKey[Boolean]("Publish to oss.sonatype.org instead of s01 (default: true)")
+
+    lazy val tlMimaReportBinaryIssuesIfRelevant = taskKey[Unit](
+      "A wrapper around the `mimaReportBinaryIssues` task which checks to ensure the current scalaVersion is in crossScalaVersions")
   }
 
   import autoImport._
+  import MimaPlugin.autoImport._
 
   override def buildSettings =
     Seq(tlSonatypeUseLegacyHost := true) ++
@@ -42,8 +46,8 @@ object TypelevelSonatypePlugin extends AutoPlugin {
           List(
             "reload",
             "project /",
-            "+mimaReportBinaryIssues",
-            "+publish",
+            "+tlMimaReportBinaryIssuesIfRelevant",
+            "+tlPublishIfRelevant",
             "tlSonatypeBundleReleaseIfRelevant"))
       )
 
@@ -57,7 +61,8 @@ object TypelevelSonatypePlugin extends AutoPlugin {
         "oss.sonatype.org"
       else
         "s01.oss.sonatype.org"
-    }
+    },
+    tlMimaReportBinaryIssuesIfRelevant := filterTaskWhereRelevant(mimaReportBinaryIssues).value
   )
 
   private def sonatypeBundleReleaseIfRelevant: Command =
