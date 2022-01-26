@@ -36,6 +36,7 @@ object TypelevelCiSigningPlugin extends AutoPlugin {
     githubWorkflowPublishPreamble := Seq(
       WorkflowStep.Run( // if your key is not passphrase-protected
         List("echo $PGP_SECRET | base64 -d | gpg --import"),
+        id = Some("import-key"),
         name = Some("Import signing key"),
         cond = Some("env.PGP_SECRET != '' && env.PGP_PASSPHRASE == ''")
       ),
@@ -45,6 +46,7 @@ object TypelevelCiSigningPlugin extends AutoPlugin {
           "echo \"$PGP_PASSPHRASE\" | gpg --pinentry-mode loopback --passphrase-fd 0 --import /tmp/signing-key.gpg",
           "(echo \"$PGP_PASSPHRASE\"; echo; echo) | gpg --command-fd 0 --pinentry-mode loopback --change-passphrase $(gpg --list-secret-keys --with-colons 2> /dev/null | grep '^sec:' | cut --delimiter ':' --fields 5 | tail -n 1)"
         ),
+        id = Some("import-passphrased-key"),
         name = Some("Import signing key and strip passphrase"),
         cond = Some("env.PGP_SECRET != '' && env.PGP_PASSPHRASE != ''")
       )

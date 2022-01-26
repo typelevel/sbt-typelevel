@@ -114,6 +114,7 @@ object TypelevelSitePlugin extends AutoPlugin {
     tlSiteGenerate := List(
       WorkflowStep.Sbt(
         List(s"${thisProject.value.id}/${tlSite.key.toString}"),
+        id = Some("site"),
         name = Some("Generate site")
       )
     ),
@@ -130,6 +131,7 @@ object TypelevelSitePlugin extends AutoPlugin {
             .toString,
           "publish_branch" -> "gh-pages"
         ),
+        id = Some("publish-site"),
         name = Some("Publish site"),
         cond = {
           val predicate = tlSitePublishBranch

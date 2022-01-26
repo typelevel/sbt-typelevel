@@ -66,6 +66,7 @@ object TypelevelPlugin extends AutoPlugin {
     githubWorkflowBuild := {
       WorkflowStep.Sbt(
         List("headerCheckAll", "scalafmtCheckAll", "project /", "scalafmtSbtCheck"),
+        id = Some("check-headers-fmt"),
         name = Some("Check headers and formatting"),
         cond = Some(primaryJavaCond.value)
       ) +: githubWorkflowBuild.value
