@@ -66,12 +66,10 @@ object TypelevelKernelPlugin extends AutoPlugin {
 
       if (cross.contains(ver))
         Def.task(delegate.value)
-      else
-        Def.task(
-          streams
-            .value
-            .log
-            .info(s"skipping `${delegate.key.label}` in ${name.value}: $ver is not in $cross"))
+      else {
+        val msg = s"skipping `${delegate.key.label}` in ${name.value}: $ver is not in $cross"
+        Def.task(streams.value.log.info(msg))
+      }
     }
 
 }
