@@ -583,20 +583,15 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
           name = Some("Compress target directories"),
           cond = Some(publicationCond.value))
 
-        val keys = githubWorkflowBuildMatrixAdditions
-          .value
-          .keys
-          .toList
-          .sorted
-          .map(k => s"$${{ matrix.$k }}")
-          .mkString("-", "-", "")
+        val keys = githubWorkflowBuildMatrixAdditions.value.keys.toList.sorted
+
+        val artifactId =
+          (List("os", "java", "scala") ::: keys).map(k => s"$${{ matrix.$k }}").mkString("-")
 
         val upload = WorkflowStep.Use(
           UseRef.Public("actions", "upload-artifact", "v2"),
           name = Some(s"Upload target directories"),
-          params = Map(
-            "name" -> s"target-$${{ matrix.os }}-$${{ matrix.java }}-$${{ matrix.scala }}$keys",
-            "path" -> "targets.tar"),
+          params = Map("name" -> s"target-$artifactId", "path" -> "targets.tar"),
           cond = Some(publicationCond.value)
         )
 
@@ -645,8 +640,8 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
           val download = WorkflowStep.Use(
             UseRef.Public("actions", "download-artifact", "v2"),
             name = Some(s"Download target directories ($pretty)"),
-            params = Map(
-              "name" -> s"target-$${{ matrix.os }}-$${{ matrix.java }}${v.mkString("-", "-", "")}")
+            params =
+              Map("name" -> s"target-$${{ matrix.os }}-$${{ matrix.java }}-${v.mkString("-")}")
           )
 
           val untar = WorkflowStep.Run(
