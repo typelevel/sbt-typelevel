@@ -151,4 +151,10 @@ lazy val site = project
 lazy val docs = project
   .in(file("mdocs"))
   .enablePlugins(TypelevelSitePlugin)
+  .enablePlugins(ScalaUnidocPlugin)
   .settings(laikaConfig ~= { _.withRawContent })
+  .settings(
+    laikaIncludeAPI := true,
+    autoAPIMappings := true,
+    laikaGenerateAPI / mappings := (site/Compile / packageDoc / mappings).value
+  )
