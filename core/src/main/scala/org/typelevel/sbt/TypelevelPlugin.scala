@@ -40,6 +40,7 @@ object TypelevelPlugin extends AutoPlugin {
   }
 
   import autoImport._
+  import TypelevelKernelPlugin.mkCommand
   import TypelevelSettingsPlugin.autoImport._
   import TypelevelSonatypeCiReleasePlugin.autoImport._
   import GenerativePlugin.autoImport._
@@ -72,7 +73,7 @@ object TypelevelPlugin extends AutoPlugin {
     }
   ) ++ addCommandAlias(
     "prePR",
-    TypelevelKernelPlugin.mkCommand(
+    mkCommand(
       List(
         "reload",
         "project /",
@@ -84,6 +85,16 @@ object TypelevelPlugin extends AutoPlugin {
         "set ThisBuild / tlFatalWarnings := tlFatalWarningsInCi.value",
         "Test / compile",
         "reload"
+      )
+    )
+  ) ++ addCommandAlias(
+    "tlPrePrHook",
+    mkCommand(
+      List(
+        "githubWorkflowGenerate",
+        "headerCreateAll",
+        "scalafmtAll",
+        "scalafmtSbt"
       )
     )
   )
