@@ -88,7 +88,7 @@ object TypelevelPlugin extends AutoPlugin {
       )
     )
   ) ++ addCommandAlias(
-    "tlPrePrHook",
+    "tlPrePrBotHook",
     mkCommand(
       List(
         "githubWorkflowGenerate",
