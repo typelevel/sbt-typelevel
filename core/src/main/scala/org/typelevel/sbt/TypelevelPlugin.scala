@@ -20,7 +20,6 @@ import sbt._, Keys._
 import org.typelevel.sbt.gha.GenerativePlugin
 import org.typelevel.sbt.gha.GitHubActionsPlugin
 import de.heikoseeberger.sbtheader.HeaderPlugin
-import org.scalafmt.sbt.ScalafmtPlugin
 
 import scala.collection.immutable
 
@@ -31,17 +30,13 @@ object TypelevelPlugin extends AutoPlugin {
       TypelevelSettingsPlugin &&
       TypelevelCiReleasePlugin &&
       GitHubActionsPlugin &&
-      HeaderPlugin &&
-      ScalafmtPlugin
+      HeaderPlugin
 
   override def trigger = allRequirements
 
   object autoImport {
     lazy val tlFatalWarningsInCi = settingKey[Boolean](
       "Convert compiler warnings into errors under CI builds (default: true)")
-
-    lazy val tlPrePrBotHook =
-      taskKey[Unit]("A hook for bots like Scala Steward to run prePR commands")
   }
 
   import autoImport._
@@ -50,8 +45,6 @@ object TypelevelPlugin extends AutoPlugin {
   import TypelevelSonatypeCiReleasePlugin.autoImport._
   import GenerativePlugin.autoImport._
   import GitHubActionsPlugin.autoImport._
-  import HeaderPlugin.autoImport._
-  import ScalafmtPlugin.autoImport._
 
   override def globalSettings = Seq(
     tlFatalWarningsInCi := true
@@ -94,19 +87,20 @@ object TypelevelPlugin extends AutoPlugin {
         "reload"
       )
     )
+  ) ++ addCommandAlias(
+    "tlPrePrBotHook",
+    mkCommand(
+      List(
+        "githubWorkflowGenerate",
+        "headerCreateAll",
+        "scalafmtAll",
+        "scalafmtSbt"
+      )
+    )
   )
 
-  // immutable.Seq for bincompat
-  override def projectSettings = immutable.Seq(
-    tlPrePrBotHook := Def
-      .sequential(
-        githubWorkflowGenerate,
-        headerCreateAll,
-        scalafmtAll,
-        scalafmtSbt
-      )
-      .value
-  )
+  // override for bincompat
+  override def projectSettings = immutable.Seq.empty
 
   private val primaryJavaCond = Def.setting {
     val java = githubWorkflowJavaVersions.value.head
