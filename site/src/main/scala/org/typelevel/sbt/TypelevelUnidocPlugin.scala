@@ -19,6 +19,7 @@ package org.typelevel.sbt
 import sbt._, Keys._
 import sbtunidoc.ScalaUnidocPlugin
 import laika.sbt.LaikaPlugin
+import org.typelevel.sbt.kernel.V
 
 object TypelevelUnidocPlugin extends AutoPlugin {
 
@@ -43,7 +44,11 @@ object TypelevelUnidocPlugin extends AutoPlugin {
   )
 
   override def projectSettings = Seq(
-    laikaIncludeAPI := true,
+    laikaIncludeAPI := {
+      // include the API docs, only if this is not a snapshot nor a pre-release
+      // so long as tlSiteKeepFiles is true, it won't delete existing API docs
+      !isSnapshot.value && V.unapply(version.value).exists(!_.isPrerelease)
+    },
     laikaGenerateAPI / mappings := (ScalaUnidoc / packageDoc / mappings).value
   )
 
