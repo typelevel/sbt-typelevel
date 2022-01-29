@@ -153,11 +153,12 @@ object TypelevelSitePlugin extends AutoPlugin {
         ),
         name = Some("Publish site"),
         cond = {
-          val predicate = tlSitePublishBranch
-            .value // Either publish from branch or on tags, not both
-            .fold[RefPredicate](RefPredicate.StartsWith(Ref.Tag("v")))(b =>
-              RefPredicate.Equals(Ref.Branch(b)))
-          val publicationCond = GenerativePlugin.compileBranchPredicate("github.ref", predicate)
+          val refPred = RefPredicate.StartsWith(Ref.Tag("v"))
+          val branchPred =
+            tlSitePublishBranch.value.map { b => RefPredicate.Equals(Ref.Branch(b)) }
+          val publicationCond = (refPred :: branchPred.toList)
+            .map(GenerativePlugin.compileBranchPredicate("github.ref", _))
+            .mkString("(", " || ", ")")
           Some(s"github.event_name != 'pull_request' && $publicationCond")
         }
       )
