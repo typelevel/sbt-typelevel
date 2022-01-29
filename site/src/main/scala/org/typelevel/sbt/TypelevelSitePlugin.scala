@@ -74,7 +74,7 @@ object TypelevelSitePlugin extends AutoPlugin {
     laikaTheme := tlSiteHeliumConfig.value.build,
     mdocVariables ++= Map(
       "VERSION" -> GitHelper
-        .previousReleases()
+        .previousReleases(fromHead = true)
         .filterNot(_.isPrerelease)
         .headOption
         .fold(version.value)(_.toString),
