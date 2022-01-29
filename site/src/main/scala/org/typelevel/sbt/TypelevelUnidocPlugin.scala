@@ -35,7 +35,7 @@ object TypelevelUnidocPlugin extends AutoPlugin {
     tlSiteApiUri := Some(uri("api/")),
     apiURL := {
       tlSiteApiUri.value.flatMap { api =>
-        if (api.isAbsolute())
+        if (api.isAbsolute)
           Some(api.toURL)
         else // resolve the api relative to the homepage
           homepage.value.map(_.toURI.resolve(api).toURL)
