@@ -33,7 +33,9 @@ object TypelevelSitePlugin extends AutoPlugin {
 
   object autoImport {
     lazy val tlSiteHeliumConfig = settingKey[Helium]("The Helium configuration")
-    @deprecated("Use tlSiteApiUri", "0.4.4")
+    @deprecated(
+      "Use tlSiteApiUri or enable the ScalaUnidocPlugin on your docs project",
+      "0.4.4")
     lazy val tlSiteApiUrl = settingKey[Option[URL]]("URL to the API docs")
     lazy val tlSiteApiUri = settingKey[Option[URI]]("URI to the API docs")
     lazy val tlSiteGenerate = settingKey[Seq[WorkflowStep]](
