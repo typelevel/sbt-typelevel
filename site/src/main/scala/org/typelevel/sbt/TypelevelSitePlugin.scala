@@ -38,6 +38,8 @@ object TypelevelSitePlugin extends AutoPlugin {
       "0.4.4")
     lazy val tlSiteApiUrl = settingKey[Option[URL]]("URL to the API docs")
     lazy val tlSiteApiUri = settingKey[Option[URI]]("URI to the API docs")
+    lazy val tlSiteKeepFiles =
+      settingKey[Boolean]("Whether to keep existing files when deploying site (default: true)")
     lazy val tlSiteGenerate = settingKey[Seq[WorkflowStep]](
       "A sequence of workflow steps which generates the site (default: [Sbt(List(\"tlSite\"))])")
     lazy val tlSitePublish = settingKey[Seq[WorkflowStep]](
@@ -57,6 +59,7 @@ object TypelevelSitePlugin extends AutoPlugin {
     tlSitePublishBranch := Some("main"),
     tlSiteApiUri := None,
     tlSiteApiUrl := None: @nowarn,
+    tlSiteKeepFiles := true,
     homepage := {
       gitHubUserRepo.value.map {
         case ("typelevel", repo) => url(s"https://typelevel.org/$repo")
@@ -145,7 +148,8 @@ object TypelevelSitePlugin extends AutoPlugin {
             .toAbsolutePath
             .relativize(((Laika / target).value / "site").toPath)
             .toString,
-          "publish_branch" -> "gh-pages"
+          "publish_branch" -> "gh-pages",
+          "keep_files" -> tlSiteKeepFiles.value.toString
         ),
         name = Some("Publish site"),
         cond = {
