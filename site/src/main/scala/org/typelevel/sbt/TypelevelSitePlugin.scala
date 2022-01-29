@@ -62,8 +62,8 @@ object TypelevelSitePlugin extends AutoPlugin {
     tlSiteKeepFiles := true,
     homepage := {
       gitHubUserRepo.value.map {
-        case ("typelevel", repo) => url(s"https://typelevel.org/$repo")
-        case (user, repo) => url(s"https://$user.github.io/$repo")
+        case ("typelevel", repo) => url(s"https://typelevel.org/$repo/")
+        case (user, repo) => url(s"https://$user.github.io/$repo/")
       }
     }
   )

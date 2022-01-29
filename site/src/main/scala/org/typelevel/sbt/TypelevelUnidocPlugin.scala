@@ -30,10 +30,20 @@ object TypelevelUnidocPlugin extends AutoPlugin {
   import LaikaPlugin.autoImport._
   import ScalaUnidocPlugin.autoImport._
 
-  override def projectSettings = Seq(
+  override def buildSettings = Seq(
     tlSiteApiUri := Some(uri("api/")),
+    apiURL := {
+      tlSiteApiUri.value.flatMap { api =>
+        if (api.isAbsolute())
+          Some(api.toURL)
+        else // resolve the api relative to the homepage
+          homepage.value.map(_.toURI.resolve(api).toURL)
+      }
+    }
+  )
+
+  override def projectSettings = Seq(
     laikaIncludeAPI := true,
-    autoAPIMappings := true,
     laikaGenerateAPI / mappings := (ScalaUnidoc / packageDoc / mappings).value
   )
 
