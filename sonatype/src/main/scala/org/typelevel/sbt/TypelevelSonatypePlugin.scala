@@ -20,10 +20,11 @@ import sbt._, Keys._
 import com.typesafe.tools.mima.plugin.MimaPlugin
 import xerial.sbt.Sonatype, Sonatype.autoImport._
 import TypelevelKernelPlugin.mkCommand
+import sbt.plugins.IvyPlugin
 
 object TypelevelSonatypePlugin extends AutoPlugin {
 
-  override def requires = MimaPlugin && Sonatype
+  override def requires = MimaPlugin && Sonatype && IvyPlugin
 
   override def trigger = allRequirements
 
@@ -35,17 +36,19 @@ object TypelevelSonatypePlugin extends AutoPlugin {
   import autoImport._
 
   override def buildSettings =
-    Seq(tlSonatypeUseLegacyHost := true) ++
-      addCommandAlias(
-        "tlRelease",
-        mkCommand(
-          List(
-            "reload",
-            "project /",
-            "+mimaReportBinaryIssues",
-            "+publish",
-            "tlSonatypeBundleReleaseIfRelevant"))
-      )
+    Seq(
+      tlSonatypeUseLegacyHost := true,
+      autoAPIMappings := true
+    ) ++ addCommandAlias(
+      "tlRelease",
+      mkCommand(
+        List(
+          "reload",
+          "project /",
+          "+mimaReportBinaryIssues",
+          "+publish",
+          "tlSonatypeBundleReleaseIfRelevant"))
+    )
 
   override def projectSettings = Seq(
     publishMavenStyle := true, // we want to do this unconditionally, even if publishing a plugin
@@ -57,6 +60,17 @@ object TypelevelSonatypePlugin extends AutoPlugin {
         "oss.sonatype.org"
       else
         "s01.oss.sonatype.org"
+    },
+    apiURL := {
+      val javadocio = CrossVersion(
+        crossVersion.value,
+        scalaVersion.value,
+        scalaBinaryVersion.value
+      ).map { cross =>
+        url(
+          s"https://www.javadoc.io/doc/${organization.value}/${cross(moduleName.value)}/${version.value}/")
+      }
+      apiURL.value.orElse(javadocio)
     }
   )
 
