@@ -20,11 +20,10 @@ import sbt._, Keys._
 import com.typesafe.tools.mima.plugin.MimaPlugin
 import xerial.sbt.Sonatype, Sonatype.autoImport._
 import TypelevelKernelPlugin.mkCommand
-import sbt.plugins.IvyPlugin
 
 object TypelevelSonatypePlugin extends AutoPlugin {
 
-  override def requires = MimaPlugin && Sonatype && IvyPlugin
+  override def requires = MimaPlugin && Sonatype
 
   override def trigger = allRequirements
 
