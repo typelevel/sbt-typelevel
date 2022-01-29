@@ -33,7 +33,9 @@ object TypelevelSitePlugin extends AutoPlugin {
 
   object autoImport {
     lazy val tlSiteHeliumConfig = settingKey[Helium]("The Helium configuration")
+    @deprecated("Use tlSiteApiUri", "0.4.4")
     lazy val tlSiteApiUrl = settingKey[Option[URL]]("URL to the API docs")
+    lazy val tlSiteApiUri = settingKey[Option[URI]]("URI to the API docs")
     lazy val tlSiteGenerate = settingKey[Seq[WorkflowStep]](
       "A sequence of workflow steps which generates the site (default: [Sbt(List(\"tlSite\"))])")
     lazy val tlSitePublish = settingKey[Seq[WorkflowStep]](
@@ -49,7 +51,8 @@ object TypelevelSitePlugin extends AutoPlugin {
 
   override def buildSettings = Seq(
     tlSitePublishBranch := Some("main"),
-    tlSiteApiUrl := None
+    tlSiteApiUri := None,
+    tlSiteApiUrl := None: @nowarn
   )
 
   override def projectSettings = Seq(
@@ -91,13 +94,17 @@ object TypelevelSitePlugin extends AutoPlugin {
             "https://typelevel.org",
             Image.external(s"data:image/svg+xml;base64,$getSvgLogo")
           ),
-          navLinks = tlSiteApiUrl.value.toList.map { url =>
-            IconLink.external(
-              url.toString,
-              HeliumIcon.api,
-              options = Styles("svg-link")
-            )
-          } ++ List(
+          navLinks = tlSiteApiUri
+            .value
+            .orElse(tlSiteApiUrl.value.map(_.toURI): @nowarn)
+            .toList
+            .map { url =>
+              IconLink.external(
+                url.toString,
+                HeliumIcon.api,
+                options = Styles("svg-link")
+              )
+            } ++ List(
             IconLink.external(
               scmInfo.value.fold("https://github.com/typelevel")(_.browseUrl.toString),
               HeliumIcon.github,
