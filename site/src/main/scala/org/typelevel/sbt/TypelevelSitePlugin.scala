@@ -139,7 +139,6 @@ object TypelevelSitePlugin extends AutoPlugin {
             .toAbsolutePath
             .relativize(((Laika / target).value / "site").toPath)
             .toString,
-          "publish_branch" -> "gh-pages",
           "keep_files" -> tlSiteKeepFiles.value.toString
         ),
         name = Some("Publish site"),
