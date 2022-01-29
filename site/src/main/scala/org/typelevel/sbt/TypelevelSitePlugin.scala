@@ -44,12 +44,20 @@ object TypelevelSitePlugin extends AutoPlugin {
   }
 
   import autoImport._
+  import TypelevelGitHubPlugin._
 
-  override def requires = MdocPlugin && LaikaPlugin && GenerativePlugin && NoPublishPlugin
+  override def requires =
+    MdocPlugin && LaikaPlugin && TypelevelGitHubPlugin && GenerativePlugin && NoPublishPlugin
 
   override def buildSettings = Seq(
     tlSitePublishBranch := Some("main"),
-    tlSiteApiUrl := None
+    tlSiteApiUrl := None,
+    homepage := {
+      gitHubUserRepo.value.map {
+        case ("typelevel", repo) => url(s"https://typelevel.org/$repo")
+        case (user, repo) => url(s"https://$user.github.io/$repo")
+      }
+    }
   )
 
   override def projectSettings = Seq(
