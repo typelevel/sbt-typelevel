@@ -94,16 +94,6 @@ object TypelevelPlugin extends AutoPlugin {
         "reload"
       )
     )
-  ) ++ addCommandAlias(
-    "tlPrePrBotHook",
-    mkCommand(
-      List(
-        "githubWorkflowGenerate",
-        "headerCreateAll",
-        "scalafmtAll",
-        "scalafmtSbt"
-      )
-    )
   )
 
   // immutable.Seq for bincompat
