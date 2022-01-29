@@ -34,6 +34,8 @@ object TypelevelSitePlugin extends AutoPlugin {
   object autoImport {
     lazy val tlSiteHeliumConfig = settingKey[Helium]("The Helium configuration")
     lazy val tlSiteApiUrl = settingKey[Option[URL]]("URL to the API docs")
+    lazy val tlSiteKeepFiles =
+      settingKey[Boolean]("Whether to keep existing files when deploying site (default: true)")
     lazy val tlSiteGenerate = settingKey[Seq[WorkflowStep]](
       "A sequence of workflow steps which generates the site (default: [Sbt(List(\"tlSite\"))])")
     lazy val tlSitePublish = settingKey[Seq[WorkflowStep]](
@@ -52,6 +54,7 @@ object TypelevelSitePlugin extends AutoPlugin {
   override def buildSettings = Seq(
     tlSitePublishBranch := Some("main"),
     tlSiteApiUrl := None,
+    tlSiteKeepFiles := true,
     homepage := {
       gitHubUserRepo.value.map {
         case ("typelevel", repo) => url(s"https://typelevel.org/$repo")
@@ -136,7 +139,8 @@ object TypelevelSitePlugin extends AutoPlugin {
             .toAbsolutePath
             .relativize(((Laika / target).value / "site").toPath)
             .toString,
-          "publish_branch" -> "gh-pages"
+          "publish_branch" -> "gh-pages",
+          "keep_files" -> tlSiteKeepFiles.value.toString
         ),
         name = Some("Publish site"),
         cond = {
