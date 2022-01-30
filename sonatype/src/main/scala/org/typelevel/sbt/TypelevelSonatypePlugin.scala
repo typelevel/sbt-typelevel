@@ -60,18 +60,19 @@ object TypelevelSonatypePlugin extends AutoPlugin {
       else
         "s01.oss.sonatype.org"
     },
-    apiURL := {
-      val javadocio = CrossVersion(
-        crossVersion.value,
-        scalaVersion.value,
-        scalaBinaryVersion.value
-      ).map { cross =>
-        url(
-          s"https://www.javadoc.io/doc/${organization.value}/${cross(moduleName.value)}/${version.value}/")
-      }
-      apiURL.value.orElse(javadocio)
-    }
+    apiURL := apiURL.value.orElse(javadocioUrl.value)
   )
+
+  private[sbt] def javadocioUrl = Def.setting {
+    CrossVersion(
+      crossVersion.value,
+      scalaVersion.value,
+      scalaBinaryVersion.value
+    ).map { cross =>
+      url(
+        s"https://www.javadoc.io/doc/${organization.value}/${cross(moduleName.value)}/${version.value}/")
+    }
+  }
 
   private def sonatypeBundleReleaseIfRelevant: Command =
     Command.command("tlSonatypeBundleReleaseIfRelevant") { state =>

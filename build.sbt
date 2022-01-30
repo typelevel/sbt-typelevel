@@ -148,6 +148,13 @@ lazy val site = project
   )
   .dependsOn(kernel, githubActions, noPublish)
 
+lazy val unidoc = project
+  .in(file("unidoc"))
+  .enablePlugins(TypelevelUnidocPlugin)
+  .settings(
+    name := "sbt-typelevel-unidoc"
+  )
+
 lazy val docs = project
   .in(file("mdocs"))
   .enablePlugins(TypelevelSitePlugin)
