@@ -57,10 +57,10 @@ object TypelevelPlugin extends AutoPlugin {
     tlCiReleaseBranches := Seq("main"),
     Def.derive(tlFatalWarnings := (tlFatalWarningsInCi.value && githubIsWorkflowBuild.value)),
     githubWorkflowBuildMatrixExclusions ++= {
+      val defaultScala = (ThisBuild / scalaVersion).value
       for {
-        // default scala is last in the list, default java first
-        scala <- githubWorkflowScalaVersions.value.init
-        java <- githubWorkflowJavaVersions.value.tail
+        scala <- githubWorkflowScalaVersions.value.filterNot(_ == defaultScala)
+        java <- githubWorkflowJavaVersions.value.tail // default java is head
       } yield MatrixExclude(Map("scala" -> scala, "java" -> java.render))
     },
     githubWorkflowBuild := {

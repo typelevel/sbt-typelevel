@@ -145,7 +145,7 @@ object TypelevelSitePlugin extends AutoPlugin {
       WorkflowJob(
         "site",
         "Generate Site",
-        scalas = List(crossScalaVersions.value.last),
+        scalas = List((ThisBuild / scalaVersion).value),
         javas = List(githubWorkflowJavaVersions.value.head),
         steps =
           githubWorkflowJobSetup.value.toList ++ tlSiteGenerate.value ++ tlSitePublish.value
