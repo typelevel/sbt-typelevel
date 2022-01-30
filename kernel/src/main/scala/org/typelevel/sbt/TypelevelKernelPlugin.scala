@@ -48,7 +48,7 @@ object TypelevelKernelPlugin extends AutoPlugin {
     skip := {
       skip.value || {
         val cross = crossScalaVersions.value
-        val ver = (ThisBuild / scalaVersion).value
+        val ver = (LocalRootProject / scalaVersion).value
         !cross.contains(ver)
       }
     }
