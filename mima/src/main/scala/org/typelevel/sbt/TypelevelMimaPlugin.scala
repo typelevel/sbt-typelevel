@@ -41,6 +41,11 @@ object TypelevelMimaPlugin extends AutoPlugin {
   )
 
   override def projectSettings = Seq[Setting[_]](
+    mimaReportBinaryIssues := {
+      if ((mimaReportBinaryIssues / skip).value)
+        ()
+      else mimaReportBinaryIssues.value
+    },
     mimaPreviousArtifacts := {
       require(
         versionScheme.value.contains("early-semver"),
