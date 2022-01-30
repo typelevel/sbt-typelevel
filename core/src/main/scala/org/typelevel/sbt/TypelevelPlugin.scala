@@ -92,8 +92,8 @@ object TypelevelPlugin extends AutoPlugin {
     mkCommand(
       List(
         "githubWorkflowGenerate",
-        "headerCreateAll",
-        "scalafmtAll",
+        "+headerCreateAll",
+        "+scalafmtAll",
         "scalafmtSbt"
       )
     )
