@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="Laika 0.18.1 + Helium Theme" />
-    <title>sbt-typelevel</title>
+    <title>Customization</title>
     
     
       <meta name="description" content="docs"/>
@@ -56,9 +56,9 @@
       </div>
       
       <ul class="nav-list">
-        <li class="level1 active"><a href="#">sbt-typelevel</a></li>
+        <li class="level1"><a href="index.html">sbt-typelevel</a></li>
         <li class="level1"><a href="faq.html">FAQ</a></li>
-        <li class="level1"><a href="customization.html">Customization</a></li>
+        <li class="level1 active"><a href="#">Customization</a></li>
       </ul>
       
     </nav>
@@ -66,10 +66,24 @@
     <div id="container">
 
       <nav id="page-nav">
-        <p class="header"><a href="#">sbt-typelevel</a></p>
+        <p class="header"><a href="#">Customization</a></p>
         
         <ul class="nav-list">
-          <li class="level1"><a href="#quick-start">Quick start</a></li>
+          <li class="level1"><a href="#modules">Modules</a></li>
+          <li class="level2"><a href="#sbt-typelevel-no-publish">sbt-typelevel-no-publish</a></li>
+          <li class="level2"><a href="#sbt-typelevel-kernel">sbt-typelevel-kernel</a></li>
+          <li class="level2"><a href="#sbt-typelevel-versioning">sbt-typelevel-versioning</a></li>
+          <li class="level2"><a href="#sbt-typelevel-mima">sbt-typelevel-mima</a></li>
+          <li class="level2"><a href="#sbt-typelevel-sonatype">sbt-typelevel-sonatype</a></li>
+          <li class="level2"><a href="#sbt-typelevel-settings">sbt-typelevel-settings</a></li>
+          <li class="level2"><a href="#sbt-typelevel-github">sbt-typelevel-github</a></li>
+          <li class="level2"><a href="#sbt-typelevel-ci">sbt-typelevel-ci</a></li>
+          <li class="level2"><a href="#sbt-typelevel-sonatype-ci-release">sbt-typelevel-sonatype-ci-release</a></li>
+          <li class="level2"><a href="#sbt-typelevel-ci-signing">sbt-typelevel-ci-signing</a></li>
+          <li class="level2"><a href="#sbt-typelevel-ci-release">sbt-typelevel-ci-release</a></li>
+          <li class="level2"><a href="#sbt-typelevel">sbt-typelevel</a></li>
+          <li class="level2"><a href="#sbt-typelevel-site">sbt-typelevel-site</a></li>
+          <li class="level1"><a href="#dependency-diagram">Dependency diagram</a></li>
         </ul>
         
         <p class="footer"></p>
@@ -77,30 +91,101 @@
 
       <main class="content">
 
-        <h1 id="sbt-typelevel" class="title">sbt-typelevel</h1>
-        <p>sbt-typelevel helps Scala projects to publish early-semantically-versioned, binary-compatible artifacts to Sonatype/Maven from GitHub actions. It is a collection of plugins that work well individually and even better together.</p>
+        <h1 id="customization" class="title">Customization</h1>
+        <p>The complete list of plugins, settings, and utilities is given below. The <strong>sbt-typelevel-ci-release</strong> and <strong>sbt-typelevel</strong> super-plugins automatically load most of them. The diagram at the bottom of the page shows their inter-dependencies.</p>
+        <p>Instead of using the super-plugins, for finer-grained control you can always add plugins individually to your project and even build your own custom super-plugin.</p>
         
-        <h2 id="quick-start" class="section">Quick start<a class="anchor-link right" href="#quick-start"><i class="icofont-laika">&#xef71;</i></a></h2>
-        <p><a href="https://index.scala-lang.org/typelevel/sbt-typelevel/sbt-typelevel"><img src="https://index.scala-lang.org/typelevel/sbt-typelevel/sbt-typelevel/latest-by-scala-version.svg?targetType=Sbt" alt="sbt-typelevel Scala version support"></a></p>
-        <pre class="keep-together pdf epub"><code class="nohighlight"><span class="comment">// Pick one, for project/plugins.sbt
-</span><span>
-</span><span class="comment">// Full service, batteries-included, let&#39;s go!
-</span><span class="identifier">addSbtPlugin</span><span>(</span><span class="string-literal">&quot;org.typelevel&quot;</span><span> % </span><span class="string-literal">&quot;sbt-typelevel&quot;</span><span> % </span><span class="string-literal">&quot;0.4.3&quot;</span><span>)
-
-</span><span class="comment">// Set me up for CI release, but don&#39;t touch my scalacOptions!
-</span><span class="identifier">addSbtPlugin</span><span>(</span><span class="string-literal">&quot;org.typelevel&quot;</span><span> % </span><span class="string-literal">&quot;sbt-typelevel-ci-release&quot;</span><span> % </span><span class="string-literal">&quot;0.4.3&quot;</span><span>)
-
-</span><span class="comment">// Then, in your build.sbt
-</span><span class="type-name">ThisBuild</span><span> / </span><span class="identifier">tlBaseVersion</span><span> := </span><span class="string-literal">&quot;0.4&quot;</span><span> </span><span class="comment">// your current series x.y
-</span><span class="type-name">ThisBuild</span><span> / </span><span class="identifier">developers</span><span> +=
-  </span><span class="identifier">tlGitHubDev</span><span>(</span><span class="string-literal">&quot;armanbilge&quot;</span><span>, </span><span class="string-literal">&quot;Arman Bilge&quot;</span><span>) </span><span class="comment">// your GitHub handle and name</span></code></pre>
-        <p>Next, run <code>githubWorkflowGenerate</code> in sbt to automatically generate the GitHub Actions workflows.</p>
-        <p>Finally, on GitHub set the following secrets on your repository:</p>
+        <h2 id="modules" class="section">Modules<a class="anchor-link right" href="#modules"><i class="icofont-laika">&#xef71;</i></a></h2>
+        
+        <h3 id="sbt-typelevel-no-publish" class="section">sbt-typelevel-no-publish<a class="anchor-link right" href="#sbt-typelevel-no-publish"><i class="icofont-laika">&#xef71;</i></a></h3>
         <ul>
-          <li><code>SONATYPE_USERNAME</code> and <code>SONATYPE_PASSWORD</code></li>
-          <li><code>PGP_SECRET</code>: output of <code>gpg --armor --export-secret-keys $LONG_ID | base64</code></li>
-          <li><code>PGP_PASSPHRASE</code> (optional, use only if your key is passphrase-protected)</li>
+          <li><code>NoPublishPlugin</code></li>
         </ul>
+        
+        <h3 id="sbt-typelevel-kernel" class="section">sbt-typelevel-kernel<a class="anchor-link right" href="#sbt-typelevel-kernel"><i class="icofont-laika">&#xef71;</i></a></h3>
+        <ul>
+          <li><code>TypelevelKernelPlugin</code></li>
+          <li><code>tlIsScala3</code> (setting): true if <code>scalaVersion</code> is 3.x</li>
+          <li><code>tlReplaceCommandAlias</code> (method): replace a <code>addCommandAlias</code> definition</li>
+          <li><code>tlReleaseLocal</code> (command): alias for <code>+publishLocal</code></li>
+        </ul>
+        
+        <h3 id="sbt-typelevel-versioning" class="section">sbt-typelevel-versioning<a class="anchor-link right" href="#sbt-typelevel-versioning"><i class="icofont-laika">&#xef71;</i></a></h3>
+        <ul>
+          <li><code>TypelevelVersioningPlugin</code>: Establishes a git-based, early semantic versioning scheme</li>
+          <li><code>tlBaseVersion</code> (setting): the series your project is in. e.g., 0.2, 3.5</li>
+          <li><code>tlUntaggedAreSnapshots</code> (setting): If true, an untagged commit is given a snapshot version, e.g. <code>0.4.1-17-00218f9-SNAPSHOT</code>. If false, it is given a release version, e.g. <code>0.4.1-17-00218f9</code>. (default: true)</li>
+        </ul>
+        
+        <h3 id="sbt-typelevel-mima" class="section">sbt-typelevel-mima<a class="anchor-link right" href="#sbt-typelevel-mima"><i class="icofont-laika">&#xef71;</i></a></h3>
+        <ul>
+          <li><code>TypelevelMimaPlugin</code>: Determines previous MiMa artifacts via your <code>version</code> setting and git tags.</li>
+          <li><code>tlVersionIntroduced</code> (setting): A map <code>scalaBinaryVersion -&gt; version</code> e.g. <code>Map(&quot;2.13&quot; -&gt; &quot;1.5.2&quot;, &quot;3&quot; -&gt; &quot;1.7.1&quot;)</code> used to indicate that a particular <code>crossScalaVersions</code> value was introduced in a given version (default: empty).</li>
+        </ul>
+        
+        <h3 id="sbt-typelevel-sonatype" class="section">sbt-typelevel-sonatype<a class="anchor-link right" href="#sbt-typelevel-sonatype"><i class="icofont-laika">&#xef71;</i></a></h3>
+        <ul>
+          <li><code>TypelevelSonatypePlugin</code>: Sets up publishing to Sonatype/Maven.</li>
+          <li><code>tlRelease</code> (command): check binary-compatibility and <code>+publish</code> to Sonatype</li>
+          <li><code>tlSonatypeUseLegacyHost</code> (setting): publish to <code>oss.sonatype.org</code> instead of <code>s01.oss.sonatype.org</code> (default: true)</li>
+        </ul>
+        
+        <h3 id="sbt-typelevel-settings" class="section">sbt-typelevel-settings<a class="anchor-link right" href="#sbt-typelevel-settings"><i class="icofont-laika">&#xef71;</i></a></h3>
+        <ul>
+          <li><code>TypelevelSettingsPlugin</code>: Good and/or opinionated defaults for scalac settings etc., inspired by sbt-tpolecat.</li>
+          <li><code>tlFatalWarnings</code> (setting): Convert compiler warnings into errors (default: false).</li>
+        </ul>
+        
+        <h3 id="sbt-typelevel-github" class="section">sbt-typelevel-github<a class="anchor-link right" href="#sbt-typelevel-github"><i class="icofont-laika">&#xef71;</i></a></h3>
+        <ul>
+          <li><code>TypelevelGitHubPlugin</code>: Populates boilerplate settings assuming you are using GitHub.</li>
+          <li><code>TypelevelScalaJSGitHubPlugin</code>: Points your sourcemaps to GitHub permalinks. Only activated for Scala.js projects.</li>
+          <li><code>tlGitHubDev(user, fullName)</code> (method): Helper to create a <code>Developer</code> entry from a GitHub username.</li>
+        </ul>
+        
+        <h3 id="sbt-typelevel-ci" class="section">sbt-typelevel-ci<a class="anchor-link right" href="#sbt-typelevel-ci"><i class="icofont-laika">&#xef71;</i></a></h3>
+        <ul>
+          <li><code>TypelevelCiPlugin</code>: Sets up GitHub actions to run tests and check binary-compatibility in CI.</li>
+          <li><code>tlCrossRootProject</code> (method): helper to create a <code>root</code> project that can aggregate both <code>Project</code>s and <code>CrossProject</code>s. Automatically creates separate jobs in the CI matrix for each platform (JVM, JS, etc.).</li>
+        </ul>
+        
+        <h3 id="sbt-typelevel-sonatype-ci-release" class="section">sbt-typelevel-sonatype-ci-release<a class="anchor-link right" href="#sbt-typelevel-sonatype-ci-release"><i class="icofont-laika">&#xef71;</i></a></h3>
+        <ul>
+          <li><code>TypelevelSonatypeCiReleasePlugin</code>: Sets up GitHub actions to publish to Sonatype in CI.</li>
+          <li>Requires the <code>SONATYPE_USERNAME</code> and <code>SONATYPE_PASSWORD</code> secrets</li>
+          <li><code>tlCiReleaseTags</code> (setting): Controls whether or not v-prefixed tags should be released from CI (default true).</li>
+          <li><code>tlCiReleaseBranches</code>: The branches in your repository to release from in CI on every push. Depending on your versioning scheme, they will be either snapshots or (hash) releases. Leave this empty if you only want CI releases for tags. (default: <code>[]</code>).</li>
+        </ul>
+        
+        <h3 id="sbt-typelevel-ci-signing" class="section">sbt-typelevel-ci-signing<a class="anchor-link right" href="#sbt-typelevel-ci-signing"><i class="icofont-laika">&#xef71;</i></a></h3>
+        <ul>
+          <li><code>TypelevelCiSigningPlugin</code>: Sets up GitHub actions to sign your artifacts in CI.</li>
+          <li>Requires <code>PGP_SECRET</code> secret, with your base64-encoded PGP key</li>
+          <li>Optionally set the <code>PGP_PASSPHRASE</code> secret, but we do not recommend passphrase-protected keys for new projects. See discussion in <a href="https://github.com/typelevel/sbt-typelevel/discussions/9#discussioncomment-1251774">#9</a>.</li>
+        </ul>
+        
+        <h3 id="sbt-typelevel-ci-release" class="section">sbt-typelevel-ci-release<a class="anchor-link right" href="#sbt-typelevel-ci-release"><i class="icofont-laika">&#xef71;</i></a></h3>
+        <ul>
+          <li><code>TypelevelCiReleasePlugin</code>: The super-plugin that sets you up with versioning, mima, signing, and sonatype publishing, all in GitHub actions.</li>
+        </ul>
+        
+        <h3 id="sbt-typelevel" class="section">sbt-typelevel<a class="anchor-link right" href="#sbt-typelevel"><i class="icofont-laika">&#xef71;</i></a></h3>
+        <ul>
+          <li><code>TypelevelPlugin</code>: The super-super-plugin intended for bootstrapping the typical Typelevel project. Sets up CI release including snapshots, scalac settings, headers, and formatting.</li>
+          <li><code>tlFatalWarningsInCi</code> (setting): Convert compiler warnings into errors under CI builds (default: true).</li>
+        </ul>
+        
+        <h3 id="sbt-typelevel-site" class="section">sbt-typelevel-site<a class="anchor-link right" href="#sbt-typelevel-site"><i class="icofont-laika">&#xef71;</i></a></h3>
+        <ul>
+          <li><code>TypelevelSitePlugin</code>: Sets up an <a href="https://scalameta.org/mdoc/">mdoc</a>/<a href="https://planet42.github.io/Laika/">Laika</a>-generated microsite, automatically published to GitHub pages in CI.</li>
+          <li><code>tlSitePublishBranch</code> (setting): The branch to publish the site from on every push. Set this to <code>None</code> if you only want to update the site on tag releases. (default: <code>main</code>)</li>
+          <li><code>tlSiteApiUrl</code> (setting): URL to the API docs. (default: <code>None</code>)</li>
+          <li><code>tlSiteHeliumConfig</code> (setting): the Laika Helium config. (default: how the sbt-typelevel site looks)</li>
+        </ul>
+        
+        <h2 id="dependency-diagram" class="section">Dependency diagram<a class="anchor-link right" href="#dependency-diagram"><i class="icofont-laika">&#xef71;</i></a></h2>
+        <p>sbt-typelevel plugins are in red and the super-plugins are boxed.</p>
+        <p><a href="plugins.svg"><img src="plugins.svg" style="width: 100%"/></a></p>
 
       </main>
 
