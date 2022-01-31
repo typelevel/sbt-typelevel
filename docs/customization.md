@@ -9,7 +9,7 @@ Instead of using the super-plugins, for finer-grained control you can always add
 ### sbt-typelevel-no-publish
 - `NoPublishPlugin`
 
-### sbt-typelevel-kernel,
+### sbt-typelevel-kernel
 - `TypelevelKernelPlugin`
 - `tlIsScala3` (setting): true if `scalaVersion` is 3.x
 - `tlReplaceCommandAlias` (method): replace a `addCommandAlias` definition
