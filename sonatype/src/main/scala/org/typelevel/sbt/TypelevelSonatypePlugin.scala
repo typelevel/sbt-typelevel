@@ -64,14 +64,16 @@ object TypelevelSonatypePlugin extends AutoPlugin {
   )
 
   private[sbt] def javadocioUrl = Def.setting {
-    CrossVersion(
-      crossVersion.value,
-      scalaVersion.value,
-      scalaBinaryVersion.value
-    ).map { cross =>
-      url(
-        s"https://www.javadoc.io/doc/${organization.value}/${cross(moduleName.value)}/${version.value}/")
-    }
+    if (isSnapshot.value) None // javadoc.io doesn't support snapshots
+    else
+      CrossVersion(
+        crossVersion.value,
+        scalaVersion.value,
+        scalaBinaryVersion.value
+      ).map { cross =>
+        url(
+          s"https://www.javadoc.io/doc/${organization.value}/${cross(moduleName.value)}/${version.value}/")
+      }
   }
 
   private def sonatypeBundleReleaseIfRelevant: Command =
