@@ -21,7 +21,9 @@ ThisBuild / developers +=
   tlGitHubDev("armanbilge", "Arman Bilge") // your GitHub handle and name
 ```
 
-Then, on GitHub set the following secrets on your repository:
+Next, run `githubWorkflowGenerate` in sbt to automatically generate the GitHub Actions workflows.
+
+Finally, on GitHub set the following secrets on your repository:
 
 - `SONATYPE_USERNAME` and `SONATYPE_PASSWORD`
 - `PGP_SECRET`: output of `gpg --armor --export-secret-keys $LONG_ID | base64`
