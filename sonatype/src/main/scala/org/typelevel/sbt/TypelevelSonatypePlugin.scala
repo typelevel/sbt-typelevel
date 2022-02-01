@@ -64,7 +64,8 @@ object TypelevelSonatypePlugin extends AutoPlugin {
   )
 
   private[sbt] def javadocioUrl = Def.setting {
-    if (isSnapshot.value) None // javadoc.io doesn't support snapshots
+    if (isSnapshot.value || !publishArtifact.value)
+      None // javadoc.io doesn't support snapshots or unpublished modules ;)
     else
       CrossVersion(
         crossVersion.value,
