@@ -115,7 +115,8 @@ object TypelevelCiCrossPlugin extends AutoPlugin {
 
   override def buildSettings = Seq(
     githubWorkflowBuildSbtStepPreamble ~= { s"project $${{ matrix.project }}" +: _ },
-    githubWorkflowBuildMatrixAdditions += "project" -> Nil
+    githubWorkflowBuildMatrixAdditions += "project" -> Nil,
+    githubWorkflowArtifactDownloadExtraKeys += "project"
   )
 }
 

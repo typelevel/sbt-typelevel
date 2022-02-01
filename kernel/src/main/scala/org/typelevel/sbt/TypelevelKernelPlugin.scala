@@ -44,6 +44,16 @@ object TypelevelKernelPlugin extends AutoPlugin {
   override def buildSettings =
     addCommandAlias("tlReleaseLocal", mkCommand(List("reload", "project /", "+publishLocal")))
 
+  override def projectSettings = Seq(
+    skip := {
+      skip.value || {
+        val cross = crossScalaVersions.value
+        val ver = (LocalRootProject / scalaVersion).value
+        !cross.contains(ver)
+      }
+    }
+  )
+
   private[sbt] def mkCommand(commands: List[String]): String = commands.mkString("; ", "; ", "")
 
 }

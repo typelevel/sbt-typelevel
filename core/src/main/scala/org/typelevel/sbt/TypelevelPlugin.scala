@@ -40,6 +40,7 @@ object TypelevelPlugin extends AutoPlugin {
   }
 
   import autoImport._
+  import TypelevelKernelPlugin.mkCommand
   import TypelevelSettingsPlugin.autoImport._
   import TypelevelSonatypeCiReleasePlugin.autoImport._
   import GenerativePlugin.autoImport._
@@ -57,10 +58,10 @@ object TypelevelPlugin extends AutoPlugin {
     tlCiReleaseBranches := Seq("main"),
     Def.derive(tlFatalWarnings := (tlFatalWarningsInCi.value && githubIsWorkflowBuild.value)),
     githubWorkflowBuildMatrixExclusions ++= {
+      val defaultScala = (ThisBuild / scalaVersion).value
       for {
-        // default scala is last in the list, default java first
-        scala <- githubWorkflowScalaVersions.value.init
-        java <- githubWorkflowJavaVersions.value.tail
+        scala <- githubWorkflowScalaVersions.value.filterNot(_ == defaultScala)
+        java <- githubWorkflowJavaVersions.value.tail // default java is head
       } yield MatrixExclude(Map("scala" -> scala, "java" -> java.render))
     },
     githubWorkflowBuild := {
@@ -72,7 +73,7 @@ object TypelevelPlugin extends AutoPlugin {
     }
   ) ++ addCommandAlias(
     "prePR",
-    TypelevelKernelPlugin.mkCommand(
+    mkCommand(
       List(
         "reload",
         "project /",
@@ -84,6 +85,16 @@ object TypelevelPlugin extends AutoPlugin {
         "set ThisBuild / tlFatalWarnings := tlFatalWarningsInCi.value",
         "Test / compile",
         "reload"
+      )
+    )
+  ) ++ addCommandAlias(
+    "tlPrePrBotHook",
+    mkCommand(
+      List(
+        "githubWorkflowGenerate",
+        "+headerCreateAll",
+        "+scalafmtAll",
+        "scalafmtSbt"
       )
     )
   )
