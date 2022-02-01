@@ -10,6 +10,23 @@ It is also possible to run the release process entirely locally by invoking the 
 
 Bump your `tlBaseVersion` to the next breaking-version according to early-semver, e.g. 0.7 to 0.8 or 4.2 to 5.0.
 
+## What is a base version anyway?
+
+The "base version" is a concept inherited from [sbt-spiewak](https://github.com/djspiewak/sbt-spiewak/blob/d689a5be2f3dba2c335b2be072870287fda701b8/versioning.md#compatibility-version). It is the first two components `x.y` of your semantic version `x.y.z` which are used to communicate important information about binary- and source-compatibility of your library relative to previous releases.
+
+If your library is in 0.x, when you open a PR:
+
+- **If the change is binary-breaking**: bump the base version from `0.y` to `0.(y+1)` (e.g. 0.4 to 5.0). This will indicate to MiMa to stop checking binary compatibility against the `0.y` series.
+- **If the change is a backwards compatible feature or bug fix**: no need to update the base version, although you may choose to do so if introducing significant new functionality.
+
+If your library is in 1.x or beyond, when you open a PR:
+
+- **If the change is binary-breaking**: bump the base version from `x.y` to `(x+1).0` (e.g. 4.2 to 5.0). This will indicate to MiMa to stop checking binary compatibility against the `x` series.
+- **If the change is source-breaking**: bump the base version from `x.y` to `x.(y+1)` (e.g. 4.2 to 4.3). You may also want to do this when introducing significant new functionality (or for some projects such as Cats and Cats Effect, any new feature at all).
+- **If the change is a backwards-compatible feature or bug fix**: no need to update the base version.
+
+In general, if you attempt to introduce binary-breaking changes without appropriately bumping the base version, your PR will fail in CI due to the MiMa binary-compatibility checks.
+
 ## How do I indicate the first version that I published Scala 3 artifacts for?
 
 ```scala
