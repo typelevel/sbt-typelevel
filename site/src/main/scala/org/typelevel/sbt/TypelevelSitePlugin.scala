@@ -33,6 +33,7 @@ object TypelevelSitePlugin extends AutoPlugin {
 
   object autoImport {
     lazy val tlSiteHeliumConfig = settingKey[Helium]("The Helium configuration")
+    @deprecated("Use apiURL instead", "0.4.4")
     lazy val tlSiteApiUrl = settingKey[Option[URL]]("URL to the API docs")
     lazy val tlSiteKeepFiles =
       settingKey[Boolean]("Whether to keep existing files when deploying site (default: true)")
@@ -53,7 +54,7 @@ object TypelevelSitePlugin extends AutoPlugin {
 
   override def buildSettings = Seq(
     tlSitePublishBranch := Some("main"),
-    tlSiteApiUrl := None,
+    tlSiteApiUrl := None: @nowarn,
     tlSiteKeepFiles := true,
     homepage := {
       gitHubUserRepo.value.map {
@@ -102,7 +103,7 @@ object TypelevelSitePlugin extends AutoPlugin {
             "https://typelevel.org",
             Image.external(s"data:image/svg+xml;base64,$getSvgLogo")
           ),
-          navLinks = tlSiteApiUrl.value.toList.map { url =>
+          navLinks = apiURL.value.orElse(tlSiteApiUrl.value: @nowarn).toList.map { url =>
             IconLink.external(
               url.toString,
               HeliumIcon.api,
