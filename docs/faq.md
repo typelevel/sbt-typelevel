@@ -16,7 +16,7 @@ The "base version" is a concept inherited from [sbt-spiewak](https://github.com/
 
 If your library is in 0.x, when you open a PR:
 
-- **If the change is binary-breaking**: bump the base version from `0.y` to `0.(y+1)` (e.g. 0.4 to 5.0). This will indicate to MiMa to stop checking binary compatibility against the `0.y` series.
+- **If the change is binary-breaking**: bump the base version from `0.y` to `0.(y+1)` (e.g. 0.4 to 0.5). This will indicate to MiMa to stop checking binary compatibility against the `0.y` series.
 - **If the change is a backwards compatible feature or bug fix**: no need to update the base version, although you may choose to do so if introducing significant new functionality.
 
 If your library is in 1.x or beyond, when you open a PR:
