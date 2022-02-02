@@ -22,9 +22,10 @@ import laika.ast._
 import laika.ast.LengthUnit._
 import laika.sbt.LaikaPlugin, LaikaPlugin.autoImport._
 import laika.helium.Helium
-import laika.helium.config.{HeliumIcon, IconLink, ImageLink}
+import laika.helium.config.{Favicon, HeliumIcon, IconLink, ImageLink}
 import org.typelevel.sbt.kernel.GitHelper
 import gha.GenerativePlugin, GenerativePlugin.autoImport._
+import laika.ast.Path.Root
 import scala.io.Source
 import java.util.Base64
 import scala.annotation.nowarn
@@ -52,7 +53,15 @@ object TypelevelSitePlugin extends AutoPlugin {
     tlSiteApiUrl := None
   )
 
+  val faviconPath: Path = Root / "images" / "favicon.png"
+
   override def projectSettings = Seq(
+    laikaInputs ~= {
+      _.delegate.addStream(
+        cats.effect.IO.blocking(getClass.getResourceAsStream("/images/favicon.png")),
+        faviconPath
+      )
+    },
     tlSite := Def
       .sequential(
         mdoc.toTask(""),
@@ -81,10 +90,10 @@ object TypelevelSitePlugin extends AutoPlugin {
           defaultLineHeight = 1.5,
           anchorPlacement = laika.helium.config.AnchorPlacement.Right
         )
-        // .site
-        // .favIcons( // TODO broken?
-        //   Favicon.external("https://typelevel.org/img/favicon.png", "32x32", "image/png")
-        // )
+        .site
+        .favIcons(
+          Favicon.internal(faviconPath, "32x32")
+        )
         .site
         .topNavigationBar(
           homeLink = ImageLink.external(
@@ -153,7 +162,7 @@ object TypelevelSitePlugin extends AutoPlugin {
   )
 
   private def getSvgLogo: String = {
-    val src = Source.fromURL(getClass.getResource("/logo.svg"))
+    val src = Source.fromURL(getClass.getResource("/images/logo.svg"))
     try {
       Base64.getEncoder().encodeToString(src.mkString.getBytes)
     } finally {
