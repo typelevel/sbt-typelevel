@@ -25,6 +25,7 @@ lazy val root = tlCrossRootProject.aggregate(
   core,
   ciRelease,
   site,
+  unidoc,
   docs
 )
 
