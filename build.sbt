@@ -162,4 +162,7 @@ lazy val unidoc = project
 lazy val docs = project
   .in(file("mdocs"))
   .enablePlugins(TypelevelSitePlugin)
-  .settings(laikaConfig ~= { _.withRawContent })
+  .settings(
+    laikaConfig ~= { _.withRawContent },
+    tlSiteApiModule := Some((unidoc / projectID).value)
+  )

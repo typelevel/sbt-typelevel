@@ -34,6 +34,8 @@ object TypelevelSitePlugin extends AutoPlugin {
   object autoImport {
     lazy val tlSiteHeliumConfig = settingKey[Helium]("The Helium configuration")
     lazy val tlSiteApiUrl = settingKey[Option[URL]]("URL to the API docs")
+    lazy val tlSiteApiModule =
+      settingKey[Option[ModuleID]]("The project that publishes API docs")
     lazy val tlSiteGenerate = settingKey[Seq[WorkflowStep]](
       "A sequence of workflow steps which generates the site (default: [Sbt(List(\"tlSite\"))])")
     lazy val tlSitePublish = settingKey[Seq[WorkflowStep]](
@@ -49,7 +51,8 @@ object TypelevelSitePlugin extends AutoPlugin {
 
   override def buildSettings = Seq(
     tlSitePublishBranch := Some("main"),
-    tlSiteApiUrl := None
+    tlSiteApiUrl := None,
+    tlSiteApiModule := None
   )
 
   override def projectSettings = Seq(
@@ -62,13 +65,23 @@ object TypelevelSitePlugin extends AutoPlugin {
     Laika / sourceDirectories := Seq(mdocOut.value),
     laikaTheme := tlSiteHeliumConfig.value.build,
     mdocVariables ++= Map(
-      "VERSION" -> GitHelper
-        .previousReleases()
-        .filterNot(_.isPrerelease)
-        .headOption
-        .fold(version.value)(_.toString),
+      "VERSION" -> currentRelease.value.fold(version.value)(_.toString),
       "SNAPSHOT_VERSION" -> version.value
     ),
+    tlSiteApiUrl := {
+      val javadocioUrl = for {
+        moduleId <- (ThisProject / tlSiteApiModule).value
+        cross <- CrossVersion(
+          moduleId.crossVersion,
+          scalaVersion.value,
+          scalaBinaryVersion.value
+        )
+        version <- currentRelease.value
+      } yield url(
+        s"https://www.javadoc.io/doc/${moduleId.organization}/${cross(moduleId.name)}/${version}/")
+
+      tlSiteApiUrl.value.orElse(javadocioUrl)
+    },
     tlSiteHeliumConfig := {
       Helium
         .defaults
@@ -159,6 +172,10 @@ object TypelevelSitePlugin extends AutoPlugin {
     } finally {
       src.close()
     }
+  }
+
+  private lazy val currentRelease = Def.setting {
+    GitHelper.previousReleases(fromHead = true).filterNot(_.isPrerelease).headOption
   }
 
 }
