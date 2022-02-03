@@ -164,5 +164,6 @@ lazy val docs = project
   .enablePlugins(TypelevelSitePlugin)
   .settings(
     laikaConfig ~= { _.withRawContent },
-    tlSiteApiModule := Some((unidoc / projectID).value)
+    tlSiteApiModule := Some((unidoc / projectID).value),
+    tlSiteApiPackage := Some("org.typelevel.sbt")
   )

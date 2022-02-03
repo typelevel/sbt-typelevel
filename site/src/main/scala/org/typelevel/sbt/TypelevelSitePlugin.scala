@@ -36,6 +36,8 @@ object TypelevelSitePlugin extends AutoPlugin {
     lazy val tlSiteApiUrl = settingKey[Option[URL]]("URL to the API docs")
     lazy val tlSiteApiModule =
       settingKey[Option[ModuleID]]("The project that publishes API docs")
+    lazy val tlSiteApiPackage = settingKey[Option[String]](
+      "The top-level package for your API docs (e.g. org.typlevel.sbt)")
     lazy val tlSiteGenerate = settingKey[Seq[WorkflowStep]](
       "A sequence of workflow steps which generates the site (default: [Sbt(List(\"tlSite\"))])")
     lazy val tlSitePublish = settingKey[Seq[WorkflowStep]](
@@ -52,7 +54,8 @@ object TypelevelSitePlugin extends AutoPlugin {
   override def buildSettings = Seq(
     tlSitePublishBranch := Some("main"),
     tlSiteApiUrl := None,
-    tlSiteApiModule := None
+    tlSiteApiModule := None,
+    tlSiteApiPackage := None
   )
 
   override def projectSettings = Seq(
@@ -77,8 +80,13 @@ object TypelevelSitePlugin extends AutoPlugin {
           scalaBinaryVersion.value
         )
         version <- currentRelease.value
-      } yield url(
-        s"https://www.javadoc.io/doc/${moduleId.organization}/${cross(moduleId.name)}/${version}/")
+      } yield {
+        val o = moduleId.organization
+        val n = cross(moduleId.name)
+        val v = version
+        val p = tlSiteApiPackage.value.fold("")(_.replace('.', '/') + '/')
+        url(s"https://www.javadoc.io/doc/$o/$n/$v/$p")
+      }
 
       tlSiteApiUrl.value.orElse(javadocioUrl)
     },
