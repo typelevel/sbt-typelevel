@@ -50,8 +50,8 @@ private[sbt] final case class V(
         if (z != 0) return z
         (this.prerelease, that.prerelease) match {
           case (None, None) => 0
-          case (Some(_), None) => 1
-          case (None, Some(_)) => -1
+          case (Some(_), None) => -1
+          case (None, Some(_)) => 1
           case (Some(thisPrerelease), Some(thatPrerelease)) =>
             // TODO not great, but not everyone uses Ms and RCs
             thisPrerelease.compare(thatPrerelease)
