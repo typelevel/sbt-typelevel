@@ -565,7 +565,10 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
     githubWorkflowPREventTypes := PREventType.Defaults,
     githubWorkflowArtifactDownloadExtraKeys := Set.empty,
     githubWorkflowGeneratedUploadSteps := {
-      if (githubWorkflowArtifactUpload.value) {
+      val generate =
+        githubWorkflowArtifactUpload.value &&
+          githubWorkflowPublishTargetBranches.value.nonEmpty
+      if (generate) {
         val sanitized = pathStrs.value map { str =>
           if (str.indexOf(' ') >= 0) // TODO be less naive
             s"'$str'"
