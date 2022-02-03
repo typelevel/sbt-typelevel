@@ -76,10 +76,10 @@ object TypelevelVersioningPlugin extends AutoPlugin {
           .flatMap { previous =>
             if (previous > baseV)
               sys.error(s"Your tlBaseVersion $baseV is behind the latest tag $previous")
-            else if (baseV.isSameSeries(previous))
-              Some(previous)
+            else if (!baseV.isSameSeries(previous))
+              sys.error(s"Your tlBaseVersion $baseV has to be same with latest tag $previous")
             else
-              None
+              Some(previous)
           }
 
         var version = latestInSeries.fold(tlBaseVersion.value)(_.toString)
