@@ -77,7 +77,7 @@ object TypelevelVersioningPlugin extends AutoPlugin {
             if (previous > baseV)
               sys.error(s"Your tlBaseVersion $baseV is behind the latest tag $previous")
             else if (!baseV.isSameSeries(previous))
-              sys.error(s"Your tlBaseVersion $baseV has to be same with latest tag $previous")
+              sys.error(s"Your tlBaseVersion $baseV has to be in the same series with latest tag $previous")
             else
               Some(previous)
           }
