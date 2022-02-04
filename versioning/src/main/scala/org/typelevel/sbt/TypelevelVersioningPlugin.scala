@@ -90,7 +90,7 @@ object TypelevelVersioningPlugin extends AutoPlugin {
             sys.error(s"verion $version not formatted properly.")
           case Some(value) =>
             if (!(value.isSameSeries(baseV) || value >= baseV))
-              sys.error(s"Your latest tag $version cannot be less than tlBaseVersion $baseV")
+              sys.error(s"Your current version $version cannot be less than tlBaseVersion $baseV")
             else
               // Looks for the distance to latest release in this series
               latestInSeries.foreach { latestInSeries =>
