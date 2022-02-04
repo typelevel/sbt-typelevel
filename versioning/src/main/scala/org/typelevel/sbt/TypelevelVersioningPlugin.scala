@@ -73,27 +73,27 @@ object TypelevelVersioningPlugin extends AutoPlugin {
           .previousReleases(true)
           .filterNot(_.isPrerelease) // TODO Ordering of pre-releases is arbitrary
           .headOption
+          .flatMap { previous =>
+            if (previous > baseV)
+              sys.error(s"Your tlBaseVersion $baseV is behind the latest tag $previous")
+            else if (baseV.isSameSeries(previous))
+              Some(previous)
+            else
+              None
+          }
 
         // version here is the prefix used further to build a final version number
         var version = latestInSeries.fold(tlBaseVersion.value)(_.toString)
 
-        latestInSeries.flatMap { previous =>
-          if (previous > baseV)
-            sys.error(s"Your tlBaseVersion $baseV is behind the latest tag $previous")
-          else if (version < baseV.toString)
-            sys.error(s"Your latest tag $version cannot be less than tlBaseVersion $baseV")
-          else if (baseV.isSameSeries(previous))
-            Some(previous)
-          else
-            None
-        }
-
-        // Looks for the distance to latest release in this series
-        latestInSeries.foreach { latestInSeries =>
-          Try(s"git describe --tags --match v$latestInSeries".!!.trim)
-            .collect { case Description(distance) => distance }
-            .foreach { distance => version += s"-$distance" }
-        }
+        if (version < baseV.toString)
+          sys.error(s"Your latest tag $version cannot be less than tlBaseVersion $baseV")
+        else
+          // Looks for the distance to latest release in this series
+          latestInSeries.foreach { latestInSeries =>
+            Try(s"git describe --tags --match v$latestInSeries".!!.trim)
+              .collect { case Description(distance) => distance }
+              .foreach { distance => version += s"-$distance" }
+          }
 
         git.gitHeadCommit.value.foreach { sha => version += s"-${sha.take(7)}" }
         version
