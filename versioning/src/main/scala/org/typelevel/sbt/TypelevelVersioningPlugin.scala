@@ -87,7 +87,7 @@ object TypelevelVersioningPlugin extends AutoPlugin {
 
         V(version) match {
           case None =>
-            sys.error(s"verion $version not formatted properly.")
+            sys.error(s"version must be semver format: $version")
           case Some(value) =>
             if (!(value.isSameSeries(baseV) || value >= baseV))
               sys.error(s"Your current version $version cannot be less than tlBaseVersion $baseV")
