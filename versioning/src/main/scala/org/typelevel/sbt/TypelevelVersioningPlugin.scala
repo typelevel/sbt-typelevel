@@ -90,17 +90,18 @@ object TypelevelVersioningPlugin extends AutoPlugin {
             sys.error(s"version must be semver format: $version")
           case Some(value) =>
             if (!(value.isSameSeries(baseV) || value >= baseV))
-              sys.error(s"Your current version $version cannot be less than tlBaseVersion $baseV")
-            else
-              // Looks for the distance to latest release in this series
-              latestInSeries.foreach { latestInSeries =>
-                Try(s"git describe --tags --match v$latestInSeries".!!.trim)
-                  .collect { case Description(distance) => distance }
-                  .foreach { distance => version += s"-$distance" }
-              }
-            git.gitHeadCommit.value.foreach { sha => version += s"-${sha.take(7)}" }
-            version
+              sys.error(
+                s"Your current version $version cannot be less than tlBaseVersion $baseV")
         }
+        // Looks for the distance to latest release in this series
+        latestInSeries.foreach { latestInSeries =>
+          Try(s"git describe --tags --match v$latestInSeries".!!.trim)
+            .collect { case Description(distance) => distance }
+            .foreach { distance => version += s"-$distance" }
+        }
+        git.gitHeadCommit.value.foreach { sha => version += s"-${sha.take(7)}" }
+        version
+
       }
 
       // Even if version was provided by a tag, we check for uncommited changes
