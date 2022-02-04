@@ -85,18 +85,22 @@ object TypelevelVersioningPlugin extends AutoPlugin {
         // version here is the prefix used further to build a final version number
         var version = latestInSeries.fold(tlBaseVersion.value)(_.toString)
 
-        if (version < baseV.toString)
-          sys.error(s"Your latest tag $version cannot be less than tlBaseVersion $baseV")
-        else
-          // Looks for the distance to latest release in this series
-          latestInSeries.foreach { latestInSeries =>
-            Try(s"git describe --tags --match v$latestInSeries".!!.trim)
-              .collect { case Description(distance) => distance }
-              .foreach { distance => version += s"-$distance" }
-          }
-
-        git.gitHeadCommit.value.foreach { sha => version += s"-${sha.take(7)}" }
-        version
+        V(version) match {
+          case None =>
+            sys.error(s"verion $version not formatted properly.")
+          case Some(value) =>
+            if (!(value.isSameSeries(baseV) || value >= baseV))
+              sys.error(s"Your latest tag $version cannot be less than tlBaseVersion $baseV")
+            else
+              // Looks for the distance to latest release in this series
+              latestInSeries.foreach { latestInSeries =>
+                Try(s"git describe --tags --match v$latestInSeries".!!.trim)
+                  .collect { case Description(distance) => distance }
+                  .foreach { distance => version += s"-$distance" }
+              }
+            git.gitHeadCommit.value.foreach { sha => version += s"-${sha.take(7)}" }
+            version
+        }
       }
 
       // Even if version was provided by a tag, we check for uncommited changes
