@@ -73,13 +73,15 @@ object TypelevelVersioningPlugin extends AutoPlugin {
           .previousReleases(true)
           .filterNot(_.isPrerelease) // TODO Ordering of pre-releases is arbitrary
           .headOption
-          .flatMap { previous =>
-            if (previous > baseV)
-              sys.error(s"Your tlBaseVersion $baseV is behind the latest tag $previous")
-            else if (!baseV.isSameSeries(previous))
-              sys.error(s"Your tlBaseVersion $baseV has to be in the same series with latest tag $previous")
+          .flatMap { currentTag =>
+            if (currentTag > baseV)
+              sys.error(s"Your tlBaseVersion $baseV is behind the latest tag $currentTag")
+            else if (currentTag < baseV)
+              sys.error(s"Your latest tag $currentTag cannot be less than tlBaseVersion $baseV")
+            else if (baseV.isSameSeries(currentTag))
+              Some(currentTag)
             else
-              Some(previous)
+              None
           }
 
         var version = latestInSeries.fold(tlBaseVersion.value)(_.toString)
