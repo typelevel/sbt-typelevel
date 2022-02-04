@@ -74,6 +74,7 @@ object TypelevelVersioningPlugin extends AutoPlugin {
           .filterNot(_.isPrerelease) // TODO Ordering of pre-releases is arbitrary
           .headOption
 
+        // version here is the prefix used further to build a final version number
         var version = latestInSeries.fold(tlBaseVersion.value)(_.toString)
 
         latestInSeries.flatMap { previous =>
