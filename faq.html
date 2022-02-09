@@ -116,6 +116,7 @@
         
         <h2 id="how-do-i-locally-prepare-my-pr-for-ci" class="section">How do I locally prepare my PR for CI?<a class="anchor-link right" href="#how-do-i-locally-prepare-my-pr-for-ci"><i class="icofont-laika">&#xef71;</i></a></h2>
         <p><strong>sbt-typelevel</strong> comes with a <code>prePR</code> command, which updates the GitHub workflow, generates headers, runs <code>scalafmt</code>, and clean compiles your code.</p>
+        <p>You may also want to (globally) install the <a href="https://github.com/rtimush/sbt-rewarn">sbt-rewarn</a> plugin to help you identify and resolve compiler warnings, which by default are fatal in CI.</p>
         
         <h2 id="how-do-i-disable-fatal-warnings-in-ci" class="section">How do I disable fatal warnings in CI?<a class="anchor-link right" href="#how-do-i-disable-fatal-warnings-in-ci"><i class="icofont-laika">&#xef71;</i></a></h2>
         <p>If you are using <strong>sbt-typelevel</strong> fatal warnings are on by default in CI.</p>
