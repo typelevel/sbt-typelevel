@@ -41,10 +41,10 @@ object TypelevelSonatypeCiReleasePlugin extends AutoPlugin {
     Seq(tlCiReleaseTags := true, tlCiReleaseBranches := Seq())
 
   override def buildSettings = Seq(
-    githubWorkflowEnv ++= Map(
-      "SONATYPE_USERNAME" -> s"$${{ secrets.SONATYPE_USERNAME }}",
-      "SONATYPE_PASSWORD" -> s"$${{ secrets.SONATYPE_PASSWORD }}"
-    ),
+    githubWorkflowEnv ++= List(
+      "SONATYPE_USERNAME",
+      "SONATYPE_PASSWORD",
+      "SONATYPE_CREDENTIAL_HOST").map(k => k -> s"$${{ secrets.$k }}").toMap,
     githubWorkflowPublishTargetBranches := {
       val branches =
         tlCiReleaseBranches.value.map(b => RefPredicate.Equals(Ref.Branch(b)))
