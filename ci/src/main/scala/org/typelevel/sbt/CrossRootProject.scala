@@ -149,8 +149,8 @@ object TypelevelCiJSPlugin extends AutoPlugin {
       steps.flatMap {
         case testStep @ WorkflowStep.Sbt(List("test"), _, _, _, _, _) =>
           val fastOptStep = WorkflowStep.Sbt(
-            List("Test/fastLinkJS"),
-            name = Some("fastLinkJS"),
+            List("Test/scalaJSLinkerResult"),
+            name = Some("scalaJSLink"),
             cond = Some("matrix.project == 'rootJS'")
           )
           List(fastOptStep, testStep)
