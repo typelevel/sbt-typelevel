@@ -37,6 +37,8 @@ ThisBuild / tlVersionIntroduced := Map("3" -> "0.4.2")
 
 **sbt-typelevel** comes with a `prePR` command, which updates the GitHub workflow, generates headers, runs `scalafmt`, and clean compiles your code.
 
+You may also want to (globally) install the [sbt-rewarn](https://github.com/rtimush/sbt-rewarn) plugin to help you identify and resolve compiler warnings, which by default are fatal in CI.
+
 ## How do I disable fatal warnings in CI?
 
 If you are using **sbt-typelevel** fatal warnings are on by default in CI.
