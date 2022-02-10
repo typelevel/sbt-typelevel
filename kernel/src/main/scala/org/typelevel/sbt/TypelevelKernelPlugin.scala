@@ -54,6 +54,12 @@ object TypelevelKernelPlugin extends AutoPlugin {
         val ver = (LocalRootProject / scalaVersion).value
         tlSkipIrrelevantScalas.value && !cross.contains(ver)
       }
+    },
+    update / skip := {
+      if (tlSkipIrrelevantScalas)
+        false // sadly, skipping update is effectively a fatal error
+      else
+        (update / skip).value
     }
   )
 
