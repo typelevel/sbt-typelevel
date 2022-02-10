@@ -63,12 +63,12 @@ object TypelevelVersioningPlugin extends AutoPlugin {
     version := {
       import scala.sys.process._
 
+      val baseV = V(tlBaseVersion.value)
+        .filter(v => v.patch.isEmpty && v.prerelease.isEmpty)
+        .getOrElse(sys.error(s"tlBaseVersion must be of form x.y: ${tlBaseVersion.value}"))
+
       var version = getTaggedVersion(git.gitCurrentTags.value).map(_.toString).getOrElse {
         // No tag, so we build our version based on this commit
-
-        val baseV = V(tlBaseVersion.value)
-          .filter(v => v.patch.isEmpty && v.prerelease.isEmpty)
-          .getOrElse(sys.error(s"tlBaseVersion must be of form x.y: ${tlBaseVersion.value}"))
 
         val latestInSeries = GitHelper
           .previousReleases(true)
@@ -83,6 +83,7 @@ object TypelevelVersioningPlugin extends AutoPlugin {
               None
           }
 
+        // version here is the prefix used further to build a final version number
         var version = latestInSeries.fold(tlBaseVersion.value)(_.toString)
 
         // Looks for the distance to latest release in this series
@@ -94,6 +95,14 @@ object TypelevelVersioningPlugin extends AutoPlugin {
 
         git.gitHeadCommit.value.foreach { sha => version += s"-${sha.take(7)}" }
         version
+      }
+
+      V(version) match {
+        case None =>
+          sys.error(s"version must be semver format: $version")
+        case Some(v) if !(v.isSameSeries(baseV) || v >= baseV) =>
+          sys.error(s"Your current version $version cannot be less than tlBaseVersion $baseV")
+        case _ => // do nothing
       }
 
       // Even if version was provided by a tag, we check for uncommited changes
