@@ -55,10 +55,12 @@ object TypelevelSonatypePlugin extends AutoPlugin {
     publishTo := sonatypePublishToBundle.value,
     commands += sonatypeBundleReleaseIfRelevant,
     sonatypeCredentialHost := {
-      if (tlSonatypeUseLegacyHost.value)
-        "oss.sonatype.org"
-      else
-        "s01.oss.sonatype.org"
+      Option(System.getenv("SONATYPE_CREDENTIAL_HOST")).filter(_.nonEmpty).getOrElse {
+        if (tlSonatypeUseLegacyHost.value)
+          "oss.sonatype.org"
+        else
+          "s01.oss.sonatype.org"
+      }
     },
     apiURL := {
       val javadocio = CrossVersion(

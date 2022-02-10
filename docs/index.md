@@ -5,6 +5,7 @@ sbt-typelevel helps Scala projects to publish early-semantically-versioned, bina
 ## Quick start
 
 [![sbt-typelevel Scala version support](https://index.scala-lang.org/typelevel/sbt-typelevel/sbt-typelevel/latest-by-scala-version.svg?targetType=Sbt)](https://index.scala-lang.org/typelevel/sbt-typelevel/sbt-typelevel)
+[![Discord](https://img.shields.io/discord/632277896739946517.svg?label=&logo=discord&logoColor=ffffff&color=404244&labelColor=6A7EC2)](https://discord.gg/D7wY3aH7BQ)
 
 ```scala
 // Pick one, for project/plugins.sbt

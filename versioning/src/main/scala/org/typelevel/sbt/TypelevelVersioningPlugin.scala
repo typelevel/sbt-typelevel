@@ -64,7 +64,8 @@ object TypelevelVersioningPlugin extends AutoPlugin {
       import scala.sys.process._
 
       val baseV = V(tlBaseVersion.value)
-        .getOrElse(sys.error(s"tlBaseVersion must be semver format: ${tlBaseVersion.value}"))
+        .filter(v => v.patch.isEmpty && v.prerelease.isEmpty)
+        .getOrElse(sys.error(s"tlBaseVersion must be of form x.y: ${tlBaseVersion.value}"))
 
       var version = getTaggedVersion(git.gitCurrentTags.value).map(_.toString).getOrElse {
         // No tag, so we build our version based on this commit
