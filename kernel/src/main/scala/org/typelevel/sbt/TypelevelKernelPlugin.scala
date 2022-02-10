@@ -26,6 +26,8 @@ object TypelevelKernelPlugin extends AutoPlugin {
 
   object autoImport {
     lazy val tlIsScala3 = settingKey[Boolean]("True if building with Scala 3")
+    lazy val tlSkipIrrelevantScalas = settingKey[Boolean](
+      "Sets skip := true for a project if the current scalaVersion is not in that project's crossScalaVersions (default: true)")
 
     def tlReplaceCommandAlias(name: String, contents: String): Seq[Setting[State => State]] =
       Seq(GlobalScope / onLoad ~= { (f: State => State) =>
@@ -42,14 +44,15 @@ object TypelevelKernelPlugin extends AutoPlugin {
   )
 
   override def buildSettings =
-    addCommandAlias("tlReleaseLocal", mkCommand(List("reload", "project /", "+publishLocal")))
+    Seq(tlSkipIrrelevantScalas := true) ++
+      addCommandAlias("tlReleaseLocal", mkCommand(List("reload", "project /", "+publishLocal")))
 
   override def projectSettings = Seq(
     skip := {
       skip.value || {
         val cross = crossScalaVersions.value
         val ver = (LocalRootProject / scalaVersion).value
-        !cross.contains(ver)
+        tlSkipIrrelevantScalas.value && !cross.contains(ver)
       }
     }
   )
