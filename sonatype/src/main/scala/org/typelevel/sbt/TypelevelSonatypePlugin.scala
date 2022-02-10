@@ -63,14 +63,19 @@ object TypelevelSonatypePlugin extends AutoPlugin {
       }
     },
     apiURL := {
-      val javadocio = CrossVersion(
-        crossVersion.value,
-        scalaVersion.value,
-        scalaBinaryVersion.value
-      ).map { cross =>
-        url(
-          s"https://www.javadoc.io/doc/${organization.value}/${cross(moduleName.value)}/${version.value}/")
-      }
+      val javadocio =
+        if (isSnapshot.value || sbtPlugin.value || !publishArtifact.value)
+          None // javadoc.io doesn't support snapshots, sbt plugins, or unpublished modules ;)
+        else
+          CrossVersion(
+            crossVersion.value,
+            scalaVersion.value,
+            scalaBinaryVersion.value
+          ).map { cross =>
+            url(
+              s"https://www.javadoc.io/doc/${organization.value}/${cross(moduleName.value)}/${version.value}/")
+          }
+
       apiURL.value.orElse(javadocio)
     }
   )
