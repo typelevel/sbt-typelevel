@@ -56,7 +56,7 @@ object TypelevelKernelPlugin extends AutoPlugin {
       }
     },
     update / skip := {
-      if (tlSkipIrrelevantScalas)
+      if (tlSkipIrrelevantScalas.value)
         false // sadly, skipping update is effectively a fatal error
       else
         (update / skip).value
