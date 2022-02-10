@@ -67,7 +67,8 @@ object TypelevelVersioningPlugin extends AutoPlugin {
         // No tag, so we build our version based on this commit
 
         val baseV = V(tlBaseVersion.value)
-          .getOrElse(sys.error(s"tlBaseVersion must be semver format: ${tlBaseVersion.value}"))
+          .filter(v => v.patch.isEmpty && v.prerelease.isEmpty)
+          .getOrElse(sys.error(s"tlBaseVersion must be of form x.y: ${tlBaseVersion.value}"))
 
         val latestInSeries = GitHelper
           .previousReleases(true)
