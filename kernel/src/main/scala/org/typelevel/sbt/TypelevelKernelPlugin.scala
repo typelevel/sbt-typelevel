@@ -49,7 +49,7 @@ object TypelevelKernelPlugin extends AutoPlugin {
 
   override def projectSettings = Seq(
     (Test / test) := {
-      if ((Test / test / skip).value)
+      if (tlSkipIrrelevantScalas.value && (Test / test / skip).value)
         ()
       else (Test / test).value
     },
