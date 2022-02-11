@@ -48,6 +48,13 @@ object TypelevelKernelPlugin extends AutoPlugin {
       addCommandAlias("tlReleaseLocal", mkCommand(List("reload", "project /", "+publishLocal")))
 
   override def projectSettings = Seq(
+    (Test / test) := {
+      if ((Test / test / skip).value)
+        ()
+      else (Test / test).value
+    },
+    skipIfIrrelevant(compile),
+    skipIfIrrelevant(test),
     skipIfIrrelevant(publishLocal),
     skipIfIrrelevant(publish)
   )
