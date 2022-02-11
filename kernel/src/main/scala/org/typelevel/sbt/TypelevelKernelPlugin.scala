@@ -44,7 +44,7 @@ object TypelevelKernelPlugin extends AutoPlugin {
   )
 
   override def buildSettings =
-    Seq(tlSkipIrrelevantScalas := true) ++
+    Seq(tlSkipIrrelevantScalas := false) ++
       addCommandAlias("tlReleaseLocal", mkCommand(List("reload", "project /", "+publishLocal")))
 
   override def projectSettings = Seq(
