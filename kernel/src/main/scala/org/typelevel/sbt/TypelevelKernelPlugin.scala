@@ -61,7 +61,11 @@ object TypelevelKernelPlugin extends AutoPlugin {
 
   private[sbt] def mkCommand(commands: List[String]): String = commands.mkString("; ", "; ", "")
 
-  private[sbt] def skipIfIrrelevant[T](task: TaskKey[T]) = {
+  /**
+   * A setting that will make a task respect the `tlSkipIrrelevantScalas` setting. Note that the
+   * task itself must respect `skip` for this to take effect.
+   */
+  def skipIfIrrelevant[T](task: TaskKey[T]) = {
     task / skip := {
       (task / skip).value || {
         val cross = crossScalaVersions.value
