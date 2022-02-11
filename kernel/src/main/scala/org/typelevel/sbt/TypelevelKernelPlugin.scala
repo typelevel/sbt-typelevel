@@ -27,7 +27,7 @@ object TypelevelKernelPlugin extends AutoPlugin {
   object autoImport {
     lazy val tlIsScala3 = settingKey[Boolean]("True if building with Scala 3")
     lazy val tlSkipIrrelevantScalas = settingKey[Boolean](
-      "Sets skip := true for a project if the current scalaVersion is not in that project's crossScalaVersions (default: false)")
+      "Sets skip := true for compile/test/publish/etc. tasks on a project if the current scalaVersion is not in that project's crossScalaVersions (default: false)")
 
     def tlReplaceCommandAlias(name: String, contents: String): Seq[Setting[State => State]] =
       Seq(GlobalScope / onLoad ~= { (f: State => State) =>
