@@ -61,7 +61,7 @@ object TypelevelKernelPlugin extends AutoPlugin {
       (task / skip).value || {
         val cross = crossScalaVersions.value
         val ver = (LocalRootProject / scalaVersion).value
-        tlSkipIrrelevantScalas.value && !cross.contains(ver)
+        (task / tlSkipIrrelevantScalas).value && !cross.contains(ver)
       }
     }
   }
