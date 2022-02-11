@@ -48,15 +48,22 @@ object TypelevelKernelPlugin extends AutoPlugin {
       addCommandAlias("tlReleaseLocal", mkCommand(List("reload", "project /", "+publishLocal")))
 
   override def projectSettings = Seq(
-    skip := {
-      skip.value || {
+    skipIfIrrelevant(compile),
+    skipIfIrrelevant(test),
+    skipIfIrrelevant(publishLocal),
+    skipIfIrrelevant(publish)
+  )
+
+  private[sbt] def mkCommand(commands: List[String]): String = commands.mkString("; ", "; ", "")
+
+  private[sbt] def skipIfIrrelevant[T](task: TaskKey[T]) = {
+    task / skip := {
+      (task / skip).value || {
         val cross = crossScalaVersions.value
         val ver = (LocalRootProject / scalaVersion).value
         tlSkipIrrelevantScalas.value && !cross.contains(ver)
       }
     }
-  )
-
-  private[sbt] def mkCommand(commands: List[String]): String = commands.mkString("; ", "; ", "")
+  }
 
 }
