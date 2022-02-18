@@ -29,6 +29,9 @@ object TypelevelSettingsPlugin extends AutoPlugin {
   object autoImport {
     lazy val tlFatalWarnings =
       settingKey[Boolean]("Convert compiler warnings into errors (default: false)")
+    lazy val tlJvmRelease =
+      settingKey[Int](
+        "JVM target version for the compiled bytecode (default: 8, supported values: 8, 9, 10, 11, 12, 13, 14, 15, 16, 17)")
   }
 
   import autoImport._
@@ -36,6 +39,7 @@ object TypelevelSettingsPlugin extends AutoPlugin {
 
   override def globalSettings = Seq(
     tlFatalWarnings := false,
+    tlJvmRelease := 8,
     Def.derive(scalaVersion := crossScalaVersions.value.last, default = true)
   )
 
@@ -201,7 +205,29 @@ object TypelevelSettingsPlugin extends AutoPlugin {
         Seq("-Werror")
       else
         Seq.empty
+    },
+    scalacOptions ++= {
+      val releaseOption = if (isJava8) Seq() else Seq("-release", tlJvmRelease.value.toString)
+      val targetOption = if (isJava8) Seq() else Seq(s"-target:${tlJvmRelease.value}")
+
+      scalaVersion.value match {
+        case V(V(2, 12, Some(build), _)) if build >= 5 =>
+          releaseOption ++ targetOption
+
+        case V(V(2, 13, _, _)) =>
+          releaseOption ++ targetOption
+
+        case V(V(3, _, _, _)) =>
+          releaseOption
+
+        case _ =>
+          Seq.empty
+      }
+    },
+    javacOptions ++= {
+      if (isJava8) Seq() else Seq("--release", tlJvmRelease.value.toString)
     }
   )
 
+  private val isJava8: Boolean = System.getProperty("java.version").startsWith("1.8")
 }
