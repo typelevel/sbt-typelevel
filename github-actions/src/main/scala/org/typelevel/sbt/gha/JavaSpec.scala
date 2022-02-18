@@ -26,7 +26,10 @@ final case class JavaSpec(dist: JavaSpec.Distribution, version: String) {
 object JavaSpec {
 
   def temurin(version: String): JavaSpec = JavaSpec(Distribution.Temurin, version)
+  def corretto(version: String): JavaSpec = JavaSpec(Distribution.Corretto, version)
   def graalvm(version: String): JavaSpec = JavaSpec(Distribution.GraalVM, version)
+  def openj9(version: String): JavaSpec = JavaSpec(Distribution.OpenJ9, version)
+  def oracle(version: String): JavaSpec = JavaSpec(Distribution.Oracle, version)
 
   @deprecated(
     "Use single-arg overload to get the latest GraalVM for a Java version. If you need a specific GraalVM then use JavaSpec(Distribution.GraalVM(graal), version)",
