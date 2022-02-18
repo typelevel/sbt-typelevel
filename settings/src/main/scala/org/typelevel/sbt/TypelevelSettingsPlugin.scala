@@ -208,14 +208,18 @@ object TypelevelSettingsPlugin extends AutoPlugin {
     },
     scalacOptions ++= {
       val releaseOption = if (isJava8) Seq() else Seq("-release", tlJvmRelease.value.toString)
-      val targetOption = if (isJava8) Seq() else Seq(s"-target:${tlJvmRelease.value}")
+      val newTargetOption = if (isJava8) Seq() else Seq(s"-target:${tlJvmRelease.value}")
+      val oldTargetOption = if (isJava8) Seq() else Seq(s"-target:jvm-1.8")
 
       scalaVersion.value match {
+        case V(V(2, 11, _, _)) =>
+          oldTargetOption
+
         case V(V(2, 12, Some(build), _)) if build >= 5 =>
-          releaseOption ++ targetOption
+          releaseOption ++ oldTargetOption
 
         case V(V(2, 13, _, _)) =>
-          releaseOption ++ targetOption
+          releaseOption ++ newTargetOption
 
         case V(V(3, _, _, _)) =>
           releaseOption
