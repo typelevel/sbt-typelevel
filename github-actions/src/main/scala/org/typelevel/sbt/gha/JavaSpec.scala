@@ -29,13 +29,26 @@ object JavaSpec {
   def graalvm(graal: String, version: String): JavaSpec =
     JavaSpec(Distribution.GraalVM(graal), version)
 
-  sealed abstract class Distribution(val rendering: String) extends Product with Serializable
+  sealed abstract class Distribution(val rendering: String) extends Product with Serializable {
+    private[gha] def isTlIndexed: Boolean = false
+  }
+
+  // marker for distributions in the typelevel jdk index
+  private[gha] sealed abstract class TlDistribution(rendering: String)
+      extends Distribution(rendering) {
+    override def isTlIndexed = true
+  }
 
   object Distribution {
-    case object Temurin extends Distribution("temurin")
+    case object Temurin extends TlDistribution("temurin")
+    case object Corretto extends TlDistribution("corretto")
+    case object GraalVM extends TlDistribution("graalvm")
+    case object OpenJ9 extends TlDistribution("openj9")
+    case object Oracle extends TlDistribution("oracle")
+
     case object Zulu extends Distribution("zulu")
+    @deprecated("AdoptOpenJDK been transitioned to Adoptium Temurin", "0.4.6")
     case object Adopt extends Distribution("adopt-hotspot")
-    case object OpenJ9 extends Distribution("adopt-openj9")
     case object Liberica extends Distribution("liberica")
     final case class GraalVM(version: String) extends Distribution(version)
   }
