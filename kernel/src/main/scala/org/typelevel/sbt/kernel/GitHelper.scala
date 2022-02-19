@@ -31,9 +31,12 @@ private[sbt] object GitHelper {
     Try {
       val merged = if (fromHead) " --merged HEAD" else ""
       // --no-contains omits tags on HEAD
-      s"git tag --no-contains HEAD$merged --sort=-v:refname # reverse".!!.split("\n").toList.map(_.trim).collect {
-        case V.Tag(version) => version
-      }
+      s"git tag --no-contains HEAD$merged --sort=-v:refname # reverse"
+        .!!
+        .split("\n")
+        .toList
+        .map(_.trim)
+        .collect { case V.Tag(version) => version }
     }.getOrElse(List.empty)
 
   def getTagOrHash(tags: Seq[String], hash: Option[String]): Option[String] =
