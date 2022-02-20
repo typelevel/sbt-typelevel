@@ -32,14 +32,43 @@ object TypelevelMimaPlugin extends AutoPlugin {
     lazy val tlVersionIntroduced =
       settingKey[Map[String, String]](
         "A map scalaBinaryVersion -> version e.g. Map('2.13' -> '1.5.2', '3' -> '1.7.1') used to indicate that a particular crossScalaVersions value was introduced in a given version (default: empty).")
+    lazy val tlMimaPreviousVersions = settingKey[Set[String]](
+      "A set of previous versions to compare binary-compatibility against (default: auto-populated from git tags and the tlVersionIntroduced setting)")
   }
 
   import autoImport._
   import TypelevelKernelPlugin.autoImport._
   import TypelevelKernelPlugin.skipIfIrrelevant
 
-  override def buildSettings = Seq(
-    tlVersionIntroduced := Map.empty
+  override def buildSettings = Seq[Setting[_]](
+    tlVersionIntroduced := Map.empty,
+    tlMimaPreviousVersions := {
+      require(
+        versionScheme.value.contains("early-semver"),
+        "Only early-semver versioning scheme supported.")
+
+      if (publishArtifact.value) {
+        val current = V(version.value)
+          // Consider it as a real release, for purposes of compat-checking
+          .map(_.copy(prerelease = None))
+          .getOrElse(sys.error(s"Version must be semver format: ${version.value}"))
+
+        val introduced = tlVersionIntroduced
+          .value
+          .get(scalaBinaryVersion.value)
+          .map(v => V(v).getOrElse(sys.error(s"Version must be semver format: $v")))
+
+        val previous = GitHelper
+          .previousReleases()
+          .filterNot(_.isPrerelease)
+          .filter(v => introduced.forall(v >= _))
+          .filter(current.mustBeBinCompatWith(_))
+
+        previous.map(_.toString).toSet
+      } else {
+        Set.empty
+      }
+    }
   )
 
   override def projectSettings = Seq[Setting[_]](
@@ -50,29 +79,8 @@ object TypelevelMimaPlugin extends AutoPlugin {
     },
     skipIfIrrelevant(mimaReportBinaryIssues),
     mimaPreviousArtifacts := {
-      require(
-        versionScheme.value.contains("early-semver"),
-        "Only early-semver versioning scheme supported.")
-      if (publishArtifact.value) {
-        val current = V(version.value)
-          // Consider it as a real release, for purposes of compat-checking
-          .map(_.copy(prerelease = None))
-          .getOrElse(sys.error(s"Version must be semver format: ${version.value}"))
-        val introduced = tlVersionIntroduced
-          .value
-          .get(scalaBinaryVersion.value)
-          .map(v => V(v).getOrElse(sys.error(s"Version must be semver format: $v")))
-        val previous = GitHelper
-          .previousReleases()
-          .filterNot(_.isPrerelease)
-          .filter(v => introduced.forall(v >= _))
-          .filter(current.mustBeBinCompatWith(_))
-        previous
-          .map(v =>
-            projectID.value.withRevision(v.toString).withExplicitArtifacts(Vector.empty))
-          .toSet
-      } else {
-        Set.empty
+      tlMimaPreviousVersions.value.map { v =>
+        projectID.value.withRevision(v).withExplicitArtifacts(Vector.empty)
       }
     }
   )
