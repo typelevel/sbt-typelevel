@@ -70,6 +70,8 @@
         
         <ul class="nav-list">
           <li class="level1"><a href="#quick-start">Quick start</a></li>
+          <li class="level2"><a href="#project-plugins-sbt"><code>project/plugins.sbt</code></a></li>
+          <li class="level2"><a href="#build-sbt"><code>build.sbt</code></a></li>
         </ul>
         
         <p class="footer"></p>
@@ -83,19 +85,59 @@
         <h2 id="quick-start" class="section">Quick start<a class="anchor-link right" href="#quick-start"><i class="icofont-laika">&#xef71;</i></a></h2>
         <p><a href="https://index.scala-lang.org/typelevel/sbt-typelevel/sbt-typelevel"><img src="https://index.scala-lang.org/typelevel/sbt-typelevel/sbt-typelevel/latest-by-scala-version.svg?targetType=Sbt" alt="sbt-typelevel Scala version support"></a>
         <a href="https://discord.gg/D7wY3aH7BQ"><img src="https://img.shields.io/discord/632277896739946517.svg?label=&logo=discord&logoColor=ffffff&color=404244&labelColor=6A7EC2" alt="Discord"></a></p>
-        <pre class="keep-together pdf epub"><code class="nohighlight"><span class="comment">// Pick one, for project/plugins.sbt
-</span><span>
-</span><span class="comment">// Full service, batteries-included, let&#39;s go!
+        <p>Pick either the <code>sbt-typelevel</code> (recommended) or <code>sbt-typelevel-ci-release</code> plugin.</p>
+        
+        <h4 id="project-plugins-sbt" class="section"><code>project/plugins.sbt</code><a class="anchor-link right" href="#project-plugins-sbt"><i class="icofont-laika">&#xef71;</i></a></h4>
+        <pre class="keep-together pdf epub"><code class="nohighlight"><span class="comment">// Full service, batteries-included, let&#39;s go!
 </span><span class="identifier">addSbtPlugin</span><span>(</span><span class="string-literal">&quot;org.typelevel&quot;</span><span> % </span><span class="string-literal">&quot;sbt-typelevel&quot;</span><span> % </span><span class="string-literal">&quot;0.4.5&quot;</span><span>)
 
 </span><span class="comment">// Set me up for CI release, but don&#39;t touch my scalacOptions!
-</span><span class="identifier">addSbtPlugin</span><span>(</span><span class="string-literal">&quot;org.typelevel&quot;</span><span> % </span><span class="string-literal">&quot;sbt-typelevel-ci-release&quot;</span><span> % </span><span class="string-literal">&quot;0.4.5&quot;</span><span>)
+</span><span class="identifier">addSbtPlugin</span><span>(</span><span class="string-literal">&quot;org.typelevel&quot;</span><span> % </span><span class="string-literal">&quot;sbt-typelevel-ci-release&quot;</span><span> % </span><span class="string-literal">&quot;0.4.5&quot;</span><span>)</span></code></pre>
+        <p>Then configure your build.</p>
+        
+        <h4 id="build-sbt" class="section"><code>build.sbt</code><a class="anchor-link right" href="#build-sbt"><i class="icofont-laika">&#xef71;</i></a></h4>
+        <pre><code class="nohighlight"><span class="type-name">ThisBuild</span><span> / </span><span class="identifier">tlBaseVersion</span><span> := </span><span class="string-literal">&quot;0.4&quot;</span><span> </span><span class="comment">// your current series x.y
+</span><span>
+</span><span class="type-name">ThisBuild</span><span> / </span><span class="identifier">organization</span><span> := </span><span class="string-literal">&quot;org.typelevel&quot;</span><span>
+</span><span class="type-name">ThisBuild</span><span> / </span><span class="identifier">organizationName</span><span> := </span><span class="string-literal">&quot;Typelevel&quot;</span><span>
+</span><span class="type-name">ThisBuild</span><span> / </span><span class="identifier">licenses</span><span> := </span><span class="type-name">Seq</span><span>(</span><span class="type-name">License</span><span>.</span><span class="type-name">Apache2</span><span>)
+</span><span class="type-name">ThisBuild</span><span> / </span><span class="identifier">developers</span><span> := </span><span class="type-name">Seq</span><span>(
+  </span><span class="comment">// your GitHub handle and name
+</span><span>  </span><span class="identifier">tlGitHubDev</span><span>(</span><span class="string-literal">&quot;armanbilge&quot;</span><span>, </span><span class="string-literal">&quot;Arman Bilge&quot;</span><span>)
+)
 
-</span><span class="comment">// Then, in your build.sbt
-</span><span class="type-name">ThisBuild</span><span> / </span><span class="identifier">tlBaseVersion</span><span> := </span><span class="string-literal">&quot;0.4&quot;</span><span> </span><span class="comment">// your current series x.y
-</span><span class="type-name">ThisBuild</span><span> / </span><span class="identifier">developers</span><span> +=
-  </span><span class="identifier">tlGitHubDev</span><span>(</span><span class="string-literal">&quot;armanbilge&quot;</span><span>, </span><span class="string-literal">&quot;Arman Bilge&quot;</span><span>) </span><span class="comment">// your GitHub handle and name</span></code></pre>
-        <p>Next, run <code>githubWorkflowGenerate</code> in sbt to automatically generate the GitHub Actions workflows.</p>
+</span><span class="comment">// true by default, set to false to publish to s01.oss.sonatype.org
+</span><span class="type-name">ThisBuild</span><span> / </span><span class="identifier">tlSonatypeUseLegacyHost</span><span> := </span><span class="boolean-literal">true</span><span>
+
+</span><span class="keyword">val</span><span> </span><span class="type-name">Scala213</span><span> = </span><span class="string-literal">&quot;2.13.8&quot;</span><span>
+</span><span class="type-name">ThisBuild</span><span> / </span><span class="identifier">crossScalaVersions</span><span> := </span><span class="type-name">Seq</span><span>(</span><span class="type-name">Scala213</span><span>, </span><span class="string-literal">&quot;3.1.1&quot;</span><span>)
+</span><span class="type-name">ThisBuild</span><span> / </span><span class="identifier">scalaVersion</span><span> := </span><span class="type-name">Scala213</span><span> </span><span class="comment">// the default Scala
+</span><span>
+</span><span class="keyword">lazy</span><span> </span><span class="keyword">val</span><span> </span><span class="identifier">root</span><span> = </span><span class="identifier">tlCrossRootProject</span><span>.</span><span class="identifier">aggregate</span><span>(</span><span class="identifier">core</span><span>, </span><span class="identifier">extra</span><span>, </span><span class="identifier">tests</span><span>)
+
+</span><span class="keyword">lazy</span><span> </span><span class="keyword">val</span><span> </span><span class="identifier">core</span><span> = </span><span class="identifier">crossProject</span><span>(</span><span class="type-name">JVMPlatform</span><span>, </span><span class="type-name">JSPlatform</span><span>)
+  .</span><span class="identifier">in</span><span>(</span><span class="identifier">file</span><span>(</span><span class="string-literal">&quot;core&quot;</span><span>))
+  .</span><span class="identifier">settings</span><span>(
+    </span><span class="identifier">name</span><span> := </span><span class="string-literal">&quot;woozle-core&quot;</span><span>,
+    </span><span class="identifier">libraryDependencies</span><span> += </span><span class="string-literal">&quot;org.typelevel&quot;</span><span> %%% </span><span class="string-literal">&quot;cats-core&quot;</span><span> % </span><span class="string-literal">&quot;2.7.0&quot;</span><span>
+  )
+
+</span><span class="keyword">lazy</span><span> </span><span class="keyword">val</span><span> </span><span class="identifier">extra</span><span> = </span><span class="identifier">project</span><span>
+  .</span><span class="identifier">in</span><span>(</span><span class="identifier">file</span><span>(</span><span class="string-literal">&quot;extra&quot;</span><span>))
+  .</span><span class="identifier">dependsOn</span><span>(</span><span class="identifier">core</span><span>.</span><span class="identifier">jvm</span><span>)
+  .</span><span class="identifier">settings</span><span>(</span><span class="identifier">name</span><span> := </span><span class="string-literal">&quot;woozle-extra&quot;</span><span>)
+
+</span><span class="keyword">lazy</span><span> </span><span class="keyword">val</span><span> </span><span class="identifier">tests</span><span> = </span><span class="identifier">crossProject</span><span>(</span><span class="type-name">JVMPlatform</span><span>, </span><span class="type-name">JSPlatform</span><span>)
+  .</span><span class="identifier">in</span><span>(</span><span class="identifier">file</span><span>(</span><span class="string-literal">&quot;tests&quot;</span><span>))
+  .</span><span class="identifier">enablePlugins</span><span>(</span><span class="type-name">NoPublishPlugin</span><span>)
+  .</span><span class="identifier">dependsOn</span><span>(</span><span class="identifier">core</span><span>)
+  .</span><span class="identifier">settings</span><span>(
+    </span><span class="identifier">name</span><span> := </span><span class="string-literal">&quot;woozle-tests&quot;</span><span>,
+    </span><span class="identifier">libraryDependencies</span><span> += </span><span class="string-literal">&quot;org.scalacheck&quot;</span><span> %%% </span><span class="string-literal">&quot;scalacheck&quot;</span><span> % </span><span class="string-literal">&quot;1.15.4&quot;</span><span> % </span><span class="type-name">Test</span><span>
+  )</span></code></pre>
+        <p>Next, run <code>githubWorkflowGenerate</code> in sbt to automatically generate the GitHub Actions workflows.
+        This will create a build matrix with axes for Scala version and target platform (JVM, JS, etc.).
+        It will also setup a job for publishing tagged releases e.g. <code>v0.4.5</code> to Sonatype/Maven.</p>
         <p>Finally, on GitHub set the following secrets on your repository:</p>
         <ul>
           <li><code>SONATYPE_USERNAME</code> and <code>SONATYPE_PASSWORD</code></li>
