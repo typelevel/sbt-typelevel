@@ -27,7 +27,7 @@ object JavaSpec {
 
   def temurin(version: String): JavaSpec = JavaSpec(Distribution.Temurin, version)
   def corretto(version: String): JavaSpec = JavaSpec(Distribution.Corretto, version)
-  def graalvm(version: String): JavaSpec = JavaSpec(Distribution.GraalVM, version)
+  def graalvm(version: String): JavaSpec = JavaSpec(Distribution.LatestGraalVM, version)
   def openj9(version: String): JavaSpec = JavaSpec(Distribution.OpenJ9, version)
   def oracle(version: String): JavaSpec = JavaSpec(Distribution.Oracle, version)
 
@@ -50,7 +50,7 @@ object JavaSpec {
   object Distribution {
     case object Temurin extends TlDistribution("temurin")
     case object Corretto extends TlDistribution("corretto")
-    case object GraalVM extends TlDistribution("graalvm")
+    case object LatestGraalVM extends TlDistribution("graalvm")
     case object OpenJ9 extends TlDistribution("openj9")
     case object Oracle extends TlDistribution("oracle")
 
