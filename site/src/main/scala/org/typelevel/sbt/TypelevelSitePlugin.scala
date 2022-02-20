@@ -180,14 +180,4 @@ object TypelevelSitePlugin extends AutoPlugin {
       )
   )
 
-  private def getSvgLogo: String = {
-    // val src = Source.fromURL(getClass.getResource("/logo.svg"))
-    // try {
-    //   Base64.getEncoder().encodeToString(src.mkString.getBytes)
-    // } finally {
-    //   src.close()
-    // }
-    ""
-  }
-
 }
