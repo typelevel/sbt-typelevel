@@ -47,27 +47,23 @@ object TypelevelMimaPlugin extends AutoPlugin {
         versionScheme.value.contains("early-semver"),
         "Only early-semver versioning scheme supported.")
 
-      if (publishArtifact.value) {
-        val current = V(version.value)
-          // Consider it as a real release, for purposes of compat-checking
-          .map(_.copy(prerelease = None))
-          .getOrElse(sys.error(s"Version must be semver format: ${version.value}"))
+      val current = V(version.value)
+        // Consider it as a real release, for purposes of compat-checking
+        .map(_.copy(prerelease = None))
+        .getOrElse(sys.error(s"Version must be semver format: ${version.value}"))
 
-        val introduced = tlVersionIntroduced
-          .value
-          .get(scalaBinaryVersion.value)
-          .map(v => V(v).getOrElse(sys.error(s"Version must be semver format: $v")))
+      val introduced = tlVersionIntroduced
+        .value
+        .get(scalaBinaryVersion.value)
+        .map(v => V(v).getOrElse(sys.error(s"Version must be semver format: $v")))
 
-        val previous = GitHelper
-          .previousReleases()
-          .filterNot(_.isPrerelease)
-          .filter(v => introduced.forall(v >= _))
-          .filter(current.mustBeBinCompatWith(_))
+      val previous = GitHelper
+        .previousReleases()
+        .filterNot(_.isPrerelease)
+        .filter(v => introduced.forall(v >= _))
+        .filter(current.mustBeBinCompatWith(_))
 
-        previous.map(_.toString).toSet
-      } else {
-        Set.empty
-      }
+      previous.map(_.toString).toSet
     }
   )
 
@@ -79,9 +75,12 @@ object TypelevelMimaPlugin extends AutoPlugin {
     },
     skipIfIrrelevant(mimaReportBinaryIssues),
     mimaPreviousArtifacts := {
-      tlMimaPreviousVersions.value.map { v =>
-        projectID.value.withRevision(v).withExplicitArtifacts(Vector.empty)
-      }
+      if (publishArtifact.value)
+        tlMimaPreviousVersions.value.map { v =>
+          projectID.value.withRevision(v).withExplicitArtifacts(Vector.empty)
+        }
+      else
+        Set.empty
     }
   )
 
