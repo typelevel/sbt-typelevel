@@ -16,18 +16,26 @@
 
 package org.typelevel.sbt
 
-import sbt._, Keys._
-import mdoc.MdocPlugin, MdocPlugin.autoImport._
-import laika.ast._
 import laika.ast.LengthUnit._
-import laika.sbt.LaikaPlugin, LaikaPlugin.autoImport._
+import laika.ast._
 import laika.helium.Helium
-import laika.helium.config.{HeliumIcon, IconLink, ImageLink}
+import laika.helium.config.Favicon
+import laika.helium.config.HeliumIcon
+import laika.helium.config.IconLink
+import laika.helium.config.ImageLink
+import laika.sbt.LaikaPlugin
+import laika.theme.ThemeProvider
+import mdoc.MdocPlugin
 import org.typelevel.sbt.kernel.GitHelper
-import gha.GenerativePlugin, GenerativePlugin.autoImport._
-import scala.io.Source
-import java.util.Base64
+import sbt._
+
 import scala.annotation.nowarn
+
+import Keys._
+import MdocPlugin.autoImport._
+import LaikaPlugin.autoImport._
+import gha.GenerativePlugin
+import GenerativePlugin.autoImport._
 
 object TypelevelSitePlugin extends AutoPlugin {
 
@@ -43,6 +51,9 @@ object TypelevelSitePlugin extends AutoPlugin {
     lazy val tlSitePublishBranch = settingKey[Option[String]](
       "The branch to publish the site from on every push. Set this to None if you only want to update the site on tag releases. (default: main)")
     lazy val tlSite = taskKey[Unit]("Generate the site (default: runs mdoc then laika)")
+
+    implicit def tlLaikaThemeProviderOps(provider: ThemeProvider): LaikaThemeProviderOps =
+      new LaikaThemeProviderOps(provider)
   }
 
   import autoImport._
@@ -71,7 +82,10 @@ object TypelevelSitePlugin extends AutoPlugin {
       )
       .value: @nowarn("cat=other-pure-statement"),
     Laika / sourceDirectories := Seq(mdocOut.value),
-    laikaTheme := tlSiteHeliumConfig.value.build,
+    laikaTheme := tlSiteHeliumConfig
+      .value
+      .build
+      .extend(TypelevelHeliumExtensions(licenses.value.headOption)),
     mdocVariables ++= Map(
       "VERSION" -> GitHelper
         .previousReleases(fromHead = true)
@@ -84,6 +98,13 @@ object TypelevelSitePlugin extends AutoPlugin {
       Helium
         .defaults
         .site
+        .metadata(
+          title = gitHubUserRepo.value.map(_._2),
+          authors = developers.value.map(_.name),
+          language = Some("en"),
+          version = Some(version.value.toString)
+        )
+        .site
         .layout(
           contentWidth = px(860),
           navigationWidth = px(275),
@@ -92,15 +113,15 @@ object TypelevelSitePlugin extends AutoPlugin {
           defaultLineHeight = 1.5,
           anchorPlacement = laika.helium.config.AnchorPlacement.Right
         )
-        // .site
-        // .favIcons( // TODO broken?
-        //   Favicon.external("https://typelevel.org/img/favicon.png", "32x32", "image/png")
-        // )
+        .site
+        .favIcons(
+          Favicon.external("https://typelevel.org/img/favicon.png", "32x32", "image/png")
+        )
         .site
         .topNavigationBar(
           homeLink = ImageLink.external(
             "https://typelevel.org",
-            Image.external(s"data:image/svg+xml;base64,$getSvgLogo")
+            Image.external(s"https://typelevel.org/img/logo.svg")
           ),
           navLinks = tlSiteApiUrl.value.toList.map { url =>
             IconLink.external(
@@ -160,12 +181,13 @@ object TypelevelSitePlugin extends AutoPlugin {
   )
 
   private def getSvgLogo: String = {
-    val src = Source.fromURL(getClass.getResource("/logo.svg"))
-    try {
-      Base64.getEncoder().encodeToString(src.mkString.getBytes)
-    } finally {
-      src.close()
-    }
+    // val src = Source.fromURL(getClass.getResource("/logo.svg"))
+    // try {
+    //   Base64.getEncoder().encodeToString(src.mkString.getBytes)
+    // } finally {
+    //   src.close()
+    // }
+    ""
   }
 
 }

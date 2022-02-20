@@ -18,6 +18,8 @@ package org.typelevel.sbt
 
 import cats.effect.Resource
 import cats.effect.Sync
+import laika.ast.Path
+import laika.config.Config
 import laika.io.model.InputTree
 import laika.markdown.github.GitHubFlavor
 import laika.parse.code.SyntaxHighlighting
@@ -26,16 +28,36 @@ import laika.theme.Theme
 import laika.theme.ThemeBuilder
 import laika.theme.ThemeProvider
 
-object TypelevelHeliumExtensions extends ThemeProvider {
+import java.net.URL
 
-  override def build[F[_]](implicit F: Sync[F]): Resource[F, Theme[F]] =
-    ThemeBuilder[F]("Typelevel Helium Extensions")
-      .addInputs(
-        InputTree[F].addStream(
-          F.blocking(getClass.getResourceAsStream("helium/default.template.html")),
-          DefaultTemplatePath.forHTML
-        ))
-      .addExtensions(GitHubFlavor, SyntaxHighlighting)
-      .build
+object TypelevelHeliumExtensions {
+
+  def apply(license: Option[(String, URL)]): ThemeProvider = new ThemeProvider {
+    def build[F[_]](implicit F: Sync[F]): Resource[F, Theme[F]] =
+      ThemeBuilder[F]("Typelevel Helium Extensions")
+        .addInputs(
+          InputTree[F]
+            .addStream(
+              F.blocking(getClass.getResourceAsStream("helium/default.template.html")),
+              DefaultTemplatePath.forHTML
+            )
+            .addStream(
+              F.blocking(getClass.getResourceAsStream("helium/site/styles.css")),
+              Path.Root / "site" / "styles.css"
+            )
+        )
+        .addExtensions(GitHubFlavor, SyntaxHighlighting)
+        .addBaseConfig(
+          license.fold(Config.empty) {
+            case (name, url) =>
+              Config
+                .empty
+                .withValue("typelevel.site.license.name", name)
+                .withValue("typelevel.site.license.url", url.toString)
+                .build
+          }
+        )
+        .build
+  }
 
 }

@@ -66,6 +66,14 @@
         ]
       }
       
+      <ul class="nav-list">
+        <li class="level1 nav-header">Related Projects</li>
+        <li class="level2"><a href="https://typelevel.org/cats/">cats</a></li>
+        <li class="level2"><a href="https://typelevel.org/cats-effect/">cats-effect</a></li>
+        <li class="level2"><a href="https://fs2.io/">fs2</a></li>
+        <li class="level2"><a href="https://scalacheck.org/">scalacheck</a></li>
+      </ul>
+
     </nav>
 
     <div id="container">
@@ -85,6 +93,11 @@
       <main class="content">
 
         ${cursor.currentDocument.content}
+
+        <hr style="margin-top: 30px"/>
+        <footer style="font-size: 90%; text-align: center">
+          ${laika.site.metadata.title} is a <a href="https://typelevel.org/">Typelevel</a> project distributed under the <a @:attribute(href, typelevel.site.license.url)>${typelevel.site.license.name}</a> license.
+        </footer>
 
       </main>
 
