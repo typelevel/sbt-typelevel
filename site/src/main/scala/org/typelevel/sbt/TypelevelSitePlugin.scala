@@ -137,7 +137,7 @@ object TypelevelSitePlugin extends AutoPlugin {
             .value
             .toPath
             .toAbsolutePath
-            .relativize(((Laika / target).value / "site").toPath)
+            .relativize((laikaSite / target).value.toPath)
             .toString,
           "keep_files" -> tlSiteKeepFiles.value.toString
         ),
