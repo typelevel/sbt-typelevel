@@ -74,10 +74,12 @@ object TypelevelVersioningPlugin extends AutoPlugin {
           .previousReleases(true)
           .filterNot(_.isPrerelease) // TODO Ordering of pre-releases is arbitrary
           .headOption
-          .flatMap { previous =>
-            if (previous > baseV)
+          .flatMap {
+            case previous if previous > baseV =>
               sys.error(s"Your tlBaseVersion $baseV is behind the latest tag $previous")
-            else Some(previous).filter(baseV.isSameSeries)
+            case previous if baseV.isSameSeries(previous) =>
+              Some(previous)
+            case _ => None
           }
 
         // version here is the prefix used further to build a final version number
