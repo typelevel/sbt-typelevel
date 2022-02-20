@@ -50,7 +50,7 @@ object TypelevelVersioningPlugin extends AutoPlugin {
     git.gitCurrentTags := {
       // https://docs.github.com/en/actions/learn-github-actions/environment-variables
       // GITHUB_REF_TYPE is either `branch` or `tag`
-      if (sys.env.get("GITHUB_REF_TYPE").exists(_ == "branch"))
+      if (sys.env.get("GITHUB_REF_TYPE").contains("branch"))
         // we are running in a workflow job that was *not* triggered by a tag
         // so, we discard tags that would affect our versioning
         git.gitCurrentTags.value.flatMap {
@@ -77,10 +77,7 @@ object TypelevelVersioningPlugin extends AutoPlugin {
           .flatMap { previous =>
             if (previous > baseV)
               sys.error(s"Your tlBaseVersion $baseV is behind the latest tag $previous")
-            else if (baseV.isSameSeries(previous))
-              Some(previous)
-            else
-              None
+            else Some(previous).filter(baseV.isSameSeries)
           }
 
         // version here is the prefix used further to build a final version number
@@ -123,6 +120,6 @@ object TypelevelVersioningPlugin extends AutoPlugin {
   private val Description = """^.*-(\d+)-[a-zA-Z0-9]+$""".r
 
   private def getTaggedVersion(tags: Seq[String]): Option[V] =
-    tags.collect { case V.Tag(v) => v }.headOption
+    tags.collectFirst { case V.Tag(v) => v }
 
 }
