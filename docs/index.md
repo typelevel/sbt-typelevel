@@ -55,7 +55,7 @@ lazy val extra = project
 lazy val tests = crossProject(JVMPlatform, JSPlatform)
   .in(file("tests"))
   .enablePlugins(NoPublishPlugin)
-  .dependsOn(core, extra)
+  .dependsOn(core)
   .settings(
     name := "woozle-tests",
     libraryDependencies += "org.scalacheck" %%% "scalacheck" % "1.15.4" % Test
