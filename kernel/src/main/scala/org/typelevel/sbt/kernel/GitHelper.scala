@@ -40,6 +40,6 @@ private[sbt] object GitHelper {
     }.getOrElse(List.empty)
 
   def getTagOrHash(tags: Seq[String], hash: Option[String]): Option[String] =
-    tags.collect { case v @ V.Tag(_) => v }.headOption.orElse(hash)
+    tags.collectFirst { case v @ V.Tag(_) => v }.orElse(hash)
 
 }
