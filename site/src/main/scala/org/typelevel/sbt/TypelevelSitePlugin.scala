@@ -118,10 +118,6 @@ object TypelevelSitePlugin extends AutoPlugin {
           )
         )
     },
-    laikaExtensions ++= Seq(
-      laika.markdown.github.GitHubFlavor,
-      laika.parse.code.SyntaxHighlighting
-    ),
     tlSiteGenerate := List(
       WorkflowStep.Sbt(
         List(s"${thisProject.value.id}/${tlSite.key.toString}"),
