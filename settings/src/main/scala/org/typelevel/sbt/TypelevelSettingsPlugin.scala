@@ -30,8 +30,8 @@ object TypelevelSettingsPlugin extends AutoPlugin {
     lazy val tlFatalWarnings =
       settingKey[Boolean]("Convert compiler warnings into errors (default: false)")
     lazy val tlJdkRelease =
-      settingKey[Int](
-        "JVM target version for the compiled bytecode (default: 8, supported values: 8, 9, 10, 11, 12, 13, 14, 15, 16, 17)")
+      settingKey[Option[Int]](
+        "JVM target version for the compiled bytecode, None results in default scalac and javac behavior (no --release flag is specified). (default: Some(8), supported values: 8, 9, 10, 11, 12, 13, 14, 15, 16, 17)")
   }
 
   import autoImport._
@@ -39,7 +39,7 @@ object TypelevelSettingsPlugin extends AutoPlugin {
 
   override def globalSettings = Seq(
     tlFatalWarnings := false,
-    tlJdkRelease := 8,
+    tlJdkRelease := Some(8),
     Def.derive(scalaVersion := crossScalaVersions.value.last, default = true)
   )
 
@@ -207,9 +207,18 @@ object TypelevelSettingsPlugin extends AutoPlugin {
         Seq.empty
     },
     scalacOptions ++= {
-      val releaseOption = if (isJava8) Seq() else Seq("-release", tlJdkRelease.value.toString)
-      val newTargetOption = if (isJava8) Seq() else Seq(s"-target:${tlJdkRelease.value}")
-      val oldTargetOption = if (isJava8) Seq() else Seq(s"-target:jvm-1.8")
+      val releaseOption = tlJdkRelease
+        .value
+        .map { release => if (isJava8) Seq() else Seq("-release", release.toString) }
+        .getOrElse(Seq())
+      val newTargetOption = tlJdkRelease
+        .value
+        .map { release => if (isJava8) Seq() else Seq(s"-target:$release") }
+        .getOrElse(Seq())
+      val oldTargetOption = tlJdkRelease
+        .value
+        .map { _ => if (isJava8) Seq() else Seq(s"-target:jvm-1.8") }
+        .getOrElse(Seq())
 
       scalaVersion.value match {
         case V(V(2, 11, _, _)) =>
