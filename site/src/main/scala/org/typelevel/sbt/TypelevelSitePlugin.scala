@@ -42,6 +42,8 @@ object TypelevelSitePlugin extends AutoPlugin {
       "A sequence of workflow steps which publishes the site (default: peaceiris/actions-gh-pages)")
     lazy val tlSitePublishBranch = settingKey[Option[String]](
       "The branch to publish the site from on every push. Set this to None if you only want to update the site on tag releases. (default: main)")
+    lazy val tlSitePublishTags = settingKey[Boolean](
+      "Defines whether the site should be published on tag releases. Note on setting this to true requires the 'tlSitePublishBranch' setting to be set to None. (default: false)")
     lazy val tlSite = taskKey[Unit]("Generate the site (default: runs mdoc then laika)")
   }
 
@@ -53,6 +55,7 @@ object TypelevelSitePlugin extends AutoPlugin {
 
   override def buildSettings = Seq(
     tlSitePublishBranch := Some("main"),
+    tlSitePublishTags := tlSitePublishBranch.value.fold(true)(_ => false),
     tlSiteApiUrl := None,
     tlSiteKeepFiles := true,
     homepage := {
@@ -128,30 +131,50 @@ object TypelevelSitePlugin extends AutoPlugin {
         name = Some("Generate site")
       )
     ),
-    tlSitePublish := List(
-      WorkflowStep.Use(
-        UseRef.Public("peaceiris", "actions-gh-pages", "v3.8.0"),
-        Map(
-          "github_token" -> s"$${{ secrets.GITHUB_TOKEN }}",
-          "publish_dir" -> (ThisBuild / baseDirectory)
-            .value
-            .toPath
-            .toAbsolutePath
-            .relativize((laikaSite / target).value.toPath)
-            .toString,
-          "keep_files" -> tlSiteKeepFiles.value.toString
-        ),
-        name = Some("Publish site"),
-        cond = {
-          val predicate = tlSitePublishBranch
-            .value // Either publish from branch or on tags, not both
-            .fold[RefPredicate](RefPredicate.StartsWith(Ref.Tag("v")))(b =>
-              RefPredicate.Equals(Ref.Branch(b)))
-          val publicationCond = GenerativePlugin.compileBranchPredicate("github.ref", predicate)
-          Some(s"github.event_name != 'pull_request' && $publicationCond")
-        }
-      )
-    ),
+    tlSitePublish := {
+      def publishSiteWorkflowStep(publishPredicate: RefPredicate) =
+        List(
+          WorkflowStep.Use(
+            UseRef.Public("peaceiris", "actions-gh-pages", "v3.8.0"),
+            Map(
+              "github_token" -> s"$${{ secrets.GITHUB_TOKEN }}",
+              "publish_dir" -> (ThisBuild / baseDirectory)
+                .value
+                .toPath
+                .toAbsolutePath
+                .relativize((laikaSite / target).value.toPath)
+                .toString,
+              "keep_files" -> tlSiteKeepFiles.value.toString
+            ),
+            name = Some("Publish site"),
+            cond = {
+              val predicate = publishPredicate
+              val publicationCond =
+                GenerativePlugin.compileBranchPredicate("github.ref", predicate)
+              Some(s"github.event_name != 'pull_request' && $publicationCond")
+            }
+          )
+        )
+
+      val tlSitePublishTagsV = tlSitePublishTags.value
+      val tlSitePublishBranchV = tlSitePublishBranch.value
+
+      tlSitePublishTagsV -> tlSitePublishBranchV match {
+        case (true, Some(_)) =>
+          sys.error(
+            s"'tlSitePublishTags' setting is set to 'true' which conflicts with 'tlSitePublishBranch' which is non-empty. " +
+              s"Site publishing is available from tags or a particular branch, not from both.")
+
+        case (true, None) =>
+          publishSiteWorkflowStep(RefPredicate.StartsWith(Ref.Tag("v")))
+
+        case (false, Some(branch)) =>
+          publishSiteWorkflowStep(RefPredicate.Equals(Ref.Branch(branch)))
+
+        case (false, None) =>
+          List.empty
+      }
+    },
     ThisBuild / githubWorkflowAddedJobs +=
       WorkflowJob(
         "site",
