@@ -1,6 +1,15 @@
 # sbt-typelevel
 
-sbt-typelevel helps Scala projects to publish early-semantically-versioned, binary-compatible artifacts to Sonatype/Maven from GitHub actions. It is a collection of plugins that work well individually and even better together.
+sbt-typelevel configures [sbt](https://www.scala-sbt.org/) for developing, testing, cross-building, publishing, and documenting your Scala library on GitHub, with a focus on semantic versioning and binary compatibility. It is a collection of plugins that work well individually and even better together.
+
+## Features
+
+- Auto-generated GitHub actions workflows, parallelized on Scala version and platform (JVM, JS, Native)
+- git-based dynamic versioning
+- Binary-compatibility checking with [MiMa](https://github.com/lightbend/mima), following [early semantic versioning](https://www.scala-lang.org/blog/2021/02/16/preventing-version-conflicts-with-versionscheme.html#early-semver-and-sbt-version-policy)
+- CI publishing of releases and snapshots to Sonatype/Maven
+- CI deployed GitHub pages microsites, generated with [mdoc](https://github.com/scalameta/mdoc/) and [Laika](https://github.com/planet42/laika)
+- Auto-populated settings for various boilerplate (SCM info, API doc urls, Scala.js sourcemaps, etc.)
 
 ## Quick start
 
@@ -66,8 +75,8 @@ lazy val tests = crossProject(JVMPlatform, JSPlatform)
 ```
 
 Next, run `githubWorkflowGenerate` in sbt to automatically generate the GitHub Actions workflows.
-This will create a build matrix with axes for Scala version and target platform (JVM, JS, etc.).
-It will also setup a job for publishing tagged releases e.g. `v0.4.5` to Sonatype/Maven.
+This will create a CI matrix parallelized on Scala version and target platform (JVM, JS, etc.) and includes steps for running tests and checking binary compatibility.
+It will also setup a job for publishing tagged releases e.g. `v0.4.5` and snapshots to Sonatype/Maven.
 
 Finally, on GitHub set the following secrets on your repository:
 
