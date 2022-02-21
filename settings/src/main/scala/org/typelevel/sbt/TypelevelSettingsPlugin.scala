@@ -102,7 +102,7 @@ object TypelevelSettingsPlugin extends AutoPlugin {
         "-Wvalue-discard"
       )
 
-      val warningsDotty = Seq()
+      val warningsDotty = Seq.empty
 
       scalaVersion.value match {
         case V(V(3, _, _, _)) =>
@@ -157,7 +157,7 @@ object TypelevelSettingsPlugin extends AutoPlugin {
     },
     Test / scalacOptions ++= {
       if (tlIsScala3.value)
-        Seq()
+        Seq.empty
       else
         Seq("-Yrangepos")
     },
@@ -209,16 +209,16 @@ object TypelevelSettingsPlugin extends AutoPlugin {
     scalacOptions ++= {
       val releaseOption = tlJdkRelease
         .value
-        .map { release => if (isJava8) Seq() else Seq("-release", release.toString) }
-        .getOrElse(Seq())
+        .map { release => if (isJava8) Seq.empty else Seq("-release", release.toString) }
+        .getOrElse(Seq.empty)
       val newTargetOption = tlJdkRelease
         .value
-        .map { release => if (isJava8) Seq() else Seq(s"-target:$release") }
-        .getOrElse(Seq())
+        .map { release => if (isJava8) Seq.empty else Seq(s"-target:$release") }
+        .getOrElse(Seq.empty)
       val oldTargetOption = tlJdkRelease
         .value
-        .map { _ => if (isJava8) Seq() else Seq(s"-target:jvm-1.8") }
-        .getOrElse(Seq())
+        .map { _ => if (isJava8) Seq.empty else Seq(s"-target:jvm-1.8") }
+        .getOrElse(Seq.empty)
 
       scalaVersion.value match {
         case V(V(2, 11, _, _)) =>
@@ -238,7 +238,7 @@ object TypelevelSettingsPlugin extends AutoPlugin {
       }
     },
     javacOptions ++= {
-      if (isJava8) Seq() else Seq("--release", tlJdkRelease.value.toString)
+      if (isJava8) Seq.empty else Seq("--release", tlJdkRelease.value.toString)
     }
   )
 
