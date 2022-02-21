@@ -159,7 +159,7 @@ object TypelevelSitePlugin extends AutoPlugin {
       val tlSitePublishTagsV = tlSitePublishTags.value
       val tlSitePublishBranchV = tlSitePublishBranch.value
 
-      tlSitePublishTagsV -> tlSitePublishBranchV match {
+      (tlSitePublishTagsV, tlSitePublishBranchV) match {
         case (true, Some(_)) =>
           sys.error(
             s"'tlSitePublishTags' setting is set to 'true' which conflicts with 'tlSitePublishBranch' which is non-empty. " +
