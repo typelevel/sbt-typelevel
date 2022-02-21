@@ -55,7 +55,7 @@ object TypelevelSitePlugin extends AutoPlugin {
 
   override def buildSettings = Seq(
     tlSitePublishBranch := Some("main"),
-    tlSitePublishTags := tlSitePublishBranch.value.isEmpty
+    tlSitePublishTags := tlSitePublishBranch.value.isEmpty,
     tlSiteApiUrl := None,
     tlSiteKeepFiles := true,
     homepage := {
