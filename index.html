@@ -69,6 +69,7 @@
         <p class="header"><a href="#">sbt-typelevel</a></p>
         
         <ul class="nav-list">
+          <li class="level1"><a href="#features">Features</a></li>
           <li class="level1"><a href="#quick-start">Quick start</a></li>
           <li class="level2"><a href="#project-plugins-sbt"><code>project/plugins.sbt</code></a></li>
           <li class="level2"><a href="#build-sbt"><code>build.sbt</code></a></li>
@@ -80,7 +81,17 @@
       <main class="content">
 
         <h1 id="sbt-typelevel" class="title">sbt-typelevel</h1>
-        <p>sbt-typelevel helps Scala projects to publish early-semantically-versioned, binary-compatible artifacts to Sonatype/Maven from GitHub actions. It is a collection of plugins that work well individually and even better together.</p>
+        <p>sbt-typelevel configures <a href="https://www.scala-sbt.org/">sbt</a> for developing, testing, cross-building, publishing, and documenting your Scala library on GitHub, with a focus on semantic versioning and binary compatibility. It is a collection of plugins that work well individually and even better together.</p>
+        
+        <h2 id="features" class="section">Features<a class="anchor-link right" href="#features"><i class="icofont-laika">&#xef71;</i></a></h2>
+        <ul>
+          <li>Auto-generated GitHub actions workflows, parallelized on Scala version and platform (JVM, JS, Native)</li>
+          <li>git-based dynamic versioning</li>
+          <li>Binary-compatibility checking with <a href="https://github.com/lightbend/mima">MiMa</a>, following <a href="https://www.scala-lang.org/blog/2021/02/16/preventing-version-conflicts-with-versionscheme.html#early-semver-and-sbt-version-policy">early semantic versioning</a></li>
+          <li>CI publishing of releases and snapshots to Sonatype/Maven</li>
+          <li>CI deployed GitHub pages microsites, generated with <a href="https://github.com/scalameta/mdoc/">mdoc</a> and <a href="https://github.com/planet42/laika">Laika</a></li>
+          <li>Auto-populated settings for various boilerplate (SCM info, API doc urls, Scala.js sourcemaps, etc.)</li>
+        </ul>
         
         <h2 id="quick-start" class="section">Quick start<a class="anchor-link right" href="#quick-start"><i class="icofont-laika">&#xef71;</i></a></h2>
         <p><a href="https://index.scala-lang.org/typelevel/sbt-typelevel/sbt-typelevel"><img src="https://index.scala-lang.org/typelevel/sbt-typelevel/sbt-typelevel/latest-by-scala-version.svg?targetType=Sbt" alt="sbt-typelevel Scala version support"></a>
@@ -136,8 +147,8 @@
     </span><span class="identifier">libraryDependencies</span><span> += </span><span class="string-literal">&quot;org.scalacheck&quot;</span><span> %%% </span><span class="string-literal">&quot;scalacheck&quot;</span><span> % </span><span class="string-literal">&quot;1.15.4&quot;</span><span> % </span><span class="type-name">Test</span><span>
   )</span></code></pre>
         <p>Next, run <code>githubWorkflowGenerate</code> in sbt to automatically generate the GitHub Actions workflows.
-        This will create a build matrix with axes for Scala version and target platform (JVM, JS, etc.).
-        It will also setup a job for publishing tagged releases e.g. <code>v0.4.5</code> to Sonatype/Maven.</p>
+        This will create a CI matrix parallelized on Scala version and target platform (JVM, JS, etc.) and includes steps for running tests and checking binary compatibility.
+        It will also setup a job for publishing tagged releases e.g. <code>v0.4.5</code> and snapshots to Sonatype/Maven.</p>
         <p>Finally, on GitHub set the following secrets on your repository:</p>
         <ul>
           <li><code>SONATYPE_USERNAME</code> and <code>SONATYPE_PASSWORD</code></li>
