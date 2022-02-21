@@ -209,15 +209,27 @@ object TypelevelSettingsPlugin extends AutoPlugin {
     scalacOptions ++= {
       val releaseOption = tlJdkRelease
         .value
-        .map { release => if (isJava8) Seq.empty else Seq("-release", release.toString) }
+        .map {
+          case 8 if isJava8 => Seq.empty
+          case n if n >= 8 => Seq("-release", n.toString)
+          case n => sys.error(s"'$n' is not a valid choice for '-release'")
+        }
         .getOrElse(Seq.empty)
       val newTargetOption = tlJdkRelease
         .value
-        .map { release => if (isJava8) Seq.empty else Seq(s"-target:$release") }
+        .map {
+          case 8 if isJava8 => Seq.empty
+          case n if n >= 8 => Seq(s"-target:$n")
+          case n => sys.error(s"'$n' is not a valid choice for '-target'")
+        }
         .getOrElse(Seq.empty)
       val oldTargetOption = tlJdkRelease
         .value
-        .map { _ => if (isJava8) Seq.empty else Seq(s"-target:jvm-1.8") }
+        .map {
+          case 8 if isJava8 => Seq.empty
+          case n if n >= 8 => Seq(s"-target:jvm-1.8")
+          case n => sys.error(s"'$n' is not a valid choice for '-target'")
+        }
         .getOrElse(Seq.empty)
 
       scalaVersion.value match {
@@ -238,7 +250,14 @@ object TypelevelSettingsPlugin extends AutoPlugin {
       }
     },
     javacOptions ++= {
-      if (isJava8) Seq.empty else Seq("--release", tlJdkRelease.value.toString)
+      tlJdkRelease
+        .value
+        .map {
+          case 8 if isJava8 => Seq.empty
+          case n if n >= 8 => Seq("--release", n.toString)
+          case n => sys.error(s"'$n' is not a valid choice for '--release'")
+        }
+        .getOrElse(Seq.empty)
     }
   )
 
