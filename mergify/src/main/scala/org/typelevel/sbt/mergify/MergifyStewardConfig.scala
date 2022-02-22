@@ -16,8 +16,9 @@
 
 package org.typelevel.sbt.mergify
 
-final case class MergifyPrRule(
-    name: String,
-    conditions: List[String],
-    actions: Map[String, MergifyAction]
+final case class MergifyStewardConfig(
+    author: String = "scala-steward",
+    minor: Boolean = false,
+    patch: Boolean = true,
+    labels: List[String]
 )

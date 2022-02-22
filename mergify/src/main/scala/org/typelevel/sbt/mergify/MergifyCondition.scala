@@ -16,8 +16,9 @@
 
 package org.typelevel.sbt.mergify
 
-final case class MergifyPrRule(
-    name: String,
-    conditions: List[String],
-    actions: Map[String, MergifyAction]
-)
+sealed abstract class MergifyCondition
+
+object MergifyCondition {
+  final case class And(conditions: List[MergifyCondition])
+  final case class Or(conditions: List[MergifyCondition])
+}

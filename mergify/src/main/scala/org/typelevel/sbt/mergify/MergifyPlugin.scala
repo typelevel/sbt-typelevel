@@ -25,6 +25,11 @@ object MergifyPlugin extends AutoPlugin {
     lazy val mergifyPrRules = settingKey[Seq[MergifyPrRule]]("The mergify pull request rules")
     lazy val mergifyEnableSteward = settingKey[Boolean](
       "Whether to generate an automerge rule for Scala Steward PRs (default: true)")
+
+    lazy val mergifyRequiredJobs =
+      settingKey[Seq[String]]("Ids for jobs that must succeed for merging (default: [build])")
+    lazy val mergifySuccessConditions = settingKey[List[String]](
+      "Success conditions for merging (default: auto-generated from `mergifyRequiredJobs` setting)")
   }
 
   override def requires = GenerativePlugin
