@@ -27,7 +27,8 @@ object TypelevelProject {
   val Scalacheck = "scalacheck" -> url("https://scalacheck.org/")
   val Shapeless = gh("shapeless", "milessabin")
   val Shapeless3 = gh("shapeless-3")
-  
+
   private def tl(repo: String) = repo -> url(s"https://typelevel.org/$repo/")
-  private def gh(repo: String, user: String = "typelevel") = repo -> url(s"https://github.com/$user/$repo/")
+  private def gh(repo: String, user: String = "typelevel") =
+    repo -> url(s"https://github.com/$user/$repo/")
 }
