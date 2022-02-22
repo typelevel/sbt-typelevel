@@ -17,6 +17,7 @@ lazy val root = tlCrossRootProject.aggregate(
   settings,
   github,
   githubActions,
+  mergify,
   versioning,
   mima,
   sonatype,
