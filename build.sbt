@@ -66,6 +66,14 @@ lazy val githubActions = project
     name := "sbt-typelevel-github-actions"
   )
 
+lazy val mergify = project
+  .in(file("mergify"))
+  .enablePlugins(SbtPlugin)
+  .settings(
+    name := "sbt-typelevel-mergify"
+  )
+  .dependsOn(githubActions)
+
 lazy val versioning = project
   .in(file("versioning"))
   .enablePlugins(SbtPlugin)
