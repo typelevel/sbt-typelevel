@@ -55,7 +55,7 @@ object TypelevelSitePlugin extends AutoPlugin {
       "The branch to publish the site from on every push. Set this to None if you only want to update the site on tag releases. (default: main)")
     lazy val tlSite = taskKey[Unit]("Generate the site (default: runs mdoc then laika)")
 
-    val TypelevelProjects = org.typelevel.sbt.TypelevelProjects
+    val TypelevelProject = org.typelevel.sbt.TypelevelProject
     implicit def tlLaikaThemeProviderOps(provider: ThemeProvider): LaikaThemeProviderOps =
       new LaikaThemeProviderOps(provider)
   }
@@ -69,7 +69,7 @@ object TypelevelSitePlugin extends AutoPlugin {
   override def buildSettings = Seq(
     tlSitePublishBranch := Some("main"),
     tlSiteApiUrl := None,
-    tlSiteRelated := Seq(TypelevelProjects.Cats),
+    tlSiteRelated := Seq(TypelevelProject.Cats),
     tlSiteKeepFiles := true,
     homepage := {
       gitHubUserRepo.value.map {

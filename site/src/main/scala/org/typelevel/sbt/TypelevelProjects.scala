@@ -2,7 +2,7 @@ package org.typelevel.sbt
 
 import sbt._
 
-object TypelevelProjects {
+object TypelevelProject {
   val Cats = tl("cats")
   val CatsEffect = tl("cats-effect")
   val Discipline = gh("discipline")
