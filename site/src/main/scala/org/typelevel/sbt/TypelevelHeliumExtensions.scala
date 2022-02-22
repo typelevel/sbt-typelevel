@@ -32,7 +32,10 @@ import java.net.URL
 
 object TypelevelHeliumExtensions {
 
-  def apply(license: Option[(String, URL)]): ThemeProvider = new ThemeProvider {
+  def apply(
+      license: Option[(String, URL)],
+      related: Seq[(String, URL)]
+  ): ThemeProvider = new ThemeProvider {
     def build[F[_]](implicit F: Sync[F]): Resource[F, Theme[F]] =
       ThemeBuilder[F]("Typelevel Helium Extensions")
         .addInputs(
@@ -47,17 +50,29 @@ object TypelevelHeliumExtensions {
             )
         )
         .addExtensions(GitHubFlavor, SyntaxHighlighting)
-        .addBaseConfig(
-          license.fold(Config.empty) {
-            case (name, url) =>
-              Config
-                .empty
-                .withValue("typelevel.site.license.name", name)
-                .withValue("typelevel.site.license.url", url.toString)
-                .build
-          }
-        )
+        .addBaseConfig(licenseConfig(license).withFallback(relatedConfig(related)))
         .build
   }
+
+  private def licenseConfig(license: Option[(String, URL)]) =
+    license.fold(Config.empty) {
+      case (name, url) =>
+        Config
+          .empty
+          .withValue("typelevel.site.license.name", name)
+          .withValue("typelevel.site.license.url", url.toString)
+          .build
+    }
+
+  private def relatedConfig(related: Seq[(String, URL)]) =
+    Config
+      .empty
+      .withValue(
+        "typelevel.site.related",
+        related.map {
+          case (name, url) =>
+            Map("name" -> name, "url" -> url.toString)
+        })
+      .build
 
 }

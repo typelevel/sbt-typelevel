@@ -42,6 +42,9 @@ object TypelevelSitePlugin extends AutoPlugin {
   object autoImport {
     lazy val tlSiteHeliumConfig = settingKey[Helium]("The Helium configuration")
     lazy val tlSiteApiUrl = settingKey[Option[URL]]("URL to the API docs")
+    lazy val tlSiteRelated =
+      settingKey[Seq[(String, URL)]]("A list of related projects (default: cats)")
+
     lazy val tlSiteKeepFiles =
       settingKey[Boolean]("Whether to keep existing files when deploying site (default: true)")
     lazy val tlSiteGenerate = settingKey[Seq[WorkflowStep]](
@@ -52,6 +55,7 @@ object TypelevelSitePlugin extends AutoPlugin {
       "The branch to publish the site from on every push. Set this to None if you only want to update the site on tag releases. (default: main)")
     lazy val tlSite = taskKey[Unit]("Generate the site (default: runs mdoc then laika)")
 
+    val TypelevelProjects = org.typelevel.sbt.TypelevelProjects
     implicit def tlLaikaThemeProviderOps(provider: ThemeProvider): LaikaThemeProviderOps =
       new LaikaThemeProviderOps(provider)
   }
@@ -65,6 +69,7 @@ object TypelevelSitePlugin extends AutoPlugin {
   override def buildSettings = Seq(
     tlSitePublishBranch := Some("main"),
     tlSiteApiUrl := None,
+    tlSiteRelated := Seq(TypelevelProjects.Cats),
     tlSiteKeepFiles := true,
     homepage := {
       gitHubUserRepo.value.map {
@@ -85,7 +90,7 @@ object TypelevelSitePlugin extends AutoPlugin {
     laikaTheme := tlSiteHeliumConfig
       .value
       .build
-      .extend(TypelevelHeliumExtensions(licenses.value.headOption)),
+      .extend(TypelevelHeliumExtensions(licenses.value.headOption, tlSiteRelated.value)),
     mdocVariables ++= Map(
       "VERSION" -> GitHelper
         .previousReleases(fromHead = true)
