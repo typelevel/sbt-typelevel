@@ -16,7 +16,7 @@ sbt-typelevel configures [sbt](https://www.scala-sbt.org/) for developing, testi
 [![sbt-typelevel Scala version support](https://index.scala-lang.org/typelevel/sbt-typelevel/sbt-typelevel/latest-by-scala-version.svg?targetType=Sbt)](https://index.scala-lang.org/typelevel/sbt-typelevel/sbt-typelevel)
 [![Discord](https://img.shields.io/discord/632277896739946517.svg?label=&logo=discord&logoColor=ffffff&color=404244&labelColor=6A7EC2)](https://discord.gg/D7wY3aH7BQ)
 
-Pick either the `sbt-typelevel` (recommended) or `sbt-typelevel-ci-release` plugin. [Help me choose.](#sbt-typelevel-or-sbt-typelevel-ci-release)
+Pick either the `sbt-typelevel` (recommended) or `sbt-typelevel-ci-release` plugin.
 
 #### `project/plugins.sbt`
 
@@ -27,6 +27,18 @@ addSbtPlugin("org.typelevel" % "sbt-typelevel" % "@VERSION@")
 // Set me up for CI release, but don't touch my scalacOptions!
 addSbtPlugin("org.typelevel" % "sbt-typelevel-ci-release" % "@VERSION@")
 ```
+
+@:callout(info)
+
+**sbt-typelevel-ci-release** includes all the core features mentioned above.
+
+**sbt-typelevel** extends **sbt-typelevel-ci-release** with:
+
+1. **sbt-typelevel-settings**: Good (and/or opinionated ;) defaults for `scalacOptions` and friends. Note that you can also manually add this plugin to a project using **sbt-typelevel-ci-release**.
+2. Automated scalafmt and copyright header checks in CI.
+3. A `prePR` command and other nice-to-haves.
+
+@:@
 
 Then configure your build.
 
@@ -83,13 +95,3 @@ Finally, on GitHub set the following secrets on your repository:
 - `SONATYPE_USERNAME` and `SONATYPE_PASSWORD`
 - `PGP_SECRET`: output of `gpg --armor --export-secret-keys $LONG_ID | base64`
 - `PGP_PASSPHRASE` (optional, use only if your key is passphrase-protected)
-
-### sbt-typelevel or sbt-typelevel-ci-release?
-
-**sbt-typelevel-ci-release** includes all the core features mentioned above.
-
-**sbt-typelevel** extends **sbt-typlevel-ci-release** with:
-
-1. **sbt-typelevel-settings**: Good (and/or opinionated ;) defaults for `scalacOptions` and friends. Note that you can also manually add this plugin to a project using **sbt-typlevel-ci-release**.
-2. Automated scalafmt and copyright header checks in CI.
-3. A `prePR` command and other nice-to-haves.
