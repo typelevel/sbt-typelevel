@@ -185,7 +185,7 @@ object TypelevelSettingsPlugin extends AutoPlugin {
         val infoOpt = scmInfo.value
         tagOrHash.toSeq flatMap { vh =>
           infoOpt.toSeq flatMap { info =>
-            val path = s"${info.browseUrl}/blob/$vh€{FILE_PATH}.scala"
+            val path = s"${info.browseUrl}/blob/${vh}€{FILE_PATH}.scala"
             Seq(
               "-doc-source-url",
               path,
@@ -207,30 +207,11 @@ object TypelevelSettingsPlugin extends AutoPlugin {
         Seq.empty
     },
     scalacOptions ++= {
-      val releaseOption = tlJdkRelease
-        .value
-        .map {
-          case 8 if isJava8 => Seq.empty
-          case n if n >= 8 => Seq("-release", n.toString)
-          case n => sys.error(s"'$n' is not a valid choice for '-release'")
+      val (releaseOption, newTargetOption, oldTargetOption) =
+        withJdkRelease(tlJdkRelease.value)(
+          (Seq.empty[String], Seq.empty[String], Seq.empty[String])) { n =>
+          (Seq("-release", n.toString), Seq(s"-target:$n"), Seq("-target:jvm-1.8"))
         }
-        .getOrElse(Seq.empty)
-      val newTargetOption = tlJdkRelease
-        .value
-        .map {
-          case 8 if isJava8 => Seq.empty
-          case n if n >= 8 => Seq(s"-target:$n")
-          case n => sys.error(s"'$n' is not a valid choice for '-target'")
-        }
-        .getOrElse(Seq.empty)
-      val oldTargetOption = tlJdkRelease
-        .value
-        .map {
-          case 8 if isJava8 => Seq.empty
-          case n if n >= 8 => Seq(s"-target:jvm-1.8")
-          case n => sys.error(s"'$n' is not a valid choice for '-target'")
-        }
-        .getOrElse(Seq.empty)
 
       scalaVersion.value match {
         case V(V(2, 11, _, _)) =>
@@ -250,16 +231,30 @@ object TypelevelSettingsPlugin extends AutoPlugin {
       }
     },
     javacOptions ++= {
-      tlJdkRelease
-        .value
-        .map {
-          case 8 if isJava8 => Seq.empty
-          case n if n >= 8 => Seq("--release", n.toString)
-          case n => sys.error(s"'$n' is not a valid choice for '--release'")
-        }
-        .getOrElse(Seq.empty)
+      withJdkRelease(tlJdkRelease.value)(Seq.empty[String])(n => Seq("--release", n.toString))
     }
   )
 
-  private val isJava8: Boolean = System.getProperty("java.version").startsWith("1.8")
+  private def withJdkRelease[A](jdkRelease: Option[Int])(default: => A)(f: Int => A): A =
+    jdkRelease.fold(default) {
+      case 8 if isJava8 => default
+      case n if n >= 8 =>
+        if (javaRuntimeVersion < n) {
+          sys.error(
+            s"Target JDK is $n but you are using an older JDK $javaRuntimeVersion. Please switch to JDK >= $n.")
+        } else {
+          f(n)
+        }
+      case n =>
+        sys.error(
+          s"You're using JDK $n, which is not supported by `sbt-typelevel`. Please switch to a newer JDK.")
+    }
+
+  private val javaRuntimeVersion: Int =
+    System.getProperty("java.version").split("""\.""") match {
+      case Array("1", "8", _*) => 8
+      case Array(feature, _*) => feature.toInt
+    }
+
+  private val isJava8: Boolean = javaRuntimeVersion == 8
 }
