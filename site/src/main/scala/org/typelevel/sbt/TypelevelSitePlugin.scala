@@ -16,13 +16,7 @@
 
 package org.typelevel.sbt
 
-import laika.ast.LengthUnit._
-import laika.ast._
 import laika.helium.Helium
-import laika.helium.config.Favicon
-import laika.helium.config.HeliumIcon
-import laika.helium.config.IconLink
-import laika.helium.config.ImageLink
 import laika.sbt.LaikaPlugin
 import laika.theme.ThemeProvider
 import mdoc.MdocPlugin
@@ -42,6 +36,7 @@ object TypelevelSitePlugin extends AutoPlugin {
 
   object autoImport {
     lazy val tlSiteHeliumConfig = settingKey[Helium]("The Helium configuration")
+    lazy val tlSiteTheme = settingKey[ThemeProvider]("The Typelevel Laika theme")
     lazy val tlSiteApiUrl = settingKey[Option[URL]]("URL to the API docs")
     lazy val tlSiteRelated =
       settingKey[Seq[(String, URL)]]("A list of related projects (default: cats)")
@@ -88,10 +83,21 @@ object TypelevelSitePlugin extends AutoPlugin {
       )
       .value: @nowarn("cat=other-pure-statement"),
     Laika / sourceDirectories := Seq(mdocOut.value),
-    laikaTheme := tlSiteHeliumConfig
-      .value
-      .build
-      .extend(TypelevelHeliumExtensions(licenses.value.headOption, tlSiteRelated.value)),
+    tlSiteTheme := {
+      TypelevelHeliumTheme(
+        gitHubUserRepo.value.map(_._2),
+        developers.value,
+        version.value,
+        tlSiteApiUrl.value,
+        scmInfo.value.map(_.browseUrl),
+        licenses.value.headOption,
+        tlSiteRelated.value
+      )
+    },
+    tlSiteHeliumConfig := Helium.defaults,
+    laikaTheme := {
+      tlSiteHeliumConfig.value.build.extend(tlSiteTheme.value)
+    },
     mdocVariables ++= Map(
       "VERSION" -> GitHelper
         .previousReleases(fromHead = true)
@@ -100,51 +106,6 @@ object TypelevelSitePlugin extends AutoPlugin {
         .fold(version.value)(_.toString),
       "SNAPSHOT_VERSION" -> version.value
     ),
-    tlSiteHeliumConfig := {
-      Helium
-        .defaults
-        .site
-        .metadata(
-          title = gitHubUserRepo.value.map(_._2),
-          authors = developers.value.map(_.name),
-          language = Some("en"),
-          version = Some(version.value.toString)
-        )
-        .site
-        .layout(
-          contentWidth = px(860),
-          navigationWidth = px(275),
-          topBarHeight = px(50),
-          defaultBlockSpacing = px(10),
-          defaultLineHeight = 1.5,
-          anchorPlacement = laika.helium.config.AnchorPlacement.Right
-        )
-        .site
-        .favIcons(
-          Favicon.external("https://typelevel.org/img/favicon.png", "32x32", "image/png")
-        )
-        .site
-        .topNavigationBar(
-          homeLink = ImageLink.external(
-            "https://typelevel.org",
-            Image.external(s"https://typelevel.org/img/logo.svg")
-          ),
-          navLinks = tlSiteApiUrl.value.toList.map { url =>
-            IconLink.external(
-              url.toString,
-              HeliumIcon.api,
-              options = Styles("svg-link")
-            )
-          } ++ List(
-            IconLink.external(
-              scmInfo.value.fold("https://github.com/typelevel")(_.browseUrl.toString),
-              HeliumIcon.github,
-              options = Styles("svg-link")),
-            IconLink.external("https://discord.gg/XF3CXcMzqD", HeliumIcon.chat),
-            IconLink.external("https://twitter.com/typelevel", HeliumIcon.twitter)
-          )
-        )
-    },
     tlSiteGenerate := List(
       WorkflowStep.Sbt(
         List(s"${thisProject.value.id}/${tlSite.key.toString}"),
