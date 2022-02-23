@@ -18,6 +18,6 @@ package org.typelevel.sbt.mergify
 
 final case class MergifyPrRule(
     name: String,
-    conditions: List[String],
-    actions: Map[String, MergifyAction]
+    conditions: List[MergifyCondition],
+    actions: List[MergifyAction]
 )

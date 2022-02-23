@@ -23,16 +23,48 @@ object MergifyPlugin extends AutoPlugin {
 
   object autoImport {
     lazy val mergifyPrRules = settingKey[Seq[MergifyPrRule]]("The mergify pull request rules")
-    lazy val mergifyEnableSteward = settingKey[Boolean](
-      "Whether to generate an automerge rule for Scala Steward PRs (default: true)")
+
+    lazy val mergifyStewardConfig = settingKey[Option[MergifyStewardConfig]](
+      "Config for the automerge rule for Scala Steward PRs, set to None to disable.")
 
     lazy val mergifyRequiredJobs =
       settingKey[Seq[String]]("Ids for jobs that must succeed for merging (default: [build])")
-    lazy val mergifySuccessConditions = settingKey[List[String]](
+
+    lazy val mergifySuccessConditions = settingKey[Seq[MergifyCondition]](
       "Success conditions for merging (default: auto-generated from `mergifyRequiredJobs` setting)")
   }
 
   override def requires = GenerativePlugin
   override def trigger: PluginTrigger = allRequirements
+
+  import autoImport._
+  import GenerativePlugin.autoImport._
+
+  override def buildSettings: Seq[Setting[_]] = Seq(
+    mergifyRequiredJobs := Seq("build"),
+    mergifySuccessConditions := jobSuccessConditions.value,
+    mergifyPrRules := {
+      mergifyStewardConfig.value.map(_.toPrRule(mergifySuccessConditions.value.toList)).toList
+    }
+  )
+
+  private lazy val jobSuccessConditions = Def.setting {
+    githubWorkflowGeneratedCI.value.flatMap {
+      case job if mergifyRequiredJobs.value.contains(job.id) =>
+        GenerativePlugin
+          .expandMatrix(
+            job.oses,
+            job.scalas,
+            job.javas,
+            job.matrixAdds,
+            job.matrixIncs,
+            job.matrixExcs
+          )
+          .map { cell =>
+            MergifyCondition.Custom(s"status-success=${job.name} (${cell.mkString(", ")})")
+          }
+      case _ => Nil
+    }
+  }
 
 }

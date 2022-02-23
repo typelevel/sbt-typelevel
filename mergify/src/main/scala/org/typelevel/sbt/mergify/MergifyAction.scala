@@ -16,7 +16,9 @@
 
 package org.typelevel.sbt.mergify
 
-sealed abstract class MergifyAction
+sealed abstract class MergifyAction {
+  def name: String
+}
 
 object MergifyAction {
 
@@ -24,17 +26,20 @@ object MergifyAction {
       method: Option[String] = None,
       rebaseFallback: Option[String] = None,
       commitMessageTemplate: Option[String] = None
-  ) extends MergifyAction
+  ) extends MergifyAction {
+    def name = "merge"
+  }
 
   final case class Label(
       add: List[String] = Nil,
       remove: List[String] = Nil,
       removeAll: Option[Boolean] = None
-  ) extends MergifyAction
+  ) extends MergifyAction {
+    def name = "label"
+  }
 
-  // this should prevent exhaustivity checking,
-  // so pattern matches always have to include a default case
-  // this lets us add more cases without breaking backwards compat
-  private[this] object Dummy extends MergifyAction
+  private[this] object Dummy extends MergifyAction { // break exhaustivity checking
+    def name = "dummy"
+  }
 
 }

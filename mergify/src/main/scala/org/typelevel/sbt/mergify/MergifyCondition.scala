@@ -19,6 +19,8 @@ package org.typelevel.sbt.mergify
 sealed abstract class MergifyCondition
 
 object MergifyCondition {
-  final case class And(conditions: List[MergifyCondition])
-  final case class Or(conditions: List[MergifyCondition])
+  final case class Custom(condition: String) extends MergifyCondition
+  final case class And(conditions: List[MergifyCondition]) extends MergifyCondition
+  final case class Or(conditions: List[MergifyCondition]) extends MergifyCondition
+  private[this] final object Dummy extends MergifyCondition // break exhaustivity checking
 }
