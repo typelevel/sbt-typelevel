@@ -104,6 +104,16 @@
 
 </span><span class="comment">// Set me up for CI release, but don&#39;t touch my scalacOptions!
 </span><span class="identifier">addSbtPlugin</span><span>(</span><span class="string-literal">&quot;org.typelevel&quot;</span><span> % </span><span class="string-literal">&quot;sbt-typelevel-ci-release&quot;</span><span> % </span><span class="string-literal">&quot;0.4.5&quot;</span><span>)</span></code></pre>
+        <div class="callout info">
+          <i class="icofont-laika">&#xef4e;</i>
+          <p><strong>sbt-typelevel-ci-release</strong> includes all the core features mentioned above.</p>
+          <p><strong>sbt-typelevel</strong> extends <strong>sbt-typelevel-ci-release</strong> with:</p>
+          <ol class="arabic">
+            <li><strong>sbt-typelevel-settings</strong>: Good (and/or opinionated ;) defaults for <code>scalacOptions</code> and friends. Note that you can also manually add this plugin to a project using <strong>sbt-typelevel-ci-release</strong>.</li>
+            <li>Automated scalafmt and copyright header checks in CI.</li>
+            <li>A <code>prePR</code> command and other nice-to-haves.</li>
+          </ol>
+        </div>
         <p>Then configure your build.</p>
         
         <h4 id="build-sbt" class="section"><code>build.sbt</code><a class="anchor-link right" href="#build-sbt"><i class="icofont-laika">&#xef71;</i></a></h4>
