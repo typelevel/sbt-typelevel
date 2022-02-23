@@ -27,6 +27,7 @@ import laika.sbt.LaikaPlugin
 import laika.theme.ThemeProvider
 import mdoc.MdocPlugin
 import org.typelevel.sbt.kernel.GitHelper
+import org.typelevel.sbt.site._
 import sbt._
 
 import scala.annotation.nowarn
@@ -55,9 +56,9 @@ object TypelevelSitePlugin extends AutoPlugin {
       "The branch to publish the site from on every push. Set this to None if you only want to update the site on tag releases. (default: main)")
     lazy val tlSite = taskKey[Unit]("Generate the site (default: runs mdoc then laika)")
 
-    val TypelevelProject = org.typelevel.sbt.TypelevelProject
+    val TypelevelProject = site.TypelevelProject
     implicit def tlLaikaThemeProviderOps(provider: ThemeProvider): LaikaThemeProviderOps =
-      new LaikaThemeProviderOps(provider)
+      new site.LaikaThemeProviderOps(provider)
   }
 
   import autoImport._

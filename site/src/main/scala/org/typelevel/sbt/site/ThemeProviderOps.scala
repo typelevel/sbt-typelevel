@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.typelevel.sbt
+package org.typelevel.sbt.site
 
 import cats.effect.Sync
 import laika.bundle.ExtensionBundle

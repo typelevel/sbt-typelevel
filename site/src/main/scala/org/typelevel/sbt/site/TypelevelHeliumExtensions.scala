@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.typelevel.sbt
+package org.typelevel.sbt.site
 
 import cats.effect.Resource
 import cats.effect.Sync
