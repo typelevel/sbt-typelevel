@@ -102,4 +102,10 @@ ThisBuild / tlSitePublishBranch := Some("main") // deploy docs from this branch
 lazy val docs = project.in(file("site")).enablePlugins(TypelevelSitePlugin)
 ```
 
-Place your `.md` files in the `docs/` directory of your project. The site is generated using [mdoc](https://scalameta.org/mdoc/) and [Laika](https://planet42.github.io/Laika/) and published to the `gh-pages` branch on every push to the specified branch. Make sure to enable GitHub pages in your repo settings. To preview locally, run `docs/mdoc` and then `docs/laikaPreview`.
+Place your `.md` files in the `docs/` directory of your project. The site is generated using [mdoc](https://scalameta.org/mdoc/) and [Laika](https://planet42.github.io/Laika/) and published to the `gh-pages` branch on every push to the specified branch. Make sure to enable GitHub pages in your repo settings. 
+
+To preview locally, run `docs/mdoc` and then `docs/laikaPreview`. This should (reasonably quickly) start a webserver you can view on localhost.
+
+To enjoy a tighter edit loop: with `docs/laikaPreview` running, consider firing up another terminal and starting another sbt, then run `docs/mdoc --watch` [mdoc docs](https://scalameta.org/mdoc/docs/installation.html#live-reload-html-preview-on-file-save).
+
+
