@@ -43,6 +43,7 @@ object TypelevelSitePlugin extends AutoPlugin {
     lazy val tlSitePublishBranch = settingKey[Option[String]](
       "The branch to publish the site from on every push. Set this to None if you only want to update the site on tag releases. (default: main)")
     lazy val tlSite = taskKey[Unit]("Generate the site (default: runs mdoc then laika)")
+    lazy val tlSitePreview = taskKey[Unit]("Start a live-reload preview server (combines mdoc --watch with laikaPreview)")
   }
 
   import autoImport._
@@ -70,6 +71,56 @@ object TypelevelSitePlugin extends AutoPlugin {
         laikaSite
       )
       .value: @nowarn("cat=other-pure-statement"),
+    tlSitePreview := {
+      // inlined from https://github.com/planet42/Laika/blob/9022f6f37c9017f7612fa59398f246c8e8c42c3e/sbt/src/main/scala/laika/sbt/Tasks.scala#L192
+      import cats.effect.IO
+      import cats.effect.unsafe.implicits._
+      import laika.sbt.Settings
+      import laika.sbt.Tasks.generateAPI
+      import laika.preview.{ServerBuilder, ServerConfig}
+
+      val logger = streams.value.log
+      logger.info("Initializing server...")
+
+      def applyIf(
+          flag: Boolean,
+          f: ServerConfig => ServerConfig): ServerConfig => ServerConfig =
+        if (flag) f else identity
+
+      val previewConfig = laikaPreviewConfig.value
+      val _ = generateAPI.value
+
+      val applyFlags = applyIf(laikaIncludeEPUB.value, _.withEPUBDownloads)
+        .andThen(applyIf(laikaIncludePDF.value, _.withPDFDownloads))
+        .andThen(
+          applyIf(laikaIncludeAPI.value, _.withAPIDirectory(Settings.apiTargetDirectory.value)))
+        .andThen(applyIf(previewConfig.isVerbose, _.verbose))
+
+      val config = ServerConfig
+        .defaults
+        .withArtifactBasename(name.value)
+        // .withHost(previewConfig.host)
+        .withPort(previewConfig.port)
+        .withPollInterval(previewConfig.pollInterval)
+
+      val (_, cancel) = ServerBuilder[IO](Settings.parser.value, laikaInputs.value.delegate)
+        .withLogger(s => IO(logger.info(s)))
+        .withConfig(applyFlags(config))
+        .build
+        .allocated
+        .unsafeRunSync()
+
+      logger.info(
+        s"Preview server started on port ${previewConfig.port}. Press ctrl-D to exit.")
+
+      try {
+        // watch but no-livereload b/c we don't need an mdoc server
+        (Compile / runMain).toTask(s" mdoc.Main --watch --no-livereload").value
+      } finally {
+        logger.info(s"Shutting down preview server.")
+        cancel.unsafeRunSync()
+      }
+    },
     Laika / sourceDirectories := Seq(mdocOut.value),
     laikaTheme := tlSiteHeliumConfig.value.build,
     mdocVariables ++= Map(
