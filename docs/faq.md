@@ -106,6 +106,6 @@ Place your `.md` files in the `docs/` directory of your project. The site is gen
 
 To preview locally, run `docs/mdoc` and then `docs/laikaPreview`. This should (reasonably quickly) start a webserver you can view on localhost.
 
-To enjoy a tighter edit loop: with `docs/laikaPreview` running, consider firing up another terminal and starting another sbt, then run `docs/mdoc --watch` [mdoc docs](https://scalameta.org/mdoc/docs/installation.html#live-reload-html-preview-on-file-save).
+To enjoy a tighter edit loop: with `docs/laikaPreview` running, consider firing up another terminal and starting another sbt, then run `docs/mdoc --watch` ([mdoc docs](https://scalameta.org/mdoc/docs/installation.html#live-reload-html-preview-on-file-save)).
 
 
