@@ -43,7 +43,8 @@ object TypelevelSitePlugin extends AutoPlugin {
     lazy val tlSitePublishBranch = settingKey[Option[String]](
       "The branch to publish the site from on every push. Set this to None if you only want to update the site on tag releases. (default: main)")
     lazy val tlSite = taskKey[Unit]("Generate the site (default: runs mdoc then laika)")
-    lazy val tlSitePreview = taskKey[Unit]("Start a live-reload preview server (combines mdoc --watch with laikaPreview)")
+    lazy val tlSitePreview = taskKey[Unit](
+      "Start a live-reload preview server (combines mdoc --watch with laikaPreview)")
   }
 
   import autoImport._
@@ -71,7 +72,7 @@ object TypelevelSitePlugin extends AutoPlugin {
         laikaSite
       )
       .value: @nowarn("cat=other-pure-statement"),
-    tlSitePreview := {
+    tlSitePreview := Def.taskDyn {
       // inlined from https://github.com/planet42/Laika/blob/9022f6f37c9017f7612fa59398f246c8e8c42c3e/sbt/src/main/scala/laika/sbt/Tasks.scala#L192
       import cats.effect.IO
       import cats.effect.unsafe.implicits._
@@ -113,14 +114,14 @@ object TypelevelSitePlugin extends AutoPlugin {
       logger.info(
         s"Preview server started on port ${previewConfig.port}. Press ctrl-D to exit.")
 
-      try {
+      (Compile / runMain)
         // watch but no-livereload b/c we don't need an mdoc server
-        (Compile / runMain).toTask(s" mdoc.Main --watch --no-livereload").value
-      } finally {
-        logger.info(s"Shutting down preview server.")
-        cancel.unsafeRunSync()
-      }
-    },
+        .toTask(s" mdoc.Main --watch --no-livereload")
+        .andFinally {
+          logger.info(s"Shutting down preview server.")
+          cancel.unsafeRunSync()
+        }
+    }.value,
     Laika / sourceDirectories := Seq(mdocOut.value),
     laikaTheme := tlSiteHeliumConfig.value.build,
     mdocVariables ++= Map(
