@@ -111,8 +111,7 @@ object TypelevelSitePlugin extends AutoPlugin {
         .allocated
         .unsafeRunSync()
 
-      logger.info(
-        s"Preview server started on port ${previewConfig.port}. Press ctrl-D to exit.")
+      logger.info(s"Preview server started on port ${previewConfig.port}.")
 
       (Compile / runMain)
         // watch but no-livereload b/c we don't need an mdoc server
