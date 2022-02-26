@@ -15,8 +15,5 @@ pull_request_rules:
   - status-success=Build and Test (ubuntu-latest, 2.12.15, temurin@8, rootJVM)
   - '#approved-reviews-by>=1'
   actions:
-  - merge:
-      method: null
-      rebase_fallback: null
-      commit_message_template: null
+  - merge: {}
 
