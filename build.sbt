@@ -74,7 +74,8 @@ lazy val mergify = project
   .in(file("mergify"))
   .enablePlugins(SbtPlugin)
   .settings(
-    name := "sbt-typelevel-mergify"
+    name := "sbt-typelevel-mergify",
+    tlVersionIntroduced := Map("2.12" -> "0.4.6")
   )
   .dependsOn(githubActions)
 
