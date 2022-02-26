@@ -19,6 +19,8 @@ package org.typelevel.sbt.mergify
 import sbt._, Keys._
 import org.typelevel.sbt.gha._
 
+import java.nio.file.Path
+
 object MergifyPlugin extends AutoPlugin {
 
   object autoImport {
@@ -37,6 +39,9 @@ object MergifyPlugin extends AutoPlugin {
 
     lazy val mergifySuccessConditions = settingKey[Seq[MergifyCondition]](
       "Success conditions for merging (default: auto-generated from `mergifyRequiredJobs` setting)")
+
+    lazy val mergifyLabelPaths = settingKey[Map[String, Path]](
+      "A map from label to path (default: auto-populated for every subproject in your build)")
 
     type MergifyAction = org.typelevel.sbt.mergify.MergifyAction
     val MergifyAction = org.typelevel.sbt.mergify.MergifyAction
@@ -57,6 +62,7 @@ object MergifyPlugin extends AutoPlugin {
   override def buildSettings: Seq[Setting[_]] = Seq(
     mergifyStewardConfig := Some(MergifyStewardConfig()),
     mergifyRequiredJobs := Seq("build"),
+    mergifyLabelPaths := Map.empty,
     mergifySuccessConditions := jobSuccessConditions.value,
     mergifyPrRules := {
       mergifyStewardConfig.value.map(_.toPrRule(mergifySuccessConditions.value.toList)).toList
