@@ -16,11 +16,36 @@
 
 package org.typelevel.sbt.mergify
 
+import io.circe.Encoder
+import io.circe.Json
+import io.circe.syntax._
+
 sealed abstract class MergifyCondition
 
 object MergifyCondition {
+  implicit def encoder: Encoder[MergifyCondition] = Encoder.instance {
+    case custom: Custom => custom.asJson
+    case and: And => and.asJson
+    case or: Or => or.asJson
+    case _ => sys.error("shouldn't happen")
+  }
+
   final case class Custom(condition: String) extends MergifyCondition
+  object Custom {
+    implicit def encoder: Encoder[Custom] = Encoder.encodeString.contramap(_.condition)
+  }
+
   final case class And(conditions: List[MergifyCondition]) extends MergifyCondition
+  object And {
+    implicit def encoder: Encoder[And] =
+      Encoder.forProduct1("conditions")((_: And).conditions).mapJson(a => Json.obj("and" -> a))
+  }
+
   final case class Or(conditions: List[MergifyCondition]) extends MergifyCondition
+  object Or {
+    implicit def encoder: Encoder[Or] =
+      Encoder.forProduct1("conditions")((_: Or).conditions).mapJson(o => Json.obj("or" -> o))
+  }
+
   private[this] final object Dummy extends MergifyCondition // break exhaustivity checking
 }

@@ -16,8 +16,15 @@
 
 package org.typelevel.sbt.mergify
 
+import io.circe.Encoder
+
 final case class MergifyPrRule(
     name: String,
     conditions: List[MergifyCondition],
     actions: List[MergifyAction]
 )
+
+object MergifyPrRule {
+  implicit def encoder: Encoder[MergifyPrRule] =
+    Encoder.forProduct3("name", "conditions", "actions")(m => (m.name, m.conditions, m.actions))
+}

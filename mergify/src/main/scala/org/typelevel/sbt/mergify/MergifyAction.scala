@@ -16,30 +16,50 @@
 
 package org.typelevel.sbt.mergify
 
-sealed abstract class MergifyAction {
-  def name: String
-}
+import io.circe.Encoder
+import io.circe.Json
+import io.circe.syntax._
+
+sealed abstract class MergifyAction
 
 object MergifyAction {
+
+  implicit def encoder: Encoder[MergifyAction] = Encoder.instance {
+    case merge: Merge => merge.asJson
+    case label: Label => label.asJson
+    case _ => sys.error("should not happen")
+  }
 
   final case class Merge(
       method: Option[String] = None,
       rebaseFallback: Option[String] = None,
       commitMessageTemplate: Option[String] = None
-  ) extends MergifyAction {
-    def name = "merge"
+  ) extends MergifyAction
+
+  object Merge {
+    implicit def encoder: Encoder[Merge] =
+      Encoder
+        .forProduct3("method", "rebase_fallback", "commit_message_template") { (m: Merge) =>
+          (m.method, m.rebaseFallback, m.commitMessageTemplate)
+        }
+        .mapJson(m => Json.obj("merge" -> m))
   }
 
   final case class Label(
       add: List[String] = Nil,
       remove: List[String] = Nil,
       removeAll: Option[Boolean] = None
-  ) extends MergifyAction {
-    def name = "label"
+  ) extends MergifyAction
+
+  object Label {
+    implicit def encoder: Encoder[Label] =
+      Encoder
+        .forProduct3("add", "remove", "remove_all") { (l: Label) =>
+          (l.add, l.remove, l.removeAll)
+        }
+        .mapJson(l => Json.obj("label" -> l))
   }
 
-  private[this] object Dummy extends MergifyAction { // break exhaustivity checking
-    def name = "dummy"
-  }
+  private[this] object Dummy extends MergifyAction
 
 }
