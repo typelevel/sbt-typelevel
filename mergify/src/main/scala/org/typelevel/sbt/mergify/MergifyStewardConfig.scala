@@ -19,24 +19,24 @@ package org.typelevel.sbt.mergify
 final case class MergifyStewardConfig(
     name: String = "merge scala-steward's PRs",
     author: String = "scala-steward",
-    minor: Boolean = false,
-    merge: MergifyAction.Merge = MergifyAction.Merge()
+    mergeMinors: Boolean = false,
+    action: MergifyAction.Merge = MergifyAction.Merge()
 ) {
 
   private[mergify] def toPrRule(buildConditions: List[MergifyCondition]): MergifyPrRule = {
     val authorCond = MergifyCondition.Custom(s"author=$author")
 
     val bodyCond = {
-      val patchCond = MergifyCondition.Custom("body~=labels:.*early-semver-spec-patch")
+      val patchCond = MergifyCondition.Custom("body~=labels:.*early-semver-patch")
       val minorCond = MergifyCondition.Custom("body~=labels:.*early-semver-minor")
-      if (minor) MergifyCondition.Or(List(patchCond, minorCond))
+      if (mergeMinors) MergifyCondition.Or(List(patchCond, minorCond))
       else patchCond
     }
 
     MergifyPrRule(
       name,
       authorCond :: bodyCond :: buildConditions,
-      List(merge)
+      List(action)
     )
   }
 

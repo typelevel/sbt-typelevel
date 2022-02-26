@@ -11,6 +11,9 @@ ThisBuild / developers := List(
   tlGitHubDev("djspiewak", "Daniel Spiewak")
 )
 
+ThisBuild / mergifyStewardConfig ~= { _.map(_.copy(mergeMinors = true)) }
+ThisBuild / mergifySuccessConditions += MergifyCondition.Custom("#approved-reviews-by>=1")
+
 lazy val root = tlCrossRootProject.aggregate(
   kernel,
   noPublish,

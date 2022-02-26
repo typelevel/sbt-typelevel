@@ -37,14 +37,12 @@ object MergifyCondition {
 
   final case class And(conditions: List[MergifyCondition]) extends MergifyCondition
   object And {
-    implicit def encoder: Encoder[And] =
-      Encoder.forProduct1("conditions")((_: And).conditions).mapJson(a => Json.obj("and" -> a))
+    implicit def encoder: Encoder[And] = Encoder.forProduct1("and")(_.conditions)
   }
 
   final case class Or(conditions: List[MergifyCondition]) extends MergifyCondition
   object Or {
-    implicit def encoder: Encoder[Or] =
-      Encoder.forProduct1("conditions")((_: Or).conditions).mapJson(o => Json.obj("or" -> o))
+    implicit def encoder: Encoder[Or] = Encoder.forProduct1("or")(_.conditions)
   }
 
   private[this] final object Dummy extends MergifyCondition // break exhaustivity checking

@@ -4,12 +4,16 @@
 # this file by hand! Instead, if you wish to make changes, you should
 # change your sbt build configuration to revise the mergify configuration
 # to meet your needs, then regenerate this file.
+
 pull_request_rules:
 - name: merge scala-steward's PRs
   conditions:
   - author=scala-steward
-  - body~=labels:.*early-semver-spec-patch
+  - or:
+    - body~=labels:.*early-semver-patch
+    - body~=labels:.*early-semver-minor
   - status-success=Build and Test (ubuntu-latest, 2.12.15, temurin@8, rootJVM)
+  - '#approved-reviews-by>=1'
   actions:
   - merge:
       method: null
