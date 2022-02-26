@@ -87,7 +87,11 @@ object MergifyPlugin extends AutoPlugin {
 
   override def projectSettings: Seq[Setting[_]] = Seq(
     mergifyGenerate / aggregate := false,
-    mergifyCheck / aggregate := false
+    mergifyCheck / aggregate := false,
+    githubWorkflowGenerate := githubWorkflowGenerate
+      .dependsOn((ThisBuild / mergifyGenerate))
+      .value,
+    githubWorkflowCheck := githubWorkflowCheck.dependsOn((ThisBuild / mergifyCheck)).value
   )
 
   private lazy val jobSuccessConditions = Def.setting {
