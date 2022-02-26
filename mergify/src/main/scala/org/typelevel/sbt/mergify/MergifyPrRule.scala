@@ -26,5 +26,7 @@ final case class MergifyPrRule(
 
 object MergifyPrRule {
   implicit def encoder: Encoder[MergifyPrRule] =
-    Encoder.forProduct3("name", "conditions", "actions")(m => (m.name, m.conditions, m.actions))
+    Encoder.forProduct3("name", "conditions", "actions") { m =>
+      (m.name, m.conditions, m.actions.map(a => a.name -> a).toMap)
+    }
 }

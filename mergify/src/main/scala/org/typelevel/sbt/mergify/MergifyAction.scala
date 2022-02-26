@@ -17,10 +17,11 @@
 package org.typelevel.sbt.mergify
 
 import io.circe.Encoder
-import io.circe.Json
 import io.circe.syntax._
 
-sealed abstract class MergifyAction
+sealed abstract class MergifyAction {
+  private[mergify] def name = getClass.getSimpleName.toLowerCase
+}
 
 object MergifyAction {
 
@@ -38,11 +39,9 @@ object MergifyAction {
 
   object Merge {
     implicit def encoder: Encoder[Merge] =
-      Encoder
-        .forProduct3("method", "rebase_fallback", "commit_message_template") { (m: Merge) =>
-          (m.method, m.rebaseFallback, m.commitMessageTemplate)
-        }
-        .mapJson(m => Json.obj("merge" -> m))
+      Encoder.forProduct3("method", "rebase_fallback", "commit_message_template") {
+        (m: Merge) => (m.method, m.rebaseFallback, m.commitMessageTemplate)
+      }
   }
 
   final case class Label(
@@ -53,11 +52,9 @@ object MergifyAction {
 
   object Label {
     implicit def encoder: Encoder[Label] =
-      Encoder
-        .forProduct3("add", "remove", "remove_all") { (l: Label) =>
-          (l.add, l.remove, l.removeAll)
-        }
-        .mapJson(l => Json.obj("label" -> l))
+      Encoder.forProduct3("add", "remove", "remove_all") { (l: Label) =>
+        (l.add, l.remove, l.removeAll)
+      }
   }
 
   private[this] object Dummy extends MergifyAction
