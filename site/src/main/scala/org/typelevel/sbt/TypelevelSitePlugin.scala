@@ -72,55 +72,7 @@ object TypelevelSitePlugin extends AutoPlugin {
         laikaSite
       )
       .value: @nowarn("cat=other-pure-statement"),
-    tlSitePreview := Def.taskDyn {
-      // inlined from https://github.com/planet42/Laika/blob/9022f6f37c9017f7612fa59398f246c8e8c42c3e/sbt/src/main/scala/laika/sbt/Tasks.scala#L192
-      import cats.effect.IO
-      import cats.effect.unsafe.implicits._
-      import laika.sbt.Settings
-      import laika.sbt.Tasks.generateAPI
-      import laika.preview.{ServerBuilder, ServerConfig}
-
-      val logger = streams.value.log
-      logger.info("Initializing server...")
-
-      def applyIf(
-          flag: Boolean,
-          f: ServerConfig => ServerConfig): ServerConfig => ServerConfig =
-        if (flag) f else identity
-
-      val previewConfig = laikaPreviewConfig.value
-      val _ = generateAPI.value
-
-      val applyFlags = applyIf(laikaIncludeEPUB.value, _.withEPUBDownloads)
-        .andThen(applyIf(laikaIncludePDF.value, _.withPDFDownloads))
-        .andThen(
-          applyIf(laikaIncludeAPI.value, _.withAPIDirectory(Settings.apiTargetDirectory.value)))
-        .andThen(applyIf(previewConfig.isVerbose, _.verbose))
-
-      val config = ServerConfig
-        .defaults
-        .withArtifactBasename(name.value)
-        // .withHost(previewConfig.host)
-        .withPort(previewConfig.port)
-        .withPollInterval(previewConfig.pollInterval)
-
-      val (_, cancel) = ServerBuilder[IO](Settings.parser.value, laikaInputs.value.delegate)
-        .withLogger(s => IO(logger.info(s)))
-        .withConfig(applyFlags(config))
-        .build
-        .allocated
-        .unsafeRunSync()
-
-      logger.info(s"Preview server started on port ${previewConfig.port}.")
-
-      (Compile / runMain)
-        // watch but no-livereload b/c we don't need an mdoc server
-        .toTask(s" mdoc.Main --watch --no-livereload")
-        .andFinally {
-          logger.info(s"Shutting down preview server.")
-          cancel.unsafeRunSync()
-        }
-    }.value,
+    tlSitePreview := previewTask.value,
     Laika / sourceDirectories := Seq(mdocOut.value),
     laikaTheme := tlSiteHeliumConfig.value.build,
     mdocVariables ++= Map(
@@ -222,5 +174,56 @@ object TypelevelSitePlugin extends AutoPlugin {
       src.close()
     }
   }
+
+  private def previewTask = Def
+    .taskDyn {
+      // inlined from https://github.com/planet42/Laika/blob/9022f6f37c9017f7612fa59398f246c8e8c42c3e/sbt/src/main/scala/laika/sbt/Tasks.scala#L192
+      import cats.effect.IO
+      import cats.effect.unsafe.implicits._
+      import laika.sbt.Settings
+      import laika.sbt.Tasks.generateAPI
+      import laika.preview.{ServerBuilder, ServerConfig}
+
+      val logger = streams.value.log
+      logger.info("Initializing server...")
+
+      def applyIf(
+          flag: Boolean,
+          f: ServerConfig => ServerConfig): ServerConfig => ServerConfig =
+        if (flag) f else identity
+
+      val previewConfig = laikaPreviewConfig.value
+      val _ = generateAPI.value
+
+      val applyFlags = applyIf(laikaIncludeEPUB.value, _.withEPUBDownloads)
+        .andThen(applyIf(laikaIncludePDF.value, _.withPDFDownloads))
+        .andThen(
+          applyIf(laikaIncludeAPI.value, _.withAPIDirectory(Settings.apiTargetDirectory.value)))
+        .andThen(applyIf(previewConfig.isVerbose, _.verbose))
+
+      val config = ServerConfig
+        .defaults
+        .withArtifactBasename(name.value)
+        // .withHost(previewConfig.host)
+        .withPort(previewConfig.port)
+        .withPollInterval(previewConfig.pollInterval)
+
+      val (_, cancel) = ServerBuilder[IO](Settings.parser.value, laikaInputs.value.delegate)
+        .withLogger(s => IO(logger.info(s)))
+        .withConfig(applyFlags(config))
+        .build
+        .allocated
+        .unsafeRunSync()
+
+      logger.info(s"Preview server started on port ${previewConfig.port}.")
+
+      // watch but no-livereload b/c we don't need an mdoc server
+      mdoc.toTask(" --watch --no-livereload").andFinally {
+        logger.info(s"Shutting down preview server.")
+        cancel.unsafeRunSync()
+      }
+    }
+    // initial run of mdoc to bootstrap laikaPreview
+    .dependsOn(mdoc.toTask(""))
 
 }
