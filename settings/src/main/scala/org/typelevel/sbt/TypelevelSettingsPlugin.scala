@@ -247,7 +247,7 @@ object TypelevelSettingsPlugin extends AutoPlugin {
         }
       case n =>
         sys.error(
-          s"You're using JDK $n, which is not supported by `sbt-typelevel`. Please switch to a newer JDK.")
+          s"Target JDK is $n, which is not supported by `sbt-typelevel`. Please select a JDK >= 8.")
     }
 
   private val javaRuntimeVersion: Int =
