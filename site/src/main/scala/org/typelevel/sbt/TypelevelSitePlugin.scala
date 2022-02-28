@@ -43,7 +43,7 @@ object TypelevelSitePlugin extends AutoPlugin {
   object autoImport {
     lazy val tlSiteHeliumConfig = settingKey[Helium]("The Helium configuration")
     lazy val tlSiteApiUrl = settingKey[Option[URL]]("URL to the API docs")
-    lazy val tlSiteRelated =
+    lazy val tlSiteRelatedProjects =
       settingKey[Seq[(String, URL)]]("A list of related projects (default: cats)")
 
     lazy val tlSiteKeepFiles =
@@ -72,7 +72,7 @@ object TypelevelSitePlugin extends AutoPlugin {
   override def buildSettings = Seq(
     tlSitePublishBranch := Some("main"),
     tlSiteApiUrl := None,
-    tlSiteRelated := Seq(TypelevelProject.Cats),
+    tlSiteRelatedProjects := Seq(TypelevelProject.Cats),
     tlSiteKeepFiles := true,
     homepage := {
       gitHubUserRepo.value.map {
@@ -94,7 +94,8 @@ object TypelevelSitePlugin extends AutoPlugin {
     laikaTheme := tlSiteHeliumConfig
       .value
       .build
-      .extend(TypelevelHeliumExtensions(licenses.value.headOption, tlSiteRelated.value)),
+      .extend(
+        TypelevelHeliumExtensions(licenses.value.headOption, tlSiteRelatedProjects.value)),
     mdocVariables ++= Map(
       "VERSION" -> GitHelper
         .previousReleases(fromHead = true)
