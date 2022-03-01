@@ -6,6 +6,7 @@ val modules = List(
   "github",
   "github-actions",
   "kernel",
+  "mergify",
   "mima",
   "no-publish",
   "settings",

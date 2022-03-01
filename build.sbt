@@ -11,12 +11,17 @@ ThisBuild / developers := List(
   tlGitHubDev("djspiewak", "Daniel Spiewak")
 )
 
+ThisBuild / mergifyStewardConfig ~= { _.map(_.copy(mergeMinors = true)) }
+ThisBuild / mergifySuccessConditions += MergifyCondition.Custom("#approved-reviews-by>=1")
+ThisBuild / mergifyLabelPaths += { "docs" -> file("docs") }
+
 lazy val root = tlCrossRootProject.aggregate(
   kernel,
   noPublish,
   settings,
   github,
   githubActions,
+  mergify,
   versioning,
   mima,
   sonatype,
@@ -66,6 +71,15 @@ lazy val githubActions = project
   .settings(
     name := "sbt-typelevel-github-actions"
   )
+
+lazy val mergify = project
+  .in(file("mergify"))
+  .enablePlugins(SbtPlugin)
+  .settings(
+    name := "sbt-typelevel-mergify",
+    tlVersionIntroduced := Map("2.12" -> "0.4.6")
+  )
+  .dependsOn(githubActions)
 
 lazy val versioning = project
   .in(file("versioning"))
