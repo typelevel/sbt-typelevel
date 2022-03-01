@@ -155,7 +155,6 @@ lazy val unidoc = project
   .enablePlugins(TypelevelUnidocPlugin)
   .settings(
     name := "sbt-typelevel-docs",
-    mimaPreviousArtifacts := Set.empty
   )
 
 lazy val docs = project

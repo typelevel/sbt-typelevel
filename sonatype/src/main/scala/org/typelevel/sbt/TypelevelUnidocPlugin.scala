@@ -17,6 +17,7 @@
 package org.typelevel.sbt
 
 import sbt._, Keys._
+import com.typesafe.tools.mima.plugin.MimaPlugin.autoImport._
 import sbtunidoc.ScalaUnidocPlugin
 
 object TypelevelUnidocPlugin extends AutoPlugin {
@@ -30,7 +31,8 @@ object TypelevelUnidocPlugin extends AutoPlugin {
 
   override def projectSettings = Seq(
     Compile / packageDoc / mappings := (ScalaUnidoc / packageDoc / mappings).value,
-    ThisBuild / apiURL := javadocioUrl.value
+    ThisBuild / apiURL := javadocioUrl.value,
+    mimaPreviousArtifacts := Set.empty
   )
 
 }
