@@ -52,15 +52,9 @@ object TypelevelMimaPlugin extends AutoPlugin {
         .map(_.copy(prerelease = None))
         .getOrElse(sys.error(s"Version must be semver format: ${version.value}"))
 
-      val introduced = tlVersionIntroduced
-        .value
-        .get(scalaBinaryVersion.value)
-        .map(v => V(v).getOrElse(sys.error(s"Version must be semver format: $v")))
-
       val previous = GitHelper
         .previousReleases()
         .filterNot(_.isPrerelease)
-        .filter(v => introduced.forall(v >= _))
         .filter(current.mustBeBinCompatWith(_))
 
       previous.map(_.toString).toSet
@@ -74,6 +68,18 @@ object TypelevelMimaPlugin extends AutoPlugin {
       else mimaReportBinaryIssues.value
     },
     skipIfIrrelevant(mimaReportBinaryIssues),
+    tlMimaPreviousVersions := {
+      val introduced = tlVersionIntroduced
+        .value
+        .get(scalaBinaryVersion.value)
+        .map(v => V(v).getOrElse(sys.error(s"Version must be semver format: $v")))
+
+      tlMimaPreviousVersions
+        .value
+        .map(v => V(v).getOrElse(sys.error(s"Version must be semver format: $v")))
+        .filter(v => introduced.forall(v >= _))
+        .map(_.toString)
+    },
     mimaPreviousArtifacts := {
       if (publishArtifact.value)
         tlMimaPreviousVersions.value.map { v =>
