@@ -40,8 +40,8 @@ object MergifyPlugin extends AutoPlugin {
     lazy val mergifySuccessConditions = settingKey[Seq[MergifyCondition]](
       "Success conditions for merging (default: auto-generated from `mergifyRequiredJobs` setting)")
 
-    lazy val mergifyLabelPaths = settingKey[Map[String, Path]](
-      "A map from label to path (default: auto-populated for every subproject in your build)")
+    lazy val mergifyLabelPaths = settingKey[Map[String, File]](
+      "A map from label to file path (default: auto-populated for every subproject in your build)")
 
     type MergifyAction = org.typelevel.sbt.mergify.MergifyAction
     val MergifyAction = org.typelevel.sbt.mergify.MergifyAction
@@ -70,8 +70,8 @@ object MergifyPlugin extends AutoPlugin {
         mergifyStewardConfig.value.map(_.toPrRule(mergifySuccessConditions.value.toList)).toList
       val labelRules =
         mergifyLabelPaths.value.toList.sorted.map {
-          case (label, path) =>
-            val relPath = baseDir.relativize(path)
+          case (label, file) =>
+            val relPath = baseDir.relativize(file.toPath)
             MergifyPrRule(
               s"Label ${label} PRs",
               List(MergifyCondition.Custom(s"files~=^${relPath}/")),
@@ -120,10 +120,10 @@ object MergifyPlugin extends AutoPlugin {
         labelPaths
       } else {
         val add = labelPaths.get(label._1) match {
-          case Some(path) => label._1 -> commonAncestor(path, label._2)
+          case Some(path) => label._1 -> commonAncestor(path.toPath, label._2)
           case None => label
         }
-        labelPaths + add
+        labelPaths + (add._1 -> add._2.toFile)
       }
     }
   )
