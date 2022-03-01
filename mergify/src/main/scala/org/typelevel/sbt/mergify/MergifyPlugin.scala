@@ -74,7 +74,7 @@ object MergifyPlugin extends AutoPlugin {
             val relPath = baseDir.relativize(path)
             MergifyPrRule(
               s"Label ${label} PRs",
-              List(MergifyCondition.Custom(s"files~=^${relPath}")),
+              List(MergifyCondition.Custom(s"files~=^${relPath}/")),
               List(MergifyAction.Label(add = List(label)))
             )
         }

@@ -18,7 +18,7 @@ pull_request_rules:
     merge: {}
 - name: Label ci PRs
   conditions:
-  - files~=^ci
+  - files~=^ci/
   actions:
     label:
       add:
@@ -26,7 +26,7 @@ pull_request_rules:
       remove: []
 - name: Label ci-release PRs
   conditions:
-  - files~=^ci-release
+  - files~=^ci-release/
   actions:
     label:
       add:
@@ -34,7 +34,7 @@ pull_request_rules:
       remove: []
 - name: Label ci-signing PRs
   conditions:
-  - files~=^ci-signing
+  - files~=^ci-signing/
   actions:
     label:
       add:
@@ -42,7 +42,7 @@ pull_request_rules:
       remove: []
 - name: Label core PRs
   conditions:
-  - files~=^core
+  - files~=^core/
   actions:
     label:
       add:
@@ -50,7 +50,7 @@ pull_request_rules:
       remove: []
 - name: Label github PRs
   conditions:
-  - files~=^github
+  - files~=^github/
   actions:
     label:
       add:
@@ -58,7 +58,7 @@ pull_request_rules:
       remove: []
 - name: Label github-actions PRs
   conditions:
-  - files~=^github-actions
+  - files~=^github-actions/
   actions:
     label:
       add:
@@ -66,7 +66,7 @@ pull_request_rules:
       remove: []
 - name: Label kernel PRs
   conditions:
-  - files~=^kernel
+  - files~=^kernel/
   actions:
     label:
       add:
@@ -74,7 +74,7 @@ pull_request_rules:
       remove: []
 - name: Label mdocs PRs
   conditions:
-  - files~=^mdocs
+  - files~=^mdocs/
   actions:
     label:
       add:
@@ -82,7 +82,7 @@ pull_request_rules:
       remove: []
 - name: Label mergify PRs
   conditions:
-  - files~=^mergify
+  - files~=^mergify/
   actions:
     label:
       add:
@@ -90,7 +90,7 @@ pull_request_rules:
       remove: []
 - name: Label mima PRs
   conditions:
-  - files~=^mima
+  - files~=^mima/
   actions:
     label:
       add:
@@ -98,7 +98,7 @@ pull_request_rules:
       remove: []
 - name: Label no-publish PRs
   conditions:
-  - files~=^no-publish
+  - files~=^no-publish/
   actions:
     label:
       add:
@@ -106,7 +106,7 @@ pull_request_rules:
       remove: []
 - name: Label settings PRs
   conditions:
-  - files~=^settings
+  - files~=^settings/
   actions:
     label:
       add:
@@ -114,7 +114,7 @@ pull_request_rules:
       remove: []
 - name: Label site PRs
   conditions:
-  - files~=^site
+  - files~=^site/
   actions:
     label:
       add:
@@ -122,7 +122,7 @@ pull_request_rules:
       remove: []
 - name: Label sonatype PRs
   conditions:
-  - files~=^sonatype
+  - files~=^sonatype/
   actions:
     label:
       add:
@@ -130,7 +130,7 @@ pull_request_rules:
       remove: []
 - name: Label sonatype-ci-release PRs
   conditions:
-  - files~=^sonatype-ci-release
+  - files~=^sonatype-ci-release/
   actions:
     label:
       add:
@@ -138,7 +138,7 @@ pull_request_rules:
       remove: []
 - name: Label versioning PRs
   conditions:
-  - files~=^versioning
+  - files~=^versioning/
   actions:
     label:
       add:
