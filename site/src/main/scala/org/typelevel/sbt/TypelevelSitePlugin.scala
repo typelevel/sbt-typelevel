@@ -16,24 +16,38 @@
 
 package org.typelevel.sbt
 
-import sbt._, Keys._
-import mdoc.MdocPlugin, MdocPlugin.autoImport._
-import laika.ast._
 import laika.ast.LengthUnit._
-import laika.sbt.LaikaPlugin, LaikaPlugin.autoImport._
+import laika.ast._
 import laika.helium.Helium
-import laika.helium.config.{HeliumIcon, IconLink, ImageLink}
+import laika.helium.config.Favicon
+import laika.helium.config.HeliumIcon
+import laika.helium.config.IconLink
+import laika.helium.config.ImageLink
+import laika.sbt.LaikaPlugin
+import laika.theme.ThemeProvider
+import mdoc.MdocPlugin
 import org.typelevel.sbt.kernel.GitHelper
-import gha.GenerativePlugin, GenerativePlugin.autoImport._
-import scala.io.Source
-import java.util.Base64
+import org.typelevel.sbt.site._
+import sbt._
+
 import scala.annotation.nowarn
+
+import Keys._
+import MdocPlugin.autoImport._
+import LaikaPlugin.autoImport._
+import gha.GenerativePlugin
+import GenerativePlugin.autoImport._
 
 object TypelevelSitePlugin extends AutoPlugin {
 
   object autoImport {
-    lazy val tlSiteHeliumConfig = settingKey[Helium]("The Helium configuration")
+    lazy val tlSiteHeliumConfig = settingKey[Helium]("The Typelevel Helium configuration")
+    lazy val tlSiteHeliumExtensions =
+      settingKey[ThemeProvider]("The Typelevel Helium extensions")
     lazy val tlSiteApiUrl = settingKey[Option[URL]]("URL to the API docs")
+    lazy val tlSiteRelatedProjects =
+      settingKey[Seq[(String, URL)]]("A list of related projects (default: cats)")
+
     lazy val tlSiteKeepFiles =
       settingKey[Boolean]("Whether to keep existing files when deploying site (default: true)")
     lazy val tlSiteGenerate = settingKey[Seq[WorkflowStep]](
@@ -43,6 +57,12 @@ object TypelevelSitePlugin extends AutoPlugin {
     lazy val tlSitePublishBranch = settingKey[Option[String]](
       "The branch to publish the site from on every push. Set this to None if you only want to update the site on tag releases. (default: main)")
     lazy val tlSite = taskKey[Unit]("Generate the site (default: runs mdoc then laika)")
+    lazy val tlSitePreview = taskKey[Unit](
+      "Start a live-reload preview server (combines mdoc --watch with laikaPreview)")
+
+    val TypelevelProject = site.TypelevelProject
+    implicit def tlLaikaThemeProviderOps(provider: ThemeProvider): LaikaThemeProviderOps =
+      new site.LaikaThemeProviderOps(provider)
   }
 
   import autoImport._
@@ -54,6 +74,7 @@ object TypelevelSitePlugin extends AutoPlugin {
   override def buildSettings = Seq(
     tlSitePublishBranch := Some("main"),
     tlSiteApiUrl := None,
+    tlSiteRelatedProjects := Seq(TypelevelProject.Cats),
     tlSiteKeepFiles := true,
     homepage := {
       gitHubUserRepo.value.map {
@@ -70,8 +91,9 @@ object TypelevelSitePlugin extends AutoPlugin {
         laikaSite
       )
       .value: @nowarn("cat=other-pure-statement"),
+    tlSitePreview := previewTask.value,
     Laika / sourceDirectories := Seq(mdocOut.value),
-    laikaTheme := tlSiteHeliumConfig.value.build,
+    laikaTheme := tlSiteHeliumConfig.value.build.extend(tlSiteHeliumExtensions.value),
     mdocVariables ++= Map(
       "VERSION" -> GitHelper
         .previousReleases(fromHead = true)
@@ -80,9 +102,20 @@ object TypelevelSitePlugin extends AutoPlugin {
         .fold(version.value)(_.toString),
       "SNAPSHOT_VERSION" -> version.value
     ),
+    tlSiteHeliumExtensions := TypelevelHeliumExtensions(
+      licenses.value.headOption,
+      tlSiteRelatedProjects.value
+    ),
     tlSiteHeliumConfig := {
       Helium
         .defaults
+        .site
+        .metadata(
+          title = gitHubUserRepo.value.map(_._2),
+          authors = developers.value.map(_.name),
+          language = Some("en"),
+          version = Some(version.value.toString)
+        )
         .site
         .layout(
           contentWidth = px(860),
@@ -92,15 +125,18 @@ object TypelevelSitePlugin extends AutoPlugin {
           defaultLineHeight = 1.5,
           anchorPlacement = laika.helium.config.AnchorPlacement.Right
         )
-        // .site
-        // .favIcons( // TODO broken?
-        //   Favicon.external("https://typelevel.org/img/favicon.png", "32x32", "image/png")
-        // )
+        .site
+        .darkMode
+        .disabled
+        .site
+        .favIcons(
+          Favicon.external("https://typelevel.org/img/favicon.png", "32x32", "image/png")
+        )
         .site
         .topNavigationBar(
           homeLink = ImageLink.external(
             "https://typelevel.org",
-            Image.external(s"data:image/svg+xml;base64,$getSvgLogo")
+            Image.external(s"https://typelevel.org/img/logo.svg")
           ),
           navLinks = tlSiteApiUrl.value.toList.map { url =>
             IconLink.external(
@@ -118,10 +154,6 @@ object TypelevelSitePlugin extends AutoPlugin {
           )
         )
     },
-    laikaExtensions ++= Seq(
-      laika.markdown.github.GitHubFlavor,
-      laika.parse.code.SyntaxHighlighting
-    ),
     tlSiteGenerate := List(
       WorkflowStep.Sbt(
         List(s"${thisProject.value.id}/${tlSite.key.toString}"),
@@ -163,13 +195,55 @@ object TypelevelSitePlugin extends AutoPlugin {
       )
   )
 
-  private def getSvgLogo: String = {
-    val src = Source.fromURL(getClass.getResource("/logo.svg"))
-    try {
-      Base64.getEncoder().encodeToString(src.mkString.getBytes)
-    } finally {
-      src.close()
+  private def previewTask = Def
+    .taskDyn {
+      // inlined from https://github.com/planet42/Laika/blob/9022f6f37c9017f7612fa59398f246c8e8c42c3e/sbt/src/main/scala/laika/sbt/Tasks.scala#L192
+      import cats.effect.IO
+      import cats.effect.unsafe.implicits._
+      import laika.sbt.Settings
+      import laika.sbt.Tasks.generateAPI
+      import laika.preview.{ServerBuilder, ServerConfig}
+
+      val logger = streams.value.log
+      logger.info("Initializing server...")
+
+      def applyIf(
+          flag: Boolean,
+          f: ServerConfig => ServerConfig): ServerConfig => ServerConfig =
+        if (flag) f else identity
+
+      val previewConfig = laikaPreviewConfig.value
+      val _ = generateAPI.value
+
+      val applyFlags = applyIf(laikaIncludeEPUB.value, _.withEPUBDownloads)
+        .andThen(applyIf(laikaIncludePDF.value, _.withPDFDownloads))
+        .andThen(
+          applyIf(laikaIncludeAPI.value, _.withAPIDirectory(Settings.apiTargetDirectory.value)))
+        .andThen(applyIf(previewConfig.isVerbose, _.verbose))
+
+      val config = ServerConfig
+        .defaults
+        .withArtifactBasename(name.value)
+        // .withHost(previewConfig.host)
+        .withPort(previewConfig.port)
+        .withPollInterval(previewConfig.pollInterval)
+
+      val (_, cancel) = ServerBuilder[IO](Settings.parser.value, laikaInputs.value.delegate)
+        .withLogger(s => IO(logger.info(s)))
+        .withConfig(applyFlags(config))
+        .build
+        .allocated
+        .unsafeRunSync()
+
+      logger.info(s"Preview server started on port ${previewConfig.port}.")
+
+      // watch but no-livereload b/c we don't need an mdoc server
+      mdoc.toTask(" --watch --no-livereload").andFinally {
+        logger.info(s"Shutting down preview server.")
+        cancel.unsafeRunSync()
+      }
     }
-  }
+    // initial run of mdoc to bootstrap laikaPreview
+    .dependsOn(mdoc.toTask(""))
 
 }
