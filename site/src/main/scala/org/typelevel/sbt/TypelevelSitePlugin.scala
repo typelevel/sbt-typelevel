@@ -16,24 +16,38 @@
 
 package org.typelevel.sbt
 
-import sbt._, Keys._
-import mdoc.MdocPlugin, MdocPlugin.autoImport._
-import laika.ast._
 import laika.ast.LengthUnit._
-import laika.sbt.LaikaPlugin, LaikaPlugin.autoImport._
+import laika.ast._
 import laika.helium.Helium
-import laika.helium.config.{HeliumIcon, IconLink, ImageLink}
+import laika.helium.config.Favicon
+import laika.helium.config.HeliumIcon
+import laika.helium.config.IconLink
+import laika.helium.config.ImageLink
+import laika.sbt.LaikaPlugin
+import laika.theme.ThemeProvider
+import mdoc.MdocPlugin
 import org.typelevel.sbt.kernel.GitHelper
-import gha.GenerativePlugin, GenerativePlugin.autoImport._
-import scala.io.Source
-import java.util.Base64
+import org.typelevel.sbt.site._
+import sbt._
+
 import scala.annotation.nowarn
+
+import Keys._
+import MdocPlugin.autoImport._
+import LaikaPlugin.autoImport._
+import gha.GenerativePlugin
+import GenerativePlugin.autoImport._
 
 object TypelevelSitePlugin extends AutoPlugin {
 
   object autoImport {
-    lazy val tlSiteHeliumConfig = settingKey[Helium]("The Helium configuration")
+    lazy val tlSiteHeliumConfig = settingKey[Helium]("The Typelevel Helium configuration")
+    lazy val tlSiteHeliumExtensions =
+      settingKey[ThemeProvider]("The Typelevel Helium extensions")
     lazy val tlSiteApiUrl = settingKey[Option[URL]]("URL to the API docs")
+    lazy val tlSiteRelatedProjects =
+      settingKey[Seq[(String, URL)]]("A list of related projects (default: cats)")
+
     lazy val tlSiteKeepFiles =
       settingKey[Boolean]("Whether to keep existing files when deploying site (default: true)")
     lazy val tlSiteGenerate = settingKey[Seq[WorkflowStep]](
@@ -45,6 +59,10 @@ object TypelevelSitePlugin extends AutoPlugin {
     lazy val tlSite = taskKey[Unit]("Generate the site (default: runs mdoc then laika)")
     lazy val tlSitePreview = taskKey[Unit](
       "Start a live-reload preview server (combines mdoc --watch with laikaPreview)")
+
+    val TypelevelProject = site.TypelevelProject
+    implicit def tlLaikaThemeProviderOps(provider: ThemeProvider): LaikaThemeProviderOps =
+      new site.LaikaThemeProviderOps(provider)
   }
 
   import autoImport._
@@ -56,6 +74,7 @@ object TypelevelSitePlugin extends AutoPlugin {
   override def buildSettings = Seq(
     tlSitePublishBranch := Some("main"),
     tlSiteApiUrl := None,
+    tlSiteRelatedProjects := Seq(TypelevelProject.Cats),
     tlSiteKeepFiles := true,
     homepage := {
       gitHubUserRepo.value.map {
@@ -74,7 +93,7 @@ object TypelevelSitePlugin extends AutoPlugin {
       .value: @nowarn("cat=other-pure-statement"),
     tlSitePreview := previewTask.value,
     Laika / sourceDirectories := Seq(mdocOut.value),
-    laikaTheme := tlSiteHeliumConfig.value.build,
+    laikaTheme := tlSiteHeliumConfig.value.build.extend(tlSiteHeliumExtensions.value),
     mdocVariables ++= Map(
       "VERSION" -> GitHelper
         .previousReleases(fromHead = true)
@@ -83,9 +102,20 @@ object TypelevelSitePlugin extends AutoPlugin {
         .fold(version.value)(_.toString),
       "SNAPSHOT_VERSION" -> version.value
     ),
+    tlSiteHeliumExtensions := TypelevelHeliumExtensions(
+      licenses.value.headOption,
+      tlSiteRelatedProjects.value
+    ),
     tlSiteHeliumConfig := {
       Helium
         .defaults
+        .site
+        .metadata(
+          title = gitHubUserRepo.value.map(_._2),
+          authors = developers.value.map(_.name),
+          language = Some("en"),
+          version = Some(version.value.toString)
+        )
         .site
         .layout(
           contentWidth = px(860),
@@ -95,15 +125,18 @@ object TypelevelSitePlugin extends AutoPlugin {
           defaultLineHeight = 1.5,
           anchorPlacement = laika.helium.config.AnchorPlacement.Right
         )
-        // .site
-        // .favIcons( // TODO broken?
-        //   Favicon.external("https://typelevel.org/img/favicon.png", "32x32", "image/png")
-        // )
+        .site
+        .darkMode
+        .disabled
+        .site
+        .favIcons(
+          Favicon.external("https://typelevel.org/img/favicon.png", "32x32", "image/png")
+        )
         .site
         .topNavigationBar(
           homeLink = ImageLink.external(
             "https://typelevel.org",
-            Image.external(s"data:image/svg+xml;base64,$getSvgLogo")
+            Image.external(s"https://typelevel.org/img/logo.svg")
           ),
           navLinks = tlSiteApiUrl.value.toList.map { url =>
             IconLink.external(
@@ -121,10 +154,6 @@ object TypelevelSitePlugin extends AutoPlugin {
           )
         )
     },
-    laikaExtensions ++= Seq(
-      laika.markdown.github.GitHubFlavor,
-      laika.parse.code.SyntaxHighlighting
-    ),
     tlSiteGenerate := List(
       WorkflowStep.Sbt(
         List(s"${thisProject.value.id}/${tlSite.key.toString}"),
@@ -165,15 +194,6 @@ object TypelevelSitePlugin extends AutoPlugin {
           githubWorkflowJobSetup.value.toList ++ tlSiteGenerate.value ++ tlSitePublish.value
       )
   )
-
-  private def getSvgLogo: String = {
-    val src = Source.fromURL(getClass.getResource("/logo.svg"))
-    try {
-      Base64.getEncoder().encodeToString(src.mkString.getBytes)
-    } finally {
-      src.close()
-    }
-  }
 
   private def previewTask = Def
     .taskDyn {
