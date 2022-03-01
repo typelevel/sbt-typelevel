@@ -114,17 +114,13 @@ object MergifyPlugin extends AutoPlugin {
     githubWorkflowCheck := githubWorkflowCheck.dependsOn((ThisBuild / mergifyCheck)).value,
     ThisBuild / mergifyLabelPaths := {
       val labelPaths = (ThisBuild / mergifyLabelPaths).value
-      val label = projectLabel.value
-      def isRoot = label._2 ==
-        (LocalRootProject / baseDirectory).value.toPath
-      if (label._1.startsWith(".") || isRoot) { // don't label this project
-        labelPaths
-      } else {
-        val add = labelPaths.get(label._1) match {
-          case Some(path) => label._1 -> commonAncestor(path.toPath, label._2)
-          case None => label
-        }
-        labelPaths + (add._1 -> add._2.toFile)
+      projectLabel.value.fold(labelPaths) {
+        case (label, path) =>
+          val add = labelPaths.get(label) match {
+            case Some(f) => label -> commonAncestor(f.toPath, path)
+            case None => label -> path
+          }
+          labelPaths + (add._1 -> add._2.toFile)
       }
     }
   )
@@ -155,7 +151,13 @@ object MergifyPlugin extends AutoPlugin {
       .getOrElse(Seq.empty)
       .map(_.toPath)
       .foldLeft(baseDirectory.value.toPath)(commonAncestor(_, _))
-    path.getFileName.toString -> path
+
+    val label = path.getFileName.toString
+
+    def isRoot = path == (LocalRootProject / baseDirectory).value.toPath
+    if (label.startsWith(".") || isRoot) // don't label this project
+      None
+    else Some(label -> path)
   }
 
   // x and y should be absolute/normalized
