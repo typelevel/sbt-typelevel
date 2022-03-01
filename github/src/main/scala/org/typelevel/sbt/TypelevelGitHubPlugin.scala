@@ -33,22 +33,30 @@ object TypelevelGitHubPlugin extends AutoPlugin {
     def tlGitHubDev(user: String, fullName: String): Developer = {
       Developer(user, fullName, s"@$user", url(s"https://github.com/$user"))
     }
+
+    lazy val tlGitHubRepo = settingKey[Option[String]]("The name of this repository on GitHub")
   }
 
+  import autoImport._
+
   override def buildSettings = Seq(
-    scmInfo := getScmInfo(),
+    tlGitHubRepo := gitHubUserRepo.value.map(_._2),
+    scmInfo := gitHubUserRepo.value.map {
+      case (user, repo) =>
+        gitHubScmInfo(user, repo)
+    },
     homepage := homepage.value.orElse(scmInfo.value.map(_.browseUrl))
   )
 
-  private def getScmInfo(): Option[ScmInfo] = {
-    import scala.sys.process._
+  private def gitHubScmInfo(user: String, repo: String) =
+    ScmInfo(
+      url(s"https://github.com/$user/$repo"),
+      s"scm:git:https://github.com/$user/$repo.git",
+      s"scm:git:git@github.com:$user/$repo.git"
+    )
 
-    def gitHubScmInfo(user: String, repo: String) =
-      ScmInfo(
-        url(s"https://github.com/$user/$repo"),
-        s"scm:git:https://github.com/$user/$repo.git",
-        s"scm:git:git@github.com:$user/$repo.git"
-      )
+  private[sbt] def gitHubUserRepo = Def.setting {
+    import scala.sys.process._
 
     val identifier = """([^\/]+?)"""
     val GitHubHttps = s"https://github.com/$identifier/$identifier(?:\\.git)?".r
@@ -57,9 +65,9 @@ object TypelevelGitHubPlugin extends AutoPlugin {
     Try {
       val remote = List("git", "ls-remote", "--get-url", "origin").!!.trim()
       remote match {
-        case GitHubHttps(user, repo) => Some(gitHubScmInfo(user, repo))
-        case GitHubGit(user, repo) => Some(gitHubScmInfo(user, repo))
-        case GitHubSsh(user, repo) => Some(gitHubScmInfo(user, repo))
+        case GitHubHttps(user, repo) => Some((user, repo))
+        case GitHubGit(user, repo) => Some((user, repo))
+        case GitHubSsh(user, repo) => Some((user, repo))
         case _ => None
       }
     }.toOption.flatten

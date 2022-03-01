@@ -2,6 +2,7 @@ name := "sbt-typelevel"
 
 ThisBuild / tlBaseVersion := "0.4"
 ThisBuild / tlCiReleaseBranches := Seq("series/0.4")
+ThisBuild / tlSitePublishBranch := Some("series/0.4")
 ThisBuild / crossScalaVersions := Seq("2.12.15")
 ThisBuild / developers := List(
   tlGitHubDev("armanbilge", "Arman Bilge"),
@@ -147,7 +148,7 @@ lazy val site = project
   .settings(
     name := "sbt-typelevel-site"
   )
-  .dependsOn(kernel, githubActions, noPublish)
+  .dependsOn(kernel, github, githubActions, noPublish)
 
 lazy val unidoc = project
   .in(file("unidoc"))
@@ -165,5 +166,13 @@ lazy val docs = project
   .settings(
     laikaConfig ~= { _.withRawContent },
     tlSiteApiModule := Some((unidoc / projectID).value),
-    tlSiteApiPackage := Some("org.typelevel.sbt")
+    tlSiteApiPackage := Some("org.typelevel.sbt"),
+    tlSiteRelatedProjects := Seq(
+      "sbt" -> url("https://www.scala-sbt.org/"),
+      "sbt-crossproject" -> url("https://github.com/portable-scala/sbt-crossproject"),
+      "sbt-github-actions" -> url("https://github.com/djspiewak/sbt-github-actions/"),
+      "mima" -> url("https://github.com/lightbend/mima"),
+      "mdoc" -> url("https://scalameta.org/mdoc/"),
+      "Laika" -> url("https://planet42.github.io/Laika/")
+    )
   )

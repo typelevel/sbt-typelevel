@@ -40,6 +40,7 @@ object TypelevelPlugin extends AutoPlugin {
   }
 
   import autoImport._
+  import TypelevelKernelPlugin.mkCommand
   import TypelevelSettingsPlugin.autoImport._
   import TypelevelSonatypeCiReleasePlugin.autoImport._
   import GenerativePlugin.autoImport._
@@ -52,8 +53,15 @@ object TypelevelPlugin extends AutoPlugin {
   override def buildSettings = Seq(
     organization := "org.typelevel",
     organizationName := "Typelevel",
+    organizationHomepage := {
+      organizationHomepage.?.value.flatten.orElse {
+        if (organizationName.value == "Typelevel")
+          Some(url("https://typelevel.org"))
+        else None
+      }
+    },
     startYear := Some(java.time.YearMonth.now().getYear()),
-    licenses += "Apache-2.0" -> url("http://www.apache.org/licenses/"),
+    licenses += "Apache-2.0" -> url("https://www.apache.org/licenses/LICENSE-2.0.txt"),
     tlCiReleaseBranches := Seq("main"),
     Def.derive(tlFatalWarnings := (tlFatalWarningsInCi.value && githubIsWorkflowBuild.value)),
     githubWorkflowBuildMatrixExclusions ++= {
@@ -72,7 +80,7 @@ object TypelevelPlugin extends AutoPlugin {
     }
   ) ++ addCommandAlias(
     "prePR",
-    TypelevelKernelPlugin.mkCommand(
+    mkCommand(
       List(
         "reload",
         "project /",
@@ -84,6 +92,16 @@ object TypelevelPlugin extends AutoPlugin {
         "set ThisBuild / tlFatalWarnings := tlFatalWarningsInCi.value",
         "Test / compile",
         "reload"
+      )
+    )
+  ) ++ addCommandAlias(
+    "tlPrePrBotHook",
+    mkCommand(
+      List(
+        "githubWorkflowGenerate",
+        "+headerCreateAll",
+        "+scalafmtAll",
+        "scalafmtSbt"
       )
     )
   )
