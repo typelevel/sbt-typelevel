@@ -184,8 +184,7 @@ object MergifyPlugin extends AutoPlugin {
         |# change your sbt build configuration to revise the mergify configuration
         |# to meet your needs, then regenerate this file.
         |
-        |${printer.pretty(contents.asJson)}
-        |""".stripMargin
+        |${printer.pretty(contents.asJson)}""".stripMargin
   }
 
 }
