@@ -1,0 +1,1 @@
+../mergify/build.sbt
