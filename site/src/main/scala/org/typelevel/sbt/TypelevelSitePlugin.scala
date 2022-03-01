@@ -41,7 +41,9 @@ import GenerativePlugin.autoImport._
 object TypelevelSitePlugin extends AutoPlugin {
 
   object autoImport {
-    lazy val tlSiteHeliumConfig = settingKey[Helium]("The Helium configuration")
+    lazy val tlSiteHeliumConfig = settingKey[Helium]("The Typelevel Helium configuration")
+    lazy val tlSiteHeliumExtensions =
+      settingKey[ThemeProvider]("The Typelevel Helium extensions")
     lazy val tlSiteApiUrl = settingKey[Option[URL]]("URL to the API docs")
     lazy val tlSiteRelatedProjects =
       settingKey[Seq[(String, URL)]]("A list of related projects (default: cats)")
@@ -91,11 +93,7 @@ object TypelevelSitePlugin extends AutoPlugin {
       .value: @nowarn("cat=other-pure-statement"),
     tlSitePreview := previewTask.value,
     Laika / sourceDirectories := Seq(mdocOut.value),
-    laikaTheme := tlSiteHeliumConfig
-      .value
-      .build
-      .extend(
-        TypelevelHeliumExtensions(licenses.value.headOption, tlSiteRelatedProjects.value)),
+    laikaTheme := tlSiteHeliumConfig.value.build.extend(tlSiteHeliumExtensions.value),
     mdocVariables ++= Map(
       "VERSION" -> GitHelper
         .previousReleases(fromHead = true)
@@ -103,6 +101,10 @@ object TypelevelSitePlugin extends AutoPlugin {
         .headOption
         .fold(version.value)(_.toString),
       "SNAPSHOT_VERSION" -> version.value
+    ),
+    tlSiteHeliumExtensions := TypelevelHeliumExtensions(
+      licenses.value.headOption,
+      tlSiteRelatedProjects.value
     ),
     tlSiteHeliumConfig := {
       Helium
