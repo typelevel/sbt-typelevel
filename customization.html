@@ -207,6 +207,7 @@
         <ul>
           <li><code>TypelevelSitePlugin</code>: Sets up an <a href="https://scalameta.org/mdoc/">mdoc</a>/<a href="https://planet42.github.io/Laika/">Laika</a>-generated microsite, automatically published to GitHub pages in CI.</li>
           <li><code>tlSitePublishBranch</code> (setting): The branch to publish the site from on every push. Set this to <code>None</code> if you only want to update the site on tag releases. (default: <code>main</code>)</li>
+          <li><code>tlSitePublishTags</code> (setting): Defines whether the site should be published on tag releases. Note on setting this to <code>true</code> requires the <code>tlSitePublishBranch</code> setting to be set to <code>None</code>. (default: <code>false</code>)</li>
           <li><code>tlSiteApiUrl</code> (setting): URL to the API docs. (default: <code>None</code>)</li>
           <li><code>tlSiteHeliumConfig</code> (setting): the Laika Helium config. (default: how the sbt-typelevel site looks)</li>
         </ul>
