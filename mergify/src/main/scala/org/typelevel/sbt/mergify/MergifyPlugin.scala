@@ -68,7 +68,7 @@ object MergifyPlugin extends AutoPlugin {
       val baseDir = (LocalRootProject / baseDirectory).value.toPath
       val stewardRule =
         mergifyStewardConfig.value.map(_.toPrRule(mergifySuccessConditions.value.toList)).toList
-      val labelRules = 
+      val labelRules =
         mergifyLabelPaths.value.toList.sorted.map {
           case (label, path) =>
             val relPath = baseDir.relativize(path)
