@@ -65,7 +65,20 @@ object MergifyPlugin extends AutoPlugin {
     mergifyLabelPaths := Map.empty,
     mergifySuccessConditions := jobSuccessConditions.value,
     mergifyPrRules := {
-      mergifyStewardConfig.value.map(_.toPrRule(mergifySuccessConditions.value.toList)).toList
+      val baseDir = (LocalRootProject / baseDirectory).value.toPath
+      val stewardRule =
+        mergifyStewardConfig.value.map(_.toPrRule(mergifySuccessConditions.value.toList)).toList
+      val labelRules = 
+        mergifyLabelPaths.value.toList.sorted.map {
+          case (label, path) =>
+            val relPath = baseDir.relativize(path)
+            MergifyPrRule(
+              s"Label ${label} PRs",
+              List(MergifyCondition.Custom(s"files~=^${relPath}")),
+              List(MergifyAction.Label(add = List(label)))
+            )
+        }
+      stewardRule ++ labelRules
     },
     mergifyGenerate := {
       IO.write(mergifyYaml.value, generateMergifyContents.value)
@@ -97,7 +110,22 @@ object MergifyPlugin extends AutoPlugin {
     githubWorkflowGenerate := githubWorkflowGenerate
       .dependsOn((ThisBuild / mergifyGenerate))
       .value,
-    githubWorkflowCheck := githubWorkflowCheck.dependsOn((ThisBuild / mergifyCheck)).value
+    githubWorkflowCheck := githubWorkflowCheck.dependsOn((ThisBuild / mergifyCheck)).value,
+    ThisBuild / mergifyLabelPaths := {
+      val labelPaths = (ThisBuild / mergifyLabelPaths).value
+      val label = projectLabel.value
+      def isRoot = label._2 ==
+        (LocalRootProject / baseDirectory).value.toPath
+      if (label._1.startsWith(".") || isRoot) { // don't label this project
+        labelPaths
+      } else {
+        val add = labelPaths.get(label._1) match {
+          case Some(path) => label._1 -> commonAncestor(path, label._2)
+          case None => label
+        }
+        labelPaths + add
+      }
+    }
   )
 
   private lazy val jobSuccessConditions = Def.setting {
@@ -117,6 +145,25 @@ object MergifyPlugin extends AutoPlugin {
           }
       case _ => Nil
     }
+  }
+
+  private lazy val projectLabel = Def.setting {
+    val path = (Compile / sourceDirectories)
+      .?
+      .value
+      .getOrElse(Seq.empty)
+      .map(_.toPath)
+      .foldLeft(baseDirectory.value.toPath)(commonAncestor(_, _))
+    path.getFileName.toString -> path
+  }
+
+  // x and y should be absolute/normalized
+  private def commonAncestor(x: Path, y: Path): Path = {
+    val n = math.min(x.getNameCount, y.getNameCount)
+    (0 until n)
+      .takeWhile(i => x.getName(i) == y.getName(i))
+      .map(x.getName(_))
+      .foldLeft(java.nio.file.Paths.get("/"))(_.resolve(_))
   }
 
   private lazy val mergifyYaml = Def.setting {
