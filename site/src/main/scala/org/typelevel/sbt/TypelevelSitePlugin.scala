@@ -126,6 +126,9 @@ object TypelevelSitePlugin extends AutoPlugin {
           anchorPlacement = laika.helium.config.AnchorPlacement.Right
         )
         .site
+        .darkMode
+        .disabled
+        .site
         .favIcons(
           Favicon.external("https://typelevel.org/img/favicon.png", "32x32", "image/png")
         )
