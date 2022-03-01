@@ -101,11 +101,7 @@ object TypelevelSitePlugin extends AutoPlugin {
     Laika / sourceDirectories := Seq(mdocOut.value),
     laikaTheme := tlSiteHeliumConfig.value.build.extend(tlSiteHeliumExtensions.value),
     mdocVariables ++= Map(
-      "VERSION" -> GitHelper
-        .previousReleases(fromHead = true)
-        .filterNot(_.isPrerelease)
-        .headOption
-        .fold(version.value)(_.toString),
+      "VERSION" -> currentRelease.value.getOrElse(version.value),
       "SNAPSHOT_VERSION" -> version.value
     ),
     tlSiteHeliumExtensions := TypelevelHeliumExtensions(
@@ -220,6 +216,14 @@ object TypelevelSitePlugin extends AutoPlugin {
       )
   )
 
+  private lazy val currentRelease = Def.setting {
+    GitHelper
+      .previousReleases(fromHead = true)
+      .filterNot(_.isPrerelease)
+      .headOption
+      .map(_.toString)
+  }
+
   private def previewTask = Def
     .taskDyn {
       // inlined from https://github.com/planet42/Laika/blob/9022f6f37c9017f7612fa59398f246c8e8c42c3e/sbt/src/main/scala/laika/sbt/Tasks.scala#L192
@@ -270,9 +274,5 @@ object TypelevelSitePlugin extends AutoPlugin {
     }
     // initial run of mdoc to bootstrap laikaPreview
     .dependsOn(mdoc.toTask(""))
-
-  private lazy val currentRelease = Def.setting {
-    GitHelper.previousReleases(fromHead = true).filterNot(_.isPrerelease).headOption
-  }
 
 }
