@@ -32,7 +32,9 @@ object TypelevelUnidocPlugin extends AutoPlugin {
   override def projectSettings = Seq(
     Compile / packageDoc / mappings := (ScalaUnidoc / packageDoc / mappings).value,
     ThisBuild / apiURL := javadocioUrl.value,
-    mimaPreviousArtifacts := Set.empty
+    mimaPreviousArtifacts := Set.empty,
+    // tell the site plugin about us, without forcing the dependency!
+    ThisBuild / SettingKey[Option[ModuleID]]("tlSiteApiModule") := Some(projectID.value)
   )
 
 }

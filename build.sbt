@@ -162,7 +162,6 @@ lazy val docs = project
   .enablePlugins(TypelevelSitePlugin)
   .settings(
     laikaConfig ~= { _.withRawContent },
-    tlSiteApiModule := Some((unidoc / projectID).value),
     tlSiteApiPackage := Some("org.typelevel.sbt"),
     tlSiteRelatedProjects := Seq(
       "sbt" -> url("https://www.scala-sbt.org/"),

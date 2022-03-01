@@ -46,7 +46,7 @@ object TypelevelSitePlugin extends AutoPlugin {
       settingKey[ThemeProvider]("The Typelevel Helium extensions")
     lazy val tlSiteApiUrl = settingKey[Option[URL]]("URL to the API docs")
     lazy val tlSiteApiModule =
-      settingKey[Option[ModuleID]]("The project that publishes API docs")
+      settingKey[Option[ModuleID]]("The module that publishes API docs")
     lazy val tlSiteApiPackage = settingKey[Option[String]](
       "The top-level package for your API docs (e.g. org.typlevel.sbt)")
     lazy val tlSiteRelatedProjects =
@@ -75,10 +75,13 @@ object TypelevelSitePlugin extends AutoPlugin {
   override def requires =
     MdocPlugin && LaikaPlugin && TypelevelGitHubPlugin && GenerativePlugin && NoPublishPlugin
 
+  override def globalSettings = Seq(
+    tlSiteApiModule := None
+  )
+
   override def buildSettings = Seq(
     tlSitePublishBranch := Some("main"),
     tlSiteApiUrl := None,
-    tlSiteApiModule := None,
     tlSiteApiPackage := None,
     tlSiteRelatedProjects := Seq(TypelevelProject.Cats),
     tlSiteKeepFiles := true,
