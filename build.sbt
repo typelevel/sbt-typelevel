@@ -154,7 +154,7 @@ lazy val unidoc = project
   .in(file("unidoc"))
   .enablePlugins(TypelevelUnidocPlugin)
   .settings(
-    name := "sbt-typelevel-docs",
+    name := "sbt-typelevel-docs"
   )
 
 lazy val docs = project
