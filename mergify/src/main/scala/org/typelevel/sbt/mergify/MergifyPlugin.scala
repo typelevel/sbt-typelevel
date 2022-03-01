@@ -71,10 +71,11 @@ object MergifyPlugin extends AutoPlugin {
       val labelRules =
         mergifyLabelPaths.value.toList.sorted.map {
           case (label, file) =>
-            val relPath = baseDir.relativize(file.toPath)
+            val relPath = baseDir.relativize(file.toPath.toAbsolutePath.normalize)
+            val suffix = if (file.isDirectory) "/" else ""
             MergifyPrRule(
               s"Label ${label} PRs",
-              List(MergifyCondition.Custom(s"files~=^${relPath}/")),
+              List(MergifyCondition.Custom(s"files~=^${relPath}${suffix}")),
               List(MergifyAction.Label(add = List(label)))
             )
         }

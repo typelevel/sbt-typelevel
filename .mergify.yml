@@ -48,6 +48,14 @@ pull_request_rules:
       add:
       - core
       remove: []
+- name: Label docs PRs
+  conditions:
+  - files~=^docs/
+  actions:
+    label:
+      add:
+      - docs
+      remove: []
 - name: Label github PRs
   conditions:
   - files~=^github/
