@@ -154,9 +154,7 @@ lazy val unidoc = project
   .in(file("unidoc"))
   .enablePlugins(TypelevelUnidocPlugin)
   .settings(
-    // Doesn't conflict w/ core artifact since this one won't have the sbt cross version suffix
-    // javadoc.io doesn't recognize sbt artifacts, so we must publish like this
-    name := "sbt-typelevel",
+    name := "sbt-typelevel-docs",
     mimaPreviousArtifacts := Set.empty
   )
 
