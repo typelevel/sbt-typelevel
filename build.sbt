@@ -31,6 +31,7 @@ lazy val root = tlCrossRootProject.aggregate(
   core,
   ciRelease,
   site,
+  unidoc,
   docs
 )
 
@@ -163,11 +164,19 @@ lazy val site = project
   )
   .dependsOn(kernel, github, githubActions, noPublish)
 
+lazy val unidoc = project
+  .in(file("unidoc"))
+  .enablePlugins(TypelevelUnidocPlugin)
+  .settings(
+    name := "sbt-typelevel-docs"
+  )
+
 lazy val docs = project
   .in(file("mdocs"))
   .enablePlugins(TypelevelSitePlugin)
   .settings(
     laikaConfig ~= { _.withRawContent },
+    tlSiteApiPackage := Some("org.typelevel.sbt"),
     tlSiteRelatedProjects := Seq(
       "sbt" -> url("https://www.scala-sbt.org/"),
       "sbt-crossproject" -> url("https://github.com/portable-scala/sbt-crossproject"),

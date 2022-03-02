@@ -62,23 +62,22 @@ object TypelevelSonatypePlugin extends AutoPlugin {
           "s01.oss.sonatype.org"
       }
     },
-    apiURL := {
-      val javadocio =
-        if (isSnapshot.value || sbtPlugin.value || !publishArtifact.value)
-          None // javadoc.io doesn't support snapshots, sbt plugins, or unpublished modules ;)
-        else
-          CrossVersion(
-            crossVersion.value,
-            scalaVersion.value,
-            scalaBinaryVersion.value
-          ).map { cross =>
-            url(
-              s"https://www.javadoc.io/doc/${organization.value}/${cross(moduleName.value)}/${version.value}/")
-          }
-
-      apiURL.value.orElse(javadocio)
-    }
+    apiURL := apiURL.value.orElse(javadocioUrl.value)
   )
+
+  private[sbt] def javadocioUrl = Def.setting {
+    if (isSnapshot.value || sbtPlugin.value || !publishArtifact.value)
+      None // javadoc.io doesn't support snapshots, sbt plugins, or unpublished modules ;)
+    else
+      CrossVersion(
+        crossVersion.value,
+        scalaVersion.value,
+        scalaBinaryVersion.value
+      ).map { cross =>
+        url(
+          s"https://www.javadoc.io/doc/${organization.value}/${cross(moduleName.value)}/${version.value}/")
+      }
+  }
 
   private def sonatypeBundleReleaseIfRelevant: Command =
     Command.command("tlSonatypeBundleReleaseIfRelevant") { state =>

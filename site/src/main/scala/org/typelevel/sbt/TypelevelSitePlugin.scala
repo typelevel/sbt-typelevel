@@ -45,6 +45,10 @@ object TypelevelSitePlugin extends AutoPlugin {
     lazy val tlSiteHeliumExtensions =
       settingKey[ThemeProvider]("The Typelevel Helium extensions")
     lazy val tlSiteApiUrl = settingKey[Option[URL]]("URL to the API docs")
+    lazy val tlSiteApiModule =
+      settingKey[Option[ModuleID]]("The module that publishes API docs")
+    lazy val tlSiteApiPackage = settingKey[Option[String]](
+      "The top-level package for your API docs (e.g. org.typlevel.sbt)")
     lazy val tlSiteRelatedProjects =
       settingKey[Seq[(String, URL)]]("A list of related projects (default: cats)")
 
@@ -73,10 +77,15 @@ object TypelevelSitePlugin extends AutoPlugin {
   override def requires =
     MdocPlugin && LaikaPlugin && TypelevelGitHubPlugin && GenerativePlugin && NoPublishPlugin
 
+  override def globalSettings = Seq(
+    tlSiteApiModule := None
+  )
+
   override def buildSettings = Seq(
     tlSitePublishBranch := Some("main"),
     tlSitePublishTags := tlSitePublishBranch.value.isEmpty,
     tlSiteApiUrl := None,
+    tlSiteApiPackage := None,
     tlSiteRelatedProjects := Seq(TypelevelProject.Cats),
     tlSiteKeepFiles := true,
     homepage := {
@@ -98,17 +107,32 @@ object TypelevelSitePlugin extends AutoPlugin {
     Laika / sourceDirectories := Seq(mdocOut.value),
     laikaTheme := tlSiteHeliumConfig.value.build.extend(tlSiteHeliumExtensions.value),
     mdocVariables ++= Map(
-      "VERSION" -> GitHelper
-        .previousReleases(fromHead = true)
-        .filterNot(_.isPrerelease)
-        .headOption
-        .fold(version.value)(_.toString),
+      "VERSION" -> currentRelease.value.getOrElse(version.value),
       "SNAPSHOT_VERSION" -> version.value
     ),
     tlSiteHeliumExtensions := TypelevelHeliumExtensions(
       licenses.value.headOption,
       tlSiteRelatedProjects.value
     ),
+    tlSiteApiUrl := {
+      val javadocioUrl = for {
+        moduleId <- (ThisProject / tlSiteApiModule).value
+        cross <- CrossVersion(
+          moduleId.crossVersion,
+          scalaVersion.value,
+          scalaBinaryVersion.value
+        )
+        version <- currentRelease.value
+      } yield {
+        val o = moduleId.organization
+        val n = cross(moduleId.name)
+        val v = version
+        val p = tlSiteApiPackage.value.fold("")(_.replace('.', '/') + '/')
+        url(s"https://www.javadoc.io/doc/$o/$n/$v/$p")
+      }
+
+      tlSiteApiUrl.value.orElse(javadocioUrl)
+    },
     tlSiteHeliumConfig := {
       Helium
         .defaults
@@ -217,6 +241,14 @@ object TypelevelSitePlugin extends AutoPlugin {
           githubWorkflowJobSetup.value.toList ++ tlSiteGenerate.value ++ tlSitePublish.value
       )
   )
+
+  private lazy val currentRelease = Def.setting {
+    GitHelper
+      .previousReleases(fromHead = true)
+      .filterNot(_.isPrerelease)
+      .headOption
+      .map(_.toString)
+  }
 
   private def previewTask = Def
     .taskDyn {
