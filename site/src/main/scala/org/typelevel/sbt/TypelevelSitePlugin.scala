@@ -106,10 +106,14 @@ object TypelevelSitePlugin extends AutoPlugin {
     tlSitePreview := previewTask.value,
     Laika / sourceDirectories := Seq(mdocOut.value),
     laikaTheme := tlSiteHeliumConfig.value.build.extend(tlSiteHeliumExtensions.value),
-    mdocVariables ++= Map(
-      "VERSION" -> currentRelease.value.getOrElse(version.value),
-      "SNAPSHOT_VERSION" -> version.value
-    ),
+    mdocVariables := {
+      mdocVariables.value ++
+        Map(
+          "VERSION" -> currentRelease.value.getOrElse(version.value),
+          "SNAPSHOT_VERSION" -> version.value
+        ) ++
+        tlSiteApiUrl.value.map("API_URL" -> _.toString).toMap
+    },
     tlSiteHeliumExtensions := TypelevelHeliumExtensions(
       licenses.value.headOption,
       tlSiteRelatedProjects.value
