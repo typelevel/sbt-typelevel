@@ -16,7 +16,7 @@ sbt-typelevel configures [sbt](https://www.scala-sbt.org/) for developing, testi
 [![sbt-typelevel Scala version support](https://index.scala-lang.org/typelevel/sbt-typelevel/sbt-typelevel/latest-by-scala-version.svg?targetType=Sbt)](https://index.scala-lang.org/typelevel/sbt-typelevel/sbt-typelevel)
 [![Discord](https://img.shields.io/discord/632277896739946517.svg?label=&logo=discord&logoColor=ffffff&color=404244&labelColor=6A7EC2)](https://discord.gg/D7wY3aH7BQ)
 
-Pick either the `sbt-typelevel` (recommended) or `sbt-typelevel-ci-release` plugin.
+Pick either the **sbt-typelevel** (recommended) or **sbt-typelevel-ci-release** plugin.
 
 #### `project/plugins.sbt`
 
