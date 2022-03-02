@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="Laika 0.18.1 + Helium Theme" />
-    <title>sbt-typelevel</title>
+    <title>sbt-typelevel-site</title>
     
       <meta name="author" content="Arman Bilge"/>
     
@@ -75,8 +75,8 @@
       </div>
       
       <ul class="nav-list">
-        <li class="level1 active"><a href="#">sbt-typelevel</a></li>
-        <li class="level1"><a href="site.html">sbt-typelevel-site</a></li>
+        <li class="level1"><a href="index.html">sbt-typelevel</a></li>
+        <li class="level1 active"><a href="#">sbt-typelevel-site</a></li>
         <li class="level1"><a href="faq.html">FAQ</a></li>
         <li class="level1"><a href="customization.html">Customization</a></li>
       </ul>
@@ -105,13 +105,15 @@
     <div id="container">
 
       <nav id="page-nav">
-        <p class="header"><a href="#">sbt-typelevel</a></p>
+        <p class="header"><a href="#">sbt-typelevel-site</a></p>
         
         <ul class="nav-list">
-          <li class="level1"><a href="#features">Features</a></li>
           <li class="level1"><a href="#quick-start">Quick start</a></li>
           <li class="level2"><a href="#project-plugins-sbt"><code>project/plugins.sbt</code></a></li>
           <li class="level2"><a href="#build-sbt"><code>build.sbt</code></a></li>
+          <li class="level2"><a href="#how-can-i-include-my-project-version-on-the-website">How can I include my project version on the website?</a></li>
+          <li class="level2"><a href="#how-can-i-publish-unidoc-api-docs">How can I publish &quot;unidoc&quot; API docs?</a></li>
+          <li class="level2"><a href="#how-can-i-customize-my-website-s-appearance">How can I customize my website&#39;s appearance?</a></li>
         </ul>
         
         <p class="footer"></p>
@@ -119,91 +121,37 @@
 
       <main class="content">
 
-        <h1 id="sbt-typelevel" class="title">sbt-typelevel</h1>
-        <p>sbt-typelevel configures <a href="https://www.scala-sbt.org/">sbt</a> for developing, testing, cross-building, publishing, and documenting your Scala library on GitHub, with a focus on semantic versioning and binary compatibility. It is a collection of plugins that work well individually and even better together.</p>
-        
-        <h2 id="features" class="section">Features<a class="anchor-link right" href="#features"><i class="icofont-laika">&#xef71;</i></a></h2>
-        <ul>
-          <li>Auto-generated GitHub actions workflows, parallelized on Scala version and platform (JVM, JS, Native)</li>
-          <li>git-based dynamic versioning</li>
-          <li>Binary-compatibility checking with <a href="https://github.com/lightbend/mima">MiMa</a>, following <a href="https://www.scala-lang.org/blog/2021/02/16/preventing-version-conflicts-with-versionscheme.html#early-semver-and-sbt-version-policy">early semantic versioning</a></li>
-          <li>CI publishing of releases and snapshots to Sonatype/Maven</li>
-          <li>CI deployed GitHub pages websites, generated with <a href="https://github.com/scalameta/mdoc/">mdoc</a> and <a href="https://github.com/planet42/laika">Laika</a></li>
-          <li>Auto-populated settings for various boilerplate (SCM info, API doc urls, Scala.js sourcemaps, etc.)</li>
-        </ul>
+        <h1 id="sbt-typelevel-site" class="title">sbt-typelevel-site</h1>
+        <p><strong>sbt-typelevel-site</strong> is an optional plugin for generating websites with <a href="https://scalameta.org/mdoc/">mdoc</a> and <a href="https://planet42.github.io/Laika/">Laika</a> and deploying to GitHub Pages from CI. You can add it to your build alongside either the  <strong>sbt-typelevel</strong> or <strong>sbt-typelevel-ci-release</strong> plugin.</p>
         
         <h2 id="quick-start" class="section">Quick start<a class="anchor-link right" href="#quick-start"><i class="icofont-laika">&#xef71;</i></a></h2>
-        <p><a href="https://index.scala-lang.org/typelevel/sbt-typelevel/sbt-typelevel"><img src="https://index.scala-lang.org/typelevel/sbt-typelevel/sbt-typelevel/latest-by-scala-version.svg?targetType=Sbt" alt="sbt-typelevel Scala version support"></a>
-        <a href="https://discord.gg/D7wY3aH7BQ"><img src="https://img.shields.io/discord/632277896739946517.svg?label=&logo=discord&logoColor=ffffff&color=404244&labelColor=6A7EC2" alt="Discord"></a></p>
-        <p>Pick either the <strong>sbt-typelevel</strong> (recommended) or <strong>sbt-typelevel-ci-release</strong> plugin.</p>
         
         <h4 id="project-plugins-sbt" class="section"><code>project/plugins.sbt</code><a class="anchor-link right" href="#project-plugins-sbt"><i class="icofont-laika">&#xef71;</i></a></h4>
-        <pre class="keep-together pdf epub"><code class="nohighlight"><span class="comment">// Full service, batteries-included, let&#39;s go!
-</span><span class="identifier">addSbtPlugin</span><span>(</span><span class="string-literal">&quot;org.typelevel&quot;</span><span> % </span><span class="string-literal">&quot;sbt-typelevel&quot;</span><span> % </span><span class="string-literal">&quot;0.4.6&quot;</span><span>)
-
-</span><span class="comment">// Set me up for CI release, but don&#39;t touch my scalacOptions!
-</span><span class="identifier">addSbtPlugin</span><span>(</span><span class="string-literal">&quot;org.typelevel&quot;</span><span> % </span><span class="string-literal">&quot;sbt-typelevel-ci-release&quot;</span><span> % </span><span class="string-literal">&quot;0.4.6&quot;</span><span>)</span></code></pre>
-        <div class="callout info">
-          <i class="icofont-laika">&#xef4e;</i>
-          <p><strong>sbt-typelevel-ci-release</strong> includes all the core features mentioned above.</p>
-          <p><strong>sbt-typelevel</strong> extends <strong>sbt-typelevel-ci-release</strong> with:</p>
-          <ol class="arabic">
-            <li><strong>sbt-typelevel-settings</strong>: Good (and/or opinionated ;) defaults for <code>scalacOptions</code> and friends. Note that you can also manually add this plugin to a project using <strong>sbt-typelevel-ci-release</strong>.</li>
-            <li>Automated scalafmt and copyright header checks in CI.</li>
-            <li>A <code>prePR</code> command and other nice-to-haves.</li>
-          </ol>
-        </div>
-        <p>Then configure your build.</p>
+        <pre class="keep-together pdf epub"><code class="nohighlight"><span class="identifier">addSbtPlugin</span><span>(</span><span class="string-literal">&quot;org.typelevel&quot;</span><span> % </span><span class="string-literal">&quot;sbt-typelevel-site&quot;</span><span> % </span><span class="string-literal">&quot;0.4.6&quot;</span><span>)</span></code></pre>
         
         <h4 id="build-sbt" class="section"><code>build.sbt</code><a class="anchor-link right" href="#build-sbt"><i class="icofont-laika">&#xef71;</i></a></h4>
-        <pre><code class="nohighlight"><span class="type-name">ThisBuild</span><span> / </span><span class="identifier">tlBaseVersion</span><span> := </span><span class="string-literal">&quot;0.4&quot;</span><span> </span><span class="comment">// your current series x.y
-</span><span>
-</span><span class="type-name">ThisBuild</span><span> / </span><span class="identifier">organization</span><span> := </span><span class="string-literal">&quot;org.typelevel&quot;</span><span>
-</span><span class="type-name">ThisBuild</span><span> / </span><span class="identifier">organizationName</span><span> := </span><span class="string-literal">&quot;Typelevel&quot;</span><span>
-</span><span class="type-name">ThisBuild</span><span> / </span><span class="identifier">licenses</span><span> := </span><span class="type-name">Seq</span><span>(</span><span class="type-name">License</span><span>.</span><span class="type-name">Apache2</span><span>)
-</span><span class="type-name">ThisBuild</span><span> / </span><span class="identifier">developers</span><span> := </span><span class="type-name">Seq</span><span>(
-  </span><span class="comment">// your GitHub handle and name
-</span><span>  </span><span class="identifier">tlGitHubDev</span><span>(</span><span class="string-literal">&quot;armanbilge&quot;</span><span>, </span><span class="string-literal">&quot;Arman Bilge&quot;</span><span>)
-)
+        <pre class="keep-together pdf epub"><code class="nohighlight"><span class="comment">// publish website from this branch
+</span><span class="type-name">ThisBuild</span><span> / </span><span class="identifier">tlSitePublishBranch</span><span> := </span><span class="type-name">Some</span><span>(</span><span class="string-literal">&quot;main&quot;</span><span>)
 
-</span><span class="comment">// true by default, set to false to publish to s01.oss.sonatype.org
-</span><span class="type-name">ThisBuild</span><span> / </span><span class="identifier">tlSonatypeUseLegacyHost</span><span> := </span><span class="boolean-literal">true</span><span>
-
-</span><span class="keyword">val</span><span> </span><span class="type-name">Scala213</span><span> = </span><span class="string-literal">&quot;2.13.8&quot;</span><span>
-</span><span class="type-name">ThisBuild</span><span> / </span><span class="identifier">crossScalaVersions</span><span> := </span><span class="type-name">Seq</span><span>(</span><span class="type-name">Scala213</span><span>, </span><span class="string-literal">&quot;3.1.1&quot;</span><span>)
-</span><span class="type-name">ThisBuild</span><span> / </span><span class="identifier">scalaVersion</span><span> := </span><span class="type-name">Scala213</span><span> </span><span class="comment">// the default Scala
-</span><span>
-</span><span class="keyword">lazy</span><span> </span><span class="keyword">val</span><span> </span><span class="identifier">root</span><span> = </span><span class="identifier">tlCrossRootProject</span><span>.</span><span class="identifier">aggregate</span><span>(</span><span class="identifier">core</span><span>, </span><span class="identifier">extra</span><span>, </span><span class="identifier">tests</span><span>)
-
-</span><span class="keyword">lazy</span><span> </span><span class="keyword">val</span><span> </span><span class="identifier">core</span><span> = </span><span class="identifier">crossProject</span><span>(</span><span class="type-name">JVMPlatform</span><span>, </span><span class="type-name">JSPlatform</span><span>)
-  .</span><span class="identifier">in</span><span>(</span><span class="identifier">file</span><span>(</span><span class="string-literal">&quot;core&quot;</span><span>))
-  .</span><span class="identifier">settings</span><span>(
-    </span><span class="identifier">name</span><span> := </span><span class="string-literal">&quot;woozle-core&quot;</span><span>,
-    </span><span class="identifier">libraryDependencies</span><span> += </span><span class="string-literal">&quot;org.typelevel&quot;</span><span> %%% </span><span class="string-literal">&quot;cats-core&quot;</span><span> % </span><span class="string-literal">&quot;2.7.0&quot;</span><span>
-  )
-
-</span><span class="keyword">lazy</span><span> </span><span class="keyword">val</span><span> </span><span class="identifier">extra</span><span> = </span><span class="identifier">project</span><span>
-  .</span><span class="identifier">in</span><span>(</span><span class="identifier">file</span><span>(</span><span class="string-literal">&quot;extra&quot;</span><span>))
-  .</span><span class="identifier">dependsOn</span><span>(</span><span class="identifier">core</span><span>.</span><span class="identifier">jvm</span><span>)
-  .</span><span class="identifier">settings</span><span>(</span><span class="identifier">name</span><span> := </span><span class="string-literal">&quot;woozle-extra&quot;</span><span>)
-
-</span><span class="keyword">lazy</span><span> </span><span class="keyword">val</span><span> </span><span class="identifier">tests</span><span> = </span><span class="identifier">crossProject</span><span>(</span><span class="type-name">JVMPlatform</span><span>, </span><span class="type-name">JSPlatform</span><span>)
-  .</span><span class="identifier">in</span><span>(</span><span class="identifier">file</span><span>(</span><span class="string-literal">&quot;tests&quot;</span><span>))
-  .</span><span class="identifier">enablePlugins</span><span>(</span><span class="type-name">NoPublishPlugin</span><span>)
-  .</span><span class="identifier">dependsOn</span><span>(</span><span class="identifier">core</span><span>)
-  .</span><span class="identifier">settings</span><span>(
-    </span><span class="identifier">name</span><span> := </span><span class="string-literal">&quot;woozle-tests&quot;</span><span>,
-    </span><span class="identifier">libraryDependencies</span><span> += </span><span class="string-literal">&quot;org.scalacheck&quot;</span><span> %%% </span><span class="string-literal">&quot;scalacheck&quot;</span><span> % </span><span class="string-literal">&quot;1.15.4&quot;</span><span> % </span><span class="type-name">Test</span><span>
+</span><span class="keyword">lazy</span><span> </span><span class="keyword">val</span><span> </span><span class="identifier">docs</span><span> = </span><span class="identifier">project</span><span>.</span><span class="identifier">in</span><span>(</span><span class="identifier">file</span><span>(</span><span class="string-literal">&quot;site&quot;</span><span>)).</span><span class="identifier">enablePlugins</span><span>(</span><span class="type-name">TypelevelSitePlugin</span><span>)</span></code></pre>
+        <p>Place your <code>.md</code> files in the <code>docs/</code> directory of your project. To preview locally, run <code>docs/tlSitePreview</code>. This will start a preview server at <a href="http://localhost:4242">http://localhost:4242</a>.</p>
+        <p>The site is generated using <a href="https://scalameta.org/mdoc/">mdoc</a> and <a href="https://planet42.github.io/Laika/">Laika</a> and published to the <code>gh-pages</code> branch on every push to the specified branch. Make sure to enable GitHub Pages in your repository settings.</p>
+        
+        <h3 id="how-can-i-include-my-project-version-on-the-website" class="section">How can I include my project version on the website?<a class="anchor-link right" href="#how-can-i-include-my-project-version-on-the-website"><i class="icofont-laika">&#xef71;</i></a></h3>
+        <p><strong>sbt-typelevel-site</strong> automatically adds <code>VERSION</code> and <code>SNAPSHOT_VERSION</code> to the <code>mdocVariables</code> setting which can be used with <a href="https://scalameta.org/mdoc/docs/why.html#variable-injection">variable injection</a>.</p>
+        <p>For example, the sbt-typelevel <code>VERSION</code> is <code>0.4.6</code> and <code>SNAPSHOT_VERSION</code> is <code>0.4.6-4-17b1436-SNAPSHOT</code>.</p>
+        
+        <h3 id="how-can-i-publish-unidoc-api-docs" class="section">How can I publish &quot;unidoc&quot; API docs?<a class="anchor-link right" href="#how-can-i-publish-unidoc-api-docs"><i class="icofont-laika">&#xef71;</i></a></h3>
+        <p>If you generate your API documentation with <a href="https://github.com/sbt/sbt-unidoc">sbt-unidoc</a>, you can use the <code>TypelevelUnidocPlugin</code> to publish a Scaladoc-only artifact to Sonatype/Maven alongside your library artifacts. This makes it possible to browse your unidocs at <a href="https://www.javadoc.io/">javadoc.io</a>; for example, the sbt-typelevel <a href="https://www.javadoc.io/doc/org.typelevel/sbt-typelevel-docs_2.12/0.4.6/org/typelevel/sbt/">API docs</a> are published like this.</p>
+        <pre class="keep-together pdf epub"><code class="nohighlight"><span class="keyword">lazy</span><span> </span><span class="keyword">val</span><span> </span><span class="identifier">unidoc</span><span> = </span><span class="identifier">project</span><span>
+  .</span><span class="identifier">in</span><span>(</span><span class="identifier">file</span><span>(</span><span class="string-literal">&quot;unidoc&quot;</span><span>))
+  .</span><span class="identifier">enablePlugins</span><span>(</span><span class="type-name">TypelevelUnidocPlugin</span><span>) </span><span class="comment">// also enables the ScalaUnidocPlugin
+</span><span>  .</span><span class="identifier">settings</span><span>(
+    </span><span class="identifier">name</span><span> := </span><span class="string-literal">&quot;woozle-docs&quot;</span><span>
   )</span></code></pre>
-        <p>Next, run <code>githubWorkflowGenerate</code> in sbt to automatically generate the GitHub Actions workflows.
-        This will create a CI matrix parallelized on Scala version and target platform (JVM, JS, etc.) and includes steps for running tests and checking binary compatibility.
-        It will also setup a job for publishing tagged releases e.g. <code>v0.4.5</code> and snapshots to Sonatype/Maven.</p>
-        <p>Finally, on GitHub set the following secrets on your repository:</p>
-        <ul>
-          <li><code>SONATYPE_USERNAME</code> and <code>SONATYPE_PASSWORD</code></li>
-          <li><code>PGP_SECRET</code>: output of <code>gpg --armor --export-secret-keys $LONG_ID | base64</code></li>
-          <li><code>PGP_PASSPHRASE</code> (optional, use only if your key is passphrase-protected)</li>
-        </ul>
+        
+        <h3 id="how-can-i-customize-my-website-s-appearance" class="section">How can I customize my website&#39;s appearance?<a class="anchor-link right" href="#how-can-i-customize-my-website-s-appearance"><i class="icofont-laika">&#xef71;</i></a></h3>
+        <p>We refer you to the comprehensive <a href="https://planet42.github.io/Laika/index.html">Laika manual</a> and specifically the <a href="https://planet42.github.io/Laika/0.18/02-running-laika/01-sbt-plugin.html#laikatheme-setting"><code>laikaTheme</code> setting</a>.</p>
 
         <hr style="margin-top: 30px"/>
         <footer style="font-size: 90%; text-align: center">
