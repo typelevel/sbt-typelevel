@@ -131,7 +131,7 @@ object TypelevelSitePlugin extends AutoPlugin {
         val o = moduleId.organization
         val n = cross(moduleId.name)
         val v = version
-        val p = tlSiteApiPackage.value.fold("")(_.replace('.', '/') + '/')
+        val p = tlSiteApiPackage.value.fold("")(_.replace('.', '/') + "/index.html")
         url(s"https://www.javadoc.io/doc/$o/$n/$v/$p")
       }
 
