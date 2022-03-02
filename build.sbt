@@ -183,6 +183,7 @@ lazy val docs = project
       "sbt-github-actions" -> url("https://github.com/djspiewak/sbt-github-actions/"),
       "mima" -> url("https://github.com/lightbend/mima"),
       "mdoc" -> url("https://scalameta.org/mdoc/"),
-      "Laika" -> url("https://planet42.github.io/Laika/")
+      "Laika" -> url("https://planet42.github.io/Laika/"),
+      "sbt-unidoc" -> url("https://github.com/sbt/sbt-unidoc")
     )
   )
