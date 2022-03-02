@@ -110,6 +110,7 @@ object TypelevelSitePlugin extends AutoPlugin {
       mdocVariables.value ++
         Map(
           "VERSION" -> currentRelease.value.getOrElse(version.value),
+          "PRERELEASE_VERSION" -> currentPreRelease.value.getOrElse(version.value),
           "SNAPSHOT_VERSION" -> version.value
         ) ++
         tlSiteApiUrl.value.map("API_URL" -> _.toString).toMap
@@ -247,11 +248,26 @@ object TypelevelSitePlugin extends AutoPlugin {
   )
 
   private lazy val currentRelease = Def.setting {
-    GitHelper
-      .previousReleases(fromHead = true)
-      .filterNot(_.isPrerelease)
-      .headOption
-      .map(_.toString)
+    // some tricky logic here ...
+    // if the latest release is a pre-release (e.g., M or RC)
+    // and there are no stable releases it is bincompatible with,
+    // then for all effective purposes it is the current release
+
+    val release = GitHelper.previousReleases(fromHead = true) match {
+      case head :: tail if head.isPrerelease =>
+        tail
+          .filterNot(_.isPrerelease)
+          .find(head.copy(prerelease = None).mustBeBinCompatWith(_))
+          .orElse(Some(head))
+      case releases => releases.headOption
+    }
+
+    release.map(_.toString)
+  }
+
+  // latest tagged release, including pre-releases
+  private lazy val currentPreRelease = Def.setting {
+    GitHelper.previousReleases(fromHead = true).headOption.map(_.toString)
   }
 
   private def previewTask = Def
