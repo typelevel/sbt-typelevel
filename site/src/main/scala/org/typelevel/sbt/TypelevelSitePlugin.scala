@@ -253,7 +253,7 @@ object TypelevelSitePlugin extends AutoPlugin {
     // and there are no stable releases it is bincompatible with,
     // then for all effective purposes it is the current release
 
-    val release = GitHelper.previousReleases(fromHead = true) match {
+    val release = GitHelper.previousReleases(fromHead = true, strict = false) match {
       case head :: tail if head.isPrerelease =>
         tail
           .filterNot(_.isPrerelease)
@@ -267,7 +267,7 @@ object TypelevelSitePlugin extends AutoPlugin {
 
   // latest tagged release, including pre-releases
   private lazy val currentPreRelease = Def.setting {
-    GitHelper.previousReleases(fromHead = true).headOption.map(_.toString)
+    GitHelper.previousReleases(fromHead = true, strict = false).headOption.map(_.toString)
   }
 
   private def previewTask = Def

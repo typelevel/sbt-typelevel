@@ -27,11 +27,12 @@ private[sbt] object GitHelper {
    * @param fromHead
    *   if `true`, only tags reachable from HEAD's history. If `false`, all tags in the repo.
    */
-  def previousReleases(fromHead: Boolean = false): List[V] =
+  def previousReleases(fromHead: Boolean = false, strict: Boolean = true): List[V] =
     Try {
       val merged = if (fromHead) " --merged HEAD" else ""
       // --no-contains omits tags on HEAD
-      s"git -c versionsort.suffix=- tag --no-contains HEAD$merged --sort=-v:refname" // reverse
+      val noContains = if (strict) " --no-contains HEAD" else ""
+      s"git -c versionsort.suffix=- tag$noContains$merged --sort=-v:refname" // reverse
         .!!
         .split("\n")
         .toList
