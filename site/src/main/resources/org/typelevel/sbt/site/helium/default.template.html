@@ -49,23 +49,23 @@
         </div>
         @:@
       </div>
-  
+
       ${?helium.topBar.home}
-      
+
       ${?helium.topBar.links}
-      
+
     </header>
 
     <nav id="sidebar">
 
       ${?helium.topBar.phoneLinks}
-      
+
       @:navigationTree {
-        entries = [ 
-          { target = "/", excludeRoot = true, excludeSections = true, depth = 2 } 
+        entries = [
+          { target = "/", excludeRoot = true, excludeSections = true, depth = 2 }
         ]
       }
-      
+
       <ul class="nav-list">
         <li class="level1 nav-header">Related Projects</li>
         @:for(typelevel.site.related)
@@ -79,13 +79,13 @@
 
       <nav id="page-nav">
         <p class="header"><a href="#">${cursor.currentDocument.title}</a></p>
-        
+
         @:navigationTree {
           entries = [
            { target = "#", excludeRoot = true, depth = 2 }
           ]
         }
-        
+
         <p class="footer">@:for(helium.markupEditLinks)<a href="${_.baseURL}${cursor.currentDocument.path}">${_.icon}${_.text}</a>@:@</p>
       </nav>
 
