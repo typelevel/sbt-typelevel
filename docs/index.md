@@ -50,7 +50,7 @@ ThisBuild / tlBaseVersion := "0.4" // your current series x.y
 ThisBuild / organization := "org.typelevel"
 ThisBuild / organizationName := "Typelevel"
 ThisBuild / licenses := Seq(License.Apache2)
-ThisBuild / developers := Seq(
+ThisBuild / developers := List(
   // your GitHub handle and name
   tlGitHubDev("armanbilge", "Arman Bilge")
 )
