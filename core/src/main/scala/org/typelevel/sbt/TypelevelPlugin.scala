@@ -91,6 +91,7 @@ object TypelevelPlugin extends AutoPlugin {
         "scalafmtSbt",
         "set ThisBuild / tlFatalWarnings := tlFatalWarningsInCi.value",
         "Test / compile",
+        "mimaReportBinaryIssues",
         "reload"
       )
     )
