@@ -35,7 +35,7 @@ ThisBuild / tlVersionIntroduced := Map("3" -> "0.4.2")
 
 ## How do I locally prepare my PR for CI?
 
-**sbt-typelevel** comes with a `prePR` command, which updates the GitHub workflow, generates headers, runs `scalafmt`, and clean compiles your code.
+**sbt-typelevel** comes with a `prePR` command, which updates the GitHub workflow, generates headers, runs `scalafmt`, checks binary compatibility via MiMa tool, and clean compiles your code.
 
 You may also want to (globally) install the [sbt-rewarn](https://github.com/rtimush/sbt-rewarn) plugin to help you identify and resolve compiler warnings, which by default are fatal in CI.
 
