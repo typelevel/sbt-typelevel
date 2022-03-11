@@ -1,4 +1,4 @@
-# Publishing Secrets
+# Secrets
 
 To publish to [Sonatype/Maven Central](https://central.sonatype.org/) you must obtain and install the following secrets on your repository:
 

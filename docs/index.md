@@ -95,3 +95,5 @@ Finally, on GitHub set the following secrets on your repository:
 - `SONATYPE_USERNAME` and `SONATYPE_PASSWORD`
 - `PGP_SECRET`: output of `gpg --armor --export-secret-keys $LONG_ID | base64`
 - `PGP_PASSPHRASE` (optional, use only if your key is passphrase-protected)
+
+Please see the [Secrets](secrets.md) page for more information and detailed instructions.
