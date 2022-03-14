@@ -26,6 +26,8 @@ object TypelevelKernelPlugin extends AutoPlugin {
 
   object autoImport {
     lazy val tlIsScala3 = settingKey[Boolean]("True if building with Scala 3")
+    lazy val tlSkipIrrelevantScalas = settingKey[Boolean](
+      "Sets skip := true for compile/test/publish/etc. tasks on a project if the current scalaVersion is not in that project's crossScalaVersions (default: false)")
 
     def tlReplaceCommandAlias(name: String, contents: String): Seq[Setting[State => State]] =
       Seq(GlobalScope / onLoad ~= { (f: State => State) =>
@@ -42,18 +44,35 @@ object TypelevelKernelPlugin extends AutoPlugin {
   )
 
   override def buildSettings =
-    addCommandAlias("tlReleaseLocal", mkCommand(List("reload", "project /", "+publishLocal")))
+    Seq(tlSkipIrrelevantScalas := false) ++
+      addCommandAlias("tlReleaseLocal", mkCommand(List("reload", "project /", "+publishLocal")))
 
   override def projectSettings = Seq(
-    skip := {
-      skip.value || {
-        val cross = crossScalaVersions.value
-        val ver = (LocalRootProject / scalaVersion).value
-        !cross.contains(ver)
-      }
-    }
+    (Test / test) := {
+      if (tlSkipIrrelevantScalas.value && (Test / test / skip).value)
+        ()
+      else (Test / test).value
+    },
+    skipIfIrrelevant(compile),
+    skipIfIrrelevant(test),
+    skipIfIrrelevant(publishLocal),
+    skipIfIrrelevant(publish)
   )
 
   private[sbt] def mkCommand(commands: List[String]): String = commands.mkString("; ", "; ", "")
+
+  /**
+   * A setting that will make a task respect the `tlSkipIrrelevantScalas` setting. Note that the
+   * task itself must respect `skip` for this to take effect.
+   */
+  def skipIfIrrelevant[T](task: TaskKey[T]) = {
+    task / skip := {
+      (task / skip).value || {
+        val cross = crossScalaVersions.value
+        val ver = (LocalRootProject / scalaVersion).value
+        (task / tlSkipIrrelevantScalas).value && !cross.contains(ver)
+      }
+    }
+  }
 
 }

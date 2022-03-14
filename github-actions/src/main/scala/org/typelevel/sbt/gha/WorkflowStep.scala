@@ -35,13 +35,36 @@ object WorkflowStep {
     name = Some("Checkout current branch (fast)"))
 
   def SetupJava(versions: List[JavaSpec]): List[WorkflowStep] =
-    versions map {
+    versions flatMap {
       case jv @ JavaSpec(JavaSpec.Distribution.GraalVM(graalVersion), version) =>
         WorkflowStep.Use(
           UseRef.Public("DeLaGuardo", "setup-graalvm", "5.0"),
           name = Some(s"Setup GraalVM (${jv.render})"),
           cond = Some(s"matrix.java == '${jv.render}'"),
           params = Map("graalvm" -> graalVersion, "java" -> s"java$version")
+        ) :: Nil
+
+      case jv @ JavaSpec(dist, version) if dist.isTlIndexed =>
+        val cond = Some(s"matrix.java == '${jv.render}'")
+        val id = s"download-java-${dist.rendering}-$version"
+        List(
+          WorkflowStep.Use(
+            UseRef.Public("typelevel", "download-java", "v1"),
+            name = Some(s"Download Java (${jv.render})"),
+            id = Some(id),
+            cond = cond,
+            params = Map("distribution" -> dist.rendering, "java-version" -> version)
+          ),
+          WorkflowStep.Use(
+            UseRef.Public("actions", "setup-java", "v2"),
+            name = Some(s"Setup Java (${jv.render})"),
+            cond = cond,
+            params = Map(
+              "distribution" -> "jdkfile",
+              "java-version" -> version,
+              "jdkFile" -> s"$${{ steps.$id.outputs.jdkFile }}"
+            )
+          )
         )
 
       case jv @ JavaSpec(dist, version) =>
@@ -50,7 +73,7 @@ object WorkflowStep {
           name = Some(s"Setup Java (${jv.render})"),
           cond = Some(s"matrix.java == '${jv.render}'"),
           params = Map("distribution" -> dist.rendering, "java-version" -> version)
-        )
+        ) :: Nil
     }
 
   val Tmate: WorkflowStep =
