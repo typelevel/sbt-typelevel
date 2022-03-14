@@ -99,11 +99,13 @@ object CrossRootProject {
   def unapply(root: CrossRootProject): Some[(Project, Project, Project, Project)] =
     Some((root.all, root.jvm, root.js, root.native))
 
-  private[sbt] def apply(): CrossRootProject = new CrossRootProject(
-    Project("root", file(".")),
-    Project("rootJVM", file(".jvm")),
-    Project("rootJS", file(".js")),
-    Project("rootNative", file(".native"))
+  def apply(): CrossRootProject = CrossRootProject("root")
+
+  def apply(name: String): CrossRootProject = new CrossRootProject(
+    Project(name, file(".")),
+    Project(s"${name}JVM", file(".jvm")),
+    Project(s"${name}JS", file(".js")),
+    Project(s"${name}Native", file(".native"))
   ).enablePlugins(NoPublishPlugin, TypelevelCiCrossPlugin)
 }
 
