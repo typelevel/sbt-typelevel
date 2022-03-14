@@ -50,7 +50,7 @@ object TypelevelVersioningPlugin extends AutoPlugin {
     git.gitCurrentTags := {
       // https://docs.github.com/en/actions/learn-github-actions/environment-variables
       // GITHUB_REF_TYPE is either `branch` or `tag`
-      if (sys.env.get("GITHUB_REF_TYPE").exists(_ == "branch"))
+      if (sys.env.get("GITHUB_REF_TYPE").contains("branch"))
         // we are running in a workflow job that was *not* triggered by a tag
         // so, we discard tags that would affect our versioning
         git.gitCurrentTags.value.flatMap {
@@ -63,25 +63,26 @@ object TypelevelVersioningPlugin extends AutoPlugin {
     version := {
       import scala.sys.process._
 
+      val baseV = V(tlBaseVersion.value)
+        .filter(v => v.patch.isEmpty && v.prerelease.isEmpty)
+        .getOrElse(sys.error(s"tlBaseVersion must be of form x.y: ${tlBaseVersion.value}"))
+
       var version = getTaggedVersion(git.gitCurrentTags.value).map(_.toString).getOrElse {
         // No tag, so we build our version based on this commit
-
-        val baseV = V(tlBaseVersion.value)
-          .getOrElse(sys.error(s"tlBaseVersion must be semver format: ${tlBaseVersion.value}"))
 
         val latestInSeries = GitHelper
           .previousReleases(true)
           .filterNot(_.isPrerelease) // TODO Ordering of pre-releases is arbitrary
           .headOption
-          .flatMap { previous =>
-            if (previous > baseV)
+          .flatMap {
+            case previous if previous > baseV =>
               sys.error(s"Your tlBaseVersion $baseV is behind the latest tag $previous")
-            else if (baseV.isSameSeries(previous))
+            case previous if baseV.isSameSeries(previous) =>
               Some(previous)
-            else
-              None
+            case _ => None
           }
 
+        // version here is the prefix used further to build a final version number
         var version = latestInSeries.fold(tlBaseVersion.value)(_.toString)
 
         // Looks for the distance to latest release in this series
@@ -93,6 +94,14 @@ object TypelevelVersioningPlugin extends AutoPlugin {
 
         git.gitHeadCommit.value.foreach { sha => version += s"-${sha.take(7)}" }
         version
+      }
+
+      V(version) match {
+        case None =>
+          sys.error(s"version must be semver format: $version")
+        case Some(v) if !(v.isSameSeries(baseV) || v >= baseV) =>
+          sys.error(s"Your current version $version cannot be less than tlBaseVersion $baseV")
+        case _ => // do nothing
       }
 
       // Even if version was provided by a tag, we check for uncommited changes
@@ -113,6 +122,6 @@ object TypelevelVersioningPlugin extends AutoPlugin {
   private val Description = """^.*-(\d+)-[a-zA-Z0-9]+$""".r
 
   private def getTaggedVersion(tags: Seq[String]): Option[V] =
-    tags.collect { case V.Tag(v) => v }.headOption
+    tags.collectFirst { case V.Tag(v) => v }
 
 }

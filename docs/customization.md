@@ -61,8 +61,9 @@ Instead of using the super-plugins, for finer-grained control you can always add
 - `tlFatalWarningsInCi` (setting): Convert compiler warnings into errors under CI builds (default: true).
 
 ### sbt-typelevel-site
--  `TypelevelSitePlugin`: Sets up an [mdoc](https://scalameta.org/mdoc/)/[Laika](https://planet42.github.io/Laika/)-generated microsite, automatically published to GitHub pages in CI.
+-  `TypelevelSitePlugin`: Sets up an [mdoc](https://scalameta.org/mdoc/)/[Laika](https://planet42.github.io/Laika/)-generated website, automatically published to GitHub pages in CI.
 - `tlSitePublishBranch` (setting): The branch to publish the site from on every push. Set this to `None` if you only want to update the site on tag releases. (default: `main`)
+- `tlSitePublishTags` (setting): Defines whether the site should be published on tag releases. Note on setting this to `true` requires the `tlSitePublishBranch` setting to be set to `None`. (default: `false`)
 - `tlSiteApiUrl` (setting): URL to the API docs. (default: `None`)
 - `tlSiteHeliumConfig` (setting): the Laika Helium config. (default: how the sbt-typelevel site looks)
 

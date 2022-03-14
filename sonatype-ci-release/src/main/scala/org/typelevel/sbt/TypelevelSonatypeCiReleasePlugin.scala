@@ -59,8 +59,7 @@ object TypelevelSonatypeCiReleasePlugin extends AutoPlugin {
     )
   )
 
-  private val env = Map(
-    "SONATYPE_USERNAME" -> s"$${{ secrets.SONATYPE_USERNAME }}",
-    "SONATYPE_PASSWORD" -> s"$${{ secrets.SONATYPE_PASSWORD }}"
-  )
+  private val env = List("SONATYPE_USERNAME", "SONATYPE_PASSWORD", "SONATYPE_CREDENTIAL_HOST")
+    .map(k => k -> s"$${{ secrets.$k }}")
+    .toMap
 }

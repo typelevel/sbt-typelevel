@@ -29,6 +29,9 @@ object TypelevelSettingsPlugin extends AutoPlugin {
   object autoImport {
     lazy val tlFatalWarnings =
       settingKey[Boolean]("Convert compiler warnings into errors (default: false)")
+    lazy val tlJdkRelease =
+      settingKey[Option[Int]](
+        "JVM target version for the compiled bytecode, None results in default scalac and javac behavior (no --release flag is specified). (default: None, supported values: 8, 9, 10, 11, 12, 13, 14, 15, 16, 17)")
   }
 
   import autoImport._
@@ -36,6 +39,7 @@ object TypelevelSettingsPlugin extends AutoPlugin {
 
   override def globalSettings = Seq(
     tlFatalWarnings := false,
+    tlJdkRelease := None,
     Def.derive(scalaVersion := crossScalaVersions.value.last, default = true)
   )
 
@@ -97,7 +101,7 @@ object TypelevelSettingsPlugin extends AutoPlugin {
         "-Wvalue-discard"
       )
 
-      val warningsDotty = Seq()
+      val warningsDotty = Seq.empty
 
       scalaVersion.value match {
         case V(V(3, _, _, _)) =>
@@ -152,7 +156,7 @@ object TypelevelSettingsPlugin extends AutoPlugin {
     },
     Test / scalacOptions ++= {
       if (tlIsScala3.value)
-        Seq()
+        Seq.empty
       else
         Seq("-Yrangepos")
     },
@@ -180,7 +184,7 @@ object TypelevelSettingsPlugin extends AutoPlugin {
         val infoOpt = scmInfo.value
         tagOrHash.toSeq flatMap { vh =>
           infoOpt.toSeq flatMap { info =>
-            val path = s"${info.browseUrl}/blob/$vh€{FILE_PATH}.scala"
+            val path = s"${info.browseUrl}/blob/${vh}€{FILE_PATH}.scala"
             Seq(
               "-doc-source-url",
               path,
@@ -200,7 +204,56 @@ object TypelevelSettingsPlugin extends AutoPlugin {
         Seq("-Werror")
       else
         Seq.empty
+    },
+    scalacOptions ++= {
+      val (releaseOption, newTargetOption, oldTargetOption) =
+        withJdkRelease(tlJdkRelease.value)(
+          (Seq.empty[String], Seq.empty[String], Seq.empty[String])) { n =>
+          (Seq("-release", n.toString), Seq(s"-target:$n"), Seq("-target:jvm-1.8"))
+        }
+
+      scalaVersion.value match {
+        case V(V(2, 11, _, _)) =>
+          oldTargetOption
+
+        case V(V(2, 12, Some(build), _)) if build >= 5 =>
+          releaseOption ++ oldTargetOption
+
+        case V(V(2, 13, _, _)) =>
+          releaseOption ++ newTargetOption
+
+        case V(V(3, _, _, _)) =>
+          releaseOption
+
+        case _ =>
+          Seq.empty
+      }
+    },
+    javacOptions ++= {
+      withJdkRelease(tlJdkRelease.value)(Seq.empty[String])(n => Seq("--release", n.toString))
     }
   )
 
+  private def withJdkRelease[A](jdkRelease: Option[Int])(default: => A)(f: Int => A): A =
+    jdkRelease.fold(default) {
+      case 8 if isJava8 => default
+      case n if n >= 8 =>
+        if (javaRuntimeVersion < n) {
+          sys.error(
+            s"Target JDK is $n but you are using an older JDK $javaRuntimeVersion. Please switch to JDK >= $n.")
+        } else {
+          f(n)
+        }
+      case n =>
+        sys.error(
+          s"Target JDK is $n, which is not supported by `sbt-typelevel`. Please select a JDK >= 8.")
+    }
+
+  private val javaRuntimeVersion: Int =
+    System.getProperty("java.version").split("""\.""") match {
+      case Array("1", "8", _*) => 8
+      case Array(feature, _*) => feature.toInt
+    }
+
+  private val isJava8: Boolean = javaRuntimeVersion == 8
 }

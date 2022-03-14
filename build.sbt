@@ -10,12 +10,17 @@ ThisBuild / developers := List(
   tlGitHubDev("djspiewak", "Daniel Spiewak")
 )
 
+ThisBuild / mergifyStewardConfig ~= { _.map(_.copy(mergeMinors = true)) }
+ThisBuild / mergifySuccessConditions += MergifyCondition.Custom("#approved-reviews-by>=1")
+ThisBuild / mergifyLabelPaths += { "docs" -> file("docs") }
+
 lazy val root = tlCrossRootProject.aggregate(
   kernel,
   noPublish,
   settings,
   github,
   githubActions,
+  mergify,
   versioning,
   mima,
   sonatype,
@@ -25,6 +30,7 @@ lazy val root = tlCrossRootProject.aggregate(
   core,
   ciRelease,
   site,
+  unidoc,
   docs
 )
 
@@ -64,6 +70,15 @@ lazy val githubActions = project
   .settings(
     name := "sbt-typelevel-github-actions"
   )
+
+lazy val mergify = project
+  .in(file("mergify"))
+  .enablePlugins(SbtPlugin)
+  .settings(
+    name := "sbt-typelevel-mergify",
+    tlVersionIntroduced := Map("2.12" -> "0.4.6")
+  )
+  .dependsOn(githubActions)
 
 lazy val versioning = project
   .in(file("versioning"))
@@ -146,9 +161,28 @@ lazy val site = project
   .settings(
     name := "sbt-typelevel-site"
   )
-  .dependsOn(kernel, githubActions, noPublish)
+  .dependsOn(kernel, github, githubActions, noPublish)
+
+lazy val unidoc = project
+  .in(file("unidoc"))
+  .enablePlugins(TypelevelUnidocPlugin)
+  .settings(
+    name := "sbt-typelevel-docs"
+  )
 
 lazy val docs = project
   .in(file("mdocs"))
   .enablePlugins(TypelevelSitePlugin)
-  .settings(laikaConfig ~= { _.withRawContent })
+  .settings(
+    laikaConfig ~= { _.withRawContent },
+    tlSiteApiPackage := Some("org.typelevel.sbt"),
+    tlSiteRelatedProjects := Seq(
+      "sbt" -> url("https://www.scala-sbt.org/"),
+      "sbt-crossproject" -> url("https://github.com/portable-scala/sbt-crossproject"),
+      "sbt-github-actions" -> url("https://github.com/djspiewak/sbt-github-actions/"),
+      "mima" -> url("https://github.com/lightbend/mima"),
+      "mdoc" -> url("https://scalameta.org/mdoc/"),
+      "Laika" -> url("https://planet42.github.io/Laika/"),
+      "sbt-unidoc" -> url("https://github.com/sbt/sbt-unidoc")
+    )
+  )
