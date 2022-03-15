@@ -34,6 +34,7 @@ For example, the sbt-typelevel `VERSION` is `@VERSION@` and `SNAPSHOT_VERSION` i
 If you generate your API documentation with [sbt-unidoc](https://github.com/sbt/sbt-unidoc), you can use the `TypelevelUnidocPlugin` to publish a Scaladoc-only artifact to Sonatype/Maven alongside your library artifacts. This makes it possible to browse your unidocs at [javadoc.io](https://www.javadoc.io/); for example, the sbt-typelevel [API docs](@API_URL@) are published like this.
 
 ```scala
+// Make sure to add to your root aggregate so it gets published!
 lazy val unidoc = project
   .in(file("unidoc"))
   .enablePlugins(TypelevelUnidocPlugin) // also enables the ScalaUnidocPlugin
