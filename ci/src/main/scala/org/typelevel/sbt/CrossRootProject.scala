@@ -20,8 +20,8 @@ import sbt._
 import org.typelevel.sbt.gha.GenerativePlugin.autoImport._
 
 /**
- * Simultaneously creates a `root`, `rootJVM`, `rootJS`, and `rootNative` project, and
- * automatically enables the `NoPublishPlugin`.
+ * Simultaneously creates a root project, a Scala JVM subproject, a Scala.js subproject, a Scala
+ * Native subproject and automatically enables the `NoPublishPlugin`.
  */
 final class CrossRootProject private (
     val all: Project,
@@ -96,16 +96,16 @@ final class CrossRootProject private (
 }
 
 object CrossRootProject {
-  def unapply(root: CrossRootProject): Some[(Project, Project, Project, Project)] =
-    Some((root.all, root.jvm, root.js, root.native))
+  def unapply(rootProject: CrossRootProject): Some[(Project, Project, Project, Project)] =
+    Some((rootProject.all, rootProject.jvm, rootProject.js, rootProject.native))
 
   def apply(): CrossRootProject = CrossRootProject("root")
 
-  def apply(name: String): CrossRootProject = new CrossRootProject(
-    Project(name, file(".")),
-    Project(s"${name}JVM", file(".jvm")),
-    Project(s"${name}JS", file(".js")),
-    Project(s"${name}Native", file(".native"))
+  def apply(id: String): CrossRootProject = new CrossRootProject(
+    Project(id, file(".")),
+    Project(s"${id}JVM", file(".jvm")),
+    Project(s"${id}JS", file(".js")),
+    Project(s"${id}Native", file(".native"))
   ).enablePlugins(NoPublishPlugin, TypelevelCiCrossPlugin)
 }
 
@@ -128,8 +128,10 @@ object TypelevelCiJVMPlugin extends AutoPlugin {
   override def requires = TypelevelCiCrossPlugin
 
   override def buildSettings: Seq[Setting[_]] = Seq(
-    githubWorkflowBuildMatrixAdditions ~= { matrix =>
-      matrix.updated("project", matrix("project") ::: "rootJVM" :: Nil)
+    githubWorkflowBuildMatrixAdditions := {
+      val matrix = githubWorkflowBuildMatrixAdditions.value
+      val rootProject = (LocalRootProject / Keys.thisProject).value
+      matrix.updated("project", matrix("project") ::: s"${rootProject.id}JVM" :: Nil)
     }
   )
 }
@@ -138,22 +140,28 @@ object TypelevelCiJSPlugin extends AutoPlugin {
   override def requires = TypelevelCiCrossPlugin
 
   override def buildSettings: Seq[Setting[_]] = Seq(
-    githubWorkflowBuildMatrixAdditions ~= { matrix =>
-      matrix.updated("project", matrix("project") ::: "rootJS" :: Nil)
+    githubWorkflowBuildMatrixAdditions := {
+      val matrix = githubWorkflowBuildMatrixAdditions.value
+      val rootProject = (LocalRootProject / Keys.thisProject).value
+      matrix.updated("project", matrix("project") ::: s"${rootProject.id}JS" :: Nil)
     },
     githubWorkflowBuildMatrixExclusions ++= {
+      val rootProject = (LocalRootProject / Keys.thisProject).value
       githubWorkflowJavaVersions
         .value
         .tail
-        .map(java => MatrixExclude(Map("project" -> "rootJS", "java" -> java.render)))
+        .map(java =>
+          MatrixExclude(Map("project" -> s"${rootProject.id}JS", "java" -> java.render)))
     },
-    githubWorkflowBuild ~= { steps =>
+    githubWorkflowBuild := {
+      val steps = githubWorkflowBuild.value
+      val rootProject = (LocalRootProject / Keys.thisProject).value
       steps.flatMap {
         case testStep @ WorkflowStep.Sbt(List("test"), _, _, _, _, _) =>
           val fastOptStep = WorkflowStep.Sbt(
             List("Test/scalaJSLinkerResult"),
             name = Some("scalaJSLink"),
-            cond = Some("matrix.project == 'rootJS'")
+            cond = Some(s"matrix.project == '${rootProject.id}JS'")
           )
           List(fastOptStep, testStep)
         case step => List(step)
@@ -167,22 +175,28 @@ object TypelevelCiNativePlugin extends AutoPlugin {
   override def requires = TypelevelCiCrossPlugin
 
   override def buildSettings: Seq[Setting[_]] = Seq(
-    githubWorkflowBuildMatrixAdditions ~= { matrix =>
-      matrix.updated("project", matrix("project") ::: "rootNative" :: Nil)
+    githubWorkflowBuildMatrixAdditions := {
+      val matrix = githubWorkflowBuildMatrixAdditions.value
+      val rootProject = (LocalRootProject / Keys.thisProject).value
+      matrix.updated("project", matrix("project") ::: s"${rootProject.id}Native" :: Nil)
     },
     githubWorkflowBuildMatrixExclusions ++= {
+      val rootProject = (LocalRootProject / Keys.thisProject).value
       githubWorkflowJavaVersions
         .value
         .tail
-        .map(java => MatrixExclude(Map("project" -> "rootNative", "java" -> java.render)))
+        .map(java =>
+          MatrixExclude(Map("project" -> s"${rootProject.id}Native", "java" -> java.render)))
     },
-    githubWorkflowBuild ~= { steps =>
+    githubWorkflowBuild := {
+      val steps = githubWorkflowBuild.value
+      val rootProject = (LocalRootProject / Keys.thisProject).value
       steps.flatMap {
         case testStep @ WorkflowStep.Sbt(List("test"), _, _, _, _, _) =>
           val nativeLinkStep = WorkflowStep.Sbt(
             List("Test/nativeLink"),
             name = Some("nativeLink"),
-            cond = Some("matrix.project == 'rootNative'")
+            cond = Some(s"matrix.project == '${rootProject.id}Native'")
           )
           List(nativeLinkStep, testStep)
         case step => List(step)
