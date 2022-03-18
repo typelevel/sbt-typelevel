@@ -30,6 +30,7 @@ object TypelevelUnidocPlugin extends AutoPlugin {
   import TypelevelSonatypePlugin.javadocioUrl
 
   override def projectSettings = Seq(
+    Compile / doc := (ScalaUnidoc / doc).value,
     Compile / packageDoc / mappings := (ScalaUnidoc / packageDoc / mappings).value,
     ThisBuild / apiURL := javadocioUrl.value,
     mimaPreviousArtifacts := Set.empty,
