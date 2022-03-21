@@ -20,8 +20,9 @@ import sbt._
 import org.typelevel.sbt.gha.GenerativePlugin.autoImport._
 
 /**
- * Simultaneously creates a root project, a Scala JVM subproject, a Scala.js subproject, a Scala
- * Native subproject and automatically enables the `NoPublishPlugin`.
+ * Simultaneously creates a root project, a Scala JVM aggregate project,
+ * a Scala.js aggregate project, a Scala Native aggregate project and
+ * automatically enables the `NoPublishPlugin`.
  */
 final class CrossRootProject private (
     val all: Project,
@@ -98,8 +99,6 @@ final class CrossRootProject private (
 object CrossRootProject {
   def unapply(rootProject: CrossRootProject): Some[(Project, Project, Project, Project)] =
     Some((rootProject.all, rootProject.jvm, rootProject.js, rootProject.native))
-
-  def apply(): CrossRootProject = CrossRootProject("root")
 
   def apply(id: String): CrossRootProject = new CrossRootProject(
     Project(id, file(".")),

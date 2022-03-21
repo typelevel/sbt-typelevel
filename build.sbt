@@ -14,7 +14,7 @@ ThisBuild / mergifyStewardConfig ~= { _.map(_.copy(mergeMinors = true)) }
 ThisBuild / mergifySuccessConditions += MergifyCondition.Custom("#approved-reviews-by>=1")
 ThisBuild / mergifyLabelPaths += { "docs" -> file("docs") }
 
-lazy val root = tlCrossRootProject.aggregate(
+lazy val `sbt-typelevel` = tlCrossRootProject.aggregate(
   kernel,
   noPublish,
   settings,
