@@ -37,6 +37,7 @@ import MdocPlugin.autoImport._
 import LaikaPlugin.autoImport._
 import gha.GenerativePlugin
 import GenerativePlugin.autoImport._
+import TypelevelKernelPlugin.autoImport._
 
 object TypelevelSitePlugin extends AutoPlugin {
 
@@ -117,7 +118,8 @@ object TypelevelSitePlugin extends AutoPlugin {
     },
     tlSiteHeliumExtensions := TypelevelHeliumExtensions(
       licenses.value.headOption,
-      tlSiteRelatedProjects.value
+      tlSiteRelatedProjects.value,
+      tlIsScala3.value
     ),
     tlSiteApiUrl := {
       val javadocioUrl = for {
