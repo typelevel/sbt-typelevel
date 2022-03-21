@@ -21,6 +21,7 @@ import org.typelevel.sbt.gha.GenerativePlugin
 import org.typelevel.sbt.gha.GitHubActionsPlugin
 import org.typelevel.sbt.gha.GenerativePlugin.autoImport._
 import com.typesafe.tools.mima.plugin.MimaPlugin
+import scala.language.experimental.macros
 
 object TypelevelCiPlugin extends AutoPlugin {
 
@@ -28,7 +29,7 @@ object TypelevelCiPlugin extends AutoPlugin {
   override def trigger = allRequirements
 
   object autoImport {
-    def tlCrossRootProject: CrossRootProject = CrossRootProject()
+    def tlCrossRootProject: CrossRootProject = macro CrossRootProjectMacros.crossRootProjectImpl
   }
 
   override def buildSettings = Seq(
