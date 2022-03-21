@@ -108,6 +108,15 @@ object CrossRootProject {
 }
 
 /**
+ * This trait provides an anonymous setting giving access to the local root project ID.
+ */
+private[sbt] trait RootProjectId {
+  protected def rootProjectId = Def.setting {
+    (LocalRootProject / Keys.thisProject).value.id
+  }
+}
+
+/**
  * This plugin is used internally by CrossRootProject.
  */
 object TypelevelCiCrossPlugin extends AutoPlugin {
@@ -122,44 +131,39 @@ object TypelevelCiCrossPlugin extends AutoPlugin {
 
 // The following plugins are used internally to support CrossRootProject.
 
-object TypelevelCiJVMPlugin extends AutoPlugin {
+object TypelevelCiJVMPlugin extends AutoPlugin with RootProjectId {
   override def requires = TypelevelCiCrossPlugin
 
   override def buildSettings: Seq[Setting[_]] = Seq(
     githubWorkflowBuildMatrixAdditions := {
       val matrix = githubWorkflowBuildMatrixAdditions.value
-      val rootProject = (LocalRootProject / Keys.thisProject).value
-      matrix.updated("project", matrix("project") ::: s"${rootProject.id}JVM" :: Nil)
+      matrix.updated("project", matrix("project") ::: s"${rootProjectId.value}JVM" :: Nil)
     }
   )
 }
 
-object TypelevelCiJSPlugin extends AutoPlugin {
+object TypelevelCiJSPlugin extends AutoPlugin with RootProjectId {
   override def requires = TypelevelCiCrossPlugin
 
   override def buildSettings: Seq[Setting[_]] = Seq(
     githubWorkflowBuildMatrixAdditions := {
       val matrix = githubWorkflowBuildMatrixAdditions.value
-      val rootProject = (LocalRootProject / Keys.thisProject).value
-      matrix.updated("project", matrix("project") ::: s"${rootProject.id}JS" :: Nil)
+      matrix.updated("project", matrix("project") ::: s"${rootProjectId.value}JS" :: Nil)
     },
     githubWorkflowBuildMatrixExclusions ++= {
-      val rootProject = (LocalRootProject / Keys.thisProject).value
       githubWorkflowJavaVersions
         .value
         .tail
         .map(java =>
-          MatrixExclude(Map("project" -> s"${rootProject.id}JS", "java" -> java.render)))
+          MatrixExclude(Map("project" -> s"${rootProjectId.value}JS", "java" -> java.render)))
     },
     githubWorkflowBuild := {
-      val steps = githubWorkflowBuild.value
-      val rootProject = (LocalRootProject / Keys.thisProject).value
-      steps.flatMap {
+      githubWorkflowBuild.value.flatMap {
         case testStep @ WorkflowStep.Sbt(List("test"), _, _, _, _, _) =>
           val fastOptStep = WorkflowStep.Sbt(
             List("Test/scalaJSLinkerResult"),
             name = Some("scalaJSLink"),
-            cond = Some(s"matrix.project == '${rootProject.id}JS'")
+            cond = Some(s"matrix.project == '${rootProjectId.value}JS'")
           )
           List(fastOptStep, testStep)
         case step => List(step)
@@ -169,32 +173,29 @@ object TypelevelCiJSPlugin extends AutoPlugin {
 
 }
 
-object TypelevelCiNativePlugin extends AutoPlugin {
+object TypelevelCiNativePlugin extends AutoPlugin with RootProjectId {
   override def requires = TypelevelCiCrossPlugin
 
   override def buildSettings: Seq[Setting[_]] = Seq(
     githubWorkflowBuildMatrixAdditions := {
       val matrix = githubWorkflowBuildMatrixAdditions.value
-      val rootProject = (LocalRootProject / Keys.thisProject).value
-      matrix.updated("project", matrix("project") ::: s"${rootProject.id}Native" :: Nil)
+      matrix.updated("project", matrix("project") ::: s"${rootProjectId.value}Native" :: Nil)
     },
     githubWorkflowBuildMatrixExclusions ++= {
-      val rootProject = (LocalRootProject / Keys.thisProject).value
       githubWorkflowJavaVersions
         .value
         .tail
         .map(java =>
-          MatrixExclude(Map("project" -> s"${rootProject.id}Native", "java" -> java.render)))
+          MatrixExclude(
+            Map("project" -> s"${rootProjectId.value}Native", "java" -> java.render)))
     },
     githubWorkflowBuild := {
-      val steps = githubWorkflowBuild.value
-      val rootProject = (LocalRootProject / Keys.thisProject).value
-      steps.flatMap {
+      githubWorkflowBuild.value.flatMap {
         case testStep @ WorkflowStep.Sbt(List("test"), _, _, _, _, _) =>
           val nativeLinkStep = WorkflowStep.Sbt(
             List("Test/nativeLink"),
             name = Some("nativeLink"),
-            cond = Some(s"matrix.project == '${rootProject.id}Native'")
+            cond = Some(s"matrix.project == '${rootProjectId.value}Native'")
           )
           List(nativeLinkStep, testStep)
         case step => List(step)
