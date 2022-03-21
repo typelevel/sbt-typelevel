@@ -39,7 +39,7 @@ object TypelevelSettingsPlugin extends AutoPlugin {
 
   override def globalSettings = Seq(
     tlFatalWarnings := false,
-    tlJdkRelease := None,
+    tlJdkRelease := Some(8),
     Def.derive(scalaVersion := crossScalaVersions.value.last, default = true)
   )
 
