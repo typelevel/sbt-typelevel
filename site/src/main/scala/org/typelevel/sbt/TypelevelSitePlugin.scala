@@ -23,6 +23,8 @@ import laika.helium.config.Favicon
 import laika.helium.config.HeliumIcon
 import laika.helium.config.IconLink
 import laika.helium.config.ImageLink
+import laika.rewrite.link.ApiLinks
+import laika.rewrite.link.LinkConfig
 import laika.sbt.LaikaPlugin
 import laika.theme.ThemeProvider
 import mdoc.MdocPlugin
@@ -105,6 +107,12 @@ object TypelevelSitePlugin extends AutoPlugin {
       .value: @nowarn("cat=other-pure-statement"),
     tlSitePreview := previewTask.value,
     Laika / sourceDirectories := Seq(mdocOut.value),
+    laikaConfig := {
+      val currentConfig = laikaConfig.value
+      tlSiteApiUrl.value.fold(currentConfig) { apiUrl =>
+        currentConfig.withConfigValue(LinkConfig(apiLinks = Seq(ApiLinks(apiUrl.toString))))
+      }
+    },
     laikaTheme := tlSiteHeliumConfig.value.build.extend(tlSiteHeliumExtensions.value),
     mdocVariables := {
       mdocVariables.value ++
