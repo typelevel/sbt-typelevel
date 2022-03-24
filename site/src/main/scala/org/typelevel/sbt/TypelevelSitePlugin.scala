@@ -51,6 +51,9 @@ object TypelevelSitePlugin extends AutoPlugin {
       settingKey[Option[ModuleID]]("The module that publishes API docs")
     lazy val tlSiteApiPackage = settingKey[Option[String]](
       "The top-level package for your API docs (e.g. org.typlevel.sbt)")
+    lazy val tlSiteApiIndexUrl =
+      settingKey[Option[URL]](
+        "The URL of the index page for the top-level package of your API docs")
     lazy val tlSiteRelatedProjects =
       settingKey[Seq[(String, URL)]]("A list of related projects (default: cats)")
 
@@ -87,6 +90,7 @@ object TypelevelSitePlugin extends AutoPlugin {
     tlSitePublishBranch := Some("main"),
     tlSitePublishTags := tlSitePublishBranch.value.isEmpty,
     tlSiteApiUrl := None,
+    tlSiteApiIndexUrl := None,
     tlSiteApiPackage := None,
     tlSiteRelatedProjects := Seq(TypelevelProject.Cats),
     tlSiteKeepFiles := true,
@@ -121,7 +125,7 @@ object TypelevelSitePlugin extends AutoPlugin {
           "PRERELEASE_VERSION" -> currentPreRelease.value.getOrElse(version.value),
           "SNAPSHOT_VERSION" -> version.value
         ) ++
-        tlSiteApiUrl.value.map("API_URL" -> _.toString).toMap
+        tlSiteApiIndexUrl.value.map("API_URL" -> _.toString).toMap
     },
     tlSiteHeliumExtensions := TypelevelHeliumExtensions(
       licenses.value.headOption,
@@ -140,11 +144,14 @@ object TypelevelSitePlugin extends AutoPlugin {
         val o = moduleId.organization
         val n = cross(moduleId.name)
         val v = version
-        val p = tlSiteApiPackage.value.fold("")(_.replace('.', '/') + "/index.html")
-        url(s"https://www.javadoc.io/doc/$o/$n/$v/$p")
+        url(s"https://www.javadoc.io/doc/$o/$n/$v/")
       }
 
       tlSiteApiUrl.value.orElse(javadocioUrl)
+    },
+    tlSiteApiIndexUrl := tlSiteApiUrl.value.map { apiURL =>
+      val apiIndex = tlSiteApiPackage.value.fold("")(_.replace('.', '/') + "/index.html")
+      apiURL.toURI.resolve(apiIndex).toURL
     },
     tlSiteHeliumConfig := {
       Helium
@@ -178,9 +185,9 @@ object TypelevelSitePlugin extends AutoPlugin {
             "https://typelevel.org",
             Image.external(s"https://typelevel.org/img/logo.svg")
           ),
-          navLinks = tlSiteApiUrl.value.toList.map { url =>
+          navLinks = tlSiteApiIndexUrl.value.toList.map { apiIndex =>
             IconLink.external(
-              url.toString,
+              apiIndex.toString,
               HeliumIcon.api,
               options = Styles("svg-link")
             )
