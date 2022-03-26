@@ -35,8 +35,8 @@ If you generate your API documentation with [sbt-unidoc](https://github.com/sbt/
 
 ```scala
 // Make sure to add to your root aggregate so it gets published!
-lazy val unidoc = project
-  .in(file("unidoc"))
+lazy val unidocs = project
+  .in(file("unidocs"))
   .enablePlugins(TypelevelUnidocPlugin) // also enables the ScalaUnidocPlugin
   .settings(
     name := "woozle-docs"
