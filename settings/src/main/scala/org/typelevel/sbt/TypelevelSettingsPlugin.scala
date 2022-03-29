@@ -17,8 +17,8 @@
 package org.typelevel.sbt
 
 import sbt._, Keys._
-import com.typesafe.sbt.GitPlugin
-import com.typesafe.sbt.SbtGit.git
+import com.github.sbt.git.GitPlugin
+import com.github.sbt.git.SbtGit.git
 import org.typelevel.sbt.kernel.V
 import org.typelevel.sbt.kernel.GitHelper
 
