@@ -23,6 +23,7 @@ import laika.config.Config
 import laika.io.model.InputTree
 import laika.markdown.github.GitHubFlavor
 import laika.parse.code.SyntaxHighlighting
+import laika.parse.code.languages.DottySyntax
 import laika.rewrite.DefaultTemplatePath
 import laika.theme.Theme
 import laika.theme.ThemeBuilder
@@ -32,9 +33,14 @@ import java.net.URL
 
 object TypelevelHeliumExtensions {
 
+  @deprecated("Use overload with scala3 parameter", "0.4.7")
+  def apply(license: Option[(String, URL)], related: Seq[(String, URL)]): ThemeProvider =
+    apply(license, related, false)
+
   def apply(
       license: Option[(String, URL)],
-      related: Seq[(String, URL)]
+      related: Seq[(String, URL)],
+      scala3: Boolean
   ): ThemeProvider = new ThemeProvider {
     def build[F[_]](implicit F: Sync[F]): Resource[F, Theme[F]] =
       ThemeBuilder[F]("Typelevel Helium Extensions")
@@ -49,7 +55,11 @@ object TypelevelHeliumExtensions {
               Path.Root / "site" / "styles.css"
             )
         )
-        .addExtensions(GitHubFlavor, SyntaxHighlighting)
+        .addExtensions(
+          GitHubFlavor,
+          if (scala3) SyntaxHighlighting.withSyntaxBinding("scala", DottySyntax)
+          else SyntaxHighlighting
+        )
         .addBaseConfig(licenseConfig(license).withFallback(relatedConfig(related)))
         .build
   }
