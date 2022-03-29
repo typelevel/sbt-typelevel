@@ -18,7 +18,7 @@ package org.typelevel.sbt
 
 import sbt._, Keys._
 import org.scalajs.sbtplugin.ScalaJSPlugin
-import com.typesafe.sbt.SbtGit.git
+import com.github.sbt.git.SbtGit.git
 import org.typelevel.sbt.kernel.GitHelper
 
 object TypelevelScalaJSGitHubPlugin extends AutoPlugin {
