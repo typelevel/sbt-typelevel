@@ -175,19 +175,24 @@
 </span><span class="type-name">ThisBuild</span><span> / </span><span class="identifier">crossScalaVersions</span><span> := </span><span class="type-name">Seq</span><span>(</span><span class="type-name">Scala213</span><span>, </span><span class="string-literal">&quot;3.1.1&quot;</span><span>)
 </span><span class="type-name">ThisBuild</span><span> / </span><span class="identifier">scalaVersion</span><span> := </span><span class="type-name">Scala213</span><span> </span><span class="comment">// the default Scala
 </span><span>
-</span><span class="keyword">lazy</span><span> </span><span class="keyword">val</span><span> </span><span class="identifier">root</span><span> = </span><span class="identifier">tlCrossRootProject</span><span>.</span><span class="identifier">aggregate</span><span>(</span><span class="identifier">core</span><span>, </span><span class="identifier">extra</span><span>, </span><span class="identifier">tests</span><span>)
+</span><span class="keyword">lazy</span><span> </span><span class="keyword">val</span><span> </span><span class="identifier">root</span><span> = </span><span class="identifier">tlCrossRootProject</span><span>.</span><span class="identifier">aggregate</span><span>(</span><span class="identifier">core</span><span>, </span><span class="identifier">heffalump</span><span>, </span><span class="identifier">tests</span><span>)
 
 </span><span class="keyword">lazy</span><span> </span><span class="keyword">val</span><span> </span><span class="identifier">core</span><span> = </span><span class="identifier">crossProject</span><span>(</span><span class="type-name">JVMPlatform</span><span>, </span><span class="type-name">JSPlatform</span><span>)
   .</span><span class="identifier">in</span><span>(</span><span class="identifier">file</span><span>(</span><span class="string-literal">&quot;core&quot;</span><span>))
   .</span><span class="identifier">settings</span><span>(
     </span><span class="identifier">name</span><span> := </span><span class="string-literal">&quot;woozle-core&quot;</span><span>,
+    </span><span class="identifier">description</span><span> := </span><span class="string-literal">&quot;Core data types and typeclasses&quot;</span><span>,
     </span><span class="identifier">libraryDependencies</span><span> += </span><span class="string-literal">&quot;org.typelevel&quot;</span><span> %%% </span><span class="string-literal">&quot;cats-core&quot;</span><span> % </span><span class="string-literal">&quot;2.7.0&quot;</span><span>
   )
 
-</span><span class="keyword">lazy</span><span> </span><span class="keyword">val</span><span> </span><span class="identifier">extra</span><span> = </span><span class="identifier">project</span><span>
-  .</span><span class="identifier">in</span><span>(</span><span class="identifier">file</span><span>(</span><span class="string-literal">&quot;extra&quot;</span><span>))
+</span><span class="keyword">lazy</span><span> </span><span class="keyword">val</span><span> </span><span class="identifier">heffalump</span><span> = </span><span class="identifier">project</span><span>
+  .</span><span class="identifier">in</span><span>(</span><span class="identifier">file</span><span>(</span><span class="string-literal">&quot;heffalump&quot;</span><span>))
   .</span><span class="identifier">dependsOn</span><span>(</span><span class="identifier">core</span><span>.</span><span class="identifier">jvm</span><span>)
-  .</span><span class="identifier">settings</span><span>(</span><span class="identifier">name</span><span> := </span><span class="string-literal">&quot;woozle-extra&quot;</span><span>)
+  .</span><span class="identifier">settings</span><span>(
+    </span><span class="identifier">name</span><span> := </span><span class="string-literal">&quot;woozle-heffalump&quot;</span><span>,
+    </span><span class="identifier">description</span><span> := </span><span class="string-literal">&quot;Integration module with heffalump (JVM only)&quot;</span><span>,
+    </span><span class="identifier">libraryDependencies</span><span> += </span><span class="string-literal">&quot;org.100aker&quot;</span><span> %% </span><span class="string-literal">&quot;heffalump-core&quot;</span><span> % </span><span class="string-literal">&quot;0.8.21&quot;</span><span>
+  )
 
 </span><span class="keyword">lazy</span><span> </span><span class="keyword">val</span><span> </span><span class="identifier">tests</span><span> = </span><span class="identifier">crossProject</span><span>(</span><span class="type-name">JVMPlatform</span><span>, </span><span class="type-name">JSPlatform</span><span>)
   .</span><span class="identifier">in</span><span>(</span><span class="identifier">file</span><span>(</span><span class="string-literal">&quot;tests&quot;</span><span>))
