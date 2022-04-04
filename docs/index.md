@@ -62,19 +62,24 @@ val Scala213 = "2.13.8"
 ThisBuild / crossScalaVersions := Seq(Scala213, "3.1.1")
 ThisBuild / scalaVersion := Scala213 // the default Scala
 
-lazy val root = tlCrossRootProject.aggregate(core, extra, tests)
+lazy val root = tlCrossRootProject.aggregate(core, heffalump, tests)
 
 lazy val core = crossProject(JVMPlatform, JSPlatform)
   .in(file("core"))
   .settings(
     name := "woozle-core",
+    description := "Core data types and typeclasses",
     libraryDependencies += "org.typelevel" %%% "cats-core" % "2.7.0"
   )
 
-lazy val extra = project
-  .in(file("extra"))
+lazy val heffalump = project
+  .in(file("heffalump"))
   .dependsOn(core.jvm)
-  .settings(name := "woozle-extra")
+  .settings(
+    name := "woozle-heffalump",
+    description := "Integration module with heffalump (JVM only)",
+    libraryDependencies += "org.100aker" %% "heffalump-core" % "0.8.21"
+  )
 
 lazy val tests = crossProject(JVMPlatform, JSPlatform)
   .in(file("tests"))
