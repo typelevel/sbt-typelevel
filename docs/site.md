@@ -39,7 +39,8 @@ lazy val unidocs = project
   .in(file("unidocs"))
   .enablePlugins(TypelevelUnidocPlugin) // also enables the ScalaUnidocPlugin
   .settings(
-    name := "woozle-docs"
+    name := "woozle-docs",
+    ScalaUnidoc / unidoc / unidocProjectFilter := inProjects(core.jvm, heffalump)
   )
 ```
 
