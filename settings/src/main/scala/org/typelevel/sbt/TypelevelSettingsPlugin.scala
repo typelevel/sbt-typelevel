@@ -27,6 +27,8 @@ object TypelevelSettingsPlugin extends AutoPlugin {
   override def requires = TypelevelKernelPlugin && GitPlugin
 
   object autoImport {
+    lazy val tlScala3Release =
+      settingKey[Option[String]]("Scala 3 Release version. Defaults to 3.0")
     lazy val tlFatalWarnings =
       settingKey[Boolean]("Convert compiler warnings into errors (default: false)")
     lazy val tlJdkRelease =
@@ -40,6 +42,7 @@ object TypelevelSettingsPlugin extends AutoPlugin {
   override def globalSettings = Seq(
     tlFatalWarnings := false,
     tlJdkRelease := None,
+    tlScala3Release := None,
     Def.derive(scalaVersion := crossScalaVersions.value.last, default = true)
   )
 
@@ -69,6 +72,15 @@ object TypelevelSettingsPlugin extends AutoPlugin {
           Seq("-Yno-adapted-args", "-Ywarn-unused-import")
         case _ =>
           Seq.empty
+      }
+    },
+    scalacOptions ++= {
+      val scalaReleaseOpt = "-Yscala-release"
+      scalaVersion.value match {
+        case V(V(3, minor, patch, _))
+            if minor == 1 && patch.fold(false)(_ >= 2) || minor >= 2 =>
+          tlScala3Release.value.fold(Seq(scalaReleaseOpt, "3.0"))(v => Seq(scalaReleaseOpt, v))
+        case _ => Seq.empty
       }
     },
     scalacOptions ++= {
