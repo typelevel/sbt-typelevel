@@ -64,6 +64,7 @@ object TypelevelPlugin extends AutoPlugin {
     licenses += "Apache-2.0" -> url("https://www.apache.org/licenses/LICENSE-2.0.txt"),
     tlCiReleaseBranches := Seq("main"),
     Def.derive(tlFatalWarnings := (tlFatalWarningsInCi.value && githubIsWorkflowBuild.value)),
+    githubWorkflowJavaVersions := Seq(JavaSpec.temurin("17")),
     githubWorkflowBuildMatrixExclusions ++= {
       val defaultScala = (ThisBuild / scalaVersion).value
       for {
