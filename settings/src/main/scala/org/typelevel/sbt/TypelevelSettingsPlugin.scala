@@ -195,7 +195,11 @@ object TypelevelSettingsPlugin extends AutoPlugin {
       "-encoding",
       "utf8",
       "-Xlint:all"
-    )
+    ),
+    Compile / packageSrc / mappings ++= {
+      val base = (Compile / sourceManaged).value
+      (Compile / managedSources).value.map(file => file -> file.relativeTo(base).get.getPath)
+    }
   ) ++ inConfig(Compile)(perConfigSettings) ++ inConfig(Test)(perConfigSettings)
 
   private val perConfigSettings = Seq(
