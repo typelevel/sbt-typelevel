@@ -72,12 +72,6 @@ object TypelevelSettingsPlugin extends AutoPlugin {
       }
     },
     scalacOptions ++= {
-      if (tlFatalWarnings.value)
-        Seq("-Xfatal-warnings")
-      else
-        Seq.empty
-    },
-    scalacOptions ++= {
       val warningsNsc = Seq("-Xlint", "-Ywarn-dead-code")
 
       val warnings211 =
@@ -199,7 +193,16 @@ object TypelevelSettingsPlugin extends AutoPlugin {
       "-encoding",
       "utf8",
       "-Xlint:all"
-    ),
+    )
+  ) ++ inConfig(Compile)(perConfigSettings) ++ inConfig(Test)(perConfigSettings)
+
+  private val perConfigSettings = Seq(
+    scalacOptions ++= {
+      if (tlFatalWarnings.value)
+        Seq("-Xfatal-warnings")
+      else
+        Seq.empty
+    },
     javacOptions ++= {
       if (tlFatalWarnings.value)
         Seq("-Werror")
