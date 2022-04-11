@@ -195,10 +195,9 @@ object TypelevelSettingsPlugin extends AutoPlugin {
       "-encoding",
       "utf8",
       "-Xlint:all"
-    )
-  ) ++ inConfig(Compile)(perConfigSettings) ++ inConfig(Test)(perConfigSettings)
+    ),
 
-  private val perConfigSettings = Seq(
+    // TODO make these respect Compile/Test config
     scalacOptions ++= {
       if (tlFatalWarnings.value)
         Seq("-Xfatal-warnings")
@@ -237,7 +236,10 @@ object TypelevelSettingsPlugin extends AutoPlugin {
     },
     javacOptions ++= {
       withJdkRelease(tlJdkRelease.value)(Seq.empty[String])(n => Seq("--release", n.toString))
-    },
+    }
+  ) ++ inConfig(Compile)(perConfigSettings) ++ inConfig(Test)(perConfigSettings)
+
+  private val perConfigSettings = Seq(
     unmanagedSourceDirectories ++= {
       def extraDirs(suffix: String) =
         if (crossProjectPlatform.?.value.isDefined)
