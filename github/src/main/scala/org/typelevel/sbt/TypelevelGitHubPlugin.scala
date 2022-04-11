@@ -43,6 +43,7 @@ object TypelevelGitHubPlugin extends AutoPlugin {
     tlGitHubRepo := gitHubUserRepo.value.map(_._2),
     scmInfo := gitHubUserRepo.value.map {
       case (user, repo) =>
+        sLog.value.info(s"set scmInfo to https://github.com/$user/$repo")
         gitHubScmInfo(user, repo)
     },
     homepage := homepage.value.orElse(scmInfo.value.map(_.browseUrl))
@@ -55,7 +56,7 @@ object TypelevelGitHubPlugin extends AutoPlugin {
       s"scm:git:git@github.com:$user/$repo.git"
     )
 
-  private[sbt] def gitHubUserRepo = Def.setting {
+  private[sbt] lazy val gitHubUserRepo = Def.setting {
     import scala.sys.process._
 
     def fromRemote(remote: String) = {
