@@ -21,6 +21,8 @@ import com.typesafe.sbt.GitPlugin
 import com.typesafe.sbt.SbtGit.git
 import org.typelevel.sbt.kernel.V
 import org.typelevel.sbt.kernel.GitHelper
+import sbtcrossproject.CrossPlugin.autoImport._
+import sbtcrossproject.CrossType
 
 object TypelevelSettingsPlugin extends AutoPlugin {
   override def trigger = allRequirements
@@ -235,6 +237,31 @@ object TypelevelSettingsPlugin extends AutoPlugin {
     },
     javacOptions ++= {
       withJdkRelease(tlJdkRelease.value)(Seq.empty[String])(n => Seq("--release", n.toString))
+    },
+    unmanagedSourceDirectories ++= {
+      def extraDirs(suffix: String) =
+        if (crossProjectPlatform.?.value.isDefined)
+          List(CrossType.Pure, CrossType.Full).flatMap {
+            _.sharedSrcDir(baseDirectory.value, Defaults.nameForSrc(configuration.value.name))
+              .toList
+              .map(f => file(f.getPath + suffix))
+          }
+        else
+          List(
+            baseDirectory.value / "src" / Defaults.nameForSrc(
+              configuration.value.name) / s"scala$suffix"
+          )
+
+      CrossVersion.partialVersion(scalaVersion.value) match {
+        case Some((2, y)) if y <= 12 => extraDirs("-2.12-")
+        case Some((2, y)) if y >= 13 => extraDirs("-2.13+")
+        case Some((3, _)) => extraDirs("-2.13+")
+        case _ => Nil
+      }
+    },
+    packageSrc / mappings ++= {
+      val base = sourceManaged.value
+      managedSources.value.map(file => file -> file.relativeTo(base).get.getPath)
     }
   )
 
