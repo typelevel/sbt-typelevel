@@ -180,7 +180,6 @@ lazy val docs = project
     tlSiteRelatedProjects := Seq(
       "sbt" -> url("https://www.scala-sbt.org/"),
       "sbt-crossproject" -> url("https://github.com/portable-scala/sbt-crossproject"),
-      "sbt-github-actions" -> url("https://github.com/djspiewak/sbt-github-actions/"),
       "mima" -> url("https://github.com/lightbend/mima"),
       "mdoc" -> url("https://scalameta.org/mdoc/"),
       "Laika" -> url("https://planet42.github.io/Laika/"),
