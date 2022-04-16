@@ -13,12 +13,9 @@ sbt-typelevel configures [sbt](https://www.scala-sbt.org/) for developing, testi
 
 ## Get Started
 
-Visit https://typelevel.org/sbt-typelevel for a quick start example and detailed documentation.
-
-## Giter8 Template
-
 ```sh
 sbt new typelevel/typelevel.g8
 ```
 
-Find the Giter8 template companion project at [typelevel.g8](https://github.com/typelevel/typelevel.g8)
+Visit https://typelevel.org/sbt-typelevel for a quick start example and detailed documentation.
+Find the Giter8 template companion project at [typelevel.g8](https://github.com/typelevel/typelevel.g8).
