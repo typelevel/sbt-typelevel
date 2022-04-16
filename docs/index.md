@@ -50,7 +50,7 @@ sbt new typelevel/typelevel.g8
 ```
 
 This will guide you through the basic setup to create a new project with **sbt-typelevel** and **sbt-typelevel-site**.
-Check out the project repo for more details: [typelevel.g8](https://github.com/typelevel/typelevel.g8)
+Check out the [typelevel.g8](https://github.com/typelevel/typelevel.g8) project for more details.
 
 
 ### Configure Your Build
