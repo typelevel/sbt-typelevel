@@ -49,7 +49,7 @@ We provide a [Giter8 template](http://www.foundweekends.org/giter8/index.html) f
 sbt new typelevel/typelevel.g8
 ```
 
-This will help you create a new project with sbt-typelevel, sbt-typelevel-site, and some other boilerplate setup.
+This will guide you through the basic setup to create a new project with **sbt-typelevel** and **sbt-typelevel-site**.
 Check out the project repo for more details: [typelevel.g8](https://github.com/typelevel/typelevel.g8)
 
 
