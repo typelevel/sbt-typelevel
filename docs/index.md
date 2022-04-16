@@ -16,6 +16,20 @@ sbt-typelevel configures [sbt](https://www.scala-sbt.org/) for developing, testi
 [![sbt-typelevel Scala version support](https://index.scala-lang.org/typelevel/sbt-typelevel/sbt-typelevel/latest-by-scala-version.svg?targetType=Sbt)](https://index.scala-lang.org/typelevel/sbt-typelevel/sbt-typelevel)
 [![Discord](https://img.shields.io/discord/632277896739946517.svg?label=&logo=discord&logoColor=ffffff&color=404244&labelColor=6A7EC2)](https://discord.gg/D7wY3aH7BQ)
 
+### Giter8 Template
+
+We provide a [Giter8 template](http://www.foundweekends.org/giter8/index.html) for quickly starting projects with familiar workflows and best practices.
+
+```sh
+sbt new typelevel/typelevel.g8
+```
+
+This will guide you through the basic setup to create a new project with **sbt-typelevel** and **sbt-typelevel-site**.
+Check out the [typelevel.g8](https://github.com/typelevel/typelevel.g8) project for more details.
+
+
+### Plugins
+
 Pick either the **sbt-typelevel** (recommended) or **sbt-typelevel-ci-release** plugin.
 
 #### `project/plugins.sbt`
@@ -40,7 +54,8 @@ addSbtPlugin("org.typelevel" % "sbt-typelevel-ci-release" % "@VERSION@")
 
 @:@
 
-Then configure your build.
+
+### Configure Your Build
 
 #### `build.sbt`
 
