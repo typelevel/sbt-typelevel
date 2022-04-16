@@ -40,7 +40,20 @@ addSbtPlugin("org.typelevel" % "sbt-typelevel-ci-release" % "@VERSION@")
 
 @:@
 
-Then configure your build.
+
+### Giter8 Template
+
+The sbt-typelevel project provides a [Giter8 template](http://www.foundweekends.org/giter8/index.html) for quickly starting projects with familiar workflows and best practices.
+
+```sh
+sbt new typelevel/typelevel.g8
+```
+
+This will help you create a new project with sbt-typelevel, sbt-typelevel-site, and some other boilerplate setup.
+Check out the project repo for more details: [typelevel.g8](https://github.com/typelevel/typelevel.g8)
+
+
+### Configure Your Build
 
 #### `build.sbt`
 
