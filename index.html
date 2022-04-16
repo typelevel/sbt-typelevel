@@ -115,6 +115,7 @@
           <li class="level2"><a href="#giter8-template">Giter8 Template</a></li>
           <li class="level2"><a href="#plugins">Plugins</a></li>
           <li class="level2"><a href="#configure-your-build">Configure Your Build</a></li>
+          <li class="level2"><a href="#configure-github-actions">Configure GitHub Actions</a></li>
         </ul>
 
         <p class="footer"></p>
@@ -153,7 +154,10 @@
 </span><span class="identifier">addSbtPlugin</span><span>(</span><span class="string-literal">&quot;org.typelevel&quot;</span><span> % </span><span class="string-literal">&quot;sbt-typelevel&quot;</span><span> % </span><span class="string-literal">&quot;0.4.9&quot;</span><span>)
 
 </span><span class="comment">// Set me up for CI release, but don&#39;t touch my scalacOptions!
-</span><span class="identifier">addSbtPlugin</span><span>(</span><span class="string-literal">&quot;org.typelevel&quot;</span><span> % </span><span class="string-literal">&quot;sbt-typelevel-ci-release&quot;</span><span> % </span><span class="string-literal">&quot;0.4.9&quot;</span><span>)</span></code></pre>
+</span><span class="identifier">addSbtPlugin</span><span>(</span><span class="string-literal">&quot;org.typelevel&quot;</span><span> % </span><span class="string-literal">&quot;sbt-typelevel-ci-release&quot;</span><span> % </span><span class="string-literal">&quot;0.4.9&quot;</span><span>)
+
+</span><span class="comment">// Optional. Make me a website!
+</span><span class="identifier">addSbtPlugin</span><span>(</span><span class="string-literal">&quot;org.typelevel&quot;</span><span> % </span><span class="string-literal">&quot;sbt-typelevel-site&quot;</span><span> % </span><span class="string-literal">&quot;0.4.9&quot;</span><span>)</span></code></pre>
         <div class="callout info">
           <i class="icofont-laika">&#xef4e;</i>
           <p><strong>sbt-typelevel-ci-release</strong> includes all the core features mentioned above.</p>
@@ -212,7 +216,9 @@
     </span><span class="identifier">name</span><span> := </span><span class="string-literal">&quot;woozle-tests&quot;</span><span>,
     </span><span class="identifier">libraryDependencies</span><span> += </span><span class="string-literal">&quot;org.scalacheck&quot;</span><span> %%% </span><span class="string-literal">&quot;scalacheck&quot;</span><span> % </span><span class="string-literal">&quot;1.15.4&quot;</span><span> % </span><span class="type-name">Test</span><span>
   )</span></code></pre>
-        <p>Next, run <code>githubWorkflowGenerate</code> in sbt to automatically generate the GitHub Actions workflows.
+        
+        <h3 id="configure-github-actions" class="section">Configure GitHub Actions<a class="anchor-link right" href="#configure-github-actions"><i class="icofont-laika">&#xef71;</i></a></h3>
+        <p>Run <code>githubWorkflowGenerate</code> in sbt to automatically generate the GitHub Actions workflows.
         This will create a CI matrix parallelized on Scala version and target platform (JVM, JS, etc.) and includes steps for running tests and checking binary compatibility.
         It will also setup a job for publishing tagged releases e.g. <code>v0.4.5</code> and snapshots to Sonatype/Maven.</p>
         <p>Finally, on GitHub set the following secrets on your repository:</p>
