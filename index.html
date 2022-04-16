@@ -86,6 +86,8 @@
       <ul class="nav-list">
         <li class="level1 nav-header">Related Projects</li>
         
+          <li class="level2"><a href="https://github.com/typelevel/typelevel.g8">typelevel.g8</a></li>
+        
           <li class="level2"><a href="https://www.scala-sbt.org/">sbt</a></li>
         
           <li class="level2"><a href="https://github.com/portable-scala/sbt-crossproject">sbt-crossproject</a></li>
@@ -110,8 +112,9 @@
         <ul class="nav-list">
           <li class="level1"><a href="#features">Features</a></li>
           <li class="level1"><a href="#quick-start">Quick start</a></li>
-          <li class="level2"><a href="#project-plugins-sbt"><code>project/plugins.sbt</code></a></li>
-          <li class="level2"><a href="#build-sbt"><code>build.sbt</code></a></li>
+          <li class="level2"><a href="#giter8-template">Giter8 Template</a></li>
+          <li class="level2"><a href="#plugins">Plugins</a></li>
+          <li class="level2"><a href="#configure-your-build">Configure Your Build</a></li>
         </ul>
 
         <p class="footer"></p>
@@ -135,6 +138,14 @@
         <h2 id="quick-start" class="section">Quick start<a class="anchor-link right" href="#quick-start"><i class="icofont-laika">&#xef71;</i></a></h2>
         <p><a href="https://index.scala-lang.org/typelevel/sbt-typelevel/sbt-typelevel"><img src="https://index.scala-lang.org/typelevel/sbt-typelevel/sbt-typelevel/latest-by-scala-version.svg?targetType=Sbt" alt="sbt-typelevel Scala version support"></a>
         <a href="https://discord.gg/D7wY3aH7BQ"><img src="https://img.shields.io/discord/632277896739946517.svg?label=&logo=discord&logoColor=ffffff&color=404244&labelColor=6A7EC2" alt="Discord"></a></p>
+        
+        <h3 id="giter8-template" class="section">Giter8 Template<a class="anchor-link right" href="#giter8-template"><i class="icofont-laika">&#xef71;</i></a></h3>
+        <p>We provide a <a href="http://www.foundweekends.org/giter8/index.html">Giter8 template</a> for quickly starting projects with familiar workflows and best practices.</p>
+        <pre class="keep-together pdf epub"><code class="sh">sbt new typelevel/typelevel.g8</code></pre>
+        <p>This will guide you through the basic setup to create a new project with <strong>sbt-typelevel</strong> and <strong>sbt-typelevel-site</strong>.
+        Check out the <a href="https://github.com/typelevel/typelevel.g8">typelevel.g8</a> project for more details.</p>
+        
+        <h3 id="plugins" class="section">Plugins<a class="anchor-link right" href="#plugins"><i class="icofont-laika">&#xef71;</i></a></h3>
         <p>Pick either the <strong>sbt-typelevel</strong> (recommended) or <strong>sbt-typelevel-ci-release</strong> plugin.</p>
         
         <h4 id="project-plugins-sbt" class="section"><code>project/plugins.sbt</code><a class="anchor-link right" href="#project-plugins-sbt"><i class="icofont-laika">&#xef71;</i></a></h4>
@@ -153,7 +164,8 @@
             <li>A <code>prePR</code> command and other nice-to-haves.</li>
           </ol>
         </div>
-        <p>Then configure your build.</p>
+        
+        <h3 id="configure-your-build" class="section">Configure Your Build<a class="anchor-link right" href="#configure-your-build"><i class="icofont-laika">&#xef71;</i></a></h3>
         
         <h4 id="build-sbt" class="section"><code>build.sbt</code><a class="anchor-link right" href="#build-sbt"><i class="icofont-laika">&#xef71;</i></a></h4>
         <pre><code class="nohighlight"><span class="type-name">ThisBuild</span><span> / </span><span class="identifier">tlBaseVersion</span><span> := </span><span class="string-literal">&quot;0.4&quot;</span><span> </span><span class="comment">// your current series x.y
