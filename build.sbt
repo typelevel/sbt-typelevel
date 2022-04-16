@@ -178,6 +178,7 @@ lazy val docs = project
     laikaConfig ~= { _.withRawContent },
     tlSiteApiPackage := Some("org.typelevel.sbt"),
     tlSiteRelatedProjects := Seq(
+      "typelevel.g8" -> url("https://github.com/typelevel/typelevel.g8"),
       "sbt" -> url("https://www.scala-sbt.org/"),
       "sbt-crossproject" -> url("https://github.com/portable-scala/sbt-crossproject"),
       "mima" -> url("https://github.com/lightbend/mima"),
