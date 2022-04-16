@@ -17,4 +17,8 @@ Visit https://typelevel.org/sbt-typelevel for a quick start example and detailed
 
 ## Giter8 Template
 
+```sh
+sbt new typelevel/typelevel.g8
+```
+
 Find the Giter8 template companion project at [typelevel.g8](https://github.com/typelevel/typelevel.g8)
