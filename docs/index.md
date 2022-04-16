@@ -40,6 +40,9 @@ addSbtPlugin("org.typelevel" % "sbt-typelevel" % "@VERSION@")
 
 // Set me up for CI release, but don't touch my scalacOptions!
 addSbtPlugin("org.typelevel" % "sbt-typelevel-ci-release" % "@VERSION@")
+
+// Optional. Make me a website!
+addSbtPlugin("org.typelevel" % "sbt-typelevel-site" % "@VERSION@")
 ```
 
 @:callout(info)
@@ -106,7 +109,9 @@ lazy val tests = crossProject(JVMPlatform, JSPlatform)
   )
 ```
 
-Next, run `githubWorkflowGenerate` in sbt to automatically generate the GitHub Actions workflows.
+### Configure GitHub Actions
+
+Run `githubWorkflowGenerate` in sbt to automatically generate the GitHub Actions workflows.
 This will create a CI matrix parallelized on Scala version and target platform (JVM, JS, etc.) and includes steps for running tests and checking binary compatibility.
 It will also setup a job for publishing tagged releases e.g. `v0.4.5` and snapshots to Sonatype/Maven.
 
