@@ -103,7 +103,7 @@ lazy val sonatype = project
   .settings(
     name := "sbt-typelevel-sonatype"
   )
-  .dependsOn(kernel)
+  .dependsOn(kernel, github)
 
 lazy val ciSigning = project
   .in(file("ci-signing"))

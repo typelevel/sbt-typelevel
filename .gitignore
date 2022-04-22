@@ -2,6 +2,9 @@ target/
 
 .sbtopts
 
+# Mac OS
+.DS_Store
+
 # vim
 *.sw?
 

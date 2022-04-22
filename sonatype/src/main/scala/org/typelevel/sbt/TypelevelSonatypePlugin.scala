@@ -17,13 +17,15 @@
 package org.typelevel.sbt
 
 import sbt._, Keys._
+import com.typesafe.sbt.SbtGit.git
 import com.typesafe.tools.mima.plugin.MimaPlugin
+import org.typelevel.sbt.kernel.GitHelper
 import xerial.sbt.Sonatype, Sonatype.autoImport._
 import TypelevelKernelPlugin.mkCommand
 
 object TypelevelSonatypePlugin extends AutoPlugin {
 
-  override def requires = MimaPlugin && Sonatype
+  override def requires = MimaPlugin && Sonatype && TypelevelGitHubPlugin
 
   override def trigger = allRequirements
 
@@ -66,8 +68,25 @@ object TypelevelSonatypePlugin extends AutoPlugin {
   )
 
   private[sbt] def javadocioUrl = Def.setting {
-    if (isSnapshot.value || sbtPlugin.value || !publishArtifact.value)
+    if (sbtPlugin.value || !publishArtifact.value)
       None // javadoc.io doesn't support snapshots, sbt plugins, or unpublished modules ;)
+    else if (isSnapshot.value) // Use jitpack.io to host scaladoc for snapshot releases
+      for {
+        cross <- CrossVersion(
+          crossVersion.value,
+          scalaVersion.value,
+          scalaBinaryVersion.value
+        )
+
+        (user, repo) <- TypelevelGitHubPlugin.gitHubUserRepo.value
+
+        snapshotTagOrHash <- GitHelper.getTagOrHash(
+          git.gitCurrentTags.value,
+          git.gitHeadCommit.value
+        )
+      } yield url(
+        s"https://javadoc.jitpack.io/com/github/${user}/${repo}/${cross(moduleName.value)}/${snapshotTagOrHash}/"
+      )
     else
       CrossVersion(
         crossVersion.value,
