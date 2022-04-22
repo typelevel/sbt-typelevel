@@ -56,26 +56,35 @@ object TypelevelGitHubPlugin extends AutoPlugin {
       s"scm:git:git@github.com:$user/$repo.git"
     )
 
-  private[sbt] lazy val gitHubUserRepo = Def.setting {
+  private def githubUserRepoFromRemote(remote: String) = {
     import scala.sys.process._
+    val identifier = """([^\/]+?)"""
+    val GitHubHttps = s"https://github.com/$identifier/$identifier(?:\\.git)?".r
+    val GitHubGit = s"git://github.com:$identifier/$identifier(?:\\.git)?".r
+    val GitHubSsh = s"git@github.com:$identifier/$identifier(?:\\.git)?".r
+    Try {
+      List("git", "ls-remote", "--get-url", remote).!!.trim() match {
+        case GitHubHttps(user, repo) => Some((user, repo))
+        case GitHubGit(user, repo) => Some((user, repo))
+        case GitHubSsh(user, repo) => Some((user, repo))
+        case _ => None
+      }
+    }.toOption.flatten
+  }
 
-    def fromRemote(remote: String) = {
-      val identifier = """([^\/]+?)"""
-      val GitHubHttps = s"https://github.com/$identifier/$identifier(?:\\.git)?".r
-      val GitHubGit = s"git://github.com:$identifier/$identifier(?:\\.git)?".r
-      val GitHubSsh = s"git@github.com:$identifier/$identifier(?:\\.git)?".r
-      Try {
-        List("git", "ls-remote", "--get-url", remote).!!.trim() match {
-          case GitHubHttps(user, repo) => Some((user, repo))
-          case GitHubGit(user, repo) => Some((user, repo))
-          case GitHubSsh(user, repo) => Some((user, repo))
-          case _ => None
-        }
-      }.toOption.flatten
-    }
+  /**
+   * The github origin user/repo regardless of source/fork status
+   */
+  private[sbt] lazy val gitHubOriginUserRepo = Def.setting {
+    githubUserRepoFromRemote("origin")
+  }
 
+  /**
+   * The github user/repo of the source if possible
+   */
+  private[sbt] lazy val gitHubUserRepo = Def.setting {
     // upstream if this is a fork, otherwise fallback to origin
-    fromRemote("upstream").orElse(fromRemote("origin"))
+    githubUserRepoFromRemote("upstream").orElse(githubUserRepoFromRemote("origin"))
   }
 
 }

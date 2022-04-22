@@ -78,7 +78,7 @@ object TypelevelSonatypePlugin extends AutoPlugin {
           scalaBinaryVersion.value
         )
 
-        (user, repo) <- TypelevelGitHubPlugin.gitHubUserRepo.value
+        (user, repo) <- TypelevelGitHubPlugin.gitHubOriginUserRepo.value
 
         snapshotTagOrHash <- GitHelper.getTagOrHash(
           git.gitCurrentTags.value,
