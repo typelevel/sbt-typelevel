@@ -16,11 +16,11 @@
 
 package org.typelevel.sbt
 
-import sbt._
-import org.typelevel.sbt.gha.GenerativePlugin
-import org.typelevel.sbt.gha.GitHubActionsPlugin
-import org.typelevel.sbt.gha.GenerativePlugin.autoImport._
 import com.typesafe.tools.mima.plugin.MimaPlugin
+import org.typelevel.sbt.gha.GenerativePlugin
+import org.typelevel.sbt.gha.GenerativePlugin.autoImport._
+import org.typelevel.sbt.gha.GitHubActionsPlugin
+import sbt._
 
 object TypelevelCiPlugin extends AutoPlugin {
 
@@ -46,7 +46,35 @@ object TypelevelCiPlugin extends AutoPlugin {
         cond = Some(primaryJavaCond.value)
       )
     ),
-    githubWorkflowJavaVersions := Seq(JavaSpec.temurin("8"))
+    githubWorkflowJavaVersions := Seq(JavaSpec.temurin("8")),
+    GlobalScope / Keys.onLoad := {
+      val oses = githubWorkflowOSes.value.toList
+      val javas = githubWorkflowJavaVersions.value.toList
+      val scalas = githubWorkflowScalaVersions.value.toList
+      val additions = githubWorkflowBuildMatrixAdditions.value
+      val inclusions = githubWorkflowBuildMatrixInclusions.value.toList
+      val exclusions = githubWorkflowBuildMatrixExclusions.value.toList
+      val stepPreamble = githubWorkflowBuildSbtStepPreamble.value.toList
+
+      (GlobalScope / Keys.onLoad).value.compose { (state: State) =>
+        addCiAlias(
+          state,
+          oses,
+          javas,
+          scalas,
+          additions,
+          inclusions,
+          exclusions,
+          stepPreamble,
+          githubWorkflowBuild.value
+        )
+      }
+    },
+    GlobalScope / Keys.onUnload := {
+      (GlobalScope / Keys.onUnload)
+        .value
+        .compose((state: State) => BasicCommands.removeAlias(state, "ci"))
+    }
   )
 
   private val primaryJavaCond = Def.setting {
@@ -54,4 +82,65 @@ object TypelevelCiPlugin extends AutoPlugin {
     s"matrix.java == '${java.render}'"
   }
 
+  private def addCiAlias(
+      state: State,
+      oses: List[String],
+      javaVersions: List[JavaSpec],
+      scalaVersions: List[String],
+      matrixAdditions: Map[String, List[String]],
+      matrixInclusions: List[MatrixInclude],
+      matrixExclusions: List[MatrixExclude],
+      sbtStepPreamble: List[String],
+      workflowSteps: Seq[WorkflowStep]) = {
+
+    val buildMatrix = GenerativePlugin.expandMatrix(
+      // Cannot meaningfully iterate OS or Java version here
+      oses = oses.take(1),
+      javas = javaVersions.take(1),
+      scalas = scalaVersions,
+      matrixAdds = matrixAdditions,
+      includes = matrixInclusions,
+      excludes = matrixExclusions
+    )
+
+    val keys = "os" :: "scala" :: "java" :: matrixAdditions.keys.toList.sorted
+
+    val commands = for {
+      matrixRow <- buildMatrix
+      matrixValues = keys.zip(matrixRow).toMap
+      step <- workflowSteps.collect {
+        case sbt: WorkflowStep.Sbt if matchingCondition(sbt, matrixValues) => sbt
+      }
+      command <- sbtStepPreamble ++ step.commands
+    } yield replaceMatrixVars(command, matrixValues)
+
+    val commandAlias = TypelevelKernelPlugin.mkCommand(commands)
+
+    BasicCommands.addAlias(
+      state,
+      "ci",
+      commandAlias
+    )
+  }
+
+  private def matchingCondition(
+      command: WorkflowStep.Sbt,
+      matrixValues: Map[String, String]) = {
+    // For all matrix values
+    matrixValues.forall {
+      case (k, v) =>
+        val renderedCond = s"matrix.$k == '$v'"
+
+        command.cond.forall { cond =>
+          // If the condition starts with this matrix variable, whole condition must be equal
+          if (cond.startsWith(s"matrix.$k")) cond == renderedCond else true
+        }
+    }
+  }
+
+  private def replaceMatrixVars(command: String, matrixValues: Map[String, String]): String =
+    matrixValues.foldLeft(command) {
+      case (cmd, (matrixVar, matrixVarValue)) =>
+        cmd.replaceAll(s"\\$$\\{\\{ matrix.${matrixVar} \\}\\}", matrixVarValue)
+    }
 }
