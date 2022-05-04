@@ -11,6 +11,10 @@ sbt-typelevel configures [sbt](https://www.scala-sbt.org/) for developing, testi
 - CI deployed GitHub pages websites, generated with [mdoc](https://github.com/scalameta/mdoc/) and [Laika](https://github.com/planet42/laika)
 - Auto-populated settings for various boilerplate (SCM info, API doc urls, Scala.js sourcemaps, etc.)
 
+## Adopters
+
+You can find an approximate list of sbt-typelevel adopters [here](https://github.com/typelevel/download-java/network/dependents), which includes all active [Typelevel](https://github.com/typelevel/) and [http4s](https://github.com/http4s/) projects.
+
 ## Quick start
 
 [![sbt-typelevel Scala version support](https://index.scala-lang.org/typelevel/sbt-typelevel/sbt-typelevel/latest-by-scala-version.svg?targetType=Sbt)](https://index.scala-lang.org/typelevel/sbt-typelevel/sbt-typelevel)
