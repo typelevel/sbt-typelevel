@@ -37,6 +37,14 @@ object TypelevelHeliumExtensions {
   def apply(license: Option[(String, URL)], related: Seq[(String, URL)]): ThemeProvider =
     apply(license, related, false)
 
+  /**
+   * @param license
+   *   name and [[java.net.URL]] of project license
+   * @param related
+   *   name and [[java.net.URL]] of related projects
+   * @param scala3
+   *   whether to use Scala 3 syntax highlighting
+   */
   def apply(
       license: Option[(String, URL)],
       related: Seq[(String, URL)],
