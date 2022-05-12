@@ -19,10 +19,13 @@ package org.typelevel.sbt
 import sbt._, Keys._
 import com.typesafe.sbt.GitPlugin
 import com.typesafe.sbt.SbtGit.git
+import java.io.File
+import java.lang.management.ManagementFactory
 import org.typelevel.sbt.kernel.V
 import org.typelevel.sbt.kernel.GitHelper
 import sbtcrossproject.CrossPlugin.autoImport._
 import sbtcrossproject.CrossType
+import scala.util.Try
 
 object TypelevelSettingsPlugin extends AutoPlugin {
   override def trigger = allRequirements
@@ -236,7 +239,8 @@ object TypelevelSettingsPlugin extends AutoPlugin {
     },
     javacOptions ++= {
       withJdkRelease(tlJdkRelease.value)(Seq.empty[String])(n => Seq("--release", n.toString))
-    }
+    },
+    javaApiMappings
   ) ++ inConfig(Compile)(perConfigSettings) ++ inConfig(Test)(perConfigSettings)
 
   private val perConfigSettings = Seq(
@@ -289,4 +293,27 @@ object TypelevelSettingsPlugin extends AutoPlugin {
     }
 
   private val isJava8: Boolean = javaRuntimeVersion == 8
+
+  private val javaApiMappings = {
+    // scaladoc doesn't support this automatically before 2.13
+    val baseUrl = javaRuntimeVersion match {
+      case v if v < 11 => url(s"https://docs.oracle.com/javase/${v}/docs/api/")
+      case v => url(s"https://docs.oracle.com/en/java/javase/${v}/docs/api/java.base/")
+    }
+    doc / apiMappings ~= { old =>
+      val runtimeMXBean = ManagementFactory.getRuntimeMXBean
+      val oldSchool = Try(
+        if (runtimeMXBean.isBootClassPathSupported)
+          runtimeMXBean
+            .getBootClassPath
+            .split(File.pathSeparatorChar)
+            .map(file(_) -> baseUrl)
+            .toMap
+        else Map.empty
+      ).getOrElse(Map.empty)
+      val newSchool = Map(file("/modules/java.base") -> baseUrl)
+      // Latest one wins.  We are providing a fallback.
+      oldSchool ++ newSchool ++ old
+    }
+  }
 }
