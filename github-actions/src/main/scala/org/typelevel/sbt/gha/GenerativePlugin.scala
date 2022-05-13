@@ -304,7 +304,7 @@ ${indent(rendered.mkString("\n"), 1)}"""
           val renderedImage = s"image: ${wrap(image)}"
 
           val renderedCredentials = credentials match {
-            case Some((username, password)) =>
+            case Some(username, password) =>
               s"\ncredentials:\n${indent(s"username: ${wrap(username)}\npassword: ${wrap(password)}", 1)}"
 
             case None =>

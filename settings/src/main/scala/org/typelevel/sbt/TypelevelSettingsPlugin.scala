@@ -255,9 +255,9 @@ object TypelevelSettingsPlugin extends AutoPlugin {
           )
 
       CrossVersion.partialVersion(scalaVersion.value) match {
-        case Some((2, y)) if y <= 12 => extraDirs("-2.12-")
-        case Some((2, y)) if y >= 13 => extraDirs("-2.13+")
-        case Some((3, _)) => extraDirs("-2.13+")
+        case Some(2, y) if y <= 12 => extraDirs("-2.12-")
+        case Some(2, y) if y >= 13 => extraDirs("-2.13+")
+        case Some(3, _) => extraDirs("-2.13+")
         case _ => Nil
       }
     },

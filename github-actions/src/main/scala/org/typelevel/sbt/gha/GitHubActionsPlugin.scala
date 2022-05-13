@@ -80,7 +80,7 @@ object GitHubActionsPlugin extends AutoPlugin {
                   .toList
                   .view flatMap { potential =>
                   Using.fileInputStream(potential) { fis =>
-                    Option(new Yaml().load[Any](fis)) collect {
+                    Option(new Yaml.load[Any](fis)) collect {
                       case map: java.util.Map[_, _] =>
                         map.asScala.toMap map {
                           case (k, v) => k.toString -> recursivelyConvert(v)

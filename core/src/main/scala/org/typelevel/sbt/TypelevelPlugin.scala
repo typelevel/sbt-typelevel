@@ -63,7 +63,7 @@ object TypelevelPlugin extends AutoPlugin {
     startYear := Some(java.time.YearMonth.now().getYear()),
     licenses += "Apache-2.0" -> url("https://www.apache.org/licenses/LICENSE-2.0.txt"),
     tlCiReleaseBranches := Seq("main"),
-    Def.derive(tlFatalWarnings := (tlFatalWarningsInCi.value && githubIsWorkflowBuild.value)),
+    Def.derive(tlFatalWarnings := tlFatalWarningsInCi.value && githubIsWorkflowBuild.value),
     githubWorkflowBuildMatrixExclusions ++= {
       val defaultScala = (ThisBuild / scalaVersion).value
       for {

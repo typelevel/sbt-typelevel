@@ -109,9 +109,9 @@ object MergifyPlugin extends AutoPlugin {
     mergifyGenerate / aggregate := false,
     mergifyCheck / aggregate := false,
     githubWorkflowGenerate := githubWorkflowGenerate
-      .dependsOn((ThisBuild / mergifyGenerate))
+      .dependsOn(ThisBuild / mergifyGenerate)
       .value,
-    githubWorkflowCheck := githubWorkflowCheck.dependsOn((ThisBuild / mergifyCheck)).value,
+    githubWorkflowCheck := githubWorkflowCheck.dependsOn(ThisBuild / mergifyCheck).value,
     ThisBuild / mergifyLabelPaths := {
       val labelPaths = (ThisBuild / mergifyLabelPaths).value
       projectLabel.value.fold(labelPaths) {
