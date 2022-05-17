@@ -16,11 +16,11 @@
 
 package org.typelevel.sbt
 
-import sbt._
-import org.typelevel.sbt.gha.GenerativePlugin
-import org.typelevel.sbt.gha.GitHubActionsPlugin
-import org.typelevel.sbt.gha.GenerativePlugin.autoImport._
 import com.typesafe.tools.mima.plugin.MimaPlugin
+import org.typelevel.sbt.gha.GenerativePlugin.autoImport._
+import org.typelevel.sbt.gha.{GenerativePlugin, GitHubActionsPlugin}
+import sbt._
+
 import scala.language.experimental.macros
 
 object TypelevelCiPlugin extends AutoPlugin {

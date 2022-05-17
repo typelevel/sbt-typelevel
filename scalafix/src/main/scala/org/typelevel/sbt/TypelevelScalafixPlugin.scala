@@ -1,7 +1,9 @@
 package org.typelevel.sbt
 
-import sbt._, Keys._
+import sbt._
 import scalafix.sbt.ScalafixPlugin
+
+import Keys._
 import ScalafixPlugin.autoImport._
 
 object TypelevelScalafixPlugin extends AutoPlugin {

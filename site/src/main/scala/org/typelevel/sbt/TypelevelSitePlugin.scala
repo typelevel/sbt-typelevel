@@ -19,10 +19,7 @@ package org.typelevel.sbt
 import laika.ast.LengthUnit._
 import laika.ast._
 import laika.helium.Helium
-import laika.helium.config.Favicon
-import laika.helium.config.HeliumIcon
-import laika.helium.config.IconLink
-import laika.helium.config.ImageLink
+import laika.helium.config.{Favicon, HeliumIcon, IconLink, ImageLink}
 import laika.sbt.LaikaPlugin
 import laika.theme.ThemeProvider
 import mdoc.MdocPlugin

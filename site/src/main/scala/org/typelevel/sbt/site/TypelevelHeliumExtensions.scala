@@ -16,8 +16,7 @@
 
 package org.typelevel.sbt.site
 
-import cats.effect.Resource
-import cats.effect.Sync
+import cats.effect.{Resource, Sync}
 import laika.ast.Path
 import laika.config.Config
 import laika.io.model.InputTree
@@ -25,9 +24,7 @@ import laika.markdown.github.GitHubFlavor
 import laika.parse.code.SyntaxHighlighting
 import laika.parse.code.languages.DottySyntax
 import laika.rewrite.DefaultTemplatePath
-import laika.theme.Theme
-import laika.theme.ThemeBuilder
-import laika.theme.ThemeProvider
+import laika.theme.{Theme, ThemeBuilder, ThemeProvider}
 
 import java.net.URL
 

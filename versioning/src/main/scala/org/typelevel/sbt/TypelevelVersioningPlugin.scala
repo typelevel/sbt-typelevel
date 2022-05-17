@@ -16,13 +16,14 @@
 
 package org.typelevel.sbt
 
-import sbt._, Keys._
 import com.github.sbt.git.GitPlugin
 import com.github.sbt.git.SbtGit.git
-import org.typelevel.sbt.kernel.V
+import org.typelevel.sbt.kernel.{GitHelper, V}
+import sbt._
 
 import scala.util.Try
-import org.typelevel.sbt.kernel.GitHelper
+
+import Keys._
 
 object TypelevelVersioningPlugin extends AutoPlugin {
 

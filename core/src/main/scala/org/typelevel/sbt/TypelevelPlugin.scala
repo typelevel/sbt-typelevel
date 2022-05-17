@@ -16,12 +16,13 @@
 
 package org.typelevel.sbt
 
-import sbt._, Keys._
-import org.typelevel.sbt.gha.GenerativePlugin
-import org.typelevel.sbt.gha.GitHubActionsPlugin
 import de.heikoseeberger.sbtheader.HeaderPlugin
+import org.typelevel.sbt.gha.{GenerativePlugin, GitHubActionsPlugin}
+import sbt._
 
 import scala.collection.immutable
+
+import Keys._
 
 object TypelevelPlugin extends AutoPlugin {
 
@@ -44,7 +45,6 @@ object TypelevelPlugin extends AutoPlugin {
   import TypelevelKernelPlugin.mkCommand
   import TypelevelSettingsPlugin.autoImport._
   import TypelevelSonatypeCiReleasePlugin.autoImport._
-  import TypelevelScalafixPlugin.autoImport._
   import GenerativePlugin.autoImport._
   import GitHubActionsPlugin.autoImport._
 

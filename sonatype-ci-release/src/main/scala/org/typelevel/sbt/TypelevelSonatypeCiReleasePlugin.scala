@@ -16,10 +16,9 @@
 
 package org.typelevel.sbt
 
-import sbt._
-import org.typelevel.sbt.gha.GenerativePlugin
-import org.typelevel.sbt.gha.GitHubActionsPlugin
 import org.typelevel.sbt.gha.GenerativePlugin.autoImport._
+import org.typelevel.sbt.gha.{GenerativePlugin, GitHubActionsPlugin}
+import sbt._
 
 object TypelevelSonatypeCiReleasePlugin extends AutoPlugin {
 

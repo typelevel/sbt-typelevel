@@ -20,8 +20,7 @@ import cats.effect.Sync
 import laika.bundle.ExtensionBundle
 import laika.factory.Format
 import laika.io.model.InputTree
-import laika.theme.Theme
-import laika.theme.ThemeProvider
+import laika.theme.{Theme, ThemeProvider}
 
 final class LaikaThemeProviderOps private[sbt] (provider: ThemeProvider) {
 
