@@ -17,3 +17,6 @@ tags
 .bloop/
 metals.sbt
 .vscode
+
+# Mac OS
+.DS_Store
