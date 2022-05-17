@@ -41,6 +41,7 @@ object TypelevelPlugin extends AutoPlugin {
 
   import autoImport._
   import TypelevelKernelPlugin.mkCommand
+  import TypelevelCiPlugin.autoImport._
   import TypelevelSettingsPlugin.autoImport._
   import TypelevelSonatypeCiReleasePlugin.autoImport._
   import GenerativePlugin.autoImport._
@@ -62,6 +63,8 @@ object TypelevelPlugin extends AutoPlugin {
     },
     startYear := Some(java.time.YearMonth.now().getYear()),
     licenses += "Apache-2.0" -> url("https://www.apache.org/licenses/LICENSE-2.0.txt"),
+    tlCiHeaderCheck := true,
+    tlCiScalafmtCheck := true,
     tlCiReleaseBranches := Seq("main"),
     Def.derive(tlFatalWarnings := (tlFatalWarningsInCi.value && githubIsWorkflowBuild.value)),
     githubWorkflowBuildMatrixExclusions ++= {
@@ -70,13 +73,6 @@ object TypelevelPlugin extends AutoPlugin {
         scala <- githubWorkflowScalaVersions.value.filterNot(_ == defaultScala)
         java <- githubWorkflowJavaVersions.value.tail // default java is head
       } yield MatrixExclude(Map("scala" -> scala, "java" -> java.render))
-    },
-    githubWorkflowBuild := {
-      WorkflowStep.Sbt(
-        List("headerCheckAll", "scalafmtCheckAll", "project /", "scalafmtSbtCheck"),
-        name = Some("Check headers and formatting"),
-        cond = Some(primaryJavaCond.value)
-      ) +: githubWorkflowBuild.value
     }
   ) ++ addCommandAlias(
     "prePR",
