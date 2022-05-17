@@ -29,6 +29,7 @@ object TypelevelPlugin extends AutoPlugin {
     TypelevelKernelPlugin &&
       TypelevelSettingsPlugin &&
       TypelevelCiReleasePlugin &&
+      TypelevelScalafixPlugin &&
       GitHubActionsPlugin &&
       HeaderPlugin
 
@@ -43,6 +44,7 @@ object TypelevelPlugin extends AutoPlugin {
   import TypelevelKernelPlugin.mkCommand
   import TypelevelSettingsPlugin.autoImport._
   import TypelevelSonatypeCiReleasePlugin.autoImport._
+  import TypelevelScalafixPlugin.autoImport._
   import GenerativePlugin.autoImport._
   import GitHubActionsPlugin.autoImport._
 
@@ -73,8 +75,8 @@ object TypelevelPlugin extends AutoPlugin {
     },
     githubWorkflowBuild := {
       WorkflowStep.Sbt(
-        List("headerCheckAll", "scalafmtCheckAll", "project /", "scalafmtSbtCheck"),
-        name = Some("Check headers and formatting"),
+        List("headerCheckAll", "scalafmtCheckAll", "scalafixAll --check", "project /", "scalafmtSbtCheck"),
+        name = Some("Check headers, migrations and formatting"),
         cond = Some(primaryJavaCond.value)
       ) +: githubWorkflowBuild.value
     }

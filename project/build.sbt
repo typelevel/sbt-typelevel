@@ -13,6 +13,7 @@ val modules = List(
   "site",
   "sonatype",
   "sonatype-ci-release",
+  "scalafix",
   "versioning"
 )
 

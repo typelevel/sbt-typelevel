@@ -24,6 +24,7 @@ lazy val `sbt-typelevel` = tlCrossRootProject.aggregate(
   versioning,
   mima,
   sonatype,
+  scalafix,
   ciSigning,
   sonatypeCiRelease,
   ci,
@@ -104,6 +105,14 @@ lazy val sonatype = project
   )
   .dependsOn(kernel)
 
+lazy val scalafix = project
+  .in(file("scalafix"))
+  .enablePlugins(SbtPlugin)
+  .settings(
+    name := "sbt-typelevel-scalafix"
+  )
+  .dependsOn(kernel)
+
 lazy val ciSigning = project
   .in(file("ci-signing"))
   .enablePlugins(SbtPlugin)
@@ -152,6 +161,7 @@ lazy val core = project
   )
   .dependsOn(
     ciRelease,
+    scalafix,
     settings
   )
 
