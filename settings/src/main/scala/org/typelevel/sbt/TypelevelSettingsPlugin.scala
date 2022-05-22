@@ -19,8 +19,13 @@ package org.typelevel.sbt
 import sbt._, Keys._
 import com.github.sbt.git.GitPlugin
 import com.github.sbt.git.SbtGit.git
+import java.io.File
+import java.lang.management.ManagementFactory
 import org.typelevel.sbt.kernel.V
 import org.typelevel.sbt.kernel.GitHelper
+import sbtcrossproject.CrossPlugin.autoImport._
+import sbtcrossproject.CrossType
+import scala.util.Try
 
 object TypelevelSettingsPlugin extends AutoPlugin {
   override def trigger = allRequirements
@@ -69,12 +74,6 @@ object TypelevelSettingsPlugin extends AutoPlugin {
         case _ =>
           Seq.empty
       }
-    },
-    scalacOptions ++= {
-      if (tlFatalWarnings.value)
-        Seq("-Xfatal-warnings")
-      else
-        Seq.empty
     },
     scalacOptions ++= {
       val warningsNsc = Seq("-Xlint", "-Ywarn-dead-code")
@@ -199,6 +198,14 @@ object TypelevelSettingsPlugin extends AutoPlugin {
       "utf8",
       "-Xlint:all"
     ),
+
+    // TODO make these respect Compile/Test config
+    scalacOptions ++= {
+      if (tlFatalWarnings.value)
+        Seq("-Xfatal-warnings")
+      else
+        Seq.empty
+    },
     javacOptions ++= {
       if (tlFatalWarnings.value)
         Seq("-Werror")
@@ -231,6 +238,35 @@ object TypelevelSettingsPlugin extends AutoPlugin {
     },
     javacOptions ++= {
       withJdkRelease(tlJdkRelease.value)(Seq.empty[String])(n => Seq("--release", n.toString))
+    },
+    javaApiMappings
+  ) ++ inConfig(Compile)(perConfigSettings) ++ inConfig(Test)(perConfigSettings)
+
+  private val perConfigSettings = Seq(
+    unmanagedSourceDirectories ++= {
+      def extraDirs(suffix: String) =
+        if (crossProjectPlatform.?.value.isDefined)
+          List(CrossType.Pure, CrossType.Full).flatMap {
+            _.sharedSrcDir(baseDirectory.value, Defaults.nameForSrc(configuration.value.name))
+              .toList
+              .map(f => file(f.getPath + suffix))
+          }
+        else
+          List(
+            baseDirectory.value / "src" / Defaults.nameForSrc(
+              configuration.value.name) / s"scala$suffix"
+          )
+
+      CrossVersion.partialVersion(scalaVersion.value) match {
+        case Some((2, y)) if y <= 12 => extraDirs("-2.12-")
+        case Some((2, y)) if y >= 13 => extraDirs("-2.13+")
+        case Some((3, _)) => extraDirs("-2.13+")
+        case _ => Nil
+      }
+    },
+    packageSrc / mappings ++= {
+      val base = sourceManaged.value
+      managedSources.value.map(file => file -> file.relativeTo(base).get.getPath)
     }
   )
 
@@ -256,4 +292,27 @@ object TypelevelSettingsPlugin extends AutoPlugin {
     }
 
   private val isJava8: Boolean = javaRuntimeVersion == 8
+
+  private val javaApiMappings = {
+    // scaladoc doesn't support this automatically before 2.13
+    val baseUrl = javaRuntimeVersion match {
+      case v if v < 11 => url(s"https://docs.oracle.com/javase/${v}/docs/api/")
+      case v => url(s"https://docs.oracle.com/en/java/javase/${v}/docs/api/java.base/")
+    }
+    doc / apiMappings ~= { old =>
+      val runtimeMXBean = ManagementFactory.getRuntimeMXBean
+      val oldSchool = Try(
+        if (runtimeMXBean.isBootClassPathSupported)
+          runtimeMXBean
+            .getBootClassPath
+            .split(File.pathSeparatorChar)
+            .map(file(_) -> baseUrl)
+            .toMap
+        else Map.empty
+      ).getOrElse(Map.empty)
+      val newSchool = Map(file("/modules/java.base") -> baseUrl)
+      // Latest one wins.  We are providing a fallback.
+      oldSchool ++ newSchool ++ old
+    }
+  }
 }
