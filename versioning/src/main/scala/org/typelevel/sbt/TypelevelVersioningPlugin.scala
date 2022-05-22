@@ -43,7 +43,7 @@ object TypelevelVersioningPlugin extends AutoPlugin {
     versionScheme := Some("early-semver"),
     tlUntaggedAreSnapshots := true,
     isSnapshot := {
-      val isUntagged = getTaggedVersion(git.gitCurrentTags.value).isEmpty
+      val isUntagged = taggedVersion.value.isEmpty
       val dirty = git.gitUncommittedChanges.value
       dirty || (isUntagged && tlUntaggedAreSnapshots.value)
     },
@@ -67,7 +67,12 @@ object TypelevelVersioningPlugin extends AutoPlugin {
         .filter(v => v.patch.isEmpty && v.prerelease.isEmpty)
         .getOrElse(sys.error(s"tlBaseVersion must be of form x.y: ${tlBaseVersion.value}"))
 
-      var version = getTaggedVersion(git.gitCurrentTags.value).map(_.toString).getOrElse {
+      val taggedV =
+        if (git.gitUncommittedChanges.value)
+          None // tree is dirty, so ignore the tags
+        else taggedVersion.value.map(_.toString)
+
+      var version = taggedV.getOrElse {
         // No tag, so we build our version based on this commit
 
         val latestInSeries = GitHelper
@@ -121,7 +126,8 @@ object TypelevelVersioningPlugin extends AutoPlugin {
 
   private val Description = """^.*-(\d+)-[a-zA-Z0-9]+$""".r
 
-  private def getTaggedVersion(tags: Seq[String]): Option[V] =
-    tags.collectFirst { case V.Tag(v) => v }
+  private def taggedVersion = Def.setting {
+    git.gitCurrentTags.value.collectFirst { case V.Tag(v) => v }
+  }
 
 }

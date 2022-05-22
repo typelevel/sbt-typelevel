@@ -11,10 +11,28 @@ sbt-typelevel configures [sbt](https://www.scala-sbt.org/) for developing, testi
 - CI deployed GitHub pages websites, generated with [mdoc](https://github.com/scalameta/mdoc/) and [Laika](https://github.com/planet42/laika)
 - Auto-populated settings for various boilerplate (SCM info, API doc urls, Scala.js sourcemaps, etc.)
 
+## Adopters
+
+You can find an approximate list of sbt-typelevel adopters [here](https://github.com/typelevel/download-java/network/dependents), which includes all active [Typelevel](https://github.com/typelevel/) and [http4s](https://github.com/http4s/) projects.
+
 ## Quick start
 
 [![sbt-typelevel Scala version support](https://index.scala-lang.org/typelevel/sbt-typelevel/sbt-typelevel/latest-by-scala-version.svg?targetType=Sbt)](https://index.scala-lang.org/typelevel/sbt-typelevel/sbt-typelevel)
 [![Discord](https://img.shields.io/discord/632277896739946517.svg?label=&logo=discord&logoColor=ffffff&color=404244&labelColor=6A7EC2)](https://discord.gg/D7wY3aH7BQ)
+
+### Giter8 Template
+
+We provide a [Giter8 template](http://www.foundweekends.org/giter8/index.html) for quickly starting projects with familiar workflows and best practices.
+
+```sh
+sbt new typelevel/typelevel.g8
+```
+
+This will guide you through the basic setup to create a new project with **sbt-typelevel** and **sbt-typelevel-site**.
+Check out the [typelevel.g8](https://github.com/typelevel/typelevel.g8) project for more details.
+
+
+### Plugins
 
 Pick either the **sbt-typelevel** (recommended) or **sbt-typelevel-ci-release** plugin.
 
@@ -26,6 +44,9 @@ addSbtPlugin("org.typelevel" % "sbt-typelevel" % "@VERSION@")
 
 // Set me up for CI release, but don't touch my scalacOptions!
 addSbtPlugin("org.typelevel" % "sbt-typelevel-ci-release" % "@VERSION@")
+
+// Optional. Make me a website!
+addSbtPlugin("org.typelevel" % "sbt-typelevel-site" % "@VERSION@")
 ```
 
 @:callout(info)
@@ -40,7 +61,8 @@ addSbtPlugin("org.typelevel" % "sbt-typelevel-ci-release" % "@VERSION@")
 
 @:@
 
-Then configure your build.
+
+### Configure Your Build
 
 #### `build.sbt`
 
@@ -91,7 +113,9 @@ lazy val tests = crossProject(JVMPlatform, JSPlatform)
   )
 ```
 
-Next, run `githubWorkflowGenerate` in sbt to automatically generate the GitHub Actions workflows.
+### Configure GitHub Actions
+
+Run `githubWorkflowGenerate` in sbt to automatically generate the GitHub Actions workflows.
 This will create a CI matrix parallelized on Scala version and target platform (JVM, JS, etc.) and includes steps for running tests and checking binary compatibility.
 It will also setup a job for publishing tagged releases e.g. `v0.4.5` and snapshots to Sonatype/Maven.
 

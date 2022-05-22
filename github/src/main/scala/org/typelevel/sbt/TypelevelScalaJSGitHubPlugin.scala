@@ -26,6 +26,7 @@ object TypelevelScalaJSGitHubPlugin extends AutoPlugin {
   override def requires = ScalaJSPlugin && TypelevelKernelPlugin
 
   import TypelevelKernelPlugin.autoImport._
+  import ScalaJSPlugin.autoImport._
 
   override def projectSettings = Seq(
     scalacOptions ++= {
@@ -43,6 +44,9 @@ object TypelevelScalaJSGitHubPlugin extends AutoPlugin {
           s"$flag$l->$g"
         }
       }
+    },
+    scalaJSLinkerConfig := {
+      scalaJSLinkerConfig.value.withBatchMode(sys.env.get("GITHUB_ACTIONS").contains("true"))
     }
   )
 }
