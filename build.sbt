@@ -4,7 +4,7 @@ ThisBuild / tlBaseVersion := "0.4"
 ThisBuild / tlCiReleaseBranches := Seq("series/0.4")
 ThisBuild / tlSitePublishBranch := Some("series/0.4")
 ThisBuild / crossScalaVersions := Seq("2.12.15")
-ThisBuild / developers := List(
+ThisBuild / developers ++= List(
   tlGitHubDev("armanbilge", "Arman Bilge"),
   tlGitHubDev("rossabaker", "Ross A. Baker"),
   tlGitHubDev("ChristopherDavenport", "Christopher Davenport"),
