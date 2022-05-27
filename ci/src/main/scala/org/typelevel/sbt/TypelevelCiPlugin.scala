@@ -29,23 +29,82 @@ object TypelevelCiPlugin extends AutoPlugin {
 
   object autoImport {
     def tlCrossRootProject: CrossRootProject = CrossRootProject()
+
+    lazy val tlCiHeaderCheck =
+      settingKey[Boolean]("Whether to do header check in CI (default: false)")
+    lazy val tlCiScalafmtCheck =
+      settingKey[Boolean]("Whether to do scalafmt check in CI (default: false)")
+    lazy val tlCiMimaBinaryIssueCheck =
+      settingKey[Boolean]("Whether to do MiMa binary issues check in CI (default: true)")
+    lazy val tlCiDocCheck =
+      settingKey[Boolean]("Whether to build API docs in CI (default: true)")
   }
 
+  import autoImport._
+
   override def buildSettings = Seq(
+    tlCiHeaderCheck := false,
+    tlCiScalafmtCheck := false,
+    tlCiMimaBinaryIssueCheck := true,
+    tlCiDocCheck := true,
     githubWorkflowPublishTargetBranches := Seq(),
-    githubWorkflowBuild := Seq(
-      WorkflowStep.Sbt(List("test"), name = Some("Test")),
-      WorkflowStep.Sbt(
-        List("mimaReportBinaryIssues"),
-        name = Some("Check binary compatibility"),
-        cond = Some(primaryJavaCond.value)
-      ),
-      WorkflowStep.Sbt(
-        List("doc"),
-        name = Some("Generate API documentation"),
-        cond = Some(primaryJavaCond.value)
+    githubWorkflowBuild := {
+
+      val style = (tlCiHeaderCheck.value, tlCiScalafmtCheck.value) match {
+        case (true, true) => // headers + formatting
+          List(
+            WorkflowStep.Sbt(
+              List("headerCheckAll", "scalafmtCheckAll", "project /", "scalafmtSbtCheck"),
+              name = Some("Check headers and formatting"),
+              cond = Some(primaryJavaCond.value)
+            )
+          )
+        case (true, false) => // headers
+          List(
+            WorkflowStep.Sbt(
+              List("headerCheckAll"),
+              name = Some("Check headers"),
+              cond = Some(primaryJavaCond.value)
+            )
+          )
+        case (false, true) => // formatting
+          List(
+            WorkflowStep.Sbt(
+              List("scalafmtCheckAll", "project /", "scalafmtSbtCheck"),
+              name = Some("Check formatting"),
+              cond = Some(primaryJavaCond.value)
+            )
+          )
+        case (false, false) => Nil // nada
+      }
+
+      val test = List(
+        WorkflowStep.Sbt(List("test"), name = Some("Test"))
       )
-    ),
+
+      val mima =
+        if (tlCiMimaBinaryIssueCheck.value)
+          List(
+            WorkflowStep.Sbt(
+              List("mimaReportBinaryIssues"),
+              name = Some("Check binary compatibility"),
+              cond = Some(primaryJavaCond.value)
+            ))
+        else Nil
+
+      val doc =
+        if (tlCiDocCheck.value)
+          List(
+            WorkflowStep.Sbt(
+              List("doc"),
+              name = Some("Generate API documentation"),
+              cond = Some(primaryJavaCond.value)
+            )
+          )
+        else Nil
+
+      style ++ test ++ mima ++ doc
+    },
     githubWorkflowJavaVersions := Seq(JavaSpec.temurin("8"))
   )
 
