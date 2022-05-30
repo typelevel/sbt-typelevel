@@ -16,7 +16,9 @@
 
 package org.typelevel.sbt
 
-import sbt._, Keys._
+import sbt._
+
+import Keys._
 
 object NoPublishPlugin extends AutoPlugin {
   override def trigger = noTrigger

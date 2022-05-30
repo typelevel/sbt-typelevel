@@ -16,12 +16,13 @@
 
 package org.typelevel.sbt.gha
 
-import sbt._, Keys._
+import org.yaml.snakeyaml.Yaml
+import sbt._
 import sbt.io.Using
 
-import org.yaml.snakeyaml.Yaml
-
 import scala.collection.JavaConverters._
+
+import Keys._
 
 object GitHubActionsPlugin extends AutoPlugin {
 

@@ -16,11 +16,13 @@
 
 package org.typelevel.sbt
 
-import sbt._, Keys._
 import com.typesafe.tools.mima.plugin.MimaPlugin
-import MimaPlugin.autoImport._
 import org.typelevel.sbt.kernel.GitHelper
 import org.typelevel.sbt.kernel.V
+import sbt._
+
+import Keys._
+import MimaPlugin.autoImport._
 
 object TypelevelMimaPlugin extends AutoPlugin {
 
