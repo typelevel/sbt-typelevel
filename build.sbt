@@ -114,7 +114,8 @@ lazy val scalafix = project
   .in(file("scalafix"))
   .enablePlugins(SbtPlugin)
   .settings(
-    name := "sbt-typelevel-scalafix"
+    name := "sbt-typelevel-scalafix",
+    tlVersionIntroduced := Map("2.12" -> "0.4.10")
   )
   .dependsOn(kernel)
 
