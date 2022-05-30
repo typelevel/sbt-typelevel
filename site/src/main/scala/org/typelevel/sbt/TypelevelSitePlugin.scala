@@ -27,6 +27,7 @@ import laika.sbt.LaikaPlugin
 import laika.theme.ThemeProvider
 import mdoc.MdocPlugin
 import org.typelevel.sbt.kernel.GitHelper
+import org.typelevel.sbt.kernel.V
 import org.typelevel.sbt.site._
 import sbt._
 
@@ -255,7 +256,7 @@ object TypelevelSitePlugin extends AutoPlugin {
     // and there are no stable releases it is bincompatible with,
     // then for all effective purposes it is the current release
 
-    val release = GitHelper.previousReleases(fromHead = true, strict = false) match {
+    val release = previousReleases.value match {
       case head :: tail if head.isPrerelease =>
         tail
           .filterNot(_.isPrerelease)
@@ -269,7 +270,14 @@ object TypelevelSitePlugin extends AutoPlugin {
 
   // latest tagged release, including pre-releases
   private lazy val currentPreRelease = Def.setting {
-    GitHelper.previousReleases(fromHead = true, strict = false).headOption.map(_.toString)
+    previousReleases.value.headOption.map(_.toString)
+  }
+
+  private lazy val previousReleases = Def.setting {
+    val currentVersion = V(version.value).map(_.copy(prerelease = None))
+    GitHelper.previousReleases(fromHead = true, strict = false).filter { v =>
+      currentVersion.forall(v.copy(prerelease = None) <= _)
+    }
   }
 
   private def previewTask = Def
