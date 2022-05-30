@@ -29,6 +29,7 @@ object TypelevelScalafixPlugin extends AutoPlugin {
   override def buildSettings = Seq[Setting[_]](
     semanticdbEnabled := true,
     semanticdbVersion := scalafixSemanticdb.revision,
-    scalafixScalaBinaryVersion := CrossVersion.binaryScalaVersion(scalaVersion.value)
+    scalafixScalaBinaryVersion := CrossVersion.binaryScalaVersion(scalaVersion.value),
+    SettingKey[Boolean]("tlCiScalafixCheck") := true
   )
 }
