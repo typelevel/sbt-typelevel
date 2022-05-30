@@ -26,16 +26,9 @@ object TypelevelScalafixPlugin extends AutoPlugin {
 
   override def trigger = allRequirements
 
-  object autoImport {}
-
-  import autoImport._
-
   override def buildSettings = Seq[Setting[_]](
     semanticdbEnabled := true,
     semanticdbVersion := scalafixSemanticdb.revision,
-    scalafixScalaBinaryVersion := CrossVersion.binaryScalaVersion(scalaVersion.value),
-    scalafixDependencies ++= Seq(
-      "com.github.liancheng" %% "organize-imports" % "0.6.0"
-    )
+    scalafixScalaBinaryVersion := CrossVersion.binaryScalaVersion(scalaVersion.value)
   )
 }

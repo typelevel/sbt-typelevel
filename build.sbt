@@ -15,6 +15,10 @@ ThisBuild / mergifyStewardConfig ~= { _.map(_.copy(mergeMinors = true)) }
 ThisBuild / mergifySuccessConditions += MergifyCondition.Custom("#approved-reviews-by>=1")
 ThisBuild / mergifyLabelPaths += { "docs" -> file("docs") }
 
+ThisBuild / scalafixDependencies ++= Seq(
+  "com.github.liancheng" %% "organize-imports" % "0.6.0"
+)
+
 lazy val root = tlCrossRootProject.aggregate(
   kernel,
   noPublish,
@@ -162,7 +166,6 @@ lazy val core = project
   )
   .dependsOn(
     ciRelease,
-    scalafix,
     settings
   )
 
