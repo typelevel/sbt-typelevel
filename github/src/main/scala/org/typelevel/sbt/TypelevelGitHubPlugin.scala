@@ -46,7 +46,21 @@ object TypelevelGitHubPlugin extends AutoPlugin {
         sLog.value.info(s"set scmInfo to https://github.com/$user/$repo")
         gitHubScmInfo(user, repo)
     },
-    homepage := homepage.value.orElse(scmInfo.value.map(_.browseUrl))
+    homepage := homepage.value.orElse(scmInfo.value.map(_.browseUrl)),
+    developers := {
+      gitHubUserRepo
+        .value
+        .toList
+        .map {
+          case (user, repo) =>
+            Developer(
+              user,
+              s"$repo contributors",
+              s"@$user",
+              url(s"https://github.com/$user/$repo/contributors")
+            )
+        }
+    }
   )
 
   private def gitHubScmInfo(user: String, repo: String) =
