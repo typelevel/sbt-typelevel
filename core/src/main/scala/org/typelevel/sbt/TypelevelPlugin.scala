@@ -23,6 +23,10 @@ import de.heikoseeberger.sbtheader.HeaderPlugin
 
 import scala.collection.immutable
 
+/**
+ * The [[TypelevelPlugin]] brings together the [[TypelevelCiReleasePlugin]] and the
+ * [[TypelevelSettingsPlugin]]
+ */
 object TypelevelPlugin extends AutoPlugin {
 
   override def requires =

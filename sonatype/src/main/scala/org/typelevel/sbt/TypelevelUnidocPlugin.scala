@@ -27,12 +27,12 @@ object TypelevelUnidocPlugin extends AutoPlugin {
   override def trigger = noTrigger
 
   import ScalaUnidocPlugin.autoImport._
-  import TypelevelSonatypePlugin.javadocioUrl
+  import TypelevelSonatypePlugin.hostedApiUrl
 
   override def projectSettings = Seq(
     Compile / doc := (ScalaUnidoc / doc).value,
     Compile / packageDoc / mappings := (ScalaUnidoc / packageDoc / mappings).value,
-    ThisBuild / apiURL := javadocioUrl.value,
+    ThisBuild / apiURL := hostedApiUrl.value,
     mimaPreviousArtifacts := Set.empty,
     // tell the site plugin about us, without forcing the dependency!
     ThisBuild / SettingKey[Option[ModuleID]]("tlSiteApiModule") := Some(projectID.value)
