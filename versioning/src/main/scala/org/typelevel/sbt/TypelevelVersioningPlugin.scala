@@ -129,7 +129,7 @@ object TypelevelVersioningPlugin extends AutoPlugin {
   private val Description = """^.*-(\d+)-[a-zA-Z0-9]+$""".r
 
   private def taggedVersion = Def.setting {
-    git.gitCurrentTags.value.collectFirst { case V.Tag(v) => v }
+    git.gitCurrentTags.value.collect { case V.Tag(v) => v }.sorted.lastOption
   }
 
 }

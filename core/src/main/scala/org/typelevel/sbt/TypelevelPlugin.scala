@@ -25,6 +25,10 @@ import scala.collection.immutable
 
 import Keys._
 
+/**
+ * The [[TypelevelPlugin]] brings together the [[TypelevelCiReleasePlugin]] and the
+ * [[TypelevelSettingsPlugin]]
+ */
 object TypelevelPlugin extends AutoPlugin {
 
   override def requires =
