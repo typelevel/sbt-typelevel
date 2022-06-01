@@ -11,6 +11,8 @@ ThisBuild / developers := List(
   tlGitHubDev("djspiewak", "Daniel Spiewak")
 )
 
+ThisBuild / tlCiReleaseBranches += "issue/226"
+
 ThisBuild / mergifyStewardConfig ~= { _.map(_.copy(mergeMinors = true)) }
 ThisBuild / mergifySuccessConditions += MergifyCondition.Custom("#approved-reviews-by>=1")
 ThisBuild / mergifyLabelPaths += { "docs" -> file("docs") }
