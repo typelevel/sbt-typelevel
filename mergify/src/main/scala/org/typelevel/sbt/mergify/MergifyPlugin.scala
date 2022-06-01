@@ -16,10 +16,12 @@
 
 package org.typelevel.sbt.mergify
 
-import sbt._, Keys._
 import org.typelevel.sbt.gha._
+import sbt._
 
 import java.nio.file.Path
+
+import Keys._
 
 object MergifyPlugin extends AutoPlugin {
 

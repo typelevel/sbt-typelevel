@@ -15,6 +15,10 @@ ThisBuild / mergifyStewardConfig ~= { _.map(_.copy(mergeMinors = true)) }
 ThisBuild / mergifySuccessConditions += MergifyCondition.Custom("#approved-reviews-by>=1")
 ThisBuild / mergifyLabelPaths += { "docs" -> file("docs") }
 
+ThisBuild / scalafixDependencies ++= Seq(
+  "com.github.liancheng" %% "organize-imports" % "0.6.0"
+)
+
 lazy val root = tlCrossRootProject.aggregate(
   kernel,
   noPublish,
@@ -25,6 +29,7 @@ lazy val root = tlCrossRootProject.aggregate(
   versioning,
   mima,
   sonatype,
+  scalafix,
   ciSigning,
   sonatypeCiRelease,
   ci,
@@ -104,6 +109,14 @@ lazy val sonatype = project
     name := "sbt-typelevel-sonatype"
   )
   .dependsOn(kernel)
+
+lazy val scalafix = project
+  .in(file("scalafix"))
+  .enablePlugins(SbtPlugin)
+  .settings(
+    name := "sbt-typelevel-scalafix",
+    tlVersionIntroduced := Map("2.12" -> "0.4.10")
+  )
 
 lazy val ciSigning = project
   .in(file("ci-signing"))

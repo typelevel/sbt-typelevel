@@ -17,16 +17,20 @@
 package org.typelevel.sbt
 
 import sbt._
+import scalafix.sbt.ScalafixPlugin
 
 import Keys._
+import ScalafixPlugin.autoImport._
 
-object NoPublishPlugin extends AutoPlugin {
-  override def trigger = noTrigger
+object TypelevelScalafixPlugin extends AutoPlugin {
 
-  override def projectSettings = Seq(
-    publish := {},
-    publishLocal := {},
-    publishArtifact := false,
-    publish / skip := true
+  override def requires = ScalafixPlugin
+
+  override def trigger = allRequirements
+
+  override def buildSettings = Seq[Setting[_]](
+    semanticdbEnabled := true,
+    semanticdbVersion := scalafixSemanticdb.revision,
+    SettingKey[Boolean]("tlCiScalafixCheck") := true
   )
 }

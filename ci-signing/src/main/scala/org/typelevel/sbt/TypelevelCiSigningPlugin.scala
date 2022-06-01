@@ -17,10 +17,12 @@
 package org.typelevel.sbt
 
 import io.crashbox.gpg.SbtGpg
-import sbt._, Keys._
 import org.typelevel.sbt.gha.GenerativePlugin
-import org.typelevel.sbt.gha.GitHubActionsPlugin
 import org.typelevel.sbt.gha.GenerativePlugin.autoImport._
+import org.typelevel.sbt.gha.GitHubActionsPlugin
+import sbt._
+
+import Keys._
 
 object TypelevelCiSigningPlugin extends AutoPlugin {
 

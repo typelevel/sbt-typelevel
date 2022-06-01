@@ -16,9 +16,12 @@
 
 package org.typelevel.sbt
 
-import sbt._, Keys._
 import com.typesafe.tools.mima.plugin.MimaPlugin
-import xerial.sbt.Sonatype, Sonatype.autoImport._
+import sbt._
+import xerial.sbt.Sonatype
+
+import Keys._
+import Sonatype.autoImport._
 import TypelevelKernelPlugin.mkCommand
 
 object TypelevelSonatypePlugin extends AutoPlugin {

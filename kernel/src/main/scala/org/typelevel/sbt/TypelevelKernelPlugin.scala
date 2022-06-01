@@ -16,8 +16,10 @@
 
 package org.typelevel.sbt
 
-import sbt._, Keys._
+import sbt._
 import sbt.plugins.JvmPlugin
+
+import Keys._
 
 object TypelevelKernelPlugin extends AutoPlugin {
 

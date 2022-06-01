@@ -16,11 +16,11 @@
 
 package org.typelevel.sbt
 
-import sbt._
-import org.typelevel.sbt.gha.GenerativePlugin
-import org.typelevel.sbt.gha.GitHubActionsPlugin
-import org.typelevel.sbt.gha.GenerativePlugin.autoImport._
 import com.typesafe.tools.mima.plugin.MimaPlugin
+import org.typelevel.sbt.gha.GenerativePlugin
+import org.typelevel.sbt.gha.GenerativePlugin.autoImport._
+import org.typelevel.sbt.gha.GitHubActionsPlugin
+import sbt._
 
 object TypelevelCiPlugin extends AutoPlugin {
 
@@ -34,6 +34,8 @@ object TypelevelCiPlugin extends AutoPlugin {
       settingKey[Boolean]("Whether to do header check in CI (default: false)")
     lazy val tlCiScalafmtCheck =
       settingKey[Boolean]("Whether to do scalafmt check in CI (default: false)")
+    lazy val tlCiScalafixCheck =
+      settingKey[Boolean]("Whether to do scalafix check in CI (default: false)")
     lazy val tlCiMimaBinaryIssueCheck =
       settingKey[Boolean]("Whether to do MiMa binary issues check in CI (default: true)")
     lazy val tlCiDocCheck =
@@ -45,6 +47,7 @@ object TypelevelCiPlugin extends AutoPlugin {
   override def buildSettings = Seq(
     tlCiHeaderCheck := false,
     tlCiScalafmtCheck := false,
+    tlCiScalafixCheck := false,
     tlCiMimaBinaryIssueCheck := true,
     tlCiDocCheck := true,
     githubWorkflowPublishTargetBranches := Seq(),
@@ -82,6 +85,17 @@ object TypelevelCiPlugin extends AutoPlugin {
         WorkflowStep.Sbt(List("test"), name = Some("Test"))
       )
 
+      val scalafix =
+        if (tlCiScalafixCheck.value)
+          List(
+            WorkflowStep.Sbt(
+              List("scalafixAll --check"),
+              name = Some("Check scalafix lints"),
+              cond = Some(primaryJavaCond.value)
+            )
+          )
+        else Nil
+
       val mima =
         if (tlCiMimaBinaryIssueCheck.value)
           List(
@@ -103,7 +117,7 @@ object TypelevelCiPlugin extends AutoPlugin {
           )
         else Nil
 
-      style ++ test ++ mima ++ doc
+      style ++ test ++ scalafix ++ mima ++ doc
     },
     githubWorkflowJavaVersions := Seq(JavaSpec.temurin("8"))
   )

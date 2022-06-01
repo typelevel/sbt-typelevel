@@ -16,9 +16,11 @@
 
 package org.typelevel.sbt
 
-import sbt._, Keys._
 import com.typesafe.tools.mima.plugin.MimaPlugin.autoImport._
+import sbt._
 import sbtunidoc.ScalaUnidocPlugin
+
+import Keys._
 
 object TypelevelUnidocPlugin extends AutoPlugin {
 

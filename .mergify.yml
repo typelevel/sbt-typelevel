@@ -112,6 +112,14 @@ pull_request_rules:
       add:
       - no-publish
       remove: []
+- name: Label scalafix PRs
+  conditions:
+  - files~=^scalafix/
+  actions:
+    label:
+      add:
+      - scalafix
+      remove: []
 - name: Label settings PRs
   conditions:
   - files~=^settings/
