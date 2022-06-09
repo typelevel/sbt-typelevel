@@ -28,9 +28,22 @@ object TypelevelScalafixPlugin extends AutoPlugin {
 
   override def trigger = allRequirements
 
+  object autoImport {
+    val tlTypelevelScalafixVersion = settingKey[Option[String]](
+      "The version of typelevel-scalafix to add to the scalafix dependency classpath, or None to omit the dependency entirely."
+    )
+  }
+
+  import autoImport._
+
   override def buildSettings = Seq[Setting[_]](
     semanticdbEnabled := true,
     semanticdbVersion := scalafixSemanticdb.revision,
-    SettingKey[Boolean]("tlCiScalafixCheck") := true
+    SettingKey[Boolean]("tlCiScalafixCheck") := true,
+    tlTypelevelScalafixVersion := Some("0.1.2"),
+    scalafixDependencies ++= tlTypelevelScalafixVersion
+      .value
+      .map { v => "org.typelevel" %% "typelevel-scalafix" % v }
+      .toList
   )
 }
