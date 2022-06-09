@@ -43,7 +43,7 @@ object TypelevelScalafixPlugin extends AutoPlugin {
     tlTypelevelScalafixVersion := Some("0.1.2"),
     scalafixDependencies ++= tlTypelevelScalafixVersion
       .value
-      .map { v => Seq("org.typelevel" %% "typelevel-scalafix" % v) }
-      .getOrElse(Seq.empty[ModuleID])
+      .map { v => "org.typelevel" %% "typelevel-scalafix" % v }
+      .toList
   )
 }
