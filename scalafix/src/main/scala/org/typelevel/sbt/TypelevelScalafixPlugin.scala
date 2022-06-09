@@ -41,8 +41,9 @@ object TypelevelScalafixPlugin extends AutoPlugin {
     semanticdbVersion := scalafixSemanticdb.revision,
     SettingKey[Boolean]("tlCiScalafixCheck") := true,
     tlTypelevelScalafixVersion := Some("0.1.2"),
-    scalafixDependencies ++= tlTypelevelScalafixVersion.value.map { v =>
-      Seq("org.typelevel" %% "typelevel-scalafix" % v)
-    }.getOrElse(Seq.empty[ModuleID])
+    scalafixDependencies ++= tlTypelevelScalafixVersion
+      .value
+      .map { v => Seq("org.typelevel" %% "typelevel-scalafix" % v) }
+      .getOrElse(Seq.empty[ModuleID])
   )
 }
