@@ -50,7 +50,10 @@ object TypelevelCiPlugin extends AutoPlugin {
     tlCiScalafixCheck := false,
     tlCiMimaBinaryIssueCheck := true,
     tlCiDocCheck := true,
-    githubWorkflowTargetBranches += "!update/**", // ignore steward branches
+    githubWorkflowTargetBranches ++= Seq(
+      "!update/**", // ignore steward branches
+      "!pr/**" // escape-hatch to disable ci on a branch
+    ),
     githubWorkflowPublishTargetBranches := Seq(),
     githubWorkflowBuild := {
 
