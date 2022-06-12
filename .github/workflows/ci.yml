@@ -48,18 +48,7 @@ jobs:
           distribution: jdkfile
           java-version: 8
           jdkFile: ${{ steps.download-java-temurin-8.outputs.jdkFile }}
-
-      - name: Cache sbt
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.sbt
-            ~/.ivy2/cache
-            ~/.coursier/cache/v1
-            ~/.cache/coursier/v1
-            ~/AppData/Local/Coursier/Cache/v1
-            ~/Library/Caches/Coursier/v1
-          key: ${{ runner.os }}-sbt-cache-v2-${{ hashFiles('**/*.sbt') }}-${{ hashFiles('project/build.properties') }}
+          cache: sbt
 
       - name: Check that workflows are up to date
         run: sbt 'project ${{ matrix.project }}' '++${{ matrix.scala }}' 'project /' githubWorkflowCheck
@@ -125,18 +114,7 @@ jobs:
           distribution: jdkfile
           java-version: 8
           jdkFile: ${{ steps.download-java-temurin-8.outputs.jdkFile }}
-
-      - name: Cache sbt
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.sbt
-            ~/.ivy2/cache
-            ~/.coursier/cache/v1
-            ~/.cache/coursier/v1
-            ~/AppData/Local/Coursier/Cache/v1
-            ~/Library/Caches/Coursier/v1
-          key: ${{ runner.os }}-sbt-cache-v2-${{ hashFiles('**/*.sbt') }}-${{ hashFiles('project/build.properties') }}
+          cache: sbt
 
       - name: Download target directories (2.12.15, sbt-typelevelJVM)
         uses: actions/download-artifact@v3
@@ -201,18 +179,7 @@ jobs:
           distribution: jdkfile
           java-version: 8
           jdkFile: ${{ steps.download-java-temurin-8.outputs.jdkFile }}
-
-      - name: Cache sbt
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.sbt
-            ~/.ivy2/cache
-            ~/.coursier/cache/v1
-            ~/.cache/coursier/v1
-            ~/AppData/Local/Coursier/Cache/v1
-            ~/Library/Caches/Coursier/v1
-          key: ${{ runner.os }}-sbt-cache-v2-${{ hashFiles('**/*.sbt') }}-${{ hashFiles('project/build.properties') }}
+          cache: sbt
 
       - name: Generate site
         run: sbt '++${{ matrix.scala }}' docs/tlSite
