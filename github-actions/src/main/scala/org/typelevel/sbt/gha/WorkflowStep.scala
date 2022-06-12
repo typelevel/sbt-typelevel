@@ -73,7 +73,8 @@ object WorkflowStep {
           UseRef.Public("actions", "setup-java", "v3"),
           name = Some(s"Setup Java (${jv.render})"),
           cond = Some(s"matrix.java == '${jv.render}'"),
-          params = Map("distribution" -> dist.rendering, "java-version" -> version, "cache" -> "sbt")
+          params =
+            Map("distribution" -> dist.rendering, "java-version" -> version, "cache" -> "sbt")
         ) :: Nil
     }
 
