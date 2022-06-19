@@ -16,16 +16,21 @@
 
 package org.typelevel.sbt
 
-import sbt._, Keys._
 import com.github.sbt.git.GitPlugin
 import com.github.sbt.git.SbtGit.git
-import java.io.File
-import java.lang.management.ManagementFactory
-import org.typelevel.sbt.kernel.V
 import org.typelevel.sbt.kernel.GitHelper
+import org.typelevel.sbt.kernel.V
+import sbt._
+import sbt._
 import sbtcrossproject.CrossPlugin.autoImport._
 import sbtcrossproject.CrossType
+
+import java.io.File
+import java.lang.management.ManagementFactory
 import scala.util.Try
+
+import Keys._
+import Keys._
 
 object TypelevelSettingsPlugin extends AutoPlugin {
   override def trigger = allRequirements

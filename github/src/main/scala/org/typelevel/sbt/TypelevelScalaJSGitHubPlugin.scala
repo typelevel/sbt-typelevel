@@ -16,10 +16,12 @@
 
 package org.typelevel.sbt
 
-import sbt._, Keys._
-import org.scalajs.sbtplugin.ScalaJSPlugin
 import com.github.sbt.git.SbtGit.git
+import org.scalajs.sbtplugin.ScalaJSPlugin
 import org.typelevel.sbt.kernel.GitHelper
+import sbt._
+
+import Keys._
 
 object TypelevelScalaJSGitHubPlugin extends AutoPlugin {
   override def trigger = allRequirements

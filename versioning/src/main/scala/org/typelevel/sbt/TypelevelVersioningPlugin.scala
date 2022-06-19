@@ -16,13 +16,17 @@
 
 package org.typelevel.sbt
 
-import sbt._, Keys._
 import com.github.sbt.git.GitPlugin
 import com.github.sbt.git.SbtGit.git
+import org.typelevel.sbt.kernel.GitHelper
 import org.typelevel.sbt.kernel.V
+import sbt._
+import sbt._
 
 import scala.util.Try
-import org.typelevel.sbt.kernel.GitHelper
+
+import Keys._
+import Keys._
 
 object TypelevelVersioningPlugin extends AutoPlugin {
 
@@ -127,7 +131,7 @@ object TypelevelVersioningPlugin extends AutoPlugin {
   private val Description = """^.*-(\d+)-[a-zA-Z0-9]+$""".r
 
   private def taggedVersion = Def.setting {
-    git.gitCurrentTags.value.collectFirst { case V.Tag(v) => v }
+    git.gitCurrentTags.value.collect { case V.Tag(v) => v }.sorted.lastOption
   }
 
 }

@@ -16,8 +16,10 @@
 
 package org.typelevel.sbt
 
-import sbt._, Keys._
+import sbt._
 import sbt.plugins.JvmPlugin
+
+import Keys._
 
 object TypelevelKernelPlugin extends AutoPlugin {
 
@@ -53,8 +55,14 @@ object TypelevelKernelPlugin extends AutoPlugin {
         ()
       else (Test / test).value
     },
+    (Compile / doc) := {
+      if (tlSkipIrrelevantScalas.value && (Compile / doc / skip).value)
+        (Compile / doc / target).value
+      else (Compile / doc).value
+    },
     skipIfIrrelevant(compile),
     skipIfIrrelevant(test),
+    skipIfIrrelevant(doc),
     skipIfIrrelevant(publishLocal),
     skipIfIrrelevant(publish)
   )
