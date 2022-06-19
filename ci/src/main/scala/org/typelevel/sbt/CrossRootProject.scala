@@ -16,8 +16,8 @@
 
 package org.typelevel.sbt
 
-import sbt._
 import org.typelevel.sbt.gha.GenerativePlugin.autoImport._
+import sbt._
 
 /**
  * Simultaneously creates a root project, a Scala JVM aggregate project, a Scala.js aggregate

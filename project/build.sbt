@@ -9,6 +9,7 @@ val modules = List(
   "mergify",
   "mima",
   "no-publish",
+  "scalafix",
   "settings",
   "site",
   "sonatype",

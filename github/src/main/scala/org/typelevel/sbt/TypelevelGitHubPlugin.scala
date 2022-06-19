@@ -16,9 +16,11 @@
 
 package org.typelevel.sbt
 
-import sbt._, Keys._
+import sbt._
 
 import scala.util.Try
+
+import Keys._
 
 object TypelevelGitHubPlugin extends AutoPlugin {
 

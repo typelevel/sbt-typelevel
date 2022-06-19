@@ -16,9 +16,11 @@
 
 package org.typelevel.sbt
 
-import sbt._, Keys._
 import com.typesafe.tools.mima.plugin.MimaPlugin.autoImport._
+import sbt._
 import sbtunidoc.ScalaUnidocPlugin
+
+import Keys._
 
 object TypelevelUnidocPlugin extends AutoPlugin {
 
@@ -27,12 +29,12 @@ object TypelevelUnidocPlugin extends AutoPlugin {
   override def trigger = noTrigger
 
   import ScalaUnidocPlugin.autoImport._
-  import TypelevelSonatypePlugin.javadocioUrl
+  import TypelevelSonatypePlugin.hostedApiUrl
 
   override def projectSettings = Seq(
     Compile / doc := (ScalaUnidoc / doc).value,
     Compile / packageDoc / mappings := (ScalaUnidoc / packageDoc / mappings).value,
-    ThisBuild / apiURL := javadocioUrl.value,
+    ThisBuild / apiURL := hostedApiUrl.value,
     mimaPreviousArtifacts := Set.empty,
     // tell the site plugin about us, without forcing the dependency!
     ThisBuild / SettingKey[Option[ModuleID]]("tlSiteApiModule") := Some(projectID.value)
