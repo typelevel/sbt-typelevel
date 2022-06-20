@@ -86,23 +86,20 @@ object TypelevelSettingsPlugin extends AutoPlugin {
       val warnings211 =
         Seq("-Ywarn-numeric-widen") // In 2.10 this produces a some strange spurious error
 
-      val warnings212 = Seq("-Xlint:-unused,_")
+      val warnings212 = Seq.empty[String]
 
-      val removed213 = Set("-Xlint:-unused,_", "-Xlint")
+      val removed213 = Set(
+        "-Xlint",
+        "-Ywarn-dead-code", // superseded by "-Wdead-code"
+        "-Ywarn-numeric-widen" // superseded by "-Wnumeric-widen"
+      )
       val warnings213 = Seq(
-        "-Xlint:deprecation",
-        "-Wunused:nowarn",
         "-Wdead-code",
         "-Wextra-implicit",
         "-Wnumeric-widen",
-        "-Wunused:implicits",
-        "-Wunused:explicits",
-        "-Wunused:imports",
-        "-Wunused:locals",
-        "-Wunused:params",
-        "-Wunused:patvars",
-        "-Wunused:privates",
-        "-Wvalue-discard"
+        "-Wunused", // all choices are enabled by default
+        "-Wvalue-discard",
+        "-Xlint:deprecation"
       )
 
       val warningsDotty = Seq.empty

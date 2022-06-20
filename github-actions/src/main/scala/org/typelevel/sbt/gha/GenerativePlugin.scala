@@ -614,7 +614,6 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
             key -> values.take(1) // we only want the primary value
       }
 
-      val keys = "scala" :: additions.keys.toList.sorted
       val oses = githubWorkflowOSes.value.toList
       val scalas = githubWorkflowScalaVersions.value.toList
       val javas = githubWorkflowJavaVersions.value.toList
