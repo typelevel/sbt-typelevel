@@ -18,6 +18,7 @@ package org.typelevel.sbt.mergify
 
 import io.circe.Encoder
 import io.circe.syntax._
+
 import scala.annotation.nowarn
 
 sealed abstract class MergifyAction {
