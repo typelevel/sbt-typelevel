@@ -21,15 +21,14 @@ import com.github.sbt.git.SbtGit.git
 import org.typelevel.sbt.kernel.GitHelper
 import org.typelevel.sbt.kernel.V
 import sbt._
-import sbt._
 import sbtcrossproject.CrossPlugin.autoImport._
 import sbtcrossproject.CrossType
 
 import java.io.File
 import java.lang.management.ManagementFactory
+import scala.annotation.nowarn
 import scala.util.Try
 
-import Keys._
 import Keys._
 
 object TypelevelSettingsPlugin extends AutoPlugin {
@@ -317,4 +316,7 @@ object TypelevelSettingsPlugin extends AutoPlugin {
       oldSchool ++ newSchool ++ old
     }
   }
+
+  @nowarn("cat=unused")
+  private[this] def unused(): Unit = ()
 }
