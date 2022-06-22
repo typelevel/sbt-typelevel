@@ -109,8 +109,7 @@ object TypelevelSitePlugin extends AutoPlugin {
     Laika / sourceDirectories := Seq(mdocOut.value),
     laikaTheme := tlSiteHeliumConfig.value.build.extend(tlSiteHeliumExtensions.value),
     Compile / packageDoc / mappings := {
-      val _ = tlSite.value
-      (laikaSite / mappings).value
+      (laikaSite / mappings).dependsOn(tlSite).value
     },
     SettingKey[Set[ModuleID]]("mimaPreviousArtifacts") := Set.empty,
     mdocVariables := {
