@@ -95,3 +95,14 @@ ThisBuild / tlSonatypeUseLegacyHost := false
 ## How do I publish a website like this one?
 
 Check out the [**sbt-typelevel-site**](site.md) plugin.
+
+## How do I manage my Scala.js version?
+
+We recommend explicitly setting your Scala.js version in `project/plugins.sbt`.
+
+```scala
+addSbtPlugin("org.scala-js" % "sbt-scalajs" % "1.10.0")
+```
+
+**sbt-typelevel** ships with a conservative Scala.js version to enable certain settings.
+If one of your dependencies requires a newer Scala.js version you may experience failures in the `scalaJSLink` CI step.
