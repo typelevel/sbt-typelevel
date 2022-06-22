@@ -112,6 +112,7 @@ object TypelevelSitePlugin extends AutoPlugin {
       tlSite.value: @nowarn("cat=other-pure-statement")
       (laikaSite / mappings).value
     },
+    SettingKey[Set[Nothing]]("mimaPreviousArtifacts") := Set.empty,
     mdocVariables := {
       mdocVariables.value ++
         Map(
