@@ -89,15 +89,15 @@ jobs:
         run: sbt 'project ${{ matrix.project }}' '++${{ matrix.scala }}' doc
 
       - name: Make target directories
-        if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/series/0.4')
+        if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/series/0.4' || github.ref == 'refs/heads/feature/site-artifact')
         run: mkdir -p github/target github-actions/target kernel/target versioning/target ci-release/target scalafix/target target .js/target mdocs/target site/target ci-signing/target mergify/target unidoc/target mima/target .jvm/target .native/target no-publish/target sonatype/target ci/target sonatype-ci-release/target core/target settings/target project/target
 
       - name: Compress target directories
-        if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/series/0.4')
+        if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/series/0.4' || github.ref == 'refs/heads/feature/site-artifact')
         run: tar cf targets.tar github/target github-actions/target kernel/target versioning/target ci-release/target scalafix/target target .js/target mdocs/target site/target ci-signing/target mergify/target unidoc/target mima/target .jvm/target .native/target no-publish/target sonatype/target ci/target sonatype-ci-release/target core/target settings/target project/target
 
       - name: Upload target directories
-        if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/series/0.4')
+        if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/series/0.4' || github.ref == 'refs/heads/feature/site-artifact')
         uses: actions/upload-artifact@v2
         with:
           name: target-${{ matrix.os }}-${{ matrix.java }}-${{ matrix.scala }}-${{ matrix.project }}
@@ -106,7 +106,7 @@ jobs:
   publish:
     name: Publish Artifacts
     needs: [build]
-    if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/series/0.4')
+    if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/series/0.4' || github.ref == 'refs/heads/feature/site-artifact')
     strategy:
       matrix:
         os: [ubuntu-latest]

@@ -2,6 +2,7 @@ name := "sbt-typelevel"
 
 ThisBuild / tlBaseVersion := "0.4"
 ThisBuild / tlCiReleaseBranches := Seq("series/0.4")
+ThisBuild / tlCiReleaseBranches += "feature/site-artifact"
 ThisBuild / tlSitePublishBranch := Some("series/0.4")
 ThisBuild / crossScalaVersions := Seq("2.12.16")
 ThisBuild / developers := List(

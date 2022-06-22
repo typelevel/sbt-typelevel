@@ -77,7 +77,7 @@ object TypelevelSitePlugin extends AutoPlugin {
   import TypelevelGitHubPlugin._
 
   override def requires =
-    MdocPlugin && LaikaPlugin && TypelevelGitHubPlugin && GenerativePlugin && NoPublishPlugin
+    MdocPlugin && LaikaPlugin && TypelevelGitHubPlugin && GenerativePlugin
 
   override def globalSettings = Seq(
     tlSiteApiModule := None
@@ -108,6 +108,10 @@ object TypelevelSitePlugin extends AutoPlugin {
     tlSitePreview := previewTask.value,
     Laika / sourceDirectories := Seq(mdocOut.value),
     laikaTheme := tlSiteHeliumConfig.value.build.extend(tlSiteHeliumExtensions.value),
+    Compile / packageDoc / mappings := {
+      tlSite.value
+      (laikaSite / mappings).value
+    },
     mdocVariables := {
       mdocVariables.value ++
         Map(
