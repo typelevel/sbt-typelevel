@@ -189,6 +189,7 @@ lazy val docs = project
   .in(file("mdocs"))
   .enablePlugins(TypelevelSitePlugin)
   .settings(
+    name := "sbt-typelevel-website",
     laikaConfig ~= { _.withRawContent },
     tlSiteApiPackage := Some("org.typelevel.sbt"),
     tlSiteRelatedProjects := Seq(
