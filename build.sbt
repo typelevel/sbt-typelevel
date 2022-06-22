@@ -214,7 +214,7 @@ lazy val docs = project
         try {
           Await.result(sjsVersionFuture, 5.seconds)._2.last
         } catch {
-          case ex: TimeoutException => scalaJSVersion
+          case ex: TimeoutException => scalaJSVersion // not the latest but better than nothing
         }
 
       Map(
