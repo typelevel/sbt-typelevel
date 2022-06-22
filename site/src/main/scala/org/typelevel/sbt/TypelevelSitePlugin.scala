@@ -109,7 +109,7 @@ object TypelevelSitePlugin extends AutoPlugin {
     Laika / sourceDirectories := Seq(mdocOut.value),
     laikaTheme := tlSiteHeliumConfig.value.build.extend(tlSiteHeliumExtensions.value),
     Compile / packageDoc / mappings := {
-      tlSite.value
+      tlSite.value: @nowarn("cat=other-pure-statement")
       (laikaSite / mappings).value
     },
     mdocVariables := {
