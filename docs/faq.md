@@ -101,7 +101,7 @@ Check out the [**sbt-typelevel-site**](site.md) plugin.
 We recommend explicitly setting your Scala.js version in `project/plugins.sbt`.
 
 ```scala
-addSbtPlugin("org.scala-js" % "sbt-scalajs" % "1.10.0")
+addSbtPlugin("org.scala-js" % "sbt-scalajs" % "@LATEST_SJS_VERSION@")
 ```
 
 **sbt-typelevel** ships with a conservative Scala.js version to enable certain settings.

@@ -198,5 +198,28 @@ lazy val docs = project
       "mdoc" -> url("https://scalameta.org/mdoc/"),
       "Laika" -> url("https://planet42.github.io/Laika/"),
       "sbt-unidoc" -> url("https://github.com/sbt/sbt-unidoc")
-    )
+    ),
+    mdocVariables ++= {
+      import coursier.complete.Complete
+      import java.time._
+      import scala.concurrent._
+      import scala.concurrent.duration._
+      import scala.concurrent.ExecutionContext.Implicits._
+
+      val startYear = YearMonth.now().getYear.toString
+
+      val sjsVersionFuture =
+        Complete().withInput(s"org.scala-js:scalajs-library_2.13:").complete().future()
+      val sjsVersion =
+        try {
+          Await.result(sjsVersionFuture, 5.seconds)._2.last
+        } catch {
+          case ex: TimeoutException => scalaJSVersion // not the latest but better than nothing
+        }
+
+      Map(
+        "START_YEAR" -> startYear,
+        "LATEST_SJS_VERSION" -> sjsVersion
+      )
+    }
   )
