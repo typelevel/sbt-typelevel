@@ -19,6 +19,8 @@ package org.typelevel.sbt.mergify
 import io.circe.Encoder
 import io.circe.syntax._
 
+import scala.annotation.nowarn
+
 sealed abstract class MergifyAction {
   private[mergify] def name = getClass.getSimpleName.toLowerCase
 }
@@ -57,6 +59,6 @@ object MergifyAction {
       }
   }
 
+  @nowarn("cat=unused")
   private[this] object Dummy extends MergifyAction
-
 }
