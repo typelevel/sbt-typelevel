@@ -16,7 +16,7 @@
 
 package org.typelevel.sbt.mergify
 
-import io.circe.Encoder
+import io.circe._
 import io.circe.syntax._
 
 sealed abstract class MergifyAction {
@@ -29,6 +29,7 @@ object MergifyAction {
     case merge: Merge => merge.asJson
     case label: Label => label.asJson
     case requestReviews: RequestReviews => requestReviews.asJson
+    case Update => Update.asJson
     case _ => sys.error("should not happen")
   }
 
@@ -65,6 +66,12 @@ object MergifyAction {
   object RequestReviews {
     implicit def encoder: Encoder[RequestReviews] =
       Encoder.forProduct1("users")(_.users)
+  }
+
+  final case object Update extends MergifyAction {
+    override private[mergify] def name = "update"
+
+    implicit def encoder: Encoder[Update.type] = Encoder[JsonObject].contramap(_ => JsonObject.empty)
   }
 
   private[this] object Dummy extends MergifyAction
