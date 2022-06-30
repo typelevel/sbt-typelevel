@@ -28,6 +28,7 @@ object MergifyAction {
   implicit def encoder: Encoder[MergifyAction] = Encoder.instance {
     case merge: Merge => merge.asJson
     case label: Label => label.asJson
+    case requestReviews: RequestReviews => requestReviews.asJson
     case _ => sys.error("should not happen")
   }
 
@@ -55,6 +56,15 @@ object MergifyAction {
       Encoder.forProduct3("add", "remove", "remove_all") { (l: Label) =>
         (l.add, l.remove, l.removeAll)
       }
+  }
+
+  final case class RequestReviews(users: List[String] = Nil) extends MergifyAction {
+    override private[mergify] def name = "request_reviews"
+  }
+
+  object RequestReviews {
+    implicit def encoder: Encoder[RequestReviews] =
+      Encoder.forProduct1("users")(_.users)
   }
 
   private[this] object Dummy extends MergifyAction
