@@ -16,10 +16,11 @@
 
 package org.typelevel.sbt.mergify
 
-import cats.data._
-import cats.syntax.all._
-import io.circe._
-import io.circe.syntax._
+import cats.data.*
+import cats.syntax.all.*
+import io.circe.*
+import io.circe.syntax.*
+import sbt.librarymanagement.Developer
 
 sealed abstract class MergifyAction {
   private[mergify] def name = getClass.getSimpleName.toLowerCase
@@ -83,6 +84,24 @@ object MergifyAction {
         NonEmptyMap.of(weightedUser, weightedUsers: _*).asRight,
         Option(randomCount)
       )
+
+    def apply(developers: List[Developer]) =
+      new RequestReviews(
+        developers
+          .map(_.id)
+          .toNel
+          .getOrElse(throw new RuntimeException("developers must be non-empty"))
+          .asLeft,
+        None)
+
+    def apply(developers: List[Developer], randomCount: Int) =
+      new RequestReviews(
+        developers
+          .map(_.id)
+          .toNel
+          .getOrElse(throw new RuntimeException("developers must be non-empty"))
+          .asLeft,
+        randomCount.some)
 
     implicit def encoder: Encoder[RequestReviews] =
       Encoder.forProduct2("users", "random_count") { requestReviews =>

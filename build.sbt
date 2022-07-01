@@ -11,9 +11,18 @@ ThisBuild / developers := List(
   tlGitHubDev("djspiewak", "Daniel Spiewak")
 )
 
-ThisBuild / mergifyStewardConfig ~= { _.map(_.copy(mergeMinors = true)) }
+ThisBuild / mergifyStewardConfig ~= {
+  _.map(_.copy(mergeMinors = true, author = "typelevel-steward[bot]"))
+}
 ThisBuild / mergifySuccessConditions += MergifyCondition.Custom("#approved-reviews-by>=1")
 ThisBuild / mergifyLabelPaths += { "docs" -> file("docs") }
+ThisBuild / mergifyPrRules += MergifyPrRule(
+  "assign scala-steward's PRs for review",
+  List(MergifyCondition.Custom("author=typelevel-steward[bot]")),
+  List(
+    MergifyAction.RequestReviews("armanbilge")
+  )
+)
 
 ThisBuild / scalafixDependencies ++= Seq(
   "com.github.liancheng" %% "organize-imports" % "0.6.0"
