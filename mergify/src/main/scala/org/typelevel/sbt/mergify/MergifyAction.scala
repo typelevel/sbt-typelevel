@@ -16,6 +16,8 @@
 
 package org.typelevel.sbt.mergify
 
+import cats.data._
+import cats.syntax.all._
 import io.circe._
 import io.circe.syntax._
 
@@ -59,19 +61,37 @@ object MergifyAction {
       }
   }
 
-  final case class RequestReviews(users: List[String] = Nil) extends MergifyAction {
+  final class RequestReviews(
+      val users: Either[Seq[String], Map[String, Int]],
+      val randomCount: Option[Int])
+      extends MergifyAction {
     override private[mergify] def name = "request_reviews"
   }
 
   object RequestReviews {
+    def apply(user: String, users: String*) =
+      new RequestReviews((user :: users.toList).asLeft, None)
+
+    def apply(weightedUser: (String, Int), weightedUsers: (String, Int)*) =
+      new RequestReviews((weightedUser :: weightedUsers.toList).toMap.asRight, None)
+
+    def apply(users: NonEmptyList[String], randomCount: Int) =
+      new RequestReviews(users.toList.asLeft, Option(randomCount))
+
+    def apply(weightedUsers: NonEmptyMap[String, Int], randomCount: Int) =
+      new RequestReviews(weightedUsers.toSortedMap.asRight, Option(randomCount))
+
     implicit def encoder: Encoder[RequestReviews] =
-      Encoder.forProduct1("users")(_.users)
+      Encoder.forProduct2("users", "random_count") { requestReviews =>
+        (requestReviews.users.fold(_.asJson, _.asJson), requestReviews.randomCount)
+      }
   }
 
-  final case object Update extends MergifyAction {
+  object Update extends MergifyAction {
     override private[mergify] def name = "update"
 
-    implicit def encoder: Encoder[Update.type] = Encoder[JsonObject].contramap(_ => JsonObject.empty)
+    implicit def encoder: Encoder[Update.type] =
+      Encoder[JsonObject].contramap(_ => JsonObject.empty)
   }
 
   private[this] object Dummy extends MergifyAction
