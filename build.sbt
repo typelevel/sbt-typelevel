@@ -20,7 +20,7 @@ ThisBuild / mergifyPrRules += MergifyPrRule(
   "assign scala-steward's PRs for review",
   List(MergifyCondition.Custom("author=typelevel-steward[bot]")),
   List(
-    MergifyAction.RequestReviews("armanbilge")
+    MergifyAction.RequestReviews.fromUsers("armanbilge")
   )
 )
 
