@@ -62,7 +62,7 @@ object MergifyAction {
   }
 
   final class RequestReviews(
-      val users: Either[Seq[String], Map[String, Int]],
+      val users: Either[NonEmptyList[String], NonEmptyMap[String, Int]],
       val randomCount: Option[Int])
       extends MergifyAction {
     override private[mergify] def name = "request_reviews"
@@ -70,16 +70,19 @@ object MergifyAction {
 
   object RequestReviews {
     def apply(user: String, users: String*) =
-      new RequestReviews((user :: users.toList).asLeft, None)
+      new RequestReviews(NonEmptyList.of(user, users: _*).asLeft, None)
 
     def apply(weightedUser: (String, Int), weightedUsers: (String, Int)*) =
-      new RequestReviews((weightedUser :: weightedUsers.toList).toMap.asRight, None)
+      new RequestReviews(NonEmptyMap.of(weightedUser, weightedUsers: _*).asRight, None)
 
-    def apply(users: NonEmptyList[String], randomCount: Int) =
-      new RequestReviews(users.toList.asLeft, Option(randomCount))
+    def apply(randomCount: Int, user: String, users: String*) =
+      new RequestReviews(NonEmptyList.of(user, users: _*).asLeft, Option(randomCount))
 
-    def apply(weightedUsers: NonEmptyMap[String, Int], randomCount: Int) =
-      new RequestReviews(weightedUsers.toSortedMap.asRight, Option(randomCount))
+    def apply(randomCount: Int, weightedUser: (String, Int), weightedUsers: (String, Int)*) =
+      new RequestReviews(
+        NonEmptyMap.of(weightedUser, weightedUsers: _*).asRight,
+        Option(randomCount)
+      )
 
     implicit def encoder: Encoder[RequestReviews] =
       Encoder.forProduct2("users", "random_count") { requestReviews =>
