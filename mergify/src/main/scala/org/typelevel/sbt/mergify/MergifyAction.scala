@@ -78,28 +78,28 @@ object MergifyAction {
         randomCount: Option[Int] = randomCount): RequestReviews =
       new RequestReviews(users, teams, usersFromTeams, randomCount) {}
 
-    def andUsers(user: String, users: String*): RequestReviews =
+    def withUsers(user: String, users: String*): RequestReviews =
       copy(users = Unweighted(NonEmptyList.of(user, users: _*)).some)
 
-    def andUsers(user: (String, Int), users: (String, Int)*): RequestReviews =
+    def withUsers(user: (String, Int), users: (String, Int)*): RequestReviews =
       copy(users = Weighted(NonEmptyList.of(user, users: _*)).some)
 
-    def andTeams(team: String, teams: String*): RequestReviews =
+    def withTeams(team: String, teams: String*): RequestReviews =
       copy(teams = Unweighted(NonEmptyList.of(team, teams: _*)).some)
 
-    def andTeams(team: (String, Int), teams: (String, Int)*): RequestReviews =
+    def withTeams(team: (String, Int), teams: (String, Int)*): RequestReviews =
       copy(teams = Weighted(NonEmptyList.of(team, teams: _*)).some)
 
-    def andUsersFromTeams(team: String, teams: String*): RequestReviews =
+    def withUsersFromTeams(team: String, teams: String*): RequestReviews =
       copy(usersFromTeams = Unweighted(NonEmptyList.of(team, teams: _*)).some)
 
-    def andUsersFromTeams(team: (String, Int), teams: (String, Int)*): RequestReviews =
+    def withUsersFromTeams(team: (String, Int), teams: (String, Int)*): RequestReviews =
       copy(usersFromTeams = Weighted(NonEmptyList.of(team, teams: _*)).some)
 
     def withRandomCount(count: Int): RequestReviews =
       copy(randomCount = Option(count))
 
-    def andDevelopers(developers: List[Developer]): RequestReviews =
+    def withDevelopers(developers: List[Developer]): RequestReviews =
       copy(users = NonEmptyList.fromList(developers.map(_.id)).map(Unweighted))
   }
 
