@@ -615,9 +615,9 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
       }
 
       val keys = "scala" :: additions.keys.toList.sorted
-      val oses = githubWorkflowOSes.value.toList
+      val oses = githubWorkflowOSes.value.toList.take(1)
       val scalas = githubWorkflowScalaVersions.value.toList
-      val javas = githubWorkflowJavaVersions.value.toList
+      val javas = githubWorkflowJavaVersions.value.toList.take(1)
       val exclusions = githubWorkflowBuildMatrixExclusions.value.toList
 
       // we build the list of artifacts, by iterating over all combinations of keys
