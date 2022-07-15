@@ -37,7 +37,7 @@ object TypelevelHeliumExtensions {
   def apply(license: Option[(String, URL)], related: Seq[(String, URL)]): ThemeProvider =
     apply(license, related, false)
 
-  @deprecated("Use overload with API url and scala3 parameter", "0.4.7")
+  @deprecated("Use overload with API url and scala3 parameter", "0.4.13")
   def apply(
       license: Option[(String, URL)],
       related: Seq[(String, URL)],
