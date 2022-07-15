@@ -36,6 +36,7 @@ import MdocPlugin.autoImport._
 import LaikaPlugin.autoImport._
 import gha.GenerativePlugin
 import GenerativePlugin.autoImport._
+import TypelevelKernelPlugin._
 import TypelevelKernelPlugin.autoImport._
 
 object TypelevelSitePlugin extends AutoPlugin {

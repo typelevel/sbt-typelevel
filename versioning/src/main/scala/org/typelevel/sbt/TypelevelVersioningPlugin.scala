@@ -18,7 +18,7 @@ package org.typelevel.sbt
 
 import com.typesafe.sbt.GitPlugin
 import com.typesafe.sbt.SbtGit.git
-import org.typelevel.sbt.TypelevelKernelPlugin.autoImport._
+import org.typelevel.sbt.TypelevelKernelPlugin._
 import org.typelevel.sbt.kernel.GitHelper
 import org.typelevel.sbt.kernel.V
 import sbt._
