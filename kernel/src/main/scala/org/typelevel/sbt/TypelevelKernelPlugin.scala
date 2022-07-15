@@ -16,9 +16,9 @@
 
 package org.typelevel.sbt
 
-import sbt.*
+import sbt._
 import sbt.plugins.JvmPlugin
-import Keys.*
+import Keys._
 import org.typelevel.sbt.kernel.{GitHelper, V}
 
 object TypelevelKernelPlugin extends AutoPlugin {
