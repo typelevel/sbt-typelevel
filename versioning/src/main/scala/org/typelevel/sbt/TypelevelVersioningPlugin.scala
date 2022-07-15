@@ -23,6 +23,7 @@ import org.typelevel.sbt.kernel.V
 import sbt._
 
 import scala.util.Try
+
 import Keys._
 import org.typelevel.sbt.TypelevelKernelPlugin.autoImport._
 

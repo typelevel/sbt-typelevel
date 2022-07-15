@@ -18,6 +18,7 @@ package org.typelevel.sbt
 
 import sbt._
 import sbt.plugins.JvmPlugin
+
 import Keys._
 import org.typelevel.sbt.kernel.{GitHelper, V}
 
