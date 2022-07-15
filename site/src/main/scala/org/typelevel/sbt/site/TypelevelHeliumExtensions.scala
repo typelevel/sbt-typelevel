@@ -45,14 +45,14 @@ object TypelevelHeliumExtensions {
     apply(license, related, false, None)
 
   /**
-   * @param apiUrl
-   *   url to API docs
    * @param license
    *   name and [[java.net.URL]] of project license
    * @param related
    *   name and [[java.net.URL]] of related projects
    * @param scala3
    *   whether to use Scala 3 syntax highlighting
+   * @param apiUrl
+   *   url to API docs
    */
   def apply(
       license: Option[(String, URL)],
