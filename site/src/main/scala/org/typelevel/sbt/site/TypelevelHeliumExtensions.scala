@@ -33,11 +33,20 @@ import java.net.URL
 
 object TypelevelHeliumExtensions {
 
-  @deprecated("Use overload with scala3 parameter", "0.4.7")
+  @deprecated("Use overload with API url and scala3 parameter", "0.4.7")
   def apply(license: Option[(String, URL)], related: Seq[(String, URL)]): ThemeProvider =
     apply(license, related, false)
 
+  @deprecated("Use overload with API url and scala3 parameter", "0.4.7")
+  def apply(
+      license: Option[(String, URL)],
+      related: Seq[(String, URL)],
+      scala3: Boolean): ThemeProvider =
+    apply(license, related, false, None)
+
   /**
+   * @param apiUrl
+   *   url to API docs
    * @param license
    *   name and [[java.net.URL]] of project license
    * @param related
@@ -48,7 +57,8 @@ object TypelevelHeliumExtensions {
   def apply(
       license: Option[(String, URL)],
       related: Seq[(String, URL)],
-      scala3: Boolean
+      scala3: Boolean,
+      apiUrl: Option[URL]
   ): ThemeProvider = new ThemeProvider {
     def build[F[_]](implicit F: Sync[F]): Resource[F, Theme[F]] =
       ThemeBuilder[F]("Typelevel Helium Extensions")
@@ -61,6 +71,11 @@ object TypelevelHeliumExtensions {
             .addStream(
               F.blocking(getClass.getResourceAsStream("helium/site/styles.css")),
               Path.Root / "site" / "styles.css"
+            )
+            .merge(
+              apiUrl.fold(InputTree[F]) { url =>
+                InputTree[F].addString(htmlForwarder(url), Path.Root / "api" / "index.html")
+              }
             )
         )
         .addExtensions(
@@ -92,5 +107,12 @@ object TypelevelHeliumExtensions {
             Map("name" -> name, "url" -> url.toString)
         })
       .build
+
+  private def htmlForwarder(to: URL) =
+    s"""|<!DOCTYPE html>
+        |<meta charset="utf-8">
+        |<meta http-equiv="refresh" content="0; URL=$to">
+        |<link rel="canonical" href="$to">
+        |""".stripMargin
 
 }

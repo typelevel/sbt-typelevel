@@ -120,7 +120,8 @@ object TypelevelSitePlugin extends AutoPlugin {
     tlSiteHeliumExtensions := TypelevelHeliumExtensions(
       licenses.value.headOption,
       tlSiteRelatedProjects.value,
-      tlIsScala3.value
+      tlIsScala3.value,
+      tlSiteApiUrl.value
     ),
     tlSiteApiUrl := {
       val javadocioUrl = for {
