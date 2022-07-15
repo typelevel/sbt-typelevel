@@ -16,11 +16,12 @@
 
 package org.typelevel.sbt
 
+import org.typelevel.sbt.kernel.GitHelper
+import org.typelevel.sbt.kernel.V
 import sbt._
 import sbt.plugins.JvmPlugin
 
 import Keys._
-import org.typelevel.sbt.kernel.{GitHelper, V}
 
 object TypelevelKernelPlugin extends AutoPlugin {
 
