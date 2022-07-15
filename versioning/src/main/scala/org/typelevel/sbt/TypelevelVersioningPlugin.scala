@@ -24,6 +24,7 @@ import sbt._
 
 import scala.util.Try
 import Keys._
+import org.typelevel.sbt.TypelevelKernelPlugin.autoImport._
 
 object TypelevelVersioningPlugin extends AutoPlugin {
 
@@ -37,36 +38,11 @@ object TypelevelVersioningPlugin extends AutoPlugin {
       settingKey[Boolean](
         "If true, an untagged commit is given a snapshot version, e.g. 0.4-00218f9-SNAPSHOT. If false, it is given a release version, e.g. 0.4-00218f9. (default: true)")
 
-    lazy val currentRelease = Def.setting {
-      // some tricky logic here ...
-      // if the latest release is a pre-release (e.g., M or RC)
-      // and there are no stable releases it is bincompatible with,
-      // then for all effective purposes it is the current release
+    lazy val currentRelease = currentReleaseImpl
 
-      val release = previousReleases.value match {
-        case head :: tail if head.isPrerelease =>
-          tail
-            .filterNot(_.isPrerelease)
-            .find(head.copy(prerelease = None).mustBeBinCompatWith(_))
-            .orElse(Some(head))
-        case releases => releases.headOption
-      }
+    lazy val currentPreRelease = currentPreReleaseImpl
 
-      release.map(_.toString)
-    }
-
-    // latest tagged release, including pre-releases
-    lazy val currentPreRelease = Def.setting {
-      previousReleases.value.headOption.map(_.toString)
-    }
-
-    lazy val previousReleases = Def.setting {
-      val currentVersion = V(version.value).map(_.copy(prerelease = None))
-      GitHelper.previousReleases(fromHead = true, strict = false).filter { v =>
-        currentVersion.forall(v.copy(prerelease = None) <= _)
-      }
-    }
-
+    lazy val previousReleases = previousReleasesImpl
   }
 
   import autoImport._

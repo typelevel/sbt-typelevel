@@ -37,7 +37,6 @@ import LaikaPlugin.autoImport._
 import gha.GenerativePlugin
 import GenerativePlugin.autoImport._
 import TypelevelKernelPlugin.autoImport._
-import TypelevelVersioningPlugin.autoImport._
 
 object TypelevelSitePlugin extends AutoPlugin {
 
@@ -110,8 +109,8 @@ object TypelevelSitePlugin extends AutoPlugin {
     mdocVariables := {
       mdocVariables.value ++
         Map(
-          "VERSION" -> currentRelease.value.getOrElse(version.value),
-          "PRERELEASE_VERSION" -> currentPreRelease.value.getOrElse(version.value),
+          "VERSION" -> currentReleaseImpl.value.getOrElse(version.value),
+          "PRERELEASE_VERSION" -> currentPreReleaseImpl.value.getOrElse(version.value),
           "SNAPSHOT_VERSION" -> version.value
         ) ++
         tlSiteApiUrl.value.map("API_URL" -> _.toString).toMap
@@ -129,7 +128,7 @@ object TypelevelSitePlugin extends AutoPlugin {
           scalaVersion.value,
           scalaBinaryVersion.value
         )
-        version <- currentRelease.value
+        version <- currentReleaseImpl.value
       } yield {
         val o = moduleId.organization
         val n = cross(moduleId.name)
