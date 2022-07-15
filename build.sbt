@@ -184,7 +184,7 @@ lazy val site = project
   .settings(
     name := "sbt-typelevel-site"
   )
-  .dependsOn(kernel, github, githubActions, noPublish)
+  .dependsOn(kernel, github, githubActions, versioning, noPublish)
 
 lazy val unidoc = project
   .in(file("unidoc"))

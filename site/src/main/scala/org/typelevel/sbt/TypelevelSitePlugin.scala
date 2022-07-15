@@ -26,8 +26,6 @@ import laika.helium.config.ImageLink
 import laika.sbt.LaikaPlugin
 import laika.theme.ThemeProvider
 import mdoc.MdocPlugin
-import org.typelevel.sbt.kernel.GitHelper
-import org.typelevel.sbt.kernel.V
 import org.typelevel.sbt.site._
 import sbt._
 
@@ -39,6 +37,7 @@ import LaikaPlugin.autoImport._
 import gha.GenerativePlugin
 import GenerativePlugin.autoImport._
 import TypelevelKernelPlugin.autoImport._
+import TypelevelVersioningPlugin.autoImport._
 
 object TypelevelSitePlugin extends AutoPlugin {
 
@@ -77,7 +76,7 @@ object TypelevelSitePlugin extends AutoPlugin {
   import TypelevelGitHubPlugin._
 
   override def requires =
-    MdocPlugin && LaikaPlugin && TypelevelGitHubPlugin && GenerativePlugin && NoPublishPlugin
+    MdocPlugin && LaikaPlugin && TypelevelGitHubPlugin && TypelevelVersioningPlugin && GenerativePlugin && NoPublishPlugin
 
   override def globalSettings = Seq(
     tlSiteApiModule := None
@@ -249,36 +248,6 @@ object TypelevelSitePlugin extends AutoPlugin {
           githubWorkflowJobSetup.value.toList ++ tlSiteGenerate.value ++ tlSitePublish.value
       )
   )
-
-  private lazy val currentRelease = Def.setting {
-    // some tricky logic here ...
-    // if the latest release is a pre-release (e.g., M or RC)
-    // and there are no stable releases it is bincompatible with,
-    // then for all effective purposes it is the current release
-
-    val release = previousReleases.value match {
-      case head :: tail if head.isPrerelease =>
-        tail
-          .filterNot(_.isPrerelease)
-          .find(head.copy(prerelease = None).mustBeBinCompatWith(_))
-          .orElse(Some(head))
-      case releases => releases.headOption
-    }
-
-    release.map(_.toString)
-  }
-
-  // latest tagged release, including pre-releases
-  private lazy val currentPreRelease = Def.setting {
-    previousReleases.value.headOption.map(_.toString)
-  }
-
-  private lazy val previousReleases = Def.setting {
-    val currentVersion = V(version.value).map(_.copy(prerelease = None))
-    GitHelper.previousReleases(fromHead = true, strict = false).filter { v =>
-      currentVersion.forall(v.copy(prerelease = None) <= _)
-    }
-  }
 
   private def previewTask = Def
     .taskDyn {
