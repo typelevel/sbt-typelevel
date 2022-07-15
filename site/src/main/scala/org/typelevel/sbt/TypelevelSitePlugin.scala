@@ -75,7 +75,7 @@ object TypelevelSitePlugin extends AutoPlugin {
   import TypelevelGitHubPlugin._
 
   override def requires =
-    MdocPlugin && LaikaPlugin && TypelevelGitHubPlugin && TypelevelVersioningPlugin && GenerativePlugin && NoPublishPlugin
+    MdocPlugin && LaikaPlugin && TypelevelGitHubPlugin && GenerativePlugin && NoPublishPlugin
 
   override def globalSettings = Seq(
     tlSiteApiModule := None
