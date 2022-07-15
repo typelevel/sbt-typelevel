@@ -11,6 +11,8 @@ ThisBuild / developers := List(
   tlGitHubDev("djspiewak", "Daniel Spiewak")
 )
 
+ThisBuild / githubWorkflowJavaVersions += JavaSpec.temurin("17")
+
 ThisBuild / mergifyStewardConfig ~= {
   _.map(_.copy(mergeMinors = true, author = "typelevel-steward[bot]"))
 }
