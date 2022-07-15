@@ -109,8 +109,8 @@ object TypelevelSitePlugin extends AutoPlugin {
     mdocVariables := {
       mdocVariables.value ++
         Map(
-          "VERSION" -> currentReleaseImpl.value.getOrElse(version.value),
-          "PRERELEASE_VERSION" -> currentPreReleaseImpl.value.getOrElse(version.value),
+          "VERSION" -> currentRelease.value.getOrElse(version.value),
+          "PRERELEASE_VERSION" -> currentPreRelease.value.getOrElse(version.value),
           "SNAPSHOT_VERSION" -> version.value
         ) ++
         tlSiteApiUrl.value.map("API_URL" -> _.toString).toMap
@@ -128,7 +128,7 @@ object TypelevelSitePlugin extends AutoPlugin {
           scalaVersion.value,
           scalaBinaryVersion.value
         )
-        version <- currentReleaseImpl.value
+        version <- currentRelease.value
       } yield {
         val o = moduleId.organization
         val n = cross(moduleId.name)

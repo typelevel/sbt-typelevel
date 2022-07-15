@@ -39,11 +39,12 @@ object TypelevelVersioningPlugin extends AutoPlugin {
       settingKey[Boolean](
         "If true, an untagged commit is given a snapshot version, e.g. 0.4-00218f9-SNAPSHOT. If false, it is given a release version, e.g. 0.4-00218f9. (default: true)")
 
-    lazy val currentRelease = currentReleaseImpl
+    lazy val tlCurrentRelease =
+      settingKey[Option[String]](
+        "The latest stable released version of your project, e.g. 0.2.0, 3.5.1. If applicable, this will be the version currently being released.")
 
-    lazy val currentPreRelease = currentPreReleaseImpl
-
-    lazy val previousReleases = previousReleasesImpl
+    lazy val tlCurrentPreRelease = settingKey[Option[String]](
+      "The latest pre-release (e.g. milestone, release candidate) of your project. If applicable, this will be the version currently being released.")
   }
 
   import autoImport._
@@ -130,7 +131,9 @@ object TypelevelVersioningPlugin extends AutoPlugin {
       if (isSnapshot.value) version += "-SNAPSHOT"
 
       version
-    }
+    },
+    tlCurrentRelease := currentRelease.value,
+    tlCurrentPreRelease := currentPreRelease.value
   )
 
   private val Description = """^.*-(\d+)-[a-zA-Z0-9]+$""".r

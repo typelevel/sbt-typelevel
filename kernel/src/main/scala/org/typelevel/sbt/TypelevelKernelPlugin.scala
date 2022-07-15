@@ -39,13 +39,13 @@ object TypelevelKernelPlugin extends AutoPlugin {
         }
       })
 
-    private[sbt] lazy val currentReleaseImpl = Def.setting {
+    private[sbt] lazy val currentRelease: Def.Initialize[Option[String]] = Def.setting {
       // some tricky logic here ...
       // if the latest release is a pre-release (e.g., M or RC)
       // and there are no stable releases it is bincompatible with,
       // then for all effective purposes it is the current release
 
-      val release = previousReleasesImpl.value match {
+      val release = previousReleases.value match {
         case head :: tail if head.isPrerelease =>
           tail
             .filterNot(_.isPrerelease)
@@ -58,11 +58,11 @@ object TypelevelKernelPlugin extends AutoPlugin {
     }
 
     // latest tagged release, including pre-releases
-    private[sbt] lazy val currentPreReleaseImpl = Def.setting {
-      previousReleasesImpl.value.headOption.map(_.toString)
+    private[sbt] lazy val currentPreRelease: Def.Initialize[Option[String]] = Def.setting {
+      previousReleases.value.headOption.map(_.toString)
     }
 
-    private[sbt] lazy val previousReleasesImpl = Def.setting {
+    private[sbt] lazy val previousReleases: Def.Initialize[List[V]] = Def.setting {
       val currentVersion = V(version.value).map(_.copy(prerelease = None))
       GitHelper.previousReleases(fromHead = true, strict = false).filter { v =>
         currentVersion.forall(v.copy(prerelease = None) <= _)
