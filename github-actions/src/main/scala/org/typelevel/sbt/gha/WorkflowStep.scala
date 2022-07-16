@@ -84,6 +84,12 @@ object WorkflowStep {
   val Tmate: WorkflowStep =
     Use(UseRef.Public("mxschmitt", "action-tmate", "v3"), name = Some("Setup tmate session"))
 
+  val DependencySubmission: WorkflowStep =
+    Use(
+      UseRef.Public("scalacenter", "sbt-dependency-submission", "v2"),
+      name = Some("Submit Dependencies")
+    )
+
   def ComputeVar(name: String, cmd: String): WorkflowStep =
     Run(
       List("echo \"" + name + "=$(" + cmd + ")\" >> $GITHUB_ENV"),
