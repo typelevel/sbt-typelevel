@@ -21,7 +21,14 @@ lazy val docs = project.in(file("site")).enablePlugins(TypelevelSitePlugin)
 
 Place your `.md` files in the `docs/` directory of your project. To preview locally, run `docs/tlSitePreview`. This will start a preview server at http://localhost:4242.
 
-The site is generated using [mdoc](https://scalameta.org/mdoc/) and [Laika](https://planet42.github.io/Laika/) and published to the `gh-pages` branch on every push to the specified branch. Make sure to enable GitHub Pages in your repository settings.
+The site is generated using [mdoc](https://scalameta.org/mdoc/) and [Laika](https://planet42.github.io/Laika/) and published to the `gh-pages` branch on every push to the specified branch.
+
+You will also need to configure your repository settings:
+
+1. Grant "Read and write" permissions to workflows. This enables them to push to the `gh-pages` branch.
+  `https://github.com/{user}/{repo}/settings/actions`
+2. Set the GitHub pages source to the `/` (root) directory on the `gh-pages` branch.
+  `https://github.com/{user}/{repo}/settings/pages`
 
 ### How can I include my project version on the website?
 
