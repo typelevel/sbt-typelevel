@@ -21,6 +21,11 @@ sealed trait WorkflowStep extends Product with Serializable {
   def name: Option[String]
   def cond: Option[String]
   def env: Map[String, String]
+
+  def withId(id: Option[String]): WorkflowStep
+  def withName(name: Option[String]): WorkflowStep
+  def withCond(cond: Option[String]): WorkflowStep
+  def withEnv(env: Map[String, String]): WorkflowStep
 }
 
 object WorkflowStep {
@@ -79,6 +84,12 @@ object WorkflowStep {
   val Tmate: WorkflowStep =
     Use(UseRef.Public("mxschmitt", "action-tmate", "v3"), name = Some("Setup tmate session"))
 
+  val DependencySubmission: WorkflowStep =
+    Use(
+      UseRef.Public("scalacenter", "sbt-dependency-submission", "v2"),
+      name = Some("Submit Dependencies")
+    )
+
   def ComputeVar(name: String, cmd: String): WorkflowStep =
     Run(
       List("echo \"" + name + "=$(" + cmd + ")\" >> $GITHUB_ENV"),
@@ -96,7 +107,13 @@ object WorkflowStep {
       cond: Option[String] = None,
       env: Map[String, String] = Map(),
       params: Map[String, String] = Map())
-      extends WorkflowStep
+      extends WorkflowStep {
+    def withId(id: Option[String]) = copy(id = id)
+    def withName(name: Option[String]) = copy(name = name)
+    def withCond(cond: Option[String]) = copy(cond = cond)
+    def withEnv(env: Map[String, String]) = copy(env = env)
+  }
+
   final case class Sbt(
       commands: List[String],
       id: Option[String] = None,
@@ -104,7 +121,13 @@ object WorkflowStep {
       cond: Option[String] = None,
       env: Map[String, String] = Map(),
       params: Map[String, String] = Map())
-      extends WorkflowStep
+      extends WorkflowStep {
+    def withId(id: Option[String]) = copy(id = id)
+    def withName(name: Option[String]) = copy(name = name)
+    def withCond(cond: Option[String]) = copy(cond = cond)
+    def withEnv(env: Map[String, String]) = copy(env = env)
+  }
+
   final case class Use(
       ref: UseRef,
       params: Map[String, String] = Map(),
@@ -112,5 +135,10 @@ object WorkflowStep {
       name: Option[String] = None,
       cond: Option[String] = None,
       env: Map[String, String] = Map())
-      extends WorkflowStep
+      extends WorkflowStep {
+    def withId(id: Option[String]) = copy(id = id)
+    def withName(name: Option[String]) = copy(name = name)
+    def withCond(cond: Option[String]) = copy(cond = cond)
+    def withEnv(env: Map[String, String]) = copy(env = env)
+  }
 }

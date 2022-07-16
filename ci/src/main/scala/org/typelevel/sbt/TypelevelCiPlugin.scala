@@ -20,9 +20,12 @@ import com.typesafe.tools.mima.plugin.MimaPlugin
 import org.typelevel.sbt.gha.GenerativePlugin
 import org.typelevel.sbt.gha.GenerativePlugin.autoImport._
 import org.typelevel.sbt.gha.GitHubActionsPlugin
+import org.typelevel.sbt.gha.WorkflowStep
 import sbt._
 
 import scala.language.experimental.macros
+
+import Keys._
 
 object TypelevelCiPlugin extends AutoPlugin {
 
@@ -42,6 +45,9 @@ object TypelevelCiPlugin extends AutoPlugin {
       settingKey[Boolean]("Whether to do MiMa binary issues check in CI (default: true)")
     lazy val tlCiDocCheck =
       settingKey[Boolean]("Whether to build API docs in CI (default: true)")
+
+    lazy val tlCiDependencyGraphJob =
+      settingKey[Boolean]("Whether to add a job to submit dependencies to GH (default: true)")
   }
 
   import autoImport._
@@ -52,6 +58,7 @@ object TypelevelCiPlugin extends AutoPlugin {
     tlCiScalafixCheck := false,
     tlCiMimaBinaryIssueCheck := true,
     tlCiDocCheck := true,
+    tlCiDependencyGraphJob := true,
     githubWorkflowTargetBranches ++= Seq(
       "!update/**", // ignore steward branches
       "!pr/**" // escape-hatch to disable ci on a branch
@@ -125,7 +132,25 @@ object TypelevelCiPlugin extends AutoPlugin {
 
       style ++ test ++ scalafix ++ mima ++ doc
     },
-    githubWorkflowJavaVersions := Seq(JavaSpec.temurin("8"))
+    githubWorkflowJavaVersions := Seq(JavaSpec.temurin("8")),
+    githubWorkflowAddedJobs ++= {
+      val dependencySubmission =
+        if (tlCiDependencyGraphJob.value)
+          List(
+            WorkflowJob(
+              "dependency-submission",
+              "Submit Dependencies",
+              scalas = List(scalaVersion.value),
+              javas = List(githubWorkflowJavaVersions.value.head),
+              steps = githubWorkflowJobSetup.value.toList :+
+                WorkflowStep
+                  .DependencySubmission
+                  .withCond(Some("github.event_name != 'pull_request'"))
+            ))
+        else Nil
+
+      dependencySubmission
+    }
   )
 
   private val primaryJavaCond = Def.setting {
