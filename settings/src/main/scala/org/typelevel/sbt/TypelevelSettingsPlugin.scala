@@ -184,7 +184,9 @@ object TypelevelSettingsPlugin extends AutoPlugin {
         GitHelper.getTagOrHash(git.gitCurrentTags.value, git.gitHeadCommit.value)
       val infoOpt = scmInfo.value
 
-      if (tlIsScala3.value) Nil
+      if (tlIsScala3.value)
+        Seq("-project-version", version.value) ++
+          infoOpt.toSeq.flatMap(i => Seq("-project-url", i.browseUrl.toString))
       else // TODO move to GitHub plugin
         tagOrHash.toSeq flatMap { vh =>
           infoOpt.toSeq flatMap { info =>
