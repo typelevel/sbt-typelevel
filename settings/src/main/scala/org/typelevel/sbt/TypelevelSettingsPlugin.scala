@@ -177,25 +177,21 @@ object TypelevelSettingsPlugin extends AutoPlugin {
     ),
     Test / console / scalacOptions := (Compile / console / scalacOptions).value,
     Compile / doc / scalacOptions ++= {
-      if (tlIsScala3.value)
-        Seq("-sourcepath", (LocalRootProject / baseDirectory).value.getAbsolutePath)
-      else {
+      Seq("-sourcepath", (LocalRootProject / baseDirectory).value.getAbsolutePath)
+    },
+    Compile / doc / scalacOptions ++= {
+      val tagOrHash =
+        GitHelper.getTagOrHash(git.gitCurrentTags.value, git.gitHeadCommit.value)
+      val infoOpt = scmInfo.value
 
-        val tagOrHash =
-          GitHelper.getTagOrHash(git.gitCurrentTags.value, git.gitHeadCommit.value)
-
-        val infoOpt = scmInfo.value
+      if (tlIsScala3.value) Nil
+      else // TODO move to GitHub plugin
         tagOrHash.toSeq flatMap { vh =>
           infoOpt.toSeq flatMap { info =>
             val path = s"${info.browseUrl}/blob/${vh}€{FILE_PATH}.scala"
-            Seq(
-              "-doc-source-url",
-              path,
-              "-sourcepath",
-              (LocalRootProject / baseDirectory).value.getAbsolutePath)
+            Seq("-doc-source-url", path)
           }
         }
-      }
     },
     javacOptions ++= Seq(
       "-encoding",
