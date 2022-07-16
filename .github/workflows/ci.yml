@@ -210,6 +210,7 @@ jobs:
 
   dependency-submission:
     name: Submit Dependencies
+    if: github.event_name != 'pull_request'
     strategy:
       matrix:
         os: [ubuntu-latest]
@@ -267,7 +268,6 @@ jobs:
           key: ${{ runner.os }}-sbt-cache-v2-${{ hashFiles('**/*.sbt') }}-${{ hashFiles('project/build.properties') }}
 
       - name: Submit Dependencies
-        if: github.event_name != 'pull_request'
         uses: scalacenter/sbt-dependency-submission@v2
 
   site:
