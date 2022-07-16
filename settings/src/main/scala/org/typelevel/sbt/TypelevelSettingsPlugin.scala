@@ -185,8 +185,7 @@ object TypelevelSettingsPlugin extends AutoPlugin {
       val infoOpt = scmInfo.value
 
       if (tlIsScala3.value)
-        Seq("-project-version", version.value) ++
-          infoOpt.toSeq.flatMap(i => Seq("-project-url", i.browseUrl.toString))
+        Seq("-project-version", version.value)
       else // TODO move to GitHub plugin
         tagOrHash.toSeq flatMap { vh =>
           infoOpt.toSeq flatMap { info =>
