@@ -174,25 +174,22 @@ object TypelevelSettingsPlugin extends AutoPlugin {
     ),
     Test / console / scalacOptions := (Compile / console / scalacOptions).value,
     Compile / doc / scalacOptions ++= {
+      Seq("-sourcepath", (LocalRootProject / baseDirectory).value.getAbsolutePath)
+    },
+    Compile / doc / scalacOptions ++= {
+      val tagOrHash =
+        GitHelper.getTagOrHash(git.gitCurrentTags.value, git.gitHeadCommit.value)
+      val infoOpt = scmInfo.value
+
       if (tlIsScala3.value)
-        Seq("-sourcepath", (LocalRootProject / baseDirectory).value.getAbsolutePath)
-      else {
-
-        val tagOrHash =
-          GitHelper.getTagOrHash(git.gitCurrentTags.value, git.gitHeadCommit.value)
-
-        val infoOpt = scmInfo.value
+        Seq("-project-version", version.value)
+      else // TODO move to GitHub plugin
         tagOrHash.toSeq flatMap { vh =>
           infoOpt.toSeq flatMap { info =>
             val path = s"${info.browseUrl}/blob/${vh}€{FILE_PATH}.scala"
-            Seq(
-              "-doc-source-url",
-              path,
-              "-sourcepath",
-              (LocalRootProject / baseDirectory).value.getAbsolutePath)
+            Seq("-doc-source-url", path)
           }
         }
-      }
     },
     javacOptions ++= Seq(
       "-encoding",
@@ -275,9 +272,9 @@ object TypelevelSettingsPlugin extends AutoPlugin {
     jdkRelease.fold(default) {
       case 8 if isJava8 => default
       case n if n >= 8 =>
-        if (javaRuntimeVersion < n) {
+        if (javaMajorVersion < n) {
           sys.error(
-            s"Target JDK is $n but you are using an older JDK $javaRuntimeVersion. Please switch to JDK >= $n.")
+            s"Target JDK is $n but you are using an older JDK $javaMajorVersion. Please switch to JDK >= $n.")
         } else {
           f(n)
         }
@@ -286,17 +283,14 @@ object TypelevelSettingsPlugin extends AutoPlugin {
           s"Target JDK is $n, which is not supported by `sbt-typelevel`. Please select a JDK >= 8.")
     }
 
-  private val javaRuntimeVersion: Int =
-    System.getProperty("java.version").split("""\.""") match {
-      case Array("1", "8", _*) => 8
-      case Array(feature, _*) => feature.toInt
-    }
+  private val javaMajorVersion: Int =
+    System.getProperty("java.version").stripPrefix("1.").takeWhile(_.isDigit).toInt
 
-  private val isJava8: Boolean = javaRuntimeVersion == 8
+  private val isJava8: Boolean = javaMajorVersion == 8
 
   private val javaApiMappings = {
     // scaladoc doesn't support this automatically before 2.13
-    val baseUrl = javaRuntimeVersion match {
+    val baseUrl = javaMajorVersion match {
       case v if v < 11 => url(s"https://docs.oracle.com/javase/${v}/docs/api/")
       case v => url(s"https://docs.oracle.com/en/java/javase/${v}/docs/api/java.base/")
     }
