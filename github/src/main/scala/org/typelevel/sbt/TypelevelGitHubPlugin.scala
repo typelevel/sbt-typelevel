@@ -16,11 +16,14 @@
 
 package org.typelevel.sbt
 
+import com.typesafe.sbt.SbtGit.git
+import org.typelevel.sbt.kernel.GitHelper
 import sbt._
 
 import scala.util.Try
 
 import Keys._
+import TypelevelKernelPlugin.autoImport._
 
 object TypelevelGitHubPlugin extends AutoPlugin {
 
@@ -49,6 +52,22 @@ object TypelevelGitHubPlugin extends AutoPlugin {
         gitHubScmInfo(user, repo)
     },
     homepage := homepage.value.orElse(scmInfo.value.map(_.browseUrl))
+  )
+
+  override def projectSettings: Seq[Setting[_]] = Seq(
+    Compile / doc / scalacOptions ++= {
+      val tagOrHash =
+        GitHelper.getTagOrHash(git.gitCurrentTags.value, git.gitHeadCommit.value)
+      val userRepo = gitHubUserRepo.value
+
+      if (tlIsScala3.value)
+        tagOrHash.toSeq flatMap { vh =>
+          userRepo.toSeq flatMap {
+            case (user, repo) => Seq(s"-source-links:github://${user}/${repo}", "-revision", vh)
+          }
+        }
+      else Nil // TODO move from settings plugin
+    }
   )
 
   private def gitHubScmInfo(user: String, repo: String) =
