@@ -80,22 +80,25 @@ object TypelevelSettingsPlugin extends AutoPlugin {
       }
     },
     scalacOptions ++= {
-      val warningsNsc = Seq("-Xlint", "-Ywarn-dead-code")
+      val warningsNsc = Seq(
+        "-Xlint",
+        "-Ywarn-dead-code"
+      )
 
-      val warnings211 =
-        Seq("-Ywarn-numeric-widen") // In 2.10 this produces a some strange spurious error
+      val warnings211 = Seq(
+        "-Ywarn-numeric-widen" // In 2.10 this produces a some strange spurious error
+      )
 
       val removed212 = Set(
         "-Xlint"
       )
       val warnings212 = Seq(
-        "-Xlint:_,-unused",
-        "-Ywarn-unused:_,-nowarn" // '-nowarn' because 2.13 can detect more unused cases than 2.12
+        "-Xlint:_,-unused", // "unused" provided by '-Ywarn-unused'
+        "-Ywarn-unused:_,-nowarn,-privates" // '-nowarn' because 2.13 can detect more unused cases than 2.12
       )
 
       val removed213 = Set(
-        "-Xlint:_,-unused",
-        "-Ywarn-unused:_,-nowarn", // mostly superseded by "-Wunused"
+        "-Ywarn-unused:_,-nowarn,-privates", // mostly superseded by "-Wunused"
         "-Ywarn-dead-code", // superseded by "-Wdead-code"
         "-Ywarn-numeric-widen" // superseded by "-Wnumeric-widen"
       )
@@ -104,8 +107,7 @@ object TypelevelSettingsPlugin extends AutoPlugin {
         "-Wextra-implicit",
         "-Wnumeric-widen",
         "-Wunused", // all choices are enabled by default
-        "-Wvalue-discard",
-        "-Xlint:deprecation"
+        "-Wvalue-discard"
       )
 
       val warningsDotty = Seq.empty
