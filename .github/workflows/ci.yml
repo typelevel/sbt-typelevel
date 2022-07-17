@@ -210,7 +210,6 @@ jobs:
 
   dependency-submission:
     name: Submit Dependencies
-    if: github.event_name != 'pull_request'
     strategy:
       matrix:
         os: [ubuntu-latest]
@@ -269,6 +268,10 @@ jobs:
 
       - name: Submit Dependencies
         uses: scalacenter/sbt-dependency-submission@v2
+
+      - name: Review Dependencies
+        if: github.event_name == 'pull_request'
+        uses: actions/dependency-review-action@v2
 
   site:
     name: Generate Site

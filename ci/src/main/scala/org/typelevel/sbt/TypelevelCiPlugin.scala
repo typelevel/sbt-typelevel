@@ -142,9 +142,13 @@ object TypelevelCiPlugin extends AutoPlugin {
               "Submit Dependencies",
               scalas = List(scalaVersion.value),
               javas = List(githubWorkflowJavaVersions.value.head),
-              steps = githubWorkflowJobSetup.value.toList :+
-                WorkflowStep.DependencySubmission,
-              cond = Some("github.event_name != 'pull_request'")
+              steps = githubWorkflowJobSetup.value.toList :::
+                List(
+                  WorkflowStep.DependencySubmission,
+                  WorkflowStep
+                    .DependencyReview
+                    .withCond(Some("github.event_name == 'pull_request'"))
+                )
             ))
         else Nil
 

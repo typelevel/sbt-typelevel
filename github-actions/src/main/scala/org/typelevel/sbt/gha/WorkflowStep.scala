@@ -90,6 +90,12 @@ object WorkflowStep {
       name = Some("Submit Dependencies")
     )
 
+  val DependencyReview: WorkflowStep =
+    Use(
+      UseRef.Public("actions", "dependency-review-action", "v2"),
+      name = Some("Review Dependencies")
+    )
+
   def ComputeVar(name: String, cmd: String): WorkflowStep =
     Run(
       List("echo \"" + name + "=$(" + cmd + ")\" >> $GITHUB_ENV"),
