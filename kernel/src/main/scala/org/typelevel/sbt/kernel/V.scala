@@ -43,8 +43,8 @@ private[sbt] final case class V(
     if (y != 0) return y
     (this.patch, that.patch) match {
       case (None, None) => 0
-      case (None, Some(patch)) => 1
-      case (Some(patch), None) => -1
+      case (None, Some(_)) => 1
+      case (Some(_), None) => -1
       case (Some(thisPatch), Some(thatPatch)) =>
         val z = thisPatch.compare(thatPatch)
         if (z != 0) return z

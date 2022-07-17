@@ -85,10 +85,17 @@ object TypelevelSettingsPlugin extends AutoPlugin {
       val warnings211 =
         Seq("-Ywarn-numeric-widen") // In 2.10 this produces a some strange spurious error
 
-      val warnings212 = Seq.empty[String]
+      val removed212 = Set(
+        "-Xlint"
+      )
+      val warnings212 = Seq(
+        "-Xlint:_,-unused",
+        "-Ywarn-unused:_,-nowarn" // '-nowarn' because 2.13 can detect more unused cases than 2.12
+      )
 
       val removed213 = Set(
-        "-Xlint",
+        "-Xlint:_,-unused",
+        "-Ywarn-unused:_,-nowarn", // mostly superseded by "-Wunused"
         "-Ywarn-dead-code", // superseded by "-Wdead-code"
         "-Ywarn-numeric-widen" // superseded by "-Wnumeric-widen"
       )
@@ -108,10 +115,11 @@ object TypelevelSettingsPlugin extends AutoPlugin {
           warningsDotty
 
         case V(V(2, minor, _, _)) if minor >= 13 =>
-          (warnings211 ++ warnings212 ++ warnings213 ++ warningsNsc).filterNot(removed213)
+          (warnings211 ++ warnings212 ++ warnings213 ++ warningsNsc)
+            .filterNot(removed212 ++ removed213)
 
         case V(V(2, minor, _, _)) if minor >= 12 =>
-          warnings211 ++ warnings212 ++ warningsNsc
+          (warnings211 ++ warnings212 ++ warningsNsc).filterNot(removed212)
 
         case V(V(2, minor, _, _)) if minor >= 11 =>
           warnings211 ++ warningsNsc
