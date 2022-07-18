@@ -16,6 +16,7 @@
 
 package org.typelevel.sbt
 
+import io.github.davidgregory084.TpolecatPlugin
 import org.typelevel.sbt.kernel.V
 import sbt._
 import sbtcrossproject.CrossPlugin.autoImport._
@@ -30,7 +31,7 @@ import Keys._
 
 object TypelevelSettingsPlugin extends AutoPlugin {
   override def trigger = allRequirements
-  override def requires = TypelevelKernelPlugin
+  override def requires = TypelevelKernelPlugin && TpolecatPlugin
 
   object autoImport {
     lazy val tlFatalWarnings =
@@ -60,89 +61,6 @@ object TypelevelSettingsPlugin extends AutoPlugin {
           compilerPlugin("org.typelevel" % "kind-projector" % "0.13.2" cross CrossVersion.full)
         )
     },
-
-    // Adapted from Rob Norris' post at https://tpolecat.github.io/2014/04/11/scalac-flags.html
-    scalacOptions ++= Seq(
-      "-deprecation",
-      "-encoding",
-      "UTF-8", // yes, this is 2 args
-      "-feature",
-      "-unchecked"),
-    scalacOptions ++= {
-      scalaVersion.value match {
-        case V(V(2, minor, _, _)) if minor < 13 =>
-          Seq("-Yno-adapted-args", "-Ywarn-unused-import")
-        case _ =>
-          Seq.empty
-      }
-    },
-    scalacOptions ++= {
-      val warningsNsc = Seq("-Xlint", "-Ywarn-dead-code")
-
-      val warnings211 =
-        Seq("-Ywarn-numeric-widen") // In 2.10 this produces a some strange spurious error
-
-      val warnings212 = Seq.empty[String]
-
-      val removed213 = Set(
-        "-Xlint",
-        "-Ywarn-dead-code", // superseded by "-Wdead-code"
-        "-Ywarn-numeric-widen" // superseded by "-Wnumeric-widen"
-      )
-      val warnings213 = Seq(
-        "-Wdead-code",
-        "-Wextra-implicit",
-        "-Wnumeric-widen",
-        "-Wunused", // all choices are enabled by default
-        "-Wvalue-discard",
-        "-Xlint:deprecation"
-      )
-
-      val warningsDotty = Seq.empty
-
-      scalaVersion.value match {
-        case V(V(3, _, _, _)) =>
-          warningsDotty
-
-        case V(V(2, minor, _, _)) if minor >= 13 =>
-          (warnings211 ++ warnings212 ++ warnings213 ++ warningsNsc).filterNot(removed213)
-
-        case V(V(2, minor, _, _)) if minor >= 12 =>
-          warnings211 ++ warnings212 ++ warningsNsc
-
-        case V(V(2, minor, _, _)) if minor >= 11 =>
-          warnings211 ++ warningsNsc
-
-        case _ => Seq.empty
-      }
-    },
-    scalacOptions ++= {
-      scalaVersion.value match {
-        case V(V(2, 12, _, _)) =>
-          Seq("-Ypartial-unification")
-
-        case V(V(2, 11, Some(build), _)) if build >= 11 =>
-          Seq("-Ypartial-unification")
-
-        case _ =>
-          Seq.empty
-      }
-    },
-    scalacOptions ++= {
-      val numCPUs = java.lang.Runtime.getRuntime.availableProcessors()
-      val settings = Seq(s"-Ybackend-parallelism", scala.math.min(16, numCPUs).toString)
-
-      scalaVersion.value match {
-        case V(V(2, 12, Some(build), _)) if build >= 5 =>
-          settings
-
-        case V(V(2, 13, _, _)) =>
-          settings
-
-        case _ =>
-          Seq.empty
-      }
-    },
     scalacOptions ++= {
       if (tlIsScala3.value && crossScalaVersions.value.forall(_.startsWith("3.")))
         Seq("-Ykind-projector:underscores")
@@ -157,19 +75,6 @@ object TypelevelSettingsPlugin extends AutoPlugin {
       else
         Seq("-Yrangepos")
     },
-    Compile / console / scalacOptions --= Seq(
-      "-Xlint",
-      "-Ywarn-unused-import",
-      "-Wextra-implicit",
-      "-Wunused:implicits",
-      "-Wunused:explicits",
-      "-Wunused:imports",
-      "-Wunused:locals",
-      "-Wunused:params",
-      "-Wunused:patvars",
-      "-Wunused:privates"
-    ),
-    Test / console / scalacOptions := (Compile / console / scalacOptions).value,
     Compile / doc / scalacOptions ++= {
       Seq("-sourcepath", (LocalRootProject / baseDirectory).value.getAbsolutePath)
     },
