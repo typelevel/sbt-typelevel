@@ -115,9 +115,10 @@ object TypelevelSettingsPlugin extends AutoPlugin {
         "-Wunused", // all choices are enabled by default
         "-Wvalue-discard",
         // Tune '-Xlint':
-        // - remove 'unused' because it is configured by '-Wunused'
         // - remove 'implicit-recursion' due to backward incompatibility with 2.12
-        "-Xlint:_,-unused,-implicit-recursion"
+        // - remove 'recurse-with-default' due to backward incompatibility with 2.12
+        // - remove 'unused' because it is configured by '-Wunused'
+        "-Xlint:_,-implicit-recursion,-recurse-with-default,-unused"
       )
 
       val warningsDotty = Seq.empty
