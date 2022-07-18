@@ -73,6 +73,7 @@ object TypelevelGitHubPlugin extends AutoPlugin {
       val tagOrHash =
         GitHelper.getTagOrHash(git.gitCurrentTags.value, git.gitHeadCommit.value)
       val userRepo = gitHubUserRepo.value
+      val infoOpt = scmInfo.value
 
       if (tlIsScala3.value)
         tagOrHash.toSeq flatMap { vh =>
@@ -80,7 +81,13 @@ object TypelevelGitHubPlugin extends AutoPlugin {
             case (user, repo) => Seq(s"-source-links:github://${user}/${repo}", "-revision", vh)
           }
         }
-      else Nil // TODO move from settings plugin
+      else
+        tagOrHash.toSeq flatMap { vh =>
+          infoOpt.toSeq flatMap { info =>
+            val path = s"${info.browseUrl}/blob/${vh}€{FILE_PATH}.scala"
+            Seq("-doc-source-url", path)
+          }
+        }
     }
   )
 
