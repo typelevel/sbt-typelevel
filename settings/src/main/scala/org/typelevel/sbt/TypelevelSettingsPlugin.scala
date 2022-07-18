@@ -93,11 +93,17 @@ object TypelevelSettingsPlugin extends AutoPlugin {
         "-Xlint"
       )
       val warnings212 = Seq(
-        "-Xlint:_,-unused", // "unused" provided by '-Ywarn-unused'
-        "-Ywarn-unused:_,-nowarn,-privates" // '-nowarn' because 2.13 can detect more unused cases than 2.12
+        // Tune '-Xlint':
+        // - remove 'unused' because it is configured by '-Ywarn-unused'
+        "-Xlint:_,-unused",
+        // Tune '-Ywarn-unused':
+        // - remove 'nowarn' because 2.13 can detect more unused cases than 2.12
+        // - remove 'privates' because 2.12 can incorrectly detect some private objects as unused
+        "-Ywarn-unused:_,-nowarn,-privates"
       )
 
       val removed213 = Set(
+        "-Xlint:_,-unused", // reconfigured for 2.13
         "-Ywarn-unused:_,-nowarn,-privates", // mostly superseded by "-Wunused"
         "-Ywarn-dead-code", // superseded by "-Wdead-code"
         "-Ywarn-numeric-widen" // superseded by "-Wnumeric-widen"
@@ -107,7 +113,11 @@ object TypelevelSettingsPlugin extends AutoPlugin {
         "-Wextra-implicit",
         "-Wnumeric-widen",
         "-Wunused", // all choices are enabled by default
-        "-Wvalue-discard"
+        "-Wvalue-discard",
+        // Tune '-Xlint':
+        // - remove 'unused' because it is configured by '-Wunused'
+        // - remove 'implicit-recursion' due to backward incompatibility with 2.12
+        "-Xlint:_,-unused,-implicit-recursion"
       )
 
       val warningsDotty = Seq.empty
