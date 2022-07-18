@@ -80,15 +80,31 @@ object TypelevelSettingsPlugin extends AutoPlugin {
       }
     },
     scalacOptions ++= {
-      val warningsNsc = Seq("-Xlint", "-Ywarn-dead-code")
+      val warningsNsc = Seq(
+        "-Xlint",
+        "-Ywarn-dead-code"
+      )
 
-      val warnings211 =
-        Seq("-Ywarn-numeric-widen") // In 2.10 this produces a some strange spurious error
+      val warnings211 = Seq(
+        "-Ywarn-numeric-widen" // In 2.10 this produces a some strange spurious error
+      )
 
-      val warnings212 = Seq.empty[String]
+      val removed212 = Set(
+        "-Xlint"
+      )
+      val warnings212 = Seq(
+        // Tune '-Xlint':
+        // - remove 'unused' because it is configured by '-Ywarn-unused'
+        "-Xlint:_,-unused",
+        // Tune '-Ywarn-unused':
+        // - remove 'nowarn' because 2.13 can detect more unused cases than 2.12
+        // - remove 'privates' because 2.12 can incorrectly detect some private objects as unused
+        "-Ywarn-unused:_,-nowarn,-privates"
+      )
 
       val removed213 = Set(
-        "-Xlint",
+        "-Xlint:_,-unused", // reconfigured for 2.13
+        "-Ywarn-unused:_,-nowarn,-privates", // mostly superseded by "-Wunused"
         "-Ywarn-dead-code", // superseded by "-Wdead-code"
         "-Ywarn-numeric-widen" // superseded by "-Wnumeric-widen"
       )
@@ -98,7 +114,11 @@ object TypelevelSettingsPlugin extends AutoPlugin {
         "-Wnumeric-widen",
         "-Wunused", // all choices are enabled by default
         "-Wvalue-discard",
-        "-Xlint:deprecation"
+        // Tune '-Xlint':
+        // - remove 'implicit-recursion' due to backward incompatibility with 2.12
+        // - remove 'recurse-with-default' due to backward incompatibility with 2.12
+        // - remove 'unused' because it is configured by '-Wunused'
+        "-Xlint:_,-implicit-recursion,-recurse-with-default,-unused"
       )
 
       val warningsDotty = Seq.empty
@@ -108,10 +128,11 @@ object TypelevelSettingsPlugin extends AutoPlugin {
           warningsDotty
 
         case V(V(2, minor, _, _)) if minor >= 13 =>
-          (warnings211 ++ warnings212 ++ warnings213 ++ warningsNsc).filterNot(removed213)
+          (warnings211 ++ warnings212 ++ warnings213 ++ warningsNsc)
+            .filterNot(removed212 ++ removed213)
 
         case V(V(2, minor, _, _)) if minor >= 12 =>
-          warnings211 ++ warnings212 ++ warningsNsc
+          (warnings211 ++ warnings212 ++ warningsNsc).filterNot(removed212)
 
         case V(V(2, minor, _, _)) if minor >= 11 =>
           warnings211 ++ warningsNsc
