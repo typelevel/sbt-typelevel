@@ -72,17 +72,11 @@ object TypelevelSettingsPlugin extends AutoPlugin {
       "-feature",
       "-unchecked"),
     scalacOptions ++= {
-      scalaVersion.value match {
-        case V(V(2, minor, _, _)) if minor < 13 =>
-          Seq("-Yno-adapted-args", "-Ywarn-unused-import")
-        case _ =>
-          Seq.empty
-      }
-    },
-    scalacOptions ++= {
       val warningsNsc = Seq(
         "-Xlint",
-        "-Ywarn-dead-code"
+        "-Yno-adapted-args", // similar to '-Xlint:adapted-args' but fails compilation instead of just emitting a warning
+        "-Ywarn-dead-code",
+        "-Ywarn-unused-import"
       )
 
       val warnings211 = Seq(
@@ -90,7 +84,9 @@ object TypelevelSettingsPlugin extends AutoPlugin {
       )
 
       val removed212 = Set(
-        "-Xlint"
+        "-Xlint",
+        "-Yno-adapted-args", // mostly superseded by '-Xlint:adapted-args'
+        "-Ywarn-unused-import" // superseded by '-Ywarn-unused:imports'
       )
       val warnings212 = Seq(
         // Tune '-Xlint':
@@ -181,18 +177,15 @@ object TypelevelSettingsPlugin extends AutoPlugin {
       else
         Seq("-Yrangepos")
     },
-    Compile / console / scalacOptions --= Seq(
-      "-Xlint",
-      "-Ywarn-unused-import",
-      "-Wextra-implicit",
-      "-Wunused:implicits",
-      "-Wunused:explicits",
-      "-Wunused:imports",
-      "-Wunused:locals",
-      "-Wunused:params",
-      "-Wunused:patvars",
-      "-Wunused:privates"
-    ),
+    Compile / console / scalacOptions := scalacOptions.value.filterNot { opt =>
+      opt.startsWith("-Xlint") ||
+      PartialFunction.cond(scalaVersion.value) {
+        case V(V(2, minor, _, _)) if minor >= 13 =>
+          opt.startsWith("-Wunused") || opt == "-Wextra-implicit"
+        case V(V(2, minor, _, _)) if minor >= 12 =>
+          opt.startsWith("-Ywarn-unused")
+      }
+    },
     Test / console / scalacOptions := (Compile / console / scalacOptions).value,
     Compile / doc / scalacOptions ++= {
       Seq("-sourcepath", (LocalRootProject / baseDirectory).value.getAbsolutePath)
