@@ -29,6 +29,8 @@ ThisBuild / scalafixDependencies ++= Seq(
   "com.github.liancheng" %% "organize-imports" % "0.6.0"
 )
 
+val MunitVersion = "0.7.29"
+
 lazy val `sbt-typelevel` = tlCrossRootProject.aggregate(
   kernel,
   noPublish,
@@ -55,7 +57,7 @@ lazy val kernel = project
   .enablePlugins(SbtPlugin)
   .settings(
     name := "sbt-typelevel-kernel",
-    libraryDependencies += "org.scalameta" %% "munit" % "0.7.29" % Test
+    libraryDependencies += "org.scalameta" %% "munit" % MunitVersion % Test
   )
 
 lazy val noPublish = project
