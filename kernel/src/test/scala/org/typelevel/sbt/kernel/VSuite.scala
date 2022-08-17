@@ -20,6 +20,32 @@ import munit.FunSuite
 
 class VSuite extends FunSuite {
 
+  test("V.apply constructs V") {
+    assertEquals(V("0.0"), Some(V(0, 0, None, None)))
+    assertEquals(V("0.0-M1"), Some(V(0, 0, None, Some("M1"))))
+    assertEquals(V("0.0.0-M1"), Some(V(0, 0, Some(0), Some("M1"))))
+    assertEquals(V("10.0"), Some(V(10, 0, None, None)))
+    assertEquals(V("10.100"), Some(V(10, 100, None, None)))
+    assertEquals(V("10.100.1000"), Some(V(10, 100, Some(1000), None)))
+  }
+
+  test("x.y.z-M1 is a prerelease") {
+    assert(V(0, 0, None, Some("M1")).isPrerelease)
+    assert(V(0, 0, Some(1), Some("M1")).isPrerelease)
+    assert(V(0, 1, None, Some("M1")).isPrerelease)
+    assert(V(0, 1, Some(1), Some("M1")).isPrerelease)
+    assert(V(1, 0, None, Some("M1")).isPrerelease)
+    assert(V(1, 0, Some(1), Some("M1")).isPrerelease)
+    assert(V(1, 1, None, Some("M1")).isPrerelease)
+    assert(V(1, 1, Some(1), Some("M1")).isPrerelease)
+  }
+
+  test("x.y.2 is the same series as x.y.1") {
+    assert(V(0, 0, Some(1), None).isSameSeries(V(0, 0, Some(2), None)))
+    assert(V(0, 1, Some(1), None).isSameSeries(V(0, 1, Some(2), None)))
+    assert(V(1, 1, Some(1), None).isSameSeries(V(1, 1, Some(2), None)))
+  }
+
   test("1.1 needs bincompat with 1.0") {
     val currentV = V(1, 1, None, None)
     val prevV = V(1, 0, None, None)
