@@ -74,6 +74,35 @@ class VSuite extends FunSuite {
     assertEquals(currentV.mustBeBinCompatWith(prevV), true)
   }
 
+  test("all versions that are not prereleases need bincompat with self") {
+    val vs = List(
+      V(0, 0, None, None),
+      V(0, 0, Some(1), None),
+      V(0, 5, None, None),
+      V(0, 5, Some(1), None),
+      V(1, 0, None, None),
+      V(1, 0, Some(1), None),
+      V(1, 5, None, None),
+      V(1, 5, Some(1), None)
+    )
+    vs.foreach(v => assert(v.mustBeBinCompatWith(v), s"$v did not need bincompat with itself"))
+  }
+
+  // We current don't compare prereleases correctly
+  test("all versions that are prerelease need bincompat with self".fail) {
+    val vs = List(
+      V(0, 0, None, Some("M1")),
+      V(0, 0, Some(1), Some("M1")),
+      V(0, 5, None, Some("M1")),
+      V(0, 5, Some(1), Some("M1")),
+      V(1, 0, None, Some("M1")),
+      V(1, 0, Some(1), Some("M1")),
+      V(1, 5, None, Some("M1")),
+      V(1, 5, Some(1), Some("M1"))
+    )
+    vs.foreach(v => assert(v.mustBeBinCompatWith(v), s"$v did not need bincompat with itself"))
+  }
+
   test("x.y needs bincompat with self") {
     val v0 = V(0, 5, None, None)
     assertEquals(v0.mustBeBinCompatWith(v0), true)
@@ -97,6 +126,24 @@ class VSuite extends FunSuite {
     val patch1 = V(1, 5, Some(1), None)
     val nopatch1 = V(1, 5, None, None)
     assertEquals(patch1 < nopatch1, true)
+  }
+
+  test("x.y.1 < x.y.2") {
+    val patch0 = V(0, 5, Some(1), None)
+    val p1patch0 = V(0, 5, Some(2), None)
+    assertEquals(patch0 < p1patch0, true)
+    val patch1 = V(1, 5, Some(1), None)
+    val p1patch1 = V(1, 5, Some(2), None)
+    assertEquals(patch1 < p1patch1, true)
+  }
+
+  test("x.y.1-M1 < x.y.1") {
+    val pre0 = V(0, 5, Some(1), Some("M1"))
+    val nopre0 = V(0, 5, Some(2), None)
+    assertEquals(pre0 < nopre0, true)
+    val pre1 = V(1, 5, Some(1), Some("M1"))
+    val nopre1 = V(1, 5, Some(2), None)
+    assertEquals(pre1 < nopre1, true)
   }
 
 }
