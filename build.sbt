@@ -54,7 +54,8 @@ lazy val kernel = project
   .in(file("kernel"))
   .enablePlugins(SbtPlugin)
   .settings(
-    name := "sbt-typelevel-kernel"
+    name := "sbt-typelevel-kernel",
+    libraryDependencies += "org.scalameta" %% "munit" % "0.7.29" % Test
   )
 
 lazy val noPublish = project
