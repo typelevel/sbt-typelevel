@@ -34,7 +34,8 @@ private[sbt] final case class V(
     this.major == that.major && this.minor == that.minor
 
   def mustBeBinCompatWith(that: V): Boolean =
-    this >= that && !that.isPrerelease && this.major == that.major && (major > 0 || this.minor == that.minor)
+    this >= that && !that.isPrerelease && this.major == that.major &&
+      (major > 0 || (this.minor == that.minor && minor > 0))
 
   def compare(that: V): Int = {
     val x = this.major.compare(that.major)
