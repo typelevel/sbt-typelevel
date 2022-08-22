@@ -94,22 +94,28 @@ class VSuite extends FunSuite {
     assertEquals(currentV.mustBeBinCompatWith(prevV), true)
   }
 
-  test("0.0.2 needs bincompat with 0.0.1") {
+  test("0.0.2 does not need bincompat with 0.0.1") {
     val currentV = V(0, 0, Some(1), None)
     val prevV = V(0, 0, Some(0), None)
-    assertEquals(currentV.mustBeBinCompatWith(prevV), true)
+    assertEquals(currentV.mustBeBinCompatWith(prevV), false)
   }
 
-  test("all versions that are not prereleases need bincompat with self") {
+  test("all versions > 0.0 that are not prereleases need bincompat with self") {
     val vs = List(
-      V(0, 0, None, None),
-      V(0, 0, Some(1), None),
       V(0, 5, None, None),
       V(0, 5, Some(1), None),
       V(1, 0, None, None),
       V(1, 0, Some(1), None),
       V(1, 5, None, None),
       V(1, 5, Some(1), None)
+    )
+    vs.foreach(v => assert(v.mustBeBinCompatWith(v), s"$v did not need bincompat with itself"))
+  }
+
+  test("all versions < 0.0 need bincompat with self".fail) {
+    val vs = List(
+      V(0, 0, None, None),
+      V(0, 0, Some(1), None)
     )
     vs.foreach(v => assert(v.mustBeBinCompatWith(v), s"$v did not need bincompat with itself"))
   }
