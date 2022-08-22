@@ -33,7 +33,8 @@ object JavaSpec {
 
   @deprecated(
     "Use single-arg overload to get the latest GraalVM for a Java version. If you need a specific GraalVM then use JavaSpec(Distribution.GraalVM(graal), version)",
-    "0.4.6")
+    "0.4.6"
+  )
   def graalvm(graal: String, version: String): JavaSpec =
     JavaSpec(Distribution.GraalVM(graal), version)
 
