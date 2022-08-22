@@ -111,10 +111,4 @@ object TypelevelPlugin extends AutoPlugin {
 
   // override for bincompat
   override def projectSettings = immutable.Seq.empty
-
-  private val primaryJavaCond = Def.setting {
-    val java = githubWorkflowJavaVersions.value.head
-    s"matrix.java == '${java.render}'"
-  }
-
 }

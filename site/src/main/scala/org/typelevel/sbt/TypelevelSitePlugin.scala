@@ -138,8 +138,12 @@ object TypelevelSitePlugin extends AutoPlugin {
         val p = tlSiteApiPackage.value.fold("")(_.replace('.', '/') + "/index.html")
         url(s"https://www.javadoc.io/doc/$o/$n/$v/$p")
       }
+      lazy val fallbackUrl = for {
+        moduleId <- (ThisProject / tlSiteApiModule).value
+        apiURL <- moduleId.extraAttributes.get("e:info.apiURL")
+      } yield url(apiURL)
 
-      tlSiteApiUrl.value.orElse(javadocioUrl)
+      tlSiteApiUrl.value.orElse(javadocioUrl).orElse(fallbackUrl)
     },
     tlSiteHeliumConfig := {
       Helium
