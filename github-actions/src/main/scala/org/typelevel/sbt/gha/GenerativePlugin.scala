@@ -713,6 +713,7 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
             githubWorkflowPublish.value.toList :::
             githubWorkflowPublishPostamble.value.toList,
           cond = Some(publicationCond.value),
+          oses = githubWorkflowOSes.value.toList.take(1),
           scalas = List(scalaVersion.value),
           javas = List(githubWorkflowJavaVersions.value.head),
           needs = List("build")
