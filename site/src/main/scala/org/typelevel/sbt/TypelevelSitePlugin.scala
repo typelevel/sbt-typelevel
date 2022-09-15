@@ -42,7 +42,6 @@ import GenerativePlugin.autoImport.*
 import TypelevelKernelPlugin.*
 import TypelevelKernelPlugin.autoImport.*
 import cats.data.NonEmptyList
-import cats.syntax.all.*
 
 object TypelevelSitePlugin extends AutoPlugin {
 
@@ -120,8 +119,6 @@ object TypelevelSitePlugin extends AutoPlugin {
         tlSiteApiUrl.value.map("API_URL" -> _.toString).toMap
     },
     tlSiteHeliumExtensions := TypelevelHeliumExtensions(
-      licenses.value.headOption,
-      tlSiteRelatedProjects.value,
       tlIsScala3.value,
       tlSiteApiUrl.value
     ),

@@ -18,12 +18,10 @@ package org.typelevel.sbt.site
 
 import cats.effect.{Async, Resource}
 import laika.ast.Path
-import laika.config.Config
 import laika.io.model.InputTree
 import laika.markdown.github.GitHubFlavor
 import laika.parse.code.SyntaxHighlighting
 import laika.parse.code.languages.DottySyntax
-import laika.rewrite.DefaultTemplatePath
 import laika.theme.Theme
 import laika.theme.ThemeBuilder
 import laika.theme.ThemeProvider
@@ -32,30 +30,32 @@ import java.net.URL
 
 object TypelevelHeliumExtensions {
 
-  @deprecated("Use overload with API url and scala3 parameter", "0.4.7")
+  @deprecated("Use overload with scala3 and apiURL parameter", "0.4.7")
   def apply(license: Option[(String, URL)], related: Seq[(String, URL)]): ThemeProvider =
     apply(license, related, false)
 
-  @deprecated("Use overload with API url and scala3 parameter", "0.4.13")
+  @deprecated("Use overload with scala3 and apiURL parameter", "0.4.13")
   def apply(
       license: Option[(String, URL)],
       related: Seq[(String, URL)],
       scala3: Boolean): ThemeProvider =
     apply(license, related, false, None)
 
+  @deprecated("Use overload with scala3 and apiURL parameter", "0.5.0")
+  def apply(
+      license: Option[(String, URL)],
+      related: Seq[(String, URL)],
+      scala3: Boolean,
+      apiUrl: Option[URL]
+  ): ThemeProvider = apply(scala3, apiUrl)
+
   /**
-   * @param license
-   *   name and [[java.net.URL]] of project license
-   * @param related
-   *   name and [[java.net.URL]] of related projects
    * @param scala3
    *   whether to use Scala 3 syntax highlighting
    * @param apiUrl
    *   url to API docs
    */
   def apply(
-      license: Option[(String, URL)],
-      related: Seq[(String, URL)],
       scala3: Boolean,
       apiUrl: Option[URL]
   ): ThemeProvider = new ThemeProvider {
@@ -63,10 +63,6 @@ object TypelevelHeliumExtensions {
       ThemeBuilder[F]("Typelevel Helium Extensions")
         .addInputs(
           InputTree[F]
-            .addInputStream(
-              F.blocking(getClass.getResourceAsStream("helium/default.template.html")),
-              DefaultTemplatePath.forHTML
-            )
             .addInputStream(
               F.blocking(getClass.getResourceAsStream("helium/site/styles.css")),
               Path.Root / "site" / "styles.css"
@@ -82,30 +78,8 @@ object TypelevelHeliumExtensions {
           if (scala3) SyntaxHighlighting.withSyntaxBinding("scala", DottySyntax)
           else SyntaxHighlighting
         )
-        .addBaseConfig(licenseConfig(license).withFallback(relatedConfig(related)))
         .build
   }
-
-  private def licenseConfig(license: Option[(String, URL)]) =
-    license.fold(Config.empty) {
-      case (name, url) =>
-        Config
-          .empty
-          .withValue("typelevel.site.license.name", name)
-          .withValue("typelevel.site.license.url", url.toString)
-          .build
-    }
-
-  private def relatedConfig(related: Seq[(String, URL)]) =
-    Config
-      .empty
-      .withValue(
-        "typelevel.site.related",
-        related.map {
-          case (name, url) =>
-            Map("name" -> name, "url" -> url.toString)
-        })
-      .build
 
   private def htmlForwarder(to: URL) =
     s"""|<!DOCTYPE html>
