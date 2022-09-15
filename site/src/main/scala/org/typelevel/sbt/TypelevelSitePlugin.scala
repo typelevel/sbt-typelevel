@@ -68,8 +68,6 @@ object TypelevelSitePlugin extends AutoPlugin {
       "Start a live-reload preview server (combines mdoc --watch with laikaPreview)")
 
     val TypelevelProject = site.TypelevelProject
-    implicit def tlLaikaThemeProviderOps(provider: ThemeProvider): LaikaThemeProviderOps =
-      new site.LaikaThemeProviderOps(provider)
   }
 
   import autoImport._
@@ -106,7 +104,7 @@ object TypelevelSitePlugin extends AutoPlugin {
       .value: @nowarn("cat=other-pure-statement"),
     tlSitePreview := previewTask.value,
     Laika / sourceDirectories := Seq(mdocOut.value),
-    laikaTheme := tlSiteHeliumConfig.value.build.extend(tlSiteHeliumExtensions.value),
+    laikaTheme := tlSiteHeliumConfig.value.build.extendWith(tlSiteHeliumExtensions.value),
     mdocVariables := {
       mdocVariables.value ++
         Map(
