@@ -16,28 +16,33 @@
 
 package org.typelevel.sbt
 
-import laika.ast.LengthUnit._
-import laika.ast._
+import laika.ast.LengthUnit.*
+import laika.ast.*
 import laika.helium.Helium
-import laika.helium.config.Favicon
-import laika.helium.config.HeliumIcon
-import laika.helium.config.IconLink
-import laika.helium.config.ImageLink
+import laika.helium.config.{
+  Favicon,
+  HeliumIcon,
+  IconLink,
+  ImageLink,
+  TextLink,
+  ThemeNavigationSection
+}
 import laika.sbt.{LaikaPlugin, Tasks}
 import laika.theme.ThemeProvider
 import mdoc.MdocPlugin
-import org.typelevel.sbt.site._
-import sbt._
+import org.typelevel.sbt.site.*
+import sbt.*
 
 import scala.annotation.nowarn
-
-import Keys._
-import MdocPlugin.autoImport._
-import LaikaPlugin.autoImport._
+import Keys.*
+import MdocPlugin.autoImport.*
+import LaikaPlugin.autoImport.*
 import gha.GenerativePlugin
-import GenerativePlugin.autoImport._
-import TypelevelKernelPlugin._
-import TypelevelKernelPlugin.autoImport._
+import GenerativePlugin.autoImport.*
+import TypelevelKernelPlugin.*
+import TypelevelKernelPlugin.autoImport.*
+import cats.data.NonEmptyList
+import cats.syntax.all.*
 
 object TypelevelSitePlugin extends AutoPlugin {
 
@@ -153,6 +158,12 @@ object TypelevelSitePlugin extends AutoPlugin {
           s"""$title is a <a href="https://typelevel.org/">Typelevel</a> project$licensePhrase."""
         ))
       }
+      val relatedProjects =
+        NonEmptyList.fromList(tlSiteRelatedProjects.value.toList).toList.map { projects =>
+          ThemeNavigationSection(
+            "Related Projects",
+            projects.map { case (name, url) => TextLink.external(url.toString, name) })
+        }
       Helium
         .defaults
         .site
@@ -180,6 +191,8 @@ object TypelevelSitePlugin extends AutoPlugin {
         )
         .site
         .footer(footerSpans: _*)
+        .site
+        .mainNavigation(appendLinks = relatedProjects)
         .site
         .topNavigationBar(
           homeLink = ImageLink.external(
