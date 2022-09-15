@@ -197,16 +197,11 @@ object TypelevelSitePlugin extends AutoPlugin {
             Image.external(s"https://typelevel.org/img/logo.svg")
           ),
           navLinks = tlSiteApiUrl.value.toList.map { url =>
-            IconLink.external(
-              url.toString,
-              HeliumIcon.api,
-              options = Styles("svg-link")
-            )
+            IconLink.external(url.toString, HeliumIcon.api)
           } ++ List(
             IconLink.external(
               scmInfo.value.fold("https://github.com/typelevel")(_.browseUrl.toString),
-              HeliumIcon.github,
-              options = Styles("svg-link")),
+              HeliumIcon.github),
             IconLink.external("https://discord.gg/XF3CXcMzqD", HeliumIcon.chat),
             IconLink.external("https://twitter.com/typelevel", HeliumIcon.twitter)
           )
