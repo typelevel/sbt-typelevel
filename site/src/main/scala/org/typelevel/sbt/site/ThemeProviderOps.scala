@@ -16,7 +16,7 @@
 
 package org.typelevel.sbt.site
 
-import cats.effect.Sync
+import cats.effect.Async
 import laika.bundle.ExtensionBundle
 import laika.factory.Format
 import laika.io.model.InputTree
@@ -26,7 +26,7 @@ import laika.theme.ThemeProvider
 final class LaikaThemeProviderOps private[sbt] (provider: ThemeProvider) {
 
   def extend(extensions: ThemeProvider): ThemeProvider = new ThemeProvider {
-    def build[F[_]: Sync] = for {
+    def build[F[_]: Async] = for {
       base <- provider.build
       ext <- extensions.build
     } yield {

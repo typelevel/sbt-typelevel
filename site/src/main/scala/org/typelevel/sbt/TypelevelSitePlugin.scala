@@ -23,6 +23,7 @@ import laika.helium.config.Favicon
 import laika.helium.config.HeliumIcon
 import laika.helium.config.IconLink
 import laika.helium.config.ImageLink
+import laika.io.model.FilePath
 import laika.sbt.LaikaPlugin
 import laika.theme.ThemeProvider
 import mdoc.MdocPlugin
@@ -276,14 +277,15 @@ object TypelevelSitePlugin extends AutoPlugin {
 
       val applyFlags = applyIf(laikaIncludeEPUB.value, _.withEPUBDownloads)
         .andThen(applyIf(laikaIncludePDF.value, _.withPDFDownloads))
-        .andThen(
-          applyIf(laikaIncludeAPI.value, _.withAPIDirectory(Settings.apiTargetDirectory.value)))
+        .andThen(applyIf(
+          laikaIncludeAPI.value,
+          _.withAPIDirectory(FilePath.fromJavaFile(Settings.apiTargetDirectory.value))))
         .andThen(applyIf(previewConfig.isVerbose, _.verbose))
 
       val config = ServerConfig
         .defaults
         .withArtifactBasename(name.value)
-        // .withHost(previewConfig.host)
+        .withHost(previewConfig.host)
         .withPort(previewConfig.port)
         .withPollInterval(previewConfig.pollInterval)
 
