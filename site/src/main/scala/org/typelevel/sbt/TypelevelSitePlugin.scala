@@ -144,11 +144,20 @@ object TypelevelSitePlugin extends AutoPlugin {
       tlSiteApiUrl.value.orElse(javadocioUrl).orElse(fallbackUrl)
     },
     tlSiteHeliumConfig := {
+      val title = gitHubUserRepo.value.map(_._2)
+      val footerSpans = title.fold(Seq[Span]()) { title =>
+        val licensePhrase = licenses.value.headOption.fold("") {
+          case (url, name) => s""" distributed under the <a href="$url">$name</a> license"""
+        }
+        Seq(TemplateString(
+          s"""$title is a <a href="https://typelevel.org/">Typelevel</a> project$licensePhrase."""
+        ))
+      }
       Helium
         .defaults
         .site
         .metadata(
-          title = gitHubUserRepo.value.map(_._2),
+          title = title,
           authors = developers.value.map(_.name),
           language = Some("en"),
           version = Some(version.value.toString)
@@ -169,6 +178,8 @@ object TypelevelSitePlugin extends AutoPlugin {
         .favIcons(
           Favicon.external("https://typelevel.org/img/favicon.png", "32x32", "image/png")
         )
+        .site
+        .footer(footerSpans: _*)
         .site
         .topNavigationBar(
           homeLink = ImageLink.external(
