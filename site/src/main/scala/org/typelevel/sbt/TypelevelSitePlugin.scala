@@ -172,12 +172,7 @@ object TypelevelSitePlugin extends AutoPlugin {
         )
         .site
         .layout(
-          contentWidth = px(860),
-          navigationWidth = px(275),
-          topBarHeight = px(50),
-          defaultBlockSpacing = px(10),
-          defaultLineHeight = 1.5,
-          anchorPlacement = laika.helium.config.AnchorPlacement.Right
+          topBarHeight = px(50)
         )
         .site
         .darkMode
