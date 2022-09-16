@@ -62,16 +62,9 @@ object TypelevelHeliumExtensions {
     def build[F[_]](implicit F: Async[F]): Resource[F, Theme[F]] =
       ThemeBuilder[F]("Typelevel Helium Extensions")
         .addInputs(
-          InputTree[F]
-            .addInputStream(
-              F.blocking(getClass.getResourceAsStream("helium/site/styles.css")),
-              Path.Root / "site" / "styles.css"
-            )
-            .merge(
-              apiUrl.fold(InputTree[F]) { url =>
-                InputTree[F].addString(htmlForwarder(url), Path.Root / "api" / "index.html")
-              }
-            )
+          apiUrl.fold(InputTree[F]) { url =>
+            InputTree[F].addString(htmlForwarder(url), Path.Root / "api" / "index.html")
+          }
         )
         .addExtensions(
           GitHubFlavor,
