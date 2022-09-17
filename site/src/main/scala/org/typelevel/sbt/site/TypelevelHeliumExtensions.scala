@@ -16,7 +16,8 @@
 
 package org.typelevel.sbt.site
 
-import cats.effect.{Async, Resource}
+import cats.effect.Async
+import cats.effect.kernel.Resource
 import laika.ast.Path
 import laika.io.model.InputTree
 import laika.markdown.github.GitHubFlavor
@@ -28,6 +29,7 @@ import laika.theme.ThemeProvider
 
 import java.net.URL
 
+@deprecated("Use GenericSiteSettings.extensions", "0.5.0")
 object TypelevelHeliumExtensions {
 
   @deprecated("Use overload with scala3 and apiURL parameter", "0.4.7")
@@ -60,7 +62,7 @@ object TypelevelHeliumExtensions {
       apiUrl: Option[URL]
   ): ThemeProvider = new ThemeProvider {
     def build[F[_]](implicit F: Async[F]): Resource[F, Theme[F]] =
-      ThemeBuilder[F]("Typelevel Helium Extensions")
+      ThemeBuilder[F]("sbt-typelevel Helium Extensions")
         .addInputs(
           apiUrl.fold(InputTree[F]) { url =>
             InputTree[F].addString(htmlForwarder(url), Path.Root / "api" / "index.html")

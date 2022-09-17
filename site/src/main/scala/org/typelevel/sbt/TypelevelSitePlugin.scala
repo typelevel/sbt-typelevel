@@ -16,46 +16,45 @@
 
 package org.typelevel.sbt
 
-import laika.ast.LengthUnit.*
-import laika.ast.*
 import laika.helium.Helium
-import laika.helium.config.{
-  Favicon,
-  HeliumIcon,
-  IconLink,
-  ImageLink,
-  TextLink,
-  ThemeNavigationSection
-}
-import laika.sbt.{LaikaPlugin, Tasks}
+import laika.sbt.LaikaPlugin
+import laika.sbt.LaikaPlugin.autoImport.*
+import laika.sbt.Tasks
 import laika.theme.ThemeProvider
 import mdoc.MdocPlugin
+import mdoc.MdocPlugin.autoImport.*
+import org.typelevel.sbt.TypelevelKernelPlugin.*
+import org.typelevel.sbt.gha.GenerativePlugin
+import org.typelevel.sbt.gha.GenerativePlugin.autoImport.*
 import org.typelevel.sbt.site.*
+import sbt.Keys.*
 import sbt.*
 
 import scala.annotation.nowarn
-import Keys.*
-import MdocPlugin.autoImport.*
-import LaikaPlugin.autoImport.*
-import gha.GenerativePlugin
-import GenerativePlugin.autoImport.*
-import TypelevelKernelPlugin.*
-import TypelevelKernelPlugin.autoImport.*
-import cats.data.NonEmptyList
 
 object TypelevelSitePlugin extends AutoPlugin {
 
   object autoImport {
+
+    @deprecated("Use tlSiteHelium", "0.5.0")
     lazy val tlSiteHeliumConfig = settingKey[Helium]("The Typelevel Helium configuration")
+    @deprecated("Use tlSiteHelium", "0.5.0")
     lazy val tlSiteHeliumExtensions =
       settingKey[ThemeProvider]("The Typelevel Helium extensions")
+    @deprecated("Use .site.mainNavigation(appendLinks = ...) in tlSiteHelium", "0.5.0")
+    lazy val tlSiteRelatedProjects =
+      settingKey[Seq[(String, URL)]]("A list of related projects (default: empty)")
+
+    lazy val tlSiteHelium = settingKey[Helium]("The Helium theme configuration and extensions")
+    lazy val tlSiteIsTypelevelProject =
+      settingKey[Boolean](
+        "Indicates whether the generated site should be pre-populated with UI elements specific to Typelevel projects (default: false)")
+
     lazy val tlSiteApiUrl = settingKey[Option[URL]]("URL to the API docs")
     lazy val tlSiteApiModule =
       settingKey[Option[ModuleID]]("The module that publishes API docs")
     lazy val tlSiteApiPackage = settingKey[Option[String]](
       "The top-level package for your API docs (e.g. org.typlevel.sbt)")
-    lazy val tlSiteRelatedProjects =
-      settingKey[Seq[(String, URL)]]("A list of related projects (default: cats)")
 
     lazy val tlSiteKeepFiles =
       settingKey[Boolean]("Whether to keep existing files when deploying site (default: true)")
@@ -74,8 +73,8 @@ object TypelevelSitePlugin extends AutoPlugin {
     val TypelevelProject = site.TypelevelProject
   }
 
-  import autoImport._
-  import TypelevelGitHubPlugin._
+  import autoImport.*
+  import TypelevelGitHubPlugin.*
 
   override def requires =
     MdocPlugin && LaikaPlugin && TypelevelGitHubPlugin && GenerativePlugin && NoPublishPlugin
@@ -84,12 +83,13 @@ object TypelevelSitePlugin extends AutoPlugin {
     tlSiteApiModule := None
   )
 
+  @nowarn("cat=deprecation")
   override def buildSettings = Seq(
     tlSitePublishBranch := Some("main"),
     tlSitePublishTags := tlSitePublishBranch.value.isEmpty,
     tlSiteApiUrl := None,
     tlSiteApiPackage := None,
-    tlSiteRelatedProjects := Seq(TypelevelProject.Cats),
+    tlSiteRelatedProjects := Nil,
     tlSiteKeepFiles := true,
     homepage := {
       gitHubUserRepo.value.map {
@@ -99,6 +99,7 @@ object TypelevelSitePlugin extends AutoPlugin {
     }
   )
 
+  @nowarn("cat=deprecation")
   override def projectSettings = Seq(
     tlSite := Def
       .sequential(
@@ -108,7 +109,7 @@ object TypelevelSitePlugin extends AutoPlugin {
       .value: @nowarn("cat=other-pure-statement"),
     tlSitePreview := previewTask.value,
     Laika / sourceDirectories := Seq(mdocOut.value),
-    laikaTheme := tlSiteHeliumConfig.value.build.extendWith(tlSiteHeliumExtensions.value),
+    laikaTheme := tlSiteHelium.value.build,
     mdocVariables := {
       mdocVariables.value ++
         Map(
@@ -118,10 +119,13 @@ object TypelevelSitePlugin extends AutoPlugin {
         ) ++
         tlSiteApiUrl.value.map("API_URL" -> _.toString).toMap
     },
-    tlSiteHeliumExtensions := TypelevelHeliumExtensions(
-      tlIsScala3.value,
-      tlSiteApiUrl.value
-    ),
+    tlSiteIsTypelevelProject := false,
+    tlSiteHeliumConfig := TypelevelSiteSettings.defaults.value,
+    tlSiteHeliumExtensions := GenericSiteSettings.themeExtensions.value,
+    tlSiteHelium := {
+      if (tlSiteIsTypelevelProject.value) tlSiteHeliumConfig.value
+      else GenericSiteSettings.defaults.value
+    },
     tlSiteApiUrl := {
       val javadocioUrl = for {
         moduleId <- (ThisProject / tlSiteApiModule).value
@@ -144,63 +148,6 @@ object TypelevelSitePlugin extends AutoPlugin {
       } yield url(apiURL)
 
       tlSiteApiUrl.value.orElse(javadocioUrl).orElse(fallbackUrl)
-    },
-    tlSiteHeliumConfig := {
-      val title = gitHubUserRepo.value.map(_._2)
-      val footerSpans = title.fold(Seq[Span]()) { title =>
-        val licensePhrase = licenses.value.headOption.fold("") {
-          case (url, name) => s""" distributed under the <a href="$url">$name</a> license"""
-        }
-        Seq(TemplateString(
-          s"""$title is a <a href="https://typelevel.org/">Typelevel</a> project$licensePhrase."""
-        ))
-      }
-      val relatedProjects =
-        NonEmptyList.fromList(tlSiteRelatedProjects.value.toList).toList.map { projects =>
-          ThemeNavigationSection(
-            "Related Projects",
-            projects.map { case (name, url) => TextLink.external(url.toString, name) })
-        }
-      Helium
-        .defaults
-        .site
-        .metadata(
-          title = title,
-          authors = developers.value.map(_.name),
-          language = Some("en"),
-          version = Some(version.value.toString)
-        )
-        .site
-        .layout(
-          topBarHeight = px(50)
-        )
-        .site
-        .darkMode
-        .disabled
-        .site
-        .favIcons(
-          Favicon.external("https://typelevel.org/img/favicon.png", "32x32", "image/png")
-        )
-        .site
-        .footer(footerSpans: _*)
-        .site
-        .mainNavigation(appendLinks = relatedProjects)
-        .site
-        .topNavigationBar(
-          homeLink = ImageLink.external(
-            "https://typelevel.org",
-            Image.external(s"https://typelevel.org/img/logo.svg")
-          ),
-          navLinks = tlSiteApiUrl.value.toList.map { url =>
-            IconLink.external(url.toString, HeliumIcon.api)
-          } ++ List(
-            IconLink.external(
-              scmInfo.value.fold("https://github.com/typelevel")(_.browseUrl.toString),
-              HeliumIcon.github),
-            IconLink.external("https://discord.gg/XF3CXcMzqD", HeliumIcon.chat),
-            IconLink.external("https://twitter.com/typelevel", HeliumIcon.twitter)
-          )
-        )
     },
     tlSiteGenerate := List(
       WorkflowStep.Sbt(
@@ -265,7 +212,7 @@ object TypelevelSitePlugin extends AutoPlugin {
 
   private def previewTask = Def
     .taskDyn {
-      import cats.effect.unsafe.implicits._
+      import cats.effect.unsafe.implicits.*
 
       val logger = streams.value.log
       logger.info("Initializing server...")
@@ -276,7 +223,7 @@ object TypelevelSitePlugin extends AutoPlugin {
 
       // watch but no-livereload b/c we don't need an mdoc server
       mdoc.toTask(" --watch --no-livereload").andFinally {
-        logger.info(s"Shutting down preview server.")
+        logger.info(s"Shutting down preview server...")
         cancel.unsafeRunSync()
       }
     }
