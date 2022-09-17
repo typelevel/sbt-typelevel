@@ -1,6 +1,6 @@
 # sbt-typelevel-site
 
-**sbt-typelevel-site** is an optional plugin for generating websites with [mdoc](https://scalameta.org/mdoc/) and [Laika](https://planet42.github.io/Laika/) and deploying to GitHub Pages from CI. You can add it to your build alongside either the  **sbt-typelevel** or **sbt-typelevel-ci-release** plugin.
+**sbt-typelevel-site** is an optional plugin for generating websites with [mdoc](https://scalameta.org/mdoc/) and [Laika](https://planet42.github.io/Laika/) and deploying to GitHub Pages from CI. You can add it to your build alongside either the  **sbt-typelevel** or **sbt-typelevel-ci-release** plugin or also use it stand-alone.
 
 ## Quick start
 

@@ -304,11 +304,14 @@ object TypelevelSettingsPlugin extends AutoPlugin {
 
   private val javaApiMappings = {
     // scaladoc doesn't support this automatically before 2.13
-    val baseUrl = javaMajorVersion match {
-      case v if v < 11 => url(s"https://docs.oracle.com/javase/${v}/docs/api/")
-      case v => url(s"https://docs.oracle.com/en/java/javase/${v}/docs/api/java.base/")
-    }
-    doc / apiMappings ~= { old =>
+    doc / apiMappings := {
+      val old = (doc / apiMappings).value
+
+      val baseUrl = tlJdkRelease.value.getOrElse(javaMajorVersion) match {
+        case v if v < 11 => url(s"https://docs.oracle.com/javase/${v}/docs/api/")
+        case v => url(s"https://docs.oracle.com/en/java/javase/${v}/docs/api/java.base/")
+      }
+
       val runtimeMXBean = ManagementFactory.getRuntimeMXBean
       val oldSchool = Try(
         if (runtimeMXBean.isBootClassPathSupported)
