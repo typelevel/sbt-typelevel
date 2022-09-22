@@ -18,17 +18,17 @@ package org.typelevel.sbt
 
 import laika.helium.Helium
 import laika.sbt.LaikaPlugin
-import laika.sbt.LaikaPlugin.autoImport.*
+import laika.sbt.LaikaPlugin.autoImport._
 import laika.sbt.Tasks
 import laika.theme.ThemeProvider
 import mdoc.MdocPlugin
-import mdoc.MdocPlugin.autoImport.*
-import org.typelevel.sbt.TypelevelKernelPlugin.*
+import mdoc.MdocPlugin.autoImport._
+import org.typelevel.sbt.TypelevelKernelPlugin._
 import org.typelevel.sbt.gha.GenerativePlugin
-import org.typelevel.sbt.gha.GenerativePlugin.autoImport.*
-import org.typelevel.sbt.site.*
-import sbt.Keys.*
-import sbt.*
+import org.typelevel.sbt.gha.GenerativePlugin.autoImport._
+import org.typelevel.sbt.site._
+import sbt.Keys._
+import sbt._
 
 import scala.annotation.nowarn
 
@@ -73,8 +73,8 @@ object TypelevelSitePlugin extends AutoPlugin {
     val TypelevelProject = site.TypelevelProject
   }
 
-  import autoImport.*
-  import TypelevelGitHubPlugin.*
+  import autoImport._
+  import TypelevelGitHubPlugin._
 
   override def requires =
     MdocPlugin && LaikaPlugin && TypelevelGitHubPlugin && GenerativePlugin && NoPublishPlugin
@@ -212,7 +212,7 @@ object TypelevelSitePlugin extends AutoPlugin {
 
   private def previewTask = Def
     .taskDyn {
-      import cats.effect.unsafe.implicits.*
+      import cats.effect.unsafe.implicits._
 
       val logger = streams.value.log
       logger.info("Initializing server...")

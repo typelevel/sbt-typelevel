@@ -28,7 +28,7 @@ import org.typelevel.sbt.TypelevelKernelPlugin.autoImport.tlIsScala3
 import org.typelevel.sbt.TypelevelSitePlugin.autoImport.tlSiteApiUrl
 import org.typelevel.sbt.TypelevelSitePlugin.autoImport.tlSiteHeliumExtensions
 import org.typelevel.sbt.TypelevelSitePlugin.autoImport.tlSiteRelatedProjects
-import sbt.Def.*
+import sbt.Def._
 import sbt.Keys.developers
 import sbt.Keys.scmInfo
 import sbt.Keys.version

@@ -21,9 +21,9 @@ import laika.ast.LengthUnit.px
 import laika.ast.Span
 import laika.ast.TemplateString
 import laika.helium.Helium
-import laika.helium.config.*
+import laika.helium.config._
 import org.typelevel.sbt.TypelevelGitHubPlugin.gitHubUserRepo
-import sbt.Def.*
+import sbt.Def._
 import sbt.Keys.licenses
 
 object TypelevelSiteSettings {
