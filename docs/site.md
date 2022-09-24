@@ -49,7 +49,7 @@ as well as a few pointers for the most relevant customization options.
 Whereas Laika standalone is a general purpose tool, this plugin's domain is project documentation
 which allows us to make a few additional assumptions and add useful defaults based on those.
 
-On top of the defaults of Laika standalone, sbt-typelevel adds:
+On top of the defaults of Laika standalone, sbt-typelevel-site adds:
 
 * GitHubFlavor for Markdown is enabled by default (e.g. for fenced code blocks).
 * Laika's builtin syntax highlighting is enabled by default (which does not require JavaScript highlighters).
