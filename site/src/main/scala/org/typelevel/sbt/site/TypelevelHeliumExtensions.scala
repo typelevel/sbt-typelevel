@@ -62,7 +62,7 @@ object TypelevelHeliumExtensions {
       apiUrl: Option[URL]
   ): ThemeProvider = new ThemeProvider {
     def build[F[_]](implicit F: Async[F]): Resource[F, Theme[F]] =
-      ThemeBuilder[F]("sbt-typelevel Helium Extensions")
+      ThemeBuilder[F]("sbt-typelevel-site Helium Extensions")
         .addInputs(
           apiUrl.fold(InputTree[F]) { url =>
             InputTree[F].addString(htmlForwarder(url), Path.Root / "api" / "index.html")
