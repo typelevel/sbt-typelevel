@@ -119,7 +119,7 @@ object TypelevelSitePlugin extends AutoPlugin {
         ) ++
         tlSiteApiUrl.value.map("API_URL" -> _.toString).toMap
     },
-    tlSiteIsTypelevelProject := false,
+    tlSiteIsTypelevelProject := organization.value == "org.typelevel",
     tlSiteHeliumConfig := TypelevelSiteSettings.defaults.value,
     tlSiteHeliumExtensions := GenericSiteSettings.themeExtensions.value,
     tlSiteHelium := {
