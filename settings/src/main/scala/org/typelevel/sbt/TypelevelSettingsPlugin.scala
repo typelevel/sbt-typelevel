@@ -16,8 +16,8 @@
 
 package org.typelevel.sbt
 
-import com.typesafe.sbt.GitPlugin
-import com.typesafe.sbt.SbtGit.git
+import com.github.sbt.git.GitPlugin
+import com.github.sbt.git.SbtGit.git
 import org.typelevel.sbt.kernel.GitHelper
 import org.typelevel.sbt.kernel.V
 import sbt._
@@ -26,6 +26,7 @@ import sbtcrossproject.CrossType
 
 import java.io.File
 import java.lang.management.ManagementFactory
+import scala.annotation.nowarn
 import scala.util.Try
 
 import Keys._
@@ -47,12 +48,11 @@ object TypelevelSettingsPlugin extends AutoPlugin {
 
   override def globalSettings = Seq(
     tlFatalWarnings := false,
-    tlJdkRelease := None,
+    tlJdkRelease := Some(8),
     Def.derive(scalaVersion := crossScalaVersions.value.last, default = true)
   )
 
   override def projectSettings = Seq(
-    versionScheme := Some("early-semver"),
     pomIncludeRepository := { _ => false },
     libraryDependencies ++= {
       if (tlIsScala3.value)
@@ -72,36 +72,49 @@ object TypelevelSettingsPlugin extends AutoPlugin {
       "-feature",
       "-unchecked"),
     scalacOptions ++= {
-      scalaVersion.value match {
-        case V(V(2, minor, _, _)) if minor < 13 =>
-          Seq("-Yno-adapted-args", "-Ywarn-unused-import")
-        case _ =>
-          Seq.empty
-      }
-    },
-    scalacOptions ++= {
-      val warningsNsc = Seq("-Xlint", "-Ywarn-dead-code")
+      val warningsNsc = Seq(
+        "-Xlint",
+        "-Yno-adapted-args", // similar to '-Xlint:adapted-args' but fails compilation instead of just emitting a warning
+        "-Ywarn-dead-code",
+        "-Ywarn-unused-import"
+      )
 
-      val warnings211 =
-        Seq("-Ywarn-numeric-widen") // In 2.10 this produces a some strange spurious error
+      val warnings211 = Seq(
+        "-Ywarn-numeric-widen" // In 2.10 this produces a some strange spurious error
+      )
 
-      val warnings212 = Seq("-Xlint:-unused,_")
+      val removed212 = Set(
+        "-Xlint",
+        "-Yno-adapted-args", // mostly superseded by '-Xlint:adapted-args'
+        "-Ywarn-unused-import" // superseded by '-Ywarn-unused:imports'
+      )
+      val warnings212 = Seq(
+        // Tune '-Xlint':
+        // - remove 'unused' because it is configured by '-Ywarn-unused'
+        "-Xlint:_,-unused",
+        // Tune '-Ywarn-unused':
+        // - remove 'nowarn' because 2.13 can detect more unused cases than 2.12
+        // - remove 'privates' because 2.12 can incorrectly detect some private objects as unused
+        "-Ywarn-unused:_,-nowarn,-privates"
+      )
 
-      val removed213 = Set("-Xlint:-unused,_", "-Xlint")
+      val removed213 = Set(
+        "-Xlint:_,-unused", // reconfigured for 2.13
+        "-Ywarn-unused:_,-nowarn,-privates", // mostly superseded by "-Wunused"
+        "-Ywarn-dead-code", // superseded by "-Wdead-code"
+        "-Ywarn-numeric-widen" // superseded by "-Wnumeric-widen"
+      )
       val warnings213 = Seq(
-        "-Xlint:deprecation",
-        "-Wunused:nowarn",
         "-Wdead-code",
         "-Wextra-implicit",
         "-Wnumeric-widen",
-        "-Wunused:implicits",
-        "-Wunused:explicits",
-        "-Wunused:imports",
-        "-Wunused:locals",
-        "-Wunused:params",
-        "-Wunused:patvars",
-        "-Wunused:privates",
-        "-Wvalue-discard"
+        "-Wunused", // all choices are enabled by default
+        "-Wvalue-discard",
+        // Tune '-Xlint':
+        // - remove 'implicit-recursion' due to backward incompatibility with 2.12
+        // - remove 'recurse-with-default' due to backward incompatibility with 2.12
+        // - remove 'unused' because it is configured by '-Wunused'
+        "-Xlint:_,-implicit-recursion,-recurse-with-default,-unused"
       )
 
       val warningsDotty = Seq.empty
@@ -111,10 +124,11 @@ object TypelevelSettingsPlugin extends AutoPlugin {
           warningsDotty
 
         case V(V(2, minor, _, _)) if minor >= 13 =>
-          (warnings211 ++ warnings212 ++ warnings213 ++ warningsNsc).filterNot(removed213)
+          (warnings211 ++ warnings212 ++ warnings213 ++ warningsNsc)
+            .filterNot(removed212 ++ removed213)
 
         case V(V(2, minor, _, _)) if minor >= 12 =>
-          warnings211 ++ warnings212 ++ warningsNsc
+          (warnings211 ++ warnings212 ++ warningsNsc).filterNot(removed212)
 
         case V(V(2, minor, _, _)) if minor >= 11 =>
           warnings211 ++ warningsNsc
@@ -163,18 +177,15 @@ object TypelevelSettingsPlugin extends AutoPlugin {
       else
         Seq("-Yrangepos")
     },
-    Compile / console / scalacOptions --= Seq(
-      "-Xlint",
-      "-Ywarn-unused-import",
-      "-Wextra-implicit",
-      "-Wunused:implicits",
-      "-Wunused:explicits",
-      "-Wunused:imports",
-      "-Wunused:locals",
-      "-Wunused:params",
-      "-Wunused:patvars",
-      "-Wunused:privates"
-    ),
+    Compile / console / scalacOptions := scalacOptions.value.filterNot { opt =>
+      opt.startsWith("-Xlint") ||
+      PartialFunction.cond(scalaVersion.value) {
+        case V(V(2, minor, _, _)) if minor >= 13 =>
+          opt.startsWith("-Wunused") || opt == "-Wextra-implicit"
+        case V(V(2, minor, _, _)) if minor >= 12 =>
+          opt.startsWith("-Ywarn-unused")
+      }
+    },
     Test / console / scalacOptions := (Compile / console / scalacOptions).value,
     Compile / doc / scalacOptions ++= {
       Seq("-sourcepath", (LocalRootProject / baseDirectory).value.getAbsolutePath)
@@ -227,8 +238,11 @@ object TypelevelSettingsPlugin extends AutoPlugin {
         case V(V(2, 12, Some(build), _)) if build >= 5 =>
           releaseOption ++ oldTargetOption
 
-        case V(V(2, 13, _, _)) =>
+        case V(V(2, 13, Some(build), _)) if build <= 8 =>
           releaseOption ++ newTargetOption
+
+        case V(V(2, 13, Some(build), _)) if build >= 9 =>
+          releaseOption
 
         case V(V(3, _, _, _)) =>
           releaseOption
@@ -316,4 +330,7 @@ object TypelevelSettingsPlugin extends AutoPlugin {
       oldSchool ++ newSchool ++ old
     }
   }
+
+  @nowarn("cat=unused")
+  private[this] def unused(): Unit = ()
 }
