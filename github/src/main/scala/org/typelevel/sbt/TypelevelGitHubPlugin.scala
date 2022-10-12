@@ -16,7 +16,7 @@
 
 package org.typelevel.sbt
 
-import com.typesafe.sbt.SbtGit.git
+import com.github.sbt.git.SbtGit.git
 import org.typelevel.sbt.kernel.GitHelper
 import sbt._
 
@@ -51,7 +51,21 @@ object TypelevelGitHubPlugin extends AutoPlugin {
         sLog.value.info(s"set scmInfo to https://github.com/$user/$repo")
         gitHubScmInfo(user, repo)
     },
-    homepage := homepage.value.orElse(scmInfo.value.map(_.browseUrl))
+    homepage := homepage.value.orElse(scmInfo.value.map(_.browseUrl)),
+    developers := {
+      gitHubUserRepo
+        .value
+        .toList
+        .map {
+          case (user, repo) =>
+            Developer(
+              user,
+              s"$repo contributors",
+              s"@$user",
+              url(s"https://github.com/$user/$repo/contributors")
+            )
+        }
+    }
   )
 
   override def projectSettings: Seq[Setting[_]] = Seq(
