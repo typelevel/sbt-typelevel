@@ -238,8 +238,11 @@ object TypelevelSettingsPlugin extends AutoPlugin {
         case V(V(2, 12, Some(build), _)) if build >= 5 =>
           releaseOption ++ oldTargetOption
 
-        case V(V(2, 13, _, _)) =>
+        case V(V(2, 13, Some(build), _)) if build <= 8 =>
           releaseOption ++ newTargetOption
+
+        case V(V(2, 13, Some(build), _)) if build >= 9 =>
+          releaseOption
 
         case V(V(3, _, _, _)) =>
           releaseOption
