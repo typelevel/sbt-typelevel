@@ -16,13 +16,18 @@
 
 package org.typelevel.sbt
 
-import sbt._, Keys._
 import com.github.sbt.git.GitPlugin
 import com.github.sbt.git.SbtGit.git
+import org.typelevel.sbt.TypelevelKernelPlugin._
+import org.typelevel.sbt.kernel.GitHelper
 import org.typelevel.sbt.kernel.V
+import sbt._
+import sbt._
 
 import scala.util.Try
-import org.typelevel.sbt.kernel.GitHelper
+
+import Keys._
+import Keys._
 
 object TypelevelVersioningPlugin extends AutoPlugin {
 
@@ -35,6 +40,12 @@ object TypelevelVersioningPlugin extends AutoPlugin {
     lazy val tlUntaggedAreSnapshots =
       settingKey[Boolean](
         "If true, an untagged commit is given a snapshot version, e.g. 0.4-00218f9-SNAPSHOT. If false, it is given a release version, e.g. 0.4-00218f9. (default: true)")
+
+    lazy val tlLatestVersion = settingKey[Option[String]](
+      "The latest tagged version on this branch. Priority is given to the latest stable version, but if you have tagged a binary-breaking prelease version (such as a milestone or release candidate), that will be selected instead. If applicable, this will be the current tagged version.")
+
+    lazy val tlLatestPreReleaseVersion = settingKey[Option[String]](
+      "The latest tagged version on this branch, including milestones and release candidates. If applicable, this will be the current tagged version.")
   }
 
   import autoImport._
@@ -121,13 +132,15 @@ object TypelevelVersioningPlugin extends AutoPlugin {
       if (isSnapshot.value) version += "-SNAPSHOT"
 
       version
-    }
+    },
+    tlLatestVersion := currentRelease.value,
+    tlLatestPreReleaseVersion := currentPreRelease.value
   )
 
   private val Description = """^.*-(\d+)-[a-zA-Z0-9]+$""".r
 
   private def taggedVersion = Def.setting {
-    git.gitCurrentTags.value.collectFirst { case V.Tag(v) => v }
+    git.gitCurrentTags.value.collect { case V.Tag(v) => v }.sorted.lastOption
   }
 
 }

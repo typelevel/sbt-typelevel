@@ -16,13 +16,19 @@
 
 package org.typelevel.sbt
 
-import sbt._, Keys._
+import de.heikoseeberger.sbtheader.HeaderPlugin
 import org.typelevel.sbt.gha.GenerativePlugin
 import org.typelevel.sbt.gha.GitHubActionsPlugin
-import de.heikoseeberger.sbtheader.HeaderPlugin
+import sbt._
 
 import scala.collection.immutable
 
+import Keys._
+
+/**
+ * The [[TypelevelPlugin]] brings together the [[TypelevelCiReleasePlugin]] and the
+ * [[TypelevelSettingsPlugin]]
+ */
 object TypelevelPlugin extends AutoPlugin {
 
   override def requires =
@@ -41,6 +47,7 @@ object TypelevelPlugin extends AutoPlugin {
 
   import autoImport._
   import TypelevelKernelPlugin.mkCommand
+  import TypelevelCiPlugin.autoImport._
   import TypelevelSettingsPlugin.autoImport._
   import TypelevelSonatypeCiReleasePlugin.autoImport._
   import GenerativePlugin.autoImport._
@@ -62,21 +69,19 @@ object TypelevelPlugin extends AutoPlugin {
     },
     startYear := Some(java.time.YearMonth.now().getYear()),
     licenses += "Apache-2.0" -> url("https://www.apache.org/licenses/LICENSE-2.0.txt"),
+    tlCiHeaderCheck := true,
+    tlCiScalafmtCheck := true,
     tlCiReleaseBranches := Seq("main"),
     Def.derive(tlFatalWarnings := (tlFatalWarningsInCi.value && githubIsWorkflowBuild.value)),
+    githubWorkflowJavaVersions := {
+      Seq(JavaSpec.temurin(tlJdkRelease.value.getOrElse(8).toString))
+    },
     githubWorkflowBuildMatrixExclusions ++= {
       val defaultScala = (ThisBuild / scalaVersion).value
       for {
         scala <- githubWorkflowScalaVersions.value.filterNot(_ == defaultScala)
         java <- githubWorkflowJavaVersions.value.tail // default java is head
       } yield MatrixExclude(Map("scala" -> scala, "java" -> java.render))
-    },
-    githubWorkflowBuild := {
-      WorkflowStep.Sbt(
-        List("headerCheckAll", "scalafmtCheckAll", "project /", "scalafmtSbtCheck"),
-        name = Some("Check headers and formatting"),
-        cond = Some(primaryJavaCond.value)
-      ) +: githubWorkflowBuild.value
     }
   ) ++ addCommandAlias(
     "prePR",
@@ -91,7 +96,8 @@ object TypelevelPlugin extends AutoPlugin {
         "scalafmtSbt",
         "set ThisBuild / tlFatalWarnings := tlFatalWarningsInCi.value",
         "Test / compile",
-        "reload"
+        "doc",
+        "session clear"
       )
     )
   ) ++ addCommandAlias(
@@ -108,10 +114,4 @@ object TypelevelPlugin extends AutoPlugin {
 
   // override for bincompat
   override def projectSettings = immutable.Seq.empty
-
-  private val primaryJavaCond = Def.setting {
-    val java = githubWorkflowJavaVersions.value.head
-    s"matrix.java == '${java.render}'"
-  }
-
 }

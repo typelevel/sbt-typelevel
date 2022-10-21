@@ -614,10 +614,9 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
             key -> values.take(1) // we only want the primary value
       }
 
-      val keys = "scala" :: additions.keys.toList.sorted
-      val oses = githubWorkflowOSes.value.toList
+      val oses = githubWorkflowOSes.value.toList.take(1)
       val scalas = githubWorkflowScalaVersions.value.toList
-      val javas = githubWorkflowJavaVersions.value.toList
+      val javas = githubWorkflowJavaVersions.value.toList.take(1)
       val exclusions = githubWorkflowBuildMatrixExclusions.value.toList
 
       // we build the list of artifacts, by iterating over all combinations of keys
@@ -691,6 +690,7 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
             githubWorkflowPublish.value.toList :::
             githubWorkflowPublishPostamble.value.toList,
           cond = Some(publicationCond.value),
+          oses = githubWorkflowOSes.value.toList.take(1),
           scalas = List(scalaVersion.value),
           javas = List(githubWorkflowJavaVersions.value.head),
           needs = List("build")
@@ -702,8 +702,8 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
           "Build and Test",
           githubWorkflowJobSetup.value.toList :::
             githubWorkflowBuildPreamble.value.toList :::
-            WorkflowStep.Sbt(
-              List("project /", "githubWorkflowCheck"),
+            WorkflowStep.Run(
+              List(s"${sbt.value} githubWorkflowCheck"),
               name = Some("Check that workflows are up to date")) ::
             githubWorkflowBuild.value.toList :::
             githubWorkflowBuildPostamble.value.toList :::
@@ -735,12 +735,15 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
     s"github.event_name != 'pull_request' && $publicationCond"
   }
 
-  private val generateCiContents = Def task {
-    val sbt = if (githubWorkflowUseSbtThinClient.value) {
+  private val sbt = Def.setting {
+    if (githubWorkflowUseSbtThinClient.value) {
       githubWorkflowSbtCommand.value + " --client"
     } else {
       githubWorkflowSbtCommand.value
     }
+  }
+
+  private val generateCiContents = Def task {
     compileWorkflow(
       "Continuous Integration",
       githubWorkflowTargetBranches.value.toList,
@@ -749,7 +752,7 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
       githubWorkflowPREventTypes.value.toList,
       githubWorkflowEnv.value,
       githubWorkflowGeneratedCI.value.toList,
-      sbt
+      sbt.value
     )
   }
 

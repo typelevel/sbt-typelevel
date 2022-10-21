@@ -8,11 +8,12 @@
 pull_request_rules:
 - name: merge scala-steward's PRs
   conditions:
-  - author=scala-steward
+  - author=typelevel-steward[bot]
   - or:
     - body~=labels:.*early-semver-patch
     - body~=labels:.*early-semver-minor
-  - status-success=Build and Test (ubuntu-latest, 2.12.15, temurin@8, sbt-typelevelJVM)
+  - status-success=Build and Test (ubuntu-latest, 2.12.17, temurin@8, sbt-typelevelJVM)
+  - status-success=Build and Test (ubuntu-latest, 2.12.17, temurin@17, sbt-typelevelJVM)
   - '#approved-reviews-by>=1'
   actions:
     merge: {}
@@ -112,6 +113,14 @@ pull_request_rules:
       add:
       - no-publish
       remove: []
+- name: Label scalafix PRs
+  conditions:
+  - files~=^scalafix/
+  actions:
+    label:
+      add:
+      - scalafix
+      remove: []
 - name: Label settings PRs
   conditions:
   - files~=^settings/
@@ -160,3 +169,10 @@ pull_request_rules:
       add:
       - versioning
       remove: []
+- name: assign scala-steward's PRs for review
+  conditions:
+  - author=typelevel-steward[bot]
+  actions:
+    request_reviews:
+      users:
+      - armanbilge

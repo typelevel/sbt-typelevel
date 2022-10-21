@@ -16,10 +16,12 @@
 
 package org.typelevel.sbt.mergify
 
-import sbt._, Keys._
 import org.typelevel.sbt.gha._
+import sbt._
 
 import java.nio.file.Path
+
+import Keys._
 
 object MergifyPlugin extends AutoPlugin {
 
@@ -109,9 +111,9 @@ object MergifyPlugin extends AutoPlugin {
     mergifyGenerate / aggregate := false,
     mergifyCheck / aggregate := false,
     githubWorkflowGenerate := githubWorkflowGenerate
-      .dependsOn((ThisBuild / mergifyGenerate))
+      .dependsOn(ThisBuild / mergifyGenerate)
       .value,
-    githubWorkflowCheck := githubWorkflowCheck.dependsOn((ThisBuild / mergifyCheck)).value,
+    githubWorkflowCheck := githubWorkflowCheck.dependsOn(ThisBuild / mergifyCheck).value,
     ThisBuild / mergifyLabelPaths := {
       val labelPaths = (ThisBuild / mergifyLabelPaths).value
       projectLabel.value.fold(labelPaths) {

@@ -16,9 +16,8 @@
 
 package org.typelevel.sbt.kernel
 
-import scala.util.Try
-
 import scala.sys.process._
+import scala.util.Try
 
 private[sbt] object GitHelper {
 

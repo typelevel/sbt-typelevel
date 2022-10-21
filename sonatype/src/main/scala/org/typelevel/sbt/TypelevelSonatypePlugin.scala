@@ -16,9 +16,12 @@
 
 package org.typelevel.sbt
 
-import sbt._, Keys._
 import com.typesafe.tools.mima.plugin.MimaPlugin
-import xerial.sbt.Sonatype, Sonatype.autoImport._
+import sbt._
+import xerial.sbt.Sonatype
+
+import Keys._
+import Sonatype.autoImport._
 import TypelevelKernelPlugin.mkCommand
 
 object TypelevelSonatypePlugin extends AutoPlugin {
@@ -65,7 +68,10 @@ object TypelevelSonatypePlugin extends AutoPlugin {
     apiURL := apiURL.value.orElse(javadocioUrl.value)
   )
 
-  private[sbt] def javadocioUrl = Def.setting {
+  private[sbt] lazy val hostedApiUrl =
+    Def.setting(javadocioUrl.value.orElse(sonatypeApiUrl.value))
+
+  private lazy val javadocioUrl = Def.setting {
     if (isSnapshot.value || sbtPlugin.value || !publishArtifact.value)
       None // javadoc.io doesn't support snapshots, sbt plugins, or unpublished modules ;)
     else
@@ -77,6 +83,24 @@ object TypelevelSonatypePlugin extends AutoPlugin {
         url(
           s"https://www.javadoc.io/doc/${organization.value}/${cross(moduleName.value)}/${version.value}/")
       }
+  }
+
+  private lazy val sonatypeApiUrl = Def.setting {
+    if (publishArtifact.value)
+      CrossVersion(
+        crossVersion.value,
+        scalaVersion.value,
+        scalaBinaryVersion.value
+      ).map { cross =>
+        val host = sonatypeCredentialHost.value
+        val repo = if (isSnapshot.value) "snapshots" else "releases"
+        val org = organization.value.replace('.', '/')
+        val mod = cross(moduleName.value)
+        val ver = version.value
+        url(
+          s"https://$host/service/local/repositories/$repo/archive/$org/$mod/$ver/$mod-$ver-javadoc.jar/!/index.html")
+      }
+    else None
   }
 
   private def sonatypeBundleReleaseIfRelevant: Command =

@@ -2,7 +2,7 @@ name := "sbt-typelevel"
 
 ThisBuild / tlBaseVersion := "0.5"
 ThisBuild / tlSitePublishBranch := Some("series/0.4")
-ThisBuild / crossScalaVersions := Seq("2.12.15")
+ThisBuild / crossScalaVersions := Seq("2.12.17")
 ThisBuild / developers ++= List(
   tlGitHubDev("armanbilge", "Arman Bilge"),
   tlGitHubDev("rossabaker", "Ross A. Baker"),
@@ -10,9 +10,26 @@ ThisBuild / developers ++= List(
   tlGitHubDev("djspiewak", "Daniel Spiewak")
 )
 
-ThisBuild / mergifyStewardConfig ~= { _.map(_.copy(mergeMinors = true)) }
+ThisBuild / githubWorkflowJavaVersions += JavaSpec.temurin("17")
+
+ThisBuild / mergifyStewardConfig ~= {
+  _.map(_.copy(mergeMinors = true, author = "typelevel-steward[bot]"))
+}
 ThisBuild / mergifySuccessConditions += MergifyCondition.Custom("#approved-reviews-by>=1")
 ThisBuild / mergifyLabelPaths += { "docs" -> file("docs") }
+ThisBuild / mergifyPrRules += MergifyPrRule(
+  "assign scala-steward's PRs for review",
+  List(MergifyCondition.Custom("author=typelevel-steward[bot]")),
+  List(
+    MergifyAction.RequestReviews.fromUsers("armanbilge")
+  )
+)
+
+ThisBuild / scalafixDependencies ++= Seq(
+  "com.github.liancheng" %% "organize-imports" % "0.6.0"
+)
+
+val MunitVersion = "0.7.29"
 
 lazy val `sbt-typelevel` = tlCrossRootProject.aggregate(
   kernel,
@@ -24,6 +41,7 @@ lazy val `sbt-typelevel` = tlCrossRootProject.aggregate(
   versioning,
   mima,
   sonatype,
+  scalafix,
   ciSigning,
   sonatypeCiRelease,
   ci,
@@ -38,7 +56,8 @@ lazy val kernel = project
   .in(file("kernel"))
   .enablePlugins(SbtPlugin)
   .settings(
-    name := "sbt-typelevel-kernel"
+    name := "sbt-typelevel-kernel",
+    libraryDependencies += "org.scalameta" %% "munit" % MunitVersion % Test
   )
 
 lazy val noPublish = project
@@ -103,6 +122,14 @@ lazy val sonatype = project
     name := "sbt-typelevel-sonatype"
   )
   .dependsOn(kernel)
+
+lazy val scalafix = project
+  .in(file("scalafix"))
+  .enablePlugins(SbtPlugin)
+  .settings(
+    name := "sbt-typelevel-scalafix",
+    tlVersionIntroduced := Map("2.12" -> "0.4.10")
+  )
 
 lazy val ciSigning = project
   .in(file("ci-signing"))
@@ -184,5 +211,29 @@ lazy val docs = project
       "mdoc" -> url("https://scalameta.org/mdoc/"),
       "Laika" -> url("https://planet42.github.io/Laika/"),
       "sbt-unidoc" -> url("https://github.com/sbt/sbt-unidoc")
-    )
+    ),
+    tlSiteIsTypelevelProject := true,
+    mdocVariables ++= {
+      import coursier.complete.Complete
+      import java.time._
+      import scala.concurrent._
+      import scala.concurrent.duration._
+      import scala.concurrent.ExecutionContext.Implicits._
+
+      val startYear = YearMonth.now().getYear.toString
+
+      val sjsVersionFuture =
+        Complete().withInput(s"org.scala-js:scalajs-library_2.13:").complete().future()
+      val sjsVersion =
+        try {
+          Await.result(sjsVersionFuture, 5.seconds)._2.last
+        } catch {
+          case ex: TimeoutException => scalaJSVersion // not the latest but better than nothing
+        }
+
+      Map(
+        "START_YEAR" -> startYear,
+        "LATEST_SJS_VERSION" -> sjsVersion
+      )
+    }
   )
