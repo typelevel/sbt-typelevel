@@ -17,8 +17,6 @@
 package org.typelevel.sbt
 
 import com.github.sbt.git.GitPlugin
-import com.github.sbt.git.SbtGit.git
-import org.typelevel.sbt.kernel.GitHelper
 import org.typelevel.sbt.kernel.V
 import sbt._
 import sbtcrossproject.CrossPlugin.autoImport._
@@ -191,19 +189,9 @@ object TypelevelSettingsPlugin extends AutoPlugin {
       Seq("-sourcepath", (LocalRootProject / baseDirectory).value.getAbsolutePath)
     },
     Compile / doc / scalacOptions ++= {
-      val tagOrHash =
-        GitHelper.getTagOrHash(git.gitCurrentTags.value, git.gitHeadCommit.value)
-      val infoOpt = scmInfo.value
-
       if (tlIsScala3.value)
         Seq("-project-version", version.value)
-      else // TODO move to GitHub plugin
-        tagOrHash.toSeq flatMap { vh =>
-          infoOpt.toSeq flatMap { info =>
-            val path = s"${info.browseUrl}/blob/${vh}€{FILE_PATH}.scala"
-            Seq("-doc-source-url", path)
-          }
-        }
+      else Nil
     },
     javacOptions ++= Seq(
       "-encoding",
