@@ -67,7 +67,8 @@ object WorkflowStep {
             params = Map(
               "distribution" -> "jdkfile",
               "java-version" -> version,
-              "jdkFile" -> s"$${{ steps.$id.outputs.jdkFile }}"
+              "jdkFile" -> s"$${{ steps.$id.outputs.jdkFile }}",
+              "cache" -> "sbt"
             )
           )
         )
@@ -77,7 +78,8 @@ object WorkflowStep {
           UseRef.Public("actions", "setup-java", "v3"),
           name = Some(s"Setup Java (${jv.render})"),
           cond = Some(s"matrix.java == '${jv.render}'"),
-          params = Map("distribution" -> dist.rendering, "java-version" -> version)
+          params =
+            Map("distribution" -> dist.rendering, "java-version" -> version, "cache" -> "sbt")
         ) :: Nil
     }
 

@@ -654,29 +654,7 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
         Seq()
       }
     },
-    githubWorkflowGeneratedCacheSteps := {
-      val hashes = githubWorkflowDependencyPatterns.value map { glob =>
-        s"$${{ hashFiles('$glob') }}"
-      }
-
-      Seq(
-        WorkflowStep.Use(
-          UseRef.Public("actions", "cache", "v3"),
-          name = Some("Cache sbt"),
-          params = Map(
-            "path" -> Seq(
-              "~/.sbt",
-              "~/.ivy2/cache",
-              "~/.coursier/cache/v1",
-              "~/.cache/coursier/v1",
-              "~/AppData/Local/Coursier/Cache/v1",
-              "~/Library/Caches/Coursier/v1"
-            ).mkString("\n"),
-            "key" -> s"$${{ runner.os }}-sbt-cache-v2-${hashes.mkString("-")}"
-          )
-        )
-      )
-    },
+    githubWorkflowGeneratedCacheSteps := Seq(),
     githubWorkflowJobSetup := {
       val autoCrlfOpt = if (githubWorkflowOSes.value.exists(_.contains("windows"))) {
         List(
