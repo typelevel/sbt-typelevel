@@ -18,6 +18,8 @@ package org.typelevel.sbt
 
 import sbt._
 
+import TypelevelCiPlugin.autoImport._
+
 object TypelevelCiReleasePlugin extends AutoPlugin {
 
   override def requires =
@@ -28,5 +30,10 @@ object TypelevelCiReleasePlugin extends AutoPlugin {
       TypelevelCiSigningPlugin
 
   override def trigger = allRequirements
+
+  override def buildSettings = Seq(
+    tlCiMimaBinaryIssueCheck := true,
+    tlCiDocCheck := true
+  )
 
 }

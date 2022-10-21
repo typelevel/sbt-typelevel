@@ -16,7 +16,6 @@
 
 package org.typelevel.sbt
 
-import com.typesafe.tools.mima.plugin.MimaPlugin
 import org.typelevel.sbt.gha.GenerativePlugin
 import org.typelevel.sbt.gha.GenerativePlugin.autoImport._
 import org.typelevel.sbt.gha.GitHubActionsPlugin
@@ -29,7 +28,7 @@ import Keys._
 
 object TypelevelCiPlugin extends AutoPlugin {
 
-  override def requires = GitHubActionsPlugin && GenerativePlugin && MimaPlugin
+  override def requires = GitHubActionsPlugin && GenerativePlugin
   override def trigger = allRequirements
 
   object autoImport {
@@ -56,8 +55,8 @@ object TypelevelCiPlugin extends AutoPlugin {
     tlCiHeaderCheck := false,
     tlCiScalafmtCheck := false,
     tlCiScalafixCheck := false,
-    tlCiMimaBinaryIssueCheck := true,
-    tlCiDocCheck := true,
+    tlCiMimaBinaryIssueCheck := false,
+    tlCiDocCheck := false,
     tlCiDependencyGraphJob := true,
     githubWorkflowTargetBranches ++= Seq(
       "!update/**", // ignore steward branches
