@@ -26,11 +26,6 @@ jobs:
         scala: [2.12]
         java: [temurin@8, temurin@17, graal_latest@17]
         project: [sbt-typelevelJVM]
-        exclude:
-          - scala: 2.12
-            java: temurin@17
-          - scala: 2.12
-            java: graal_latest@17
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout current branch (full)
