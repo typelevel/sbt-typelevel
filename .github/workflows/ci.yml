@@ -23,9 +23,14 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        scala: [2.12.17]
+        scala: [2.12]
         java: [temurin@8, temurin@17, graal_latest@17]
         project: [sbt-typelevelJVM]
+        exclude:
+          - scala: 2.12
+            java: temurin@17
+          - scala: 2.12
+            java: graal_latest@17
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout current branch (full)
@@ -170,12 +175,12 @@ jobs:
           java-version: 17
           cache: sbt
 
-      - name: Download target directories (2.12.17, sbt-typelevelJVM)
+      - name: Download target directories (2.12, sbt-typelevelJVM)
         uses: actions/download-artifact@v3
         with:
-          name: target-${{ matrix.os }}-${{ matrix.java }}-2.12.17-sbt-typelevelJVM
+          name: target-${{ matrix.os }}-${{ matrix.java }}-2.12-sbt-typelevelJVM
 
-      - name: Inflate target directories (2.12.17, sbt-typelevelJVM)
+      - name: Inflate target directories (2.12, sbt-typelevelJVM)
         run: |
           tar xf targets.tar
           rm targets.tar
