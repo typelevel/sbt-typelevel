@@ -525,7 +525,14 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
     githubWorkflowPublishTargetBranches := Seq(RefPredicate.Equals(Ref.Branch("main"))),
     githubWorkflowPublishCond := None,
     githubWorkflowJavaVersions := Seq(JavaSpec.temurin("11")),
-    githubWorkflowScalaVersions := crossScalaVersions.value,
+    githubWorkflowScalaVersions := {
+      val scalas = crossScalaVersions.value
+      val binaryScalas = scalas.map(CrossVersion.binaryScalaVersion(_))
+      if (binaryScalas.toSet.size == scalas.size)
+        binaryScalas
+      else
+        scalas
+    },
     githubWorkflowOSes := Seq("ubuntu-latest"),
     githubWorkflowDependencyPatterns := Seq("**/*.sbt", "project/build.properties"),
     githubWorkflowTargetBranches := Seq("**"),

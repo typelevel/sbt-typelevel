@@ -79,7 +79,7 @@ object TypelevelPlugin extends AutoPlugin {
     githubWorkflowBuildMatrixExclusions ++= {
       val defaultScala = (ThisBuild / scalaVersion).value
       for {
-        scala <- githubWorkflowScalaVersions.value.filterNot(_ == defaultScala)
+        scala <- githubWorkflowScalaVersions.value.filterNot(defaultScala.startsWith(_))
         java <- githubWorkflowJavaVersions.value.tail // default java is head
       } yield MatrixExclude(Map("scala" -> scala, "java" -> java.render))
     }
