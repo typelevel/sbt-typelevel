@@ -1,1 +1,1 @@
-libraryDependencies += "io.circe" %% "circe-yaml" % "0.14.1"
+libraryDependencies += "io.circe" %% "circe-yaml" % "0.14.2"
