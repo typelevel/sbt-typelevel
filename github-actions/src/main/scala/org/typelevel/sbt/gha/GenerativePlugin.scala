@@ -525,7 +525,14 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
     githubWorkflowPublishTargetBranches := Seq(RefPredicate.Equals(Ref.Branch("main"))),
     githubWorkflowPublishCond := None,
     githubWorkflowJavaVersions := Seq(JavaSpec.temurin("11")),
-    githubWorkflowScalaVersions := crossScalaVersions.value,
+    githubWorkflowScalaVersions := {
+      val scalas = crossScalaVersions.value
+      val binaryScalas = scalas.map(CrossVersion.binaryScalaVersion(_))
+      if (binaryScalas.toSet.size == scalas.size)
+        binaryScalas
+      else
+        scalas
+    },
     githubWorkflowOSes := Seq("ubuntu-latest"),
     githubWorkflowDependencyPatterns := Seq("**/*.sbt", "project/build.properties"),
     githubWorkflowTargetBranches := Seq("**"),
@@ -592,7 +599,7 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
           (List("os", "java", "scala") ::: keys).map(k => s"$${{ matrix.$k }}").mkString("-")
 
         val upload = WorkflowStep.Use(
-          UseRef.Public("actions", "upload-artifact", "v2"),
+          UseRef.Public("actions", "upload-artifact", "v3"),
           name = Some(s"Upload target directories"),
           params = Map("name" -> s"target-$artifactId", "path" -> "targets.tar"),
           cond = Some(publicationCond.value)
@@ -614,7 +621,6 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
             key -> values.take(1) // we only want the primary value
       }
 
-      val keys = "scala" :: additions.keys.toList.sorted
       val oses = githubWorkflowOSes.value.toList.take(1)
       val scalas = githubWorkflowScalaVersions.value.toList
       val javas = githubWorkflowJavaVersions.value.toList.take(1)
@@ -639,7 +645,7 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
           val pretty = v.mkString(", ")
 
           val download = WorkflowStep.Use(
-            UseRef.Public("actions", "download-artifact", "v2"),
+            UseRef.Public("actions", "download-artifact", "v3"),
             name = Some(s"Download target directories ($pretty)"),
             params =
               Map("name" -> s"target-$${{ matrix.os }}-$${{ matrix.java }}-${v.mkString("-")}")
@@ -655,29 +661,7 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
         Seq()
       }
     },
-    githubWorkflowGeneratedCacheSteps := {
-      val hashes = githubWorkflowDependencyPatterns.value map { glob =>
-        s"$${{ hashFiles('$glob') }}"
-      }
-
-      Seq(
-        WorkflowStep.Use(
-          UseRef.Public("actions", "cache", "v2"),
-          name = Some("Cache sbt"),
-          params = Map(
-            "path" -> Seq(
-              "~/.sbt",
-              "~/.ivy2/cache",
-              "~/.coursier/cache/v1",
-              "~/.cache/coursier/v1",
-              "~/AppData/Local/Coursier/Cache/v1",
-              "~/Library/Caches/Coursier/v1"
-            ).mkString("\n"),
-            "key" -> s"$${{ runner.os }}-sbt-cache-v2-${hashes.mkString("-")}"
-          )
-        )
-      )
-    },
+    githubWorkflowGeneratedCacheSteps := Seq(),
     githubWorkflowJobSetup := {
       val autoCrlfOpt = if (githubWorkflowOSes.value.exists(_.contains("windows"))) {
         List(

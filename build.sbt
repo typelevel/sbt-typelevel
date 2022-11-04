@@ -1,17 +1,17 @@
 name := "sbt-typelevel"
 
-ThisBuild / tlBaseVersion := "0.4"
-ThisBuild / tlCiReleaseBranches := Seq("series/0.4")
+ThisBuild / tlBaseVersion := "0.5"
 ThisBuild / tlSitePublishBranch := Some("series/0.4")
 ThisBuild / crossScalaVersions := Seq("2.12.17")
-ThisBuild / developers := List(
+ThisBuild / developers ++= List(
   tlGitHubDev("armanbilge", "Arman Bilge"),
   tlGitHubDev("rossabaker", "Ross A. Baker"),
   tlGitHubDev("ChristopherDavenport", "Christopher Davenport"),
   tlGitHubDev("djspiewak", "Daniel Spiewak")
 )
 
-ThisBuild / githubWorkflowJavaVersions += JavaSpec.temurin("17")
+ThisBuild / githubWorkflowJavaVersions ++=
+  Seq(JavaSpec.temurin("17"), JavaSpec(JavaSpec.Distribution.GraalVM("latest"), "17"))
 
 ThisBuild / mergifyStewardConfig ~= {
   _.map(_.copy(mergeMinors = true, author = "typelevel-steward[bot]"))
@@ -30,7 +30,9 @@ ThisBuild / scalafixDependencies ++= Seq(
   "com.github.liancheng" %% "organize-imports" % "0.6.0"
 )
 
-lazy val root = tlCrossRootProject.aggregate(
+val MunitVersion = "0.7.29"
+
+lazy val `sbt-typelevel` = tlCrossRootProject.aggregate(
   kernel,
   noPublish,
   settings,
@@ -55,7 +57,8 @@ lazy val kernel = project
   .in(file("kernel"))
   .enablePlugins(SbtPlugin)
   .settings(
-    name := "sbt-typelevel-kernel"
+    name := "sbt-typelevel-kernel",
+    libraryDependencies += "org.scalameta" %% "munit" % MunitVersion % Test
   )
 
 lazy val noPublish = project
@@ -210,6 +213,7 @@ lazy val docs = project
       "Laika" -> url("https://planet42.github.io/Laika/"),
       "sbt-unidoc" -> url("https://github.com/sbt/sbt-unidoc")
     ),
+    tlSiteIsTypelevelProject := true,
     mdocVariables ++= {
       import coursier.complete.Complete
       import java.time._

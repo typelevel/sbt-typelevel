@@ -21,27 +21,33 @@ sealed trait WorkflowStep extends Product with Serializable {
   def name: Option[String]
   def cond: Option[String]
   def env: Map[String, String]
+
+  def withId(id: Option[String]): WorkflowStep
+  def withName(name: Option[String]): WorkflowStep
+  def withCond(cond: Option[String]): WorkflowStep
+  def withEnv(env: Map[String, String]): WorkflowStep
 }
 
 object WorkflowStep {
 
   val CheckoutFull: WorkflowStep = Use(
-    UseRef.Public("actions", "checkout", "v2"),
+    UseRef.Public("actions", "checkout", "v3"),
     name = Some("Checkout current branch (full)"),
     params = Map("fetch-depth" -> "0"))
 
   val Checkout: WorkflowStep = Use(
-    UseRef.Public("actions", "checkout", "v2"),
+    UseRef.Public("actions", "checkout", "v3"),
     name = Some("Checkout current branch (fast)"))
 
   def SetupJava(versions: List[JavaSpec]): List[WorkflowStep] =
     versions flatMap {
-      case jv @ JavaSpec(JavaSpec.Distribution.GraalVM(graalVersion), version) =>
+      case jv @ JavaSpec(JavaSpec.Distribution.GraalVM(graalVersion), javaVersion) =>
         WorkflowStep.Use(
-          UseRef.Public("DeLaGuardo", "setup-graalvm", "5.0"),
+          UseRef.Public("graalvm", "setup-graalvm", "v1"),
           name = Some(s"Setup GraalVM (${jv.render})"),
           cond = Some(s"matrix.java == '${jv.render}'"),
-          params = Map("graalvm" -> graalVersion, "java" -> s"java$version")
+          params =
+            Map("version" -> graalVersion, "java-version" -> javaVersion, "cache" -> "sbt")
         ) :: Nil
 
       case jv @ JavaSpec(dist, version) if dist.isTlIndexed =>
@@ -49,35 +55,43 @@ object WorkflowStep {
         val id = s"download-java-${dist.rendering}-$version"
         List(
           WorkflowStep.Use(
-            UseRef.Public("typelevel", "download-java", "v1"),
+            UseRef.Public("typelevel", "download-java", "v2"),
             name = Some(s"Download Java (${jv.render})"),
             id = Some(id),
             cond = cond,
             params = Map("distribution" -> dist.rendering, "java-version" -> version)
           ),
           WorkflowStep.Use(
-            UseRef.Public("actions", "setup-java", "v2"),
+            UseRef.Public("actions", "setup-java", "v3"),
             name = Some(s"Setup Java (${jv.render})"),
             cond = cond,
             params = Map(
               "distribution" -> "jdkfile",
               "java-version" -> version,
-              "jdkFile" -> s"$${{ steps.$id.outputs.jdkFile }}"
+              "jdkFile" -> s"$${{ steps.$id.outputs.jdkFile }}",
+              "cache" -> "sbt"
             )
           )
         )
 
       case jv @ JavaSpec(dist, version) =>
         WorkflowStep.Use(
-          UseRef.Public("actions", "setup-java", "v2"),
+          UseRef.Public("actions", "setup-java", "v3"),
           name = Some(s"Setup Java (${jv.render})"),
           cond = Some(s"matrix.java == '${jv.render}'"),
-          params = Map("distribution" -> dist.rendering, "java-version" -> version)
+          params =
+            Map("distribution" -> dist.rendering, "java-version" -> version, "cache" -> "sbt")
         ) :: Nil
     }
 
   val Tmate: WorkflowStep =
-    Use(UseRef.Public("mxschmitt", "action-tmate", "v2"), name = Some("Setup tmate session"))
+    Use(UseRef.Public("mxschmitt", "action-tmate", "v3"), name = Some("Setup tmate session"))
+
+  val DependencySubmission: WorkflowStep =
+    Use(
+      UseRef.Public("scalacenter", "sbt-dependency-submission", "v2"),
+      name = Some("Submit Dependencies")
+    )
 
   def ComputeVar(name: String, cmd: String): WorkflowStep =
     Run(
@@ -96,7 +110,13 @@ object WorkflowStep {
       cond: Option[String] = None,
       env: Map[String, String] = Map(),
       params: Map[String, String] = Map())
-      extends WorkflowStep
+      extends WorkflowStep {
+    def withId(id: Option[String]) = copy(id = id)
+    def withName(name: Option[String]) = copy(name = name)
+    def withCond(cond: Option[String]) = copy(cond = cond)
+    def withEnv(env: Map[String, String]) = copy(env = env)
+  }
+
   final case class Sbt(
       commands: List[String],
       id: Option[String] = None,
@@ -104,7 +124,13 @@ object WorkflowStep {
       cond: Option[String] = None,
       env: Map[String, String] = Map(),
       params: Map[String, String] = Map())
-      extends WorkflowStep
+      extends WorkflowStep {
+    def withId(id: Option[String]) = copy(id = id)
+    def withName(name: Option[String]) = copy(name = name)
+    def withCond(cond: Option[String]) = copy(cond = cond)
+    def withEnv(env: Map[String, String]) = copy(env = env)
+  }
+
   final case class Use(
       ref: UseRef,
       params: Map[String, String] = Map(),
@@ -112,5 +138,10 @@ object WorkflowStep {
       name: Option[String] = None,
       cond: Option[String] = None,
       env: Map[String, String] = Map())
-      extends WorkflowStep
+      extends WorkflowStep {
+    def withId(id: Option[String]) = copy(id = id)
+    def withName(name: Option[String]) = copy(name = name)
+    def withCond(cond: Option[String]) = copy(cond = cond)
+    def withEnv(env: Map[String, String]) = copy(env = env)
+  }
 }
