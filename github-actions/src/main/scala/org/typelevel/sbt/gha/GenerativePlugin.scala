@@ -516,7 +516,7 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
     githubWorkflowBuildRunsOnExtraLabels := Seq(),
     githubWorkflowBuildPreamble := Seq(),
     githubWorkflowBuildPostamble := Seq(),
-    githubWorkflowBuildSbtStepPreamble := Seq(s"++$${{ matrix.scala }}"),
+    githubWorkflowBuildSbtStepPreamble := Seq(s"++ $${{ matrix.scala }}"),
     githubWorkflowBuild := Seq(WorkflowStep.Sbt(List("test"), name = Some("Build project"))),
     githubWorkflowPublishPreamble := Seq(),
     githubWorkflowPublishPostamble := Seq(),
