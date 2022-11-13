@@ -51,6 +51,8 @@ trait GenerativeKeys {
     settingKey[Seq[MatrixExclude]]("A list of matrix exclusions (default: [])")
   lazy val githubWorkflowBuildRunsOnExtraLabels = settingKey[Seq[String]](
     "A list of additional labels to append to each run of the matrix executions")
+  lazy val githubWorkflowBuildConcurrency = settingKey[Option[JobConcurrency]](
+    "Use concurrency to ensure that only a single build job within the same concurrency group will run at a time. (default: None)")
 
   lazy val githubWorkflowBuildPreamble = settingKey[Seq[WorkflowStep]](
     "A list of steps to insert after base setup but before compiling and testing (default: [])")

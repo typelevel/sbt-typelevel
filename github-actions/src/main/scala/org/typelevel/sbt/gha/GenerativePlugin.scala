@@ -31,6 +31,9 @@ object GenerativePlugin extends AutoPlugin {
     type WorkflowJob = org.typelevel.sbt.gha.WorkflowJob
     val WorkflowJob = org.typelevel.sbt.gha.WorkflowJob
 
+    type JobConcurrency = org.typelevel.sbt.gha.JobConcurrency
+    val JobConcurrency = org.typelevel.sbt.gha.JobConcurrency
+
     type JobContainer = org.typelevel.sbt.gha.JobContainer
     val JobContainer = org.typelevel.sbt.gha.JobContainer
 
@@ -157,6 +160,18 @@ object GenerativePlugin extends AutoPlugin {
     case RefPredicate.EndsWith(Ref.Branch(name)) =>
       s"(startsWith($target, 'refs/heads/') && endsWith($target, '$name'))"
   }
+
+  def compileConcurrency(concurrency: JobConcurrency): String =
+    concurrency.cancelInProgress match {
+      case Some(value) =>
+        val fields = s"""group: ${wrap(concurrency.group)}
+                        |cancel-in-progress: ${wrap(value.toString)}""".stripMargin
+        s"""concurrency:
+           |${indent(fields, 1)}""".stripMargin
+
+      case None =>
+        s"concurrency: ${wrap(concurrency.group)}"
+    }
 
   def compileEnvironment(environment: JobEnvironment): String =
     environment.url match {
@@ -295,6 +310,9 @@ ${indent(rendered.mkString("\n"), 1)}"""
       job.environment.map(compileEnvironment).map("\n" + _).getOrElse("")
 
     val renderedCond = job.cond.map(wrap).map("\nif: " + _).getOrElse("")
+
+    val renderedConcurrency =
+      job.concurrency.map(compileConcurrency).map("\n" + _).getOrElse("")
 
     val renderedContainer = job.container match {
       case Some(JobContainer(image, credentials, env, volumes, ports, options)) =>
@@ -435,7 +453,7 @@ strategy:${renderedFailFast}
     os:${compileList(job.oses, 3)}
     scala:${compileList(job.scalas, 3)}
     java:${compileList(job.javas.map(_.render), 3)}${renderedMatrices}
-runs-on: ${runsOn}${renderedEnvironment}${renderedContainer}${renderedEnv}
+runs-on: ${runsOn}${renderedEnvironment}${renderedContainer}${renderedEnv}${renderedConcurrency}
 steps:
 ${indent(job.steps.map(compileStep(_, sbt, job.sbtStepPreamble, declareShell = declareShell)).mkString("\n\n"), 1)}"""
     // format: on
@@ -723,7 +741,8 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
           matrixAdds = githubWorkflowBuildMatrixAdditions.value,
           matrixIncs = githubWorkflowBuildMatrixInclusions.value.toList,
           matrixExcs = githubWorkflowBuildMatrixExclusions.value.toList,
-          runsOnExtraLabels = githubWorkflowBuildRunsOnExtraLabels.value.toList
+          runsOnExtraLabels = githubWorkflowBuildRunsOnExtraLabels.value.toList,
+          concurrency = githubWorkflowBuildConcurrency.value
         )) ++ publishJobOpt ++ githubWorkflowAddedJobs.value
     }
   )
