@@ -21,11 +21,13 @@ sealed trait WorkflowStep extends Product with Serializable {
   def name: Option[String]
   def cond: Option[String]
   def env: Map[String, String]
+  def timeoutMinutes: Option[Int]
 
   def withId(id: Option[String]): WorkflowStep
   def withName(name: Option[String]): WorkflowStep
   def withCond(cond: Option[String]): WorkflowStep
   def withEnv(env: Map[String, String]): WorkflowStep
+  def withTimeoutMinutes(minutes: Option[Int]): WorkflowStep
 }
 
 object WorkflowStep {
@@ -109,12 +111,14 @@ object WorkflowStep {
       name: Option[String] = None,
       cond: Option[String] = None,
       env: Map[String, String] = Map(),
-      params: Map[String, String] = Map())
+      params: Map[String, String] = Map(),
+      timeoutMinutes: Option[Int] = None)
       extends WorkflowStep {
     def withId(id: Option[String]) = copy(id = id)
     def withName(name: Option[String]) = copy(name = name)
     def withCond(cond: Option[String]) = copy(cond = cond)
     def withEnv(env: Map[String, String]) = copy(env = env)
+    def withTimeoutMinutes(minutes: Option[Int]) = copy(timeoutMinutes = minutes)
   }
 
   final case class Sbt(
@@ -123,12 +127,14 @@ object WorkflowStep {
       name: Option[String] = None,
       cond: Option[String] = None,
       env: Map[String, String] = Map(),
-      params: Map[String, String] = Map())
+      params: Map[String, String] = Map(),
+      timeoutMinutes: Option[Int] = None)
       extends WorkflowStep {
     def withId(id: Option[String]) = copy(id = id)
     def withName(name: Option[String]) = copy(name = name)
     def withCond(cond: Option[String]) = copy(cond = cond)
     def withEnv(env: Map[String, String]) = copy(env = env)
+    def withTimeoutMinutes(minutes: Option[Int]) = copy(timeoutMinutes = minutes)
   }
 
   final case class Use(
@@ -137,11 +143,13 @@ object WorkflowStep {
       id: Option[String] = None,
       name: Option[String] = None,
       cond: Option[String] = None,
-      env: Map[String, String] = Map())
+      env: Map[String, String] = Map(),
+      timeoutMinutes: Option[Int] = None)
       extends WorkflowStep {
     def withId(id: Option[String]) = copy(id = id)
     def withName(name: Option[String]) = copy(name = name)
     def withCond(cond: Option[String]) = copy(cond = cond)
     def withEnv(env: Map[String, String]) = copy(env = env)
+    def withTimeoutMinutes(minutes: Option[Int]) = copy(timeoutMinutes = minutes)
   }
 }
