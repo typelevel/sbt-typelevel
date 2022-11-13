@@ -13,6 +13,8 @@ ThisBuild / developers ++= List(
 ThisBuild / githubWorkflowJavaVersions ++=
   Seq(JavaSpec.temurin("17"), JavaSpec(JavaSpec.Distribution.GraalVM("latest"), "17"))
 
+ThisBuild / githubWorkflowPublishTimeoutMinutes := Some(45)
+
 ThisBuild / mergifyStewardConfig ~= {
   _.map(_.copy(mergeMinors = true, author = "typelevel-steward[bot]"))
 }

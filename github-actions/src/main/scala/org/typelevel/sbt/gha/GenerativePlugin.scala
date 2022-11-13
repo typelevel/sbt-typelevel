@@ -203,7 +203,11 @@ ${indent(rendered.mkString("\n"), 1)}"""
       else
         renderedEnvPre + "\n"
 
-    val preamblePre = renderedName + renderedId + renderedCond + renderedEnv
+    val renderedTimeoutMinutes =
+      step.timeoutMinutes.map("timeout-minutes: " + _ + "\n").getOrElse("")
+
+    val preamblePre =
+      renderedName + renderedId + renderedCond + renderedEnv + renderedTimeoutMinutes
 
     val preamble =
       if (preamblePre.isEmpty)
@@ -349,6 +353,9 @@ ${indent(rendered.mkString("\n"), 1)}"""
       else
         "\n" + renderedEnvPre
 
+    val renderedTimeoutMinutes =
+      job.timeoutMinutes.map(timeout => s"\ntimeout-minutes: $timeout").getOrElse("")
+
     List("include", "exclude") foreach { key =>
       if (job.matrixAdds.contains(key)) {
         sys.error(s"key `$key` is reserved and cannot be used in an Actions matrix definition")
@@ -435,7 +442,7 @@ strategy:${renderedFailFast}
     os:${compileList(job.oses, 3)}
     scala:${compileList(job.scalas, 3)}
     java:${compileList(job.javas.map(_.render), 3)}${renderedMatrices}
-runs-on: ${runsOn}${renderedEnvironment}${renderedContainer}${renderedEnv}
+runs-on: ${runsOn}${renderedEnvironment}${renderedContainer}${renderedEnv}${renderedTimeoutMinutes}
 steps:
 ${indent(job.steps.map(compileStep(_, sbt, job.sbtStepPreamble, declareShell = declareShell)).mkString("\n\n"), 1)}"""
     // format: on
@@ -514,6 +521,7 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
     githubWorkflowBuildMatrixInclusions := Seq(),
     githubWorkflowBuildMatrixExclusions := Seq(),
     githubWorkflowBuildRunsOnExtraLabels := Seq(),
+    githubWorkflowBuildTimeoutMinutes := Some(60),
     githubWorkflowBuildPreamble := Seq(),
     githubWorkflowBuildPostamble := Seq(),
     githubWorkflowBuildSbtStepPreamble := Seq(s"++$${{ matrix.scala }}"),
@@ -524,6 +532,7 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
       WorkflowStep.Sbt(List("+publish"), name = Some("Publish project"))),
     githubWorkflowPublishTargetBranches := Seq(RefPredicate.Equals(Ref.Branch("main"))),
     githubWorkflowPublishCond := None,
+    githubWorkflowPublishTimeoutMinutes := None,
     githubWorkflowJavaVersions := Seq(JavaSpec.temurin("11")),
     githubWorkflowScalaVersions := {
       val scalas = crossScalaVersions.value
@@ -700,7 +709,8 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
           oses = githubWorkflowOSes.value.toList.take(1),
           scalas = List(scalaVersion.value),
           javas = List(githubWorkflowJavaVersions.value.head),
-          needs = List("build")
+          needs = List("build"),
+          timeoutMinutes = githubWorkflowPublishTimeoutMinutes.value
         )).filter(_ => githubWorkflowPublishTargetBranches.value.nonEmpty)
 
       Seq(
@@ -723,7 +733,8 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
           matrixAdds = githubWorkflowBuildMatrixAdditions.value,
           matrixIncs = githubWorkflowBuildMatrixInclusions.value.toList,
           matrixExcs = githubWorkflowBuildMatrixExclusions.value.toList,
-          runsOnExtraLabels = githubWorkflowBuildRunsOnExtraLabels.value.toList
+          runsOnExtraLabels = githubWorkflowBuildRunsOnExtraLabels.value.toList,
+          timeoutMinutes = githubWorkflowBuildTimeoutMinutes.value
         )) ++ publishJobOpt ++ githubWorkflowAddedJobs.value
     }
   )

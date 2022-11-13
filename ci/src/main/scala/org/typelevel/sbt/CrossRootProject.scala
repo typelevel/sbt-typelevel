@@ -159,7 +159,7 @@ object TypelevelCiJSPlugin extends AutoPlugin with RootProjectId {
     },
     githubWorkflowBuild := {
       githubWorkflowBuild.value.flatMap {
-        case testStep @ WorkflowStep.Sbt(List("test"), _, _, _, _, _) =>
+        case testStep @ WorkflowStep.Sbt(List("test"), _, _, _, _, _, _) =>
           val fastOptStep = WorkflowStep.Sbt(
             List("Test/scalaJSLinkerResult"),
             name = Some("scalaJSLink"),
@@ -191,7 +191,7 @@ object TypelevelCiNativePlugin extends AutoPlugin with RootProjectId {
     },
     githubWorkflowBuild := {
       githubWorkflowBuild.value.flatMap {
-        case testStep @ WorkflowStep.Sbt(List("test"), _, _, _, _, _) =>
+        case testStep @ WorkflowStep.Sbt(List("test"), _, _, _, _, _, _) =>
           val nativeLinkStep = WorkflowStep.Sbt(
             List("Test/nativeLink"),
             name = Some("nativeLink"),
