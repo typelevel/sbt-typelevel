@@ -312,25 +312,25 @@ ${indent(rendered.mkString("\n"), 1)}"""
           }
 
           val renderedEnv =
-            if (!env.isEmpty)
+            if (env.nonEmpty)
               "\n" + compileEnv(env)
             else
               ""
 
           val renderedVolumes =
-            if (!volumes.isEmpty)
+            if (volumes.nonEmpty)
               s"\nvolumes:${compileList(volumes.toList map { case (l, r) => s"$l:$r" }, 1)}"
             else
               ""
 
           val renderedPorts =
-            if (!ports.isEmpty)
+            if (ports.nonEmpty)
               s"\nports:${compileList(ports.map(_.toString), 1)}"
             else
               ""
 
           val renderedOptions =
-            if (!options.isEmpty)
+            if (options.nonEmpty)
               s"\noptions: ${wrap(options.mkString(" "))}"
             else
               ""
@@ -701,7 +701,7 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
           scalas = List(scalaVersion.value),
           javas = List(githubWorkflowJavaVersions.value.head),
           needs = List("build")
-        )).filter(_ => !githubWorkflowPublishTargetBranches.value.isEmpty)
+        )).filter(_ => githubWorkflowPublishTargetBranches.value.nonEmpty)
 
       Seq(
         WorkflowJob(
