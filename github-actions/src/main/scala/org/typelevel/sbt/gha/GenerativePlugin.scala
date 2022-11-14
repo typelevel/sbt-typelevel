@@ -68,9 +68,9 @@ object GenerativePlugin extends AutoPlugin {
   import autoImport._
 
   private object MatrixKeys {
-    val OS = "os"
-    val Scala = "scala"
-    val Java = "java"
+    final val OS = "os"
+    final val Scala = "scala"
+    final val Java = "java"
 
     def groupId(keys: List[String]): String =
       (MatrixKeys.OS :: MatrixKeys.Java :: MatrixKeys.Scala :: keys)
@@ -553,7 +553,7 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
     githubWorkflowBuildConcurrency := {
       val keys = githubWorkflowBuildMatrixAdditions.value.keys.toList.sorted
       val group = MatrixKeys.groupId(keys)
-      Some(JobConcurrency(s"ci-$group-$${{ github.ref }}", cancelInProgress = Some(true)))
+      Some(JobConcurrency(s"$group-$${{ github.ref }}", cancelInProgress = Some(true)))
     },
     githubWorkflowBuildTimeoutMinutes := Some(60),
     githubWorkflowBuildPreamble := Seq(),

@@ -28,7 +28,7 @@ jobs:
         project: [sbt-typelevelJVM]
     runs-on: ${{ matrix.os }}
     concurrency:
-      group: ci-${{ matrix.os }}-${{ matrix.java }}-${{ matrix.scala }}-${{ matrix.project }}-${{ github.ref }}
+      group: ${{ matrix.os }}-${{ matrix.java }}-${{ matrix.scala }}-${{ matrix.project }}-${{ github.ref }}
       cancel-in-progress: true
     timeout-minutes: 60
     steps:
