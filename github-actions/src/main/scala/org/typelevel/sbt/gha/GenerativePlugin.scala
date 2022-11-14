@@ -67,6 +67,17 @@ object GenerativePlugin extends AutoPlugin {
 
   import autoImport._
 
+  private object MatrixKeys {
+    val OS = "os"
+    val Scala = "scala"
+    val Java = "java"
+
+    def groupId(keys: List[String]): String =
+      (MatrixKeys.OS :: MatrixKeys.Java :: MatrixKeys.Scala :: keys)
+        .map(k => s"$${{ matrix.$k }}")
+        .mkString("-")
+  }
+
   private def indent(output: String, level: Int): String = {
     val space = (0 until level * 2).map(_ => ' ').mkString
     (space + output.replace("\n", s"\n$space")).replaceAll("""\n[ ]+\n""", "\n\n")
@@ -386,9 +397,9 @@ ${indent(rendered.mkString("\n"), 1)}"""
 
     // TODO refactor all of this stuff to use whitelist instead
     val whitelist = Map(
-      "os" -> job.oses,
-      "scala" -> job.scalas,
-      "java" -> job.javas.map(_.render)) ++ job.matrixAdds
+      MatrixKeys.OS -> job.oses,
+      MatrixKeys.Scala -> job.scalas,
+      MatrixKeys.Java -> job.javas.map(_.render)) ++ job.matrixAdds
 
     def checkMatching(matching: Map[String, String]): Unit = {
       matching foreach {
@@ -539,6 +550,11 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
     githubWorkflowBuildMatrixInclusions := Seq(),
     githubWorkflowBuildMatrixExclusions := Seq(),
     githubWorkflowBuildRunsOnExtraLabels := Seq(),
+    githubWorkflowBuildConcurrency := {
+      val keys = githubWorkflowBuildMatrixAdditions.value.keys.toList.sorted
+      val group = MatrixKeys.groupId(keys)
+      Some(JobConcurrency(s"ci-$group-$${{ github.ref }}", cancelInProgress = Some(true)))
+    },
     githubWorkflowBuildTimeoutMinutes := Some(60),
     githubWorkflowBuildPreamble := Seq(),
     githubWorkflowBuildPostamble := Seq(),
@@ -621,9 +637,7 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
           cond = Some(publicationCond.value))
 
         val keys = githubWorkflowBuildMatrixAdditions.value.keys.toList.sorted
-
-        val artifactId =
-          (List("os", "java", "scala") ::: keys).map(k => s"$${{ matrix.$k }}").mkString("-")
+        val artifactId = MatrixKeys.groupId(keys)
 
         val upload = WorkflowStep.Use(
           UseRef.Public("actions", "upload-artifact", "v3"),
@@ -886,9 +900,14 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
       includes: List[MatrixInclude],
       excludes: List[MatrixExclude]
   ): List[List[String]] = {
-    val keys = "os" :: "scala" :: "java" :: matrixAdds.keys.toList.sorted
+    val keys =
+      MatrixKeys.OS :: MatrixKeys.Scala :: MatrixKeys.Java :: matrixAdds.keys.toList.sorted
+
     val matrix =
-      matrixAdds + ("os" -> oses) + ("scala" -> scalas) + ("java" -> javas.map(_.render))
+      matrixAdds +
+        (MatrixKeys.OS -> oses) +
+        (MatrixKeys.Scala -> scalas) +
+        (MatrixKeys.Java -> javas.map(_.render))
 
     // expand the matrix
     keys

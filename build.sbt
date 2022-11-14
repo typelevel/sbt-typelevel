@@ -13,10 +13,6 @@ ThisBuild / developers ++= List(
 ThisBuild / githubWorkflowJavaVersions ++=
   Seq(JavaSpec.temurin("17"), JavaSpec(JavaSpec.Distribution.GraalVM("latest"), "17"))
 
-ThisBuild / githubWorkflowBuildConcurrency := Some(
-  JobConcurrency("ci-${{ matrix.java }}-${{ github.ref }}", cancelInProgress = Some(true))
-)
-
 ThisBuild / githubWorkflowPublishTimeoutMinutes := Some(45)
 
 ThisBuild / mergifyStewardConfig ~= {

@@ -52,7 +52,7 @@ trait GenerativeKeys {
   lazy val githubWorkflowBuildRunsOnExtraLabels = settingKey[Seq[String]](
     "A list of additional labels to append to each run of the matrix executions")
   lazy val githubWorkflowBuildConcurrency = settingKey[Option[JobConcurrency]](
-    "Use concurrency to ensure that only a single build job within the same concurrency group will run at a time. (default: None)")
+    "Use concurrency to ensure that only a single build job within the same concurrency group will run at a time. (default: ci-${{ matrix.os }}-${{ matrix.java }}-${{ matrix.scala }}-${{ github.ref }})")
   lazy val githubWorkflowBuildTimeoutMinutes = settingKey[Option[Int]](
     "The maximum number of minutes to let the build job run before GitHub automatically cancels it (default: 60)")
 
