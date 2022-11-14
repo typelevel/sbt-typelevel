@@ -553,7 +553,7 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
     githubWorkflowBuildConcurrency := {
       val keys = githubWorkflowBuildMatrixAdditions.value.keys.toList.sorted
       val group = MatrixKeys.groupId(keys)
-      Some(JobConcurrency(s"$group-$${{ github.ref }}", cancelInProgress = Some(true)))
+      Some(JobConcurrency(s"ci-build-$group-$${{ github.ref }}", cancelInProgress = Some(true)))
     },
     githubWorkflowBuildTimeoutMinutes := Some(60),
     githubWorkflowBuildPreamble := Seq(),
