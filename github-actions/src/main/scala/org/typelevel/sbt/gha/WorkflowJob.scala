@@ -34,4 +34,5 @@ final case class WorkflowJob(
     runsOnExtraLabels: List[String] = List(),
     container: Option[JobContainer] = None,
     environment: Option[JobEnvironment] = None,
-    concurrency: Option[JobConcurrency] = None)
+    concurrency: Option[JobConcurrency] = None,
+    timeoutMinutes: Option[Int] = None)

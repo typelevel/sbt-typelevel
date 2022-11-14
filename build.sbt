@@ -17,6 +17,8 @@ ThisBuild / githubWorkflowBuildConcurrency := Some(
   JobConcurrency("ci-${{ matrix.java }}-${{ github.ref }}", cancelInProgress = Some(true))
 )
 
+ThisBuild / githubWorkflowPublishTimeoutMinutes := Some(45)
+
 ThisBuild / mergifyStewardConfig ~= {
   _.map(_.copy(mergeMinors = true, author = "typelevel-steward[bot]"))
 }

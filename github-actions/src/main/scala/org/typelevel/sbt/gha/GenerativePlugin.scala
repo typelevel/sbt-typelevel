@@ -218,7 +218,11 @@ ${indent(rendered.mkString("\n"), 1)}"""
       else
         renderedEnvPre + "\n"
 
-    val preamblePre = renderedName + renderedId + renderedCond + renderedEnv
+    val renderedTimeoutMinutes =
+      step.timeoutMinutes.map("timeout-minutes: " + _ + "\n").getOrElse("")
+
+    val preamblePre =
+      renderedName + renderedId + renderedCond + renderedEnv + renderedTimeoutMinutes
 
     val preamble =
       if (preamblePre.isEmpty)
@@ -330,25 +334,25 @@ ${indent(rendered.mkString("\n"), 1)}"""
           }
 
           val renderedEnv =
-            if (!env.isEmpty)
+            if (env.nonEmpty)
               "\n" + compileEnv(env)
             else
               ""
 
           val renderedVolumes =
-            if (!volumes.isEmpty)
+            if (volumes.nonEmpty)
               s"\nvolumes:${compileList(volumes.toList map { case (l, r) => s"$l:$r" }, 1)}"
             else
               ""
 
           val renderedPorts =
-            if (!ports.isEmpty)
+            if (ports.nonEmpty)
               s"\nports:${compileList(ports.map(_.toString), 1)}"
             else
               ""
 
           val renderedOptions =
-            if (!options.isEmpty)
+            if (options.nonEmpty)
               s"\noptions: ${wrap(options.mkString(" "))}"
             else
               ""
@@ -366,6 +370,9 @@ ${indent(rendered.mkString("\n"), 1)}"""
         ""
       else
         "\n" + renderedEnvPre
+
+    val renderedTimeoutMinutes =
+      job.timeoutMinutes.map(timeout => s"\ntimeout-minutes: $timeout").getOrElse("")
 
     List("include", "exclude") foreach { key =>
       if (job.matrixAdds.contains(key)) {
@@ -453,7 +460,7 @@ strategy:${renderedFailFast}
     os:${compileList(job.oses, 3)}
     scala:${compileList(job.scalas, 3)}
     java:${compileList(job.javas.map(_.render), 3)}${renderedMatrices}
-runs-on: ${runsOn}${renderedEnvironment}${renderedContainer}${renderedEnv}${renderedConcurrency}
+runs-on: ${runsOn}${renderedEnvironment}${renderedContainer}${renderedEnv}${renderedConcurrency}${renderedTimeoutMinutes}
 steps:
 ${indent(job.steps.map(compileStep(_, sbt, job.sbtStepPreamble, declareShell = declareShell)).mkString("\n\n"), 1)}"""
     // format: on
@@ -532,6 +539,7 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
     githubWorkflowBuildMatrixInclusions := Seq(),
     githubWorkflowBuildMatrixExclusions := Seq(),
     githubWorkflowBuildRunsOnExtraLabels := Seq(),
+    githubWorkflowBuildTimeoutMinutes := Some(60),
     githubWorkflowBuildPreamble := Seq(),
     githubWorkflowBuildPostamble := Seq(),
     githubWorkflowBuildSbtStepPreamble := Seq(s"++$${{ matrix.scala }}"),
@@ -542,6 +550,7 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
       WorkflowStep.Sbt(List("+publish"), name = Some("Publish project"))),
     githubWorkflowPublishTargetBranches := Seq(RefPredicate.Equals(Ref.Branch("main"))),
     githubWorkflowPublishCond := None,
+    githubWorkflowPublishTimeoutMinutes := None,
     githubWorkflowJavaVersions := Seq(JavaSpec.temurin("11")),
     githubWorkflowScalaVersions := {
       val scalas = crossScalaVersions.value
@@ -718,8 +727,9 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
           oses = githubWorkflowOSes.value.toList.take(1),
           scalas = List(scalaVersion.value),
           javas = List(githubWorkflowJavaVersions.value.head),
-          needs = List("build")
-        )).filter(_ => !githubWorkflowPublishTargetBranches.value.isEmpty)
+          needs = List("build"),
+          timeoutMinutes = githubWorkflowPublishTimeoutMinutes.value
+        )).filter(_ => githubWorkflowPublishTargetBranches.value.nonEmpty)
 
       Seq(
         WorkflowJob(
@@ -742,7 +752,8 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
           matrixIncs = githubWorkflowBuildMatrixInclusions.value.toList,
           matrixExcs = githubWorkflowBuildMatrixExclusions.value.toList,
           runsOnExtraLabels = githubWorkflowBuildRunsOnExtraLabels.value.toList,
-          concurrency = githubWorkflowBuildConcurrency.value
+          concurrency = githubWorkflowBuildConcurrency.value,
+          timeoutMinutes = githubWorkflowBuildTimeoutMinutes.value
         )) ++ publishJobOpt ++ githubWorkflowAddedJobs.value
     }
   )
