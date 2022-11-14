@@ -29,7 +29,7 @@ object TypelevelKernelPlugin extends AutoPlugin {
   override def trigger = allRequirements
 
   object autoImport {
-    lazy val CompileTime = config("compile-time").hide
+    lazy val CompileTime: Configuration = config("compile-time").hide
 
     lazy val tlIsScala3 = settingKey[Boolean]("True if building with Scala 3")
     lazy val tlSkipIrrelevantScalas = settingKey[Boolean](
