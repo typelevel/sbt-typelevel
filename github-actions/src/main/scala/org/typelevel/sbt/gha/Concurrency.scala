@@ -16,4 +16,4 @@
 
 package org.typelevel.sbt.gha
 
-final case class JobConcurrency(group: String, cancelInProgress: Option[Boolean] = None)
+final case class Concurrency(group: String, cancelInProgress: Option[Boolean] = None)

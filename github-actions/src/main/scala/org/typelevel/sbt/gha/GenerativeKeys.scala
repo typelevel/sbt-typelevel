@@ -40,6 +40,8 @@ trait GenerativeKeys {
     "Whether to use sbt's native thin client, default is false since this can cause issues (see https://github.com/sbt/sbt/issues/6468)")
   lazy val githubWorkflowIncludeClean =
     settingKey[Boolean]("Whether to include the clean.yml file (default: true)")
+  lazy val githubWorkflowConcurrency = settingKey[Option[Concurrency]](
+    s"Use concurrency to ensure that only a single workflow within the same concurrency group will run at a time. (default: '$${{ github.workflow }} @ $${{ github.head_ref || github.ref }}')")
 
   lazy val githubWorkflowBuildMatrixFailFast = settingKey[Option[Boolean]](
     "Whether or not to enable the fail-fast strategy (default: None/Enabled)")
@@ -51,8 +53,6 @@ trait GenerativeKeys {
     settingKey[Seq[MatrixExclude]]("A list of matrix exclusions (default: [])")
   lazy val githubWorkflowBuildRunsOnExtraLabels = settingKey[Seq[String]](
     "A list of additional labels to append to each run of the matrix executions")
-  lazy val githubWorkflowBuildConcurrency = settingKey[Option[JobConcurrency]](
-    s"Use concurrency to ensure that only a single build job within the same concurrency group will run at a time. (default: ci-build-$${{ matrix.os }}-$${{ matrix.java }}-$${{ matrix.scala }}-$${{ github.ref }})")
   lazy val githubWorkflowBuildTimeoutMinutes = settingKey[Option[Int]](
     "The maximum number of minutes to let the build job run before GitHub automatically cancels it (default: 60)")
 

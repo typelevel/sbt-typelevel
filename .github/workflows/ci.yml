@@ -17,6 +17,11 @@ on:
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+
+concurrency:
+  group: ${{ github.workflow }} @ ${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     name: Build and Test
@@ -27,9 +32,6 @@ jobs:
         java: [temurin@8, temurin@17, graal_latest@17]
         project: [sbt-typelevelJVM]
     runs-on: ${{ matrix.os }}
-    concurrency:
-      group: ci-build-${{ matrix.os }}-${{ matrix.java }}-${{ matrix.scala }}-${{ matrix.project }}-${{ github.ref }}
-      cancel-in-progress: true
     timeout-minutes: 60
     steps:
       - name: Checkout current branch (full)

@@ -31,8 +31,8 @@ object GenerativePlugin extends AutoPlugin {
     type WorkflowJob = org.typelevel.sbt.gha.WorkflowJob
     val WorkflowJob = org.typelevel.sbt.gha.WorkflowJob
 
-    type JobConcurrency = org.typelevel.sbt.gha.JobConcurrency
-    val JobConcurrency = org.typelevel.sbt.gha.JobConcurrency
+    type Concurrency = org.typelevel.sbt.gha.Concurrency
+    val Concurrency = org.typelevel.sbt.gha.Concurrency
 
     type JobContainer = org.typelevel.sbt.gha.JobContainer
     val JobContainer = org.typelevel.sbt.gha.JobContainer
@@ -172,7 +172,7 @@ object GenerativePlugin extends AutoPlugin {
       s"(startsWith($target, 'refs/heads/') && endsWith($target, '$name'))"
   }
 
-  def compileConcurrency(concurrency: JobConcurrency): String =
+  def compileConcurrency(concurrency: Concurrency): String =
     concurrency.cancelInProgress match {
       case Some(value) =>
         val fields = s"""group: ${wrap(concurrency.group)}
@@ -486,6 +486,7 @@ ${indent(job.steps.map(compileStep(_, sbt, job.sbtStepPreamble, declareShell = d
       paths: Paths,
       prEventTypes: List[PREventType],
       env: Map[String, String],
+      concurrency: Option[Concurrency],
       jobs: List[WorkflowJob],
       sbt: String): String = {
 
@@ -495,6 +496,9 @@ ${indent(job.steps.map(compileStep(_, sbt, job.sbtStepPreamble, declareShell = d
         ""
       else
         renderedEnvPre + "\n\n"
+
+    val renderedConcurrency =
+      concurrency.map(compileConcurrency).map("\n" + _ + "\n\n").getOrElse("")
 
     val renderedTypesPre = prEventTypes.map(compilePREventType).mkString("[", ", ", "]")
     val renderedTypes =
@@ -534,7 +538,7 @@ on:
   push:
     branches: [${branches.map(wrap).mkString(", ")}]$renderedTags$renderedPaths
 
-${renderedEnv}jobs:
+${renderedEnv}${renderedConcurrency}jobs:
 ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
 """
   }
@@ -545,16 +549,16 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
     // This is currently set to false because of https://github.com/sbt/sbt/issues/6468. When a new SBT version is
     // released that fixes this issue then check for that SBT version (or higher) and set to true.
     githubWorkflowUseSbtThinClient := false,
+    githubWorkflowConcurrency := Some(
+      Concurrency(
+        group = s"$${{ github.workflow }} @ $${{ github.head_ref || github.ref }}",
+        cancelInProgress = Some(true))
+    ),
     githubWorkflowBuildMatrixFailFast := None,
     githubWorkflowBuildMatrixAdditions := Map(),
     githubWorkflowBuildMatrixInclusions := Seq(),
     githubWorkflowBuildMatrixExclusions := Seq(),
     githubWorkflowBuildRunsOnExtraLabels := Seq(),
-    githubWorkflowBuildConcurrency := {
-      val keys = githubWorkflowBuildMatrixAdditions.value.keys.toList.sorted
-      val group = MatrixKeys.groupId(keys)
-      Some(JobConcurrency(s"ci-build-$group-$${{ github.ref }}", cancelInProgress = Some(true)))
-    },
     githubWorkflowBuildTimeoutMinutes := Some(60),
     githubWorkflowBuildPreamble := Seq(),
     githubWorkflowBuildPostamble := Seq(),
@@ -766,7 +770,6 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
           matrixIncs = githubWorkflowBuildMatrixInclusions.value.toList,
           matrixExcs = githubWorkflowBuildMatrixExclusions.value.toList,
           runsOnExtraLabels = githubWorkflowBuildRunsOnExtraLabels.value.toList,
-          concurrency = githubWorkflowBuildConcurrency.value,
           timeoutMinutes = githubWorkflowBuildTimeoutMinutes.value
         )) ++ publishJobOpt ++ githubWorkflowAddedJobs.value
     }
@@ -802,6 +805,7 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
       githubWorkflowTargetPaths.value,
       githubWorkflowPREventTypes.value.toList,
       githubWorkflowEnv.value,
+      githubWorkflowConcurrency.value,
       githubWorkflowGeneratedCI.value.toList,
       sbt.value
     )
