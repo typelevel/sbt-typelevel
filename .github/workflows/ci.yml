@@ -58,7 +58,7 @@ jobs:
           cache: sbt
 
       - name: sbt update
-        if: matrix.java == 'temurin@8' && !steps.setup-java-temurin-8.cache-hit
+        if: matrix.java == 'temurin@8' && steps.setup-java-temurin-8.cache-hit == false
         run: sbt 'project ${{ matrix.project }}' '++${{ matrix.scala }}' reload +update
 
       - name: Download Java (temurin@17)
@@ -80,7 +80,7 @@ jobs:
           cache: sbt
 
       - name: sbt update
-        if: matrix.java == 'temurin@17' && !steps.setup-java-temurin-17.cache-hit
+        if: matrix.java == 'temurin@17' && steps.setup-java-temurin-17.cache-hit == false
         run: sbt 'project ${{ matrix.project }}' '++${{ matrix.scala }}' reload +update
 
       - name: Setup GraalVM (graal_latest@17)
@@ -93,7 +93,7 @@ jobs:
           cache: sbt
 
       - name: sbt update
-        if: matrix.java == 'graal_latest@17' && !steps.setup-graalvm-latest-17.cache-hit
+        if: matrix.java == 'graal_latest@17' && steps.setup-graalvm-latest-17.cache-hit == false
         run: sbt 'project ${{ matrix.project }}' '++${{ matrix.scala }}' reload +update
 
       - name: Check that workflows are up to date
@@ -169,7 +169,7 @@ jobs:
           cache: sbt
 
       - name: sbt update
-        if: matrix.java == 'temurin@8' && !steps.setup-java-temurin-8.cache-hit
+        if: matrix.java == 'temurin@8' && steps.setup-java-temurin-8.cache-hit == false
         run: sbt '++${{ matrix.scala }}' reload +update
 
       - name: Download Java (temurin@17)
@@ -191,7 +191,7 @@ jobs:
           cache: sbt
 
       - name: sbt update
-        if: matrix.java == 'temurin@17' && !steps.setup-java-temurin-17.cache-hit
+        if: matrix.java == 'temurin@17' && steps.setup-java-temurin-17.cache-hit == false
         run: sbt '++${{ matrix.scala }}' reload +update
 
       - name: Setup GraalVM (graal_latest@17)
@@ -204,7 +204,7 @@ jobs:
           cache: sbt
 
       - name: sbt update
-        if: matrix.java == 'graal_latest@17' && !steps.setup-graalvm-latest-17.cache-hit
+        if: matrix.java == 'graal_latest@17' && steps.setup-graalvm-latest-17.cache-hit == false
         run: sbt '++${{ matrix.scala }}' reload +update
 
       - name: Download target directories (2.12, sbt-typelevelJVM)
@@ -275,7 +275,7 @@ jobs:
           cache: sbt
 
       - name: sbt update
-        if: matrix.java == 'temurin@8' && !steps.setup-java-temurin-8.cache-hit
+        if: matrix.java == 'temurin@8' && steps.setup-java-temurin-8.cache-hit == false
         run: sbt '++${{ matrix.scala }}' reload +update
 
       - name: Download Java (temurin@17)
@@ -297,7 +297,7 @@ jobs:
           cache: sbt
 
       - name: sbt update
-        if: matrix.java == 'temurin@17' && !steps.setup-java-temurin-17.cache-hit
+        if: matrix.java == 'temurin@17' && steps.setup-java-temurin-17.cache-hit == false
         run: sbt '++${{ matrix.scala }}' reload +update
 
       - name: Setup GraalVM (graal_latest@17)
@@ -310,7 +310,7 @@ jobs:
           cache: sbt
 
       - name: sbt update
-        if: matrix.java == 'graal_latest@17' && !steps.setup-graalvm-latest-17.cache-hit
+        if: matrix.java == 'graal_latest@17' && steps.setup-graalvm-latest-17.cache-hit == false
         run: sbt '++${{ matrix.scala }}' reload +update
 
       - name: Submit Dependencies
@@ -349,7 +349,7 @@ jobs:
           cache: sbt
 
       - name: sbt update
-        if: matrix.java == 'temurin@8' && !steps.setup-java-temurin-8.cache-hit
+        if: matrix.java == 'temurin@8' && steps.setup-java-temurin-8.cache-hit == false
         run: sbt '++${{ matrix.scala }}' reload +update
 
       - name: Download Java (temurin@17)
@@ -371,7 +371,7 @@ jobs:
           cache: sbt
 
       - name: sbt update
-        if: matrix.java == 'temurin@17' && !steps.setup-java-temurin-17.cache-hit
+        if: matrix.java == 'temurin@17' && steps.setup-java-temurin-17.cache-hit == false
         run: sbt '++${{ matrix.scala }}' reload +update
 
       - name: Setup GraalVM (graal_latest@17)
@@ -384,7 +384,7 @@ jobs:
           cache: sbt
 
       - name: sbt update
-        if: matrix.java == 'graal_latest@17' && !steps.setup-graalvm-latest-17.cache-hit
+        if: matrix.java == 'graal_latest@17' && steps.setup-graalvm-latest-17.cache-hit == false
         run: sbt '++${{ matrix.scala }}' reload +update
 
       - name: Generate site
