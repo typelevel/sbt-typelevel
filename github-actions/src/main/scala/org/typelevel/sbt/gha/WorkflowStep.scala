@@ -46,7 +46,7 @@ object WorkflowStep {
       WorkflowStep.Sbt(
         List("reload", "+update"),
         name = Some(s"sbt update"),
-        cond = Some(s"$cond && ! $${{ ${setupId}.cache-hit }}")
+        cond = Some(s"$cond && !steps.${setupId}.cache-hit")
       )
 
     versions flatMap {
