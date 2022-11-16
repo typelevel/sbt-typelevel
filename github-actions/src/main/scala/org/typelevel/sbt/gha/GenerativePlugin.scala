@@ -551,7 +551,7 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
     githubWorkflowUseSbtThinClient := false,
     githubWorkflowConcurrency := Some(
       Concurrency(
-        group = s"$${{ github.workflow }} @ $${{ github.head_ref || github.ref }}",
+        group = s"$${{ github.workflow }} @ $${{ github.ref }}",
         cancelInProgress = Some(true))
     ),
     githubWorkflowBuildMatrixFailFast := None,
