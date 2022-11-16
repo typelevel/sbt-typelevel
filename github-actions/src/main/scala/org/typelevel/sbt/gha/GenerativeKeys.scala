@@ -40,6 +40,8 @@ trait GenerativeKeys {
     "Whether to use sbt's native thin client, default is false since this can cause issues (see https://github.com/sbt/sbt/issues/6468)")
   lazy val githubWorkflowIncludeClean =
     settingKey[Boolean]("Whether to include the clean.yml file (default: true)")
+  lazy val githubWorkflowConcurrency = settingKey[Option[Concurrency]](
+    s"Use concurrency to ensure that only a single workflow within the same concurrency group will run at a time. (default: '$${{ github.workflow }} @ $${{ github.ref }}')")
 
   lazy val githubWorkflowBuildMatrixFailFast = settingKey[Option[Boolean]](
     "Whether or not to enable the fail-fast strategy (default: None/Enabled)")

@@ -31,6 +31,9 @@ object GenerativePlugin extends AutoPlugin {
     type WorkflowJob = org.typelevel.sbt.gha.WorkflowJob
     val WorkflowJob = org.typelevel.sbt.gha.WorkflowJob
 
+    type Concurrency = org.typelevel.sbt.gha.Concurrency
+    val Concurrency = org.typelevel.sbt.gha.Concurrency
+
     type JobContainer = org.typelevel.sbt.gha.JobContainer
     val JobContainer = org.typelevel.sbt.gha.JobContainer
 
@@ -63,6 +66,17 @@ object GenerativePlugin extends AutoPlugin {
   }
 
   import autoImport._
+
+  private object MatrixKeys {
+    final val OS = "os"
+    final val Scala = "scala"
+    final val Java = "java"
+
+    def groupId(keys: List[String]): String =
+      (MatrixKeys.OS :: MatrixKeys.Java :: MatrixKeys.Scala :: keys)
+        .map(k => s"$${{ matrix.$k }}")
+        .mkString("-")
+  }
 
   private def indent(output: String, level: Int): String = {
     val space = (0 until level * 2).map(_ => ' ').mkString
@@ -157,6 +171,18 @@ object GenerativePlugin extends AutoPlugin {
     case RefPredicate.EndsWith(Ref.Branch(name)) =>
       s"(startsWith($target, 'refs/heads/') && endsWith($target, '$name'))"
   }
+
+  def compileConcurrency(concurrency: Concurrency): String =
+    concurrency.cancelInProgress match {
+      case Some(value) =>
+        val fields = s"""group: ${wrap(concurrency.group)}
+                        |cancel-in-progress: ${wrap(value.toString)}""".stripMargin
+        s"""concurrency:
+           |${indent(fields, 1)}""".stripMargin
+
+      case None =>
+        s"concurrency: ${wrap(concurrency.group)}"
+    }
 
   def compileEnvironment(environment: JobEnvironment): String =
     environment.url match {
@@ -300,6 +326,9 @@ ${indent(rendered.mkString("\n"), 1)}"""
 
     val renderedCond = job.cond.map(wrap).map("\nif: " + _).getOrElse("")
 
+    val renderedConcurrency =
+      job.concurrency.map(compileConcurrency).map("\n" + _).getOrElse("")
+
     val renderedContainer = job.container match {
       case Some(JobContainer(image, credentials, env, volumes, ports, options)) =>
         if (credentials.isEmpty && env.isEmpty && volumes.isEmpty && ports.isEmpty && options.isEmpty) {
@@ -368,9 +397,9 @@ ${indent(rendered.mkString("\n"), 1)}"""
 
     // TODO refactor all of this stuff to use whitelist instead
     val whitelist = Map(
-      "os" -> job.oses,
-      "scala" -> job.scalas,
-      "java" -> job.javas.map(_.render)) ++ job.matrixAdds
+      MatrixKeys.OS -> job.oses,
+      MatrixKeys.Scala -> job.scalas,
+      MatrixKeys.Java -> job.javas.map(_.render)) ++ job.matrixAdds
 
     def checkMatching(matching: Map[String, String]): Unit = {
       matching foreach {
@@ -442,7 +471,7 @@ strategy:${renderedFailFast}
     os:${compileList(job.oses, 3)}
     scala:${compileList(job.scalas, 3)}
     java:${compileList(job.javas.map(_.render), 3)}${renderedMatrices}
-runs-on: ${runsOn}${renderedEnvironment}${renderedContainer}${renderedEnv}${renderedTimeoutMinutes}
+runs-on: ${runsOn}${renderedEnvironment}${renderedContainer}${renderedEnv}${renderedConcurrency}${renderedTimeoutMinutes}
 steps:
 ${indent(job.steps.map(compileStep(_, sbt, job.sbtStepPreamble, declareShell = declareShell)).mkString("\n\n"), 1)}"""
     // format: on
@@ -457,6 +486,7 @@ ${indent(job.steps.map(compileStep(_, sbt, job.sbtStepPreamble, declareShell = d
       paths: Paths,
       prEventTypes: List[PREventType],
       env: Map[String, String],
+      concurrency: Option[Concurrency],
       jobs: List[WorkflowJob],
       sbt: String): String = {
 
@@ -466,6 +496,9 @@ ${indent(job.steps.map(compileStep(_, sbt, job.sbtStepPreamble, declareShell = d
         ""
       else
         renderedEnvPre + "\n\n"
+
+    val renderedConcurrency =
+      concurrency.map(compileConcurrency).map("\n" + _ + "\n\n").getOrElse("")
 
     val renderedTypesPre = prEventTypes.map(compilePREventType).mkString("[", ", ", "]")
     val renderedTypes =
@@ -505,7 +538,7 @@ on:
   push:
     branches: [${branches.map(wrap).mkString(", ")}]$renderedTags$renderedPaths
 
-${renderedEnv}jobs:
+${renderedEnv}${renderedConcurrency}jobs:
 ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
 """
   }
@@ -516,6 +549,11 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
     // This is currently set to false because of https://github.com/sbt/sbt/issues/6468. When a new SBT version is
     // released that fixes this issue then check for that SBT version (or higher) and set to true.
     githubWorkflowUseSbtThinClient := false,
+    githubWorkflowConcurrency := Some(
+      Concurrency(
+        group = s"$${{ github.workflow }} @ $${{ github.ref }}",
+        cancelInProgress = Some(true))
+    ),
     githubWorkflowBuildMatrixFailFast := None,
     githubWorkflowBuildMatrixAdditions := Map(),
     githubWorkflowBuildMatrixInclusions := Seq(),
@@ -603,9 +641,7 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
           cond = Some(publicationCond.value))
 
         val keys = githubWorkflowBuildMatrixAdditions.value.keys.toList.sorted
-
-        val artifactId =
-          (List("os", "java", "scala") ::: keys).map(k => s"$${{ matrix.$k }}").mkString("-")
+        val artifactId = MatrixKeys.groupId(keys)
 
         val upload = WorkflowStep.Use(
           UseRef.Public("actions", "upload-artifact", "v3"),
@@ -769,6 +805,7 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
       githubWorkflowTargetPaths.value,
       githubWorkflowPREventTypes.value.toList,
       githubWorkflowEnv.value,
+      githubWorkflowConcurrency.value,
       githubWorkflowGeneratedCI.value.toList,
       sbt.value
     )
@@ -867,9 +904,14 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
       includes: List[MatrixInclude],
       excludes: List[MatrixExclude]
   ): List[List[String]] = {
-    val keys = "os" :: "scala" :: "java" :: matrixAdds.keys.toList.sorted
+    val keys =
+      MatrixKeys.OS :: MatrixKeys.Scala :: MatrixKeys.Java :: matrixAdds.keys.toList.sorted
+
     val matrix =
-      matrixAdds + ("os" -> oses) + ("scala" -> scalas) + ("java" -> javas.map(_.render))
+      matrixAdds +
+        (MatrixKeys.OS -> oses) +
+        (MatrixKeys.Scala -> scalas) +
+        (MatrixKeys.Java -> javas.map(_.render))
 
     // expand the matrix
     keys
