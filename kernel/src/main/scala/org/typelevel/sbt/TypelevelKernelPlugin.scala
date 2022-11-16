@@ -29,6 +29,8 @@ object TypelevelKernelPlugin extends AutoPlugin {
   override def trigger = allRequirements
 
   object autoImport {
+    lazy val CompileTime: Configuration = config("compile-time").hide
+
     lazy val tlIsScala3 = settingKey[Boolean]("True if building with Scala 3")
     lazy val tlSkipIrrelevantScalas = settingKey[Boolean](
       "Sets skip := true for compile/test/publish/etc. tasks on a project if the current scalaVersion is not in that project's crossScalaVersions (default: false)")
@@ -53,6 +55,8 @@ object TypelevelKernelPlugin extends AutoPlugin {
       addCommandAlias("tlReleaseLocal", mkCommand(List("reload", "project /", "+publishLocal")))
 
   override def projectSettings = Seq(
+    ivyConfigurations += CompileTime,
+    Compile / unmanagedClasspath ++= update.value.select(configurationFilter(CompileTime.name)),
     (Test / test) := {
       if (tlSkipIrrelevantScalas.value && (Test / test / skip).value)
         ()

@@ -31,6 +31,9 @@ object GenerativePlugin extends AutoPlugin {
     type WorkflowJob = org.typelevel.sbt.gha.WorkflowJob
     val WorkflowJob = org.typelevel.sbt.gha.WorkflowJob
 
+    type Concurrency = org.typelevel.sbt.gha.Concurrency
+    val Concurrency = org.typelevel.sbt.gha.Concurrency
+
     type JobContainer = org.typelevel.sbt.gha.JobContainer
     val JobContainer = org.typelevel.sbt.gha.JobContainer
 
@@ -63,6 +66,17 @@ object GenerativePlugin extends AutoPlugin {
   }
 
   import autoImport._
+
+  private object MatrixKeys {
+    final val OS = "os"
+    final val Scala = "scala"
+    final val Java = "java"
+
+    def groupId(keys: List[String]): String =
+      (MatrixKeys.OS :: MatrixKeys.Java :: MatrixKeys.Scala :: keys)
+        .map(k => s"$${{ matrix.$k }}")
+        .mkString("-")
+  }
 
   private def indent(output: String, level: Int): String = {
     val space = (0 until level * 2).map(_ => ' ').mkString
@@ -158,6 +172,18 @@ object GenerativePlugin extends AutoPlugin {
       s"(startsWith($target, 'refs/heads/') && endsWith($target, '$name'))"
   }
 
+  def compileConcurrency(concurrency: Concurrency): String =
+    concurrency.cancelInProgress match {
+      case Some(value) =>
+        val fields = s"""group: ${wrap(concurrency.group)}
+                        |cancel-in-progress: ${wrap(value.toString)}""".stripMargin
+        s"""concurrency:
+           |${indent(fields, 1)}""".stripMargin
+
+      case None =>
+        s"concurrency: ${wrap(concurrency.group)}"
+    }
+
   def compileEnvironment(environment: JobEnvironment): String =
     environment.url match {
       case Some(url) =>
@@ -203,7 +229,11 @@ ${indent(rendered.mkString("\n"), 1)}"""
       else
         renderedEnvPre + "\n"
 
-    val preamblePre = renderedName + renderedId + renderedCond + renderedEnv
+    val renderedTimeoutMinutes =
+      step.timeoutMinutes.map("timeout-minutes: " + _ + "\n").getOrElse("")
+
+    val preamblePre =
+      renderedName + renderedId + renderedCond + renderedEnv + renderedTimeoutMinutes
 
     val preamble =
       if (preamblePre.isEmpty)
@@ -296,6 +326,9 @@ ${indent(rendered.mkString("\n"), 1)}"""
 
     val renderedCond = job.cond.map(wrap).map("\nif: " + _).getOrElse("")
 
+    val renderedConcurrency =
+      job.concurrency.map(compileConcurrency).map("\n" + _).getOrElse("")
+
     val renderedContainer = job.container match {
       case Some(JobContainer(image, credentials, env, volumes, ports, options)) =>
         if (credentials.isEmpty && env.isEmpty && volumes.isEmpty && ports.isEmpty && options.isEmpty) {
@@ -312,25 +345,25 @@ ${indent(rendered.mkString("\n"), 1)}"""
           }
 
           val renderedEnv =
-            if (!env.isEmpty)
+            if (env.nonEmpty)
               "\n" + compileEnv(env)
             else
               ""
 
           val renderedVolumes =
-            if (!volumes.isEmpty)
+            if (volumes.nonEmpty)
               s"\nvolumes:${compileList(volumes.toList map { case (l, r) => s"$l:$r" }, 1)}"
             else
               ""
 
           val renderedPorts =
-            if (!ports.isEmpty)
+            if (ports.nonEmpty)
               s"\nports:${compileList(ports.map(_.toString), 1)}"
             else
               ""
 
           val renderedOptions =
-            if (!options.isEmpty)
+            if (options.nonEmpty)
               s"\noptions: ${wrap(options.mkString(" "))}"
             else
               ""
@@ -349,6 +382,9 @@ ${indent(rendered.mkString("\n"), 1)}"""
       else
         "\n" + renderedEnvPre
 
+    val renderedTimeoutMinutes =
+      job.timeoutMinutes.map(timeout => s"\ntimeout-minutes: $timeout").getOrElse("")
+
     List("include", "exclude") foreach { key =>
       if (job.matrixAdds.contains(key)) {
         sys.error(s"key `$key` is reserved and cannot be used in an Actions matrix definition")
@@ -361,9 +397,9 @@ ${indent(rendered.mkString("\n"), 1)}"""
 
     // TODO refactor all of this stuff to use whitelist instead
     val whitelist = Map(
-      "os" -> job.oses,
-      "scala" -> job.scalas,
-      "java" -> job.javas.map(_.render)) ++ job.matrixAdds
+      MatrixKeys.OS -> job.oses,
+      MatrixKeys.Scala -> job.scalas,
+      MatrixKeys.Java -> job.javas.map(_.render)) ++ job.matrixAdds
 
     def checkMatching(matching: Map[String, String]): Unit = {
       matching foreach {
@@ -435,7 +471,7 @@ strategy:${renderedFailFast}
     os:${compileList(job.oses, 3)}
     scala:${compileList(job.scalas, 3)}
     java:${compileList(job.javas.map(_.render), 3)}${renderedMatrices}
-runs-on: ${runsOn}${renderedEnvironment}${renderedContainer}${renderedEnv}
+runs-on: ${runsOn}${renderedEnvironment}${renderedContainer}${renderedEnv}${renderedConcurrency}${renderedTimeoutMinutes}
 steps:
 ${indent(job.steps.map(compileStep(_, sbt, job.sbtStepPreamble, declareShell = declareShell)).mkString("\n\n"), 1)}"""
     // format: on
@@ -450,6 +486,7 @@ ${indent(job.steps.map(compileStep(_, sbt, job.sbtStepPreamble, declareShell = d
       paths: Paths,
       prEventTypes: List[PREventType],
       env: Map[String, String],
+      concurrency: Option[Concurrency],
       jobs: List[WorkflowJob],
       sbt: String): String = {
 
@@ -459,6 +496,9 @@ ${indent(job.steps.map(compileStep(_, sbt, job.sbtStepPreamble, declareShell = d
         ""
       else
         renderedEnvPre + "\n\n"
+
+    val renderedConcurrency =
+      concurrency.map(compileConcurrency).map("\n" + _ + "\n\n").getOrElse("")
 
     val renderedTypesPre = prEventTypes.map(compilePREventType).mkString("[", ", ", "]")
     val renderedTypes =
@@ -498,7 +538,7 @@ on:
   push:
     branches: [${branches.map(wrap).mkString(", ")}]$renderedTags$renderedPaths
 
-${renderedEnv}jobs:
+${renderedEnv}${renderedConcurrency}jobs:
 ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
 """
   }
@@ -509,11 +549,17 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
     // This is currently set to false because of https://github.com/sbt/sbt/issues/6468. When a new SBT version is
     // released that fixes this issue then check for that SBT version (or higher) and set to true.
     githubWorkflowUseSbtThinClient := false,
+    githubWorkflowConcurrency := Some(
+      Concurrency(
+        group = s"$${{ github.workflow }} @ $${{ github.ref }}",
+        cancelInProgress = Some(true))
+    ),
     githubWorkflowBuildMatrixFailFast := None,
     githubWorkflowBuildMatrixAdditions := Map(),
     githubWorkflowBuildMatrixInclusions := Seq(),
     githubWorkflowBuildMatrixExclusions := Seq(),
     githubWorkflowBuildRunsOnExtraLabels := Seq(),
+    githubWorkflowBuildTimeoutMinutes := Some(60),
     githubWorkflowBuildPreamble := Seq(),
     githubWorkflowBuildPostamble := Seq(),
     githubWorkflowBuildSbtStepPreamble := Seq(s"++ $${{ matrix.scala }}"),
@@ -524,8 +570,16 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
       WorkflowStep.Sbt(List("+publish"), name = Some("Publish project"))),
     githubWorkflowPublishTargetBranches := Seq(RefPredicate.Equals(Ref.Branch("main"))),
     githubWorkflowPublishCond := None,
+    githubWorkflowPublishTimeoutMinutes := None,
     githubWorkflowJavaVersions := Seq(JavaSpec.temurin("11")),
-    githubWorkflowScalaVersions := crossScalaVersions.value,
+    githubWorkflowScalaVersions := {
+      val scalas = crossScalaVersions.value
+      val binaryScalas = scalas.map(CrossVersion.binaryScalaVersion(_))
+      if (binaryScalas.toSet.size == scalas.size)
+        binaryScalas
+      else
+        scalas
+    },
     githubWorkflowOSes := Seq("ubuntu-latest"),
     githubWorkflowDependencyPatterns := Seq("**/*.sbt", "project/build.properties"),
     githubWorkflowTargetBranches := Seq("**"),
@@ -587,12 +641,10 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
           cond = Some(publicationCond.value))
 
         val keys = githubWorkflowBuildMatrixAdditions.value.keys.toList.sorted
-
-        val artifactId =
-          (List("os", "java", "scala") ::: keys).map(k => s"$${{ matrix.$k }}").mkString("-")
+        val artifactId = MatrixKeys.groupId(keys)
 
         val upload = WorkflowStep.Use(
-          UseRef.Public("actions", "upload-artifact", "v2"),
+          UseRef.Public("actions", "upload-artifact", "v3"),
           name = Some(s"Upload target directories"),
           params = Map("name" -> s"target-$artifactId", "path" -> "targets.tar"),
           cond = Some(publicationCond.value)
@@ -614,7 +666,6 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
             key -> values.take(1) // we only want the primary value
       }
 
-      val keys = "scala" :: additions.keys.toList.sorted
       val oses = githubWorkflowOSes.value.toList.take(1)
       val scalas = githubWorkflowScalaVersions.value.toList
       val javas = githubWorkflowJavaVersions.value.toList.take(1)
@@ -639,7 +690,7 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
           val pretty = v.mkString(", ")
 
           val download = WorkflowStep.Use(
-            UseRef.Public("actions", "download-artifact", "v2"),
+            UseRef.Public("actions", "download-artifact", "v3"),
             name = Some(s"Download target directories ($pretty)"),
             params =
               Map("name" -> s"target-$${{ matrix.os }}-$${{ matrix.java }}-${v.mkString("-")}")
@@ -655,29 +706,7 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
         Seq()
       }
     },
-    githubWorkflowGeneratedCacheSteps := {
-      val hashes = githubWorkflowDependencyPatterns.value map { glob =>
-        s"$${{ hashFiles('$glob') }}"
-      }
-
-      Seq(
-        WorkflowStep.Use(
-          UseRef.Public("actions", "cache", "v2"),
-          name = Some("Cache sbt"),
-          params = Map(
-            "path" -> Seq(
-              "~/.sbt",
-              "~/.ivy2/cache",
-              "~/.coursier/cache/v1",
-              "~/.cache/coursier/v1",
-              "~/AppData/Local/Coursier/Cache/v1",
-              "~/Library/Caches/Coursier/v1"
-            ).mkString("\n"),
-            "key" -> s"$${{ runner.os }}-sbt-cache-v2-${hashes.mkString("-")}"
-          )
-        )
-      )
-    },
+    githubWorkflowGeneratedCacheSteps := Seq(),
     githubWorkflowJobSetup := {
       val autoCrlfOpt = if (githubWorkflowOSes.value.exists(_.contains("windows"))) {
         List(
@@ -716,8 +745,9 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
           oses = githubWorkflowOSes.value.toList.take(1),
           scalas = List(scalaVersion.value),
           javas = List(githubWorkflowJavaVersions.value.head),
-          needs = List("build")
-        )).filter(_ => !githubWorkflowPublishTargetBranches.value.isEmpty)
+          needs = List("build"),
+          timeoutMinutes = githubWorkflowPublishTimeoutMinutes.value
+        )).filter(_ => githubWorkflowPublishTargetBranches.value.nonEmpty)
 
       Seq(
         WorkflowJob(
@@ -739,7 +769,8 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
           matrixAdds = githubWorkflowBuildMatrixAdditions.value,
           matrixIncs = githubWorkflowBuildMatrixInclusions.value.toList,
           matrixExcs = githubWorkflowBuildMatrixExclusions.value.toList,
-          runsOnExtraLabels = githubWorkflowBuildRunsOnExtraLabels.value.toList
+          runsOnExtraLabels = githubWorkflowBuildRunsOnExtraLabels.value.toList,
+          timeoutMinutes = githubWorkflowBuildTimeoutMinutes.value
         )) ++ publishJobOpt ++ githubWorkflowAddedJobs.value
     }
   )
@@ -774,6 +805,7 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
       githubWorkflowTargetPaths.value,
       githubWorkflowPREventTypes.value.toList,
       githubWorkflowEnv.value,
+      githubWorkflowConcurrency.value,
       githubWorkflowGeneratedCI.value.toList,
       sbt.value
     )
@@ -872,9 +904,14 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
       includes: List[MatrixInclude],
       excludes: List[MatrixExclude]
   ): List[List[String]] = {
-    val keys = "os" :: "scala" :: "java" :: matrixAdds.keys.toList.sorted
+    val keys =
+      MatrixKeys.OS :: MatrixKeys.Scala :: MatrixKeys.Java :: matrixAdds.keys.toList.sorted
+
     val matrix =
-      matrixAdds + ("os" -> oses) + ("scala" -> scalas) + ("java" -> javas.map(_.render))
+      matrixAdds +
+        (MatrixKeys.OS -> oses) +
+        (MatrixKeys.Scala -> scalas) +
+        (MatrixKeys.Java -> javas.map(_.render))
 
     // expand the matrix
     keys
