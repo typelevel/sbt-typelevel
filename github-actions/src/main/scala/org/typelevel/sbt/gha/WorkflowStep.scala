@@ -41,12 +41,14 @@ object WorkflowStep {
     UseRef.Public("actions", "checkout", "v3"),
     name = Some("Checkout current branch (fast)"))
 
-  def SetupJava(versions: List[JavaSpec]): List[WorkflowStep] =
-    versions flatMap {
+  def SetupJava(versions: List[JavaSpec]): List[WorkflowStep] = {
+    val setupId = "setup-java"
+    val downloadSetup = versions flatMap {
       case jv @ JavaSpec(JavaSpec.Distribution.GraalVM(graalVersion), javaVersion) =>
         WorkflowStep.Use(
           UseRef.Public("graalvm", "setup-graalvm", "v1"),
           name = Some(s"Setup GraalVM (${jv.render})"),
+          id = Some(setupId),
           cond = Some(s"matrix.java == '${jv.render}'"),
           params =
             Map("version" -> graalVersion, "java-version" -> javaVersion, "cache" -> "sbt")
@@ -54,23 +56,24 @@ object WorkflowStep {
 
       case jv @ JavaSpec(dist, version) if dist.isTlIndexed =>
         val cond = Some(s"matrix.java == '${jv.render}'")
-        val id = s"download-java-${dist.rendering}-$version"
+        val downloadId = s"download-java-${dist.rendering}-$version"
         List(
           WorkflowStep.Use(
             UseRef.Public("typelevel", "download-java", "v2"),
             name = Some(s"Download Java (${jv.render})"),
-            id = Some(id),
+            id = Some(downloadId),
             cond = cond,
             params = Map("distribution" -> dist.rendering, "java-version" -> version)
           ),
           WorkflowStep.Use(
             UseRef.Public("actions", "setup-java", "v3"),
             name = Some(s"Setup Java (${jv.render})"),
+            id = Some(setupId),
             cond = cond,
             params = Map(
               "distribution" -> "jdkfile",
               "java-version" -> version,
-              "jdkFile" -> s"$${{ steps.$id.outputs.jdkFile }}",
+              "jdkFile" -> s"$${{ steps.$downloadId.outputs.jdkFile }}",
               "cache" -> "sbt"
             )
           )
@@ -80,11 +83,20 @@ object WorkflowStep {
         WorkflowStep.Use(
           UseRef.Public("actions", "setup-java", "v3"),
           name = Some(s"Setup Java (${jv.render})"),
+          id = Some(setupId),
           cond = Some(s"matrix.java == '${jv.render}'"),
           params =
             Map("distribution" -> dist.rendering, "java-version" -> version, "cache" -> "sbt")
         ) :: Nil
     }
+
+    downloadSetup ::: WorkflowStep.Sbt(
+      List("reload", "+update"),
+      name = Some(s"sbt update"),
+      cond = Some(s"!${setupId}.cache-hit")
+    ) :: Nil
+
+  }
 
   val Tmate: WorkflowStep =
     Use(UseRef.Public("mxschmitt", "action-tmate", "v3"), name = Some("Setup tmate session"))
