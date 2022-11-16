@@ -48,6 +48,7 @@ jobs:
           java-version: 8
 
       - name: Setup Java (temurin@8)
+        id: setup-java-temurin-8
         if: matrix.java == 'temurin@8'
         uses: actions/setup-java@v3
         with:
@@ -55,6 +56,10 @@ jobs:
           java-version: 8
           jdkFile: ${{ steps.download-java-temurin-8.outputs.jdkFile }}
           cache: sbt
+
+      - name: sbt update
+        if: matrix.java == 'temurin@8' && !steps.setup-java-temurin-8.outputs.cache-hit
+        run: sbt 'project ${{ matrix.project }}' '++${{ matrix.scala }}' reload +update
 
       - name: Download Java (temurin@17)
         id: download-java-temurin-17
@@ -65,6 +70,7 @@ jobs:
           java-version: 17
 
       - name: Setup Java (temurin@17)
+        id: setup-java-temurin-17
         if: matrix.java == 'temurin@17'
         uses: actions/setup-java@v3
         with:
@@ -73,13 +79,22 @@ jobs:
           jdkFile: ${{ steps.download-java-temurin-17.outputs.jdkFile }}
           cache: sbt
 
+      - name: sbt update
+        if: matrix.java == 'temurin@17' && !steps.setup-java-temurin-17.outputs.cache-hit
+        run: sbt 'project ${{ matrix.project }}' '++${{ matrix.scala }}' reload +update
+
       - name: Setup GraalVM (graal_latest@17)
+        id: setup-graalvm-latest-17
         if: matrix.java == 'graal_latest@17'
         uses: graalvm/setup-graalvm@v1
         with:
           version: latest
           java-version: 17
           cache: sbt
+
+      - name: sbt update
+        if: matrix.java == 'graal_latest@17' && !steps.setup-graalvm-latest-17.outputs.cache-hit
+        run: sbt 'project ${{ matrix.project }}' '++${{ matrix.scala }}' reload +update
 
       - name: Check that workflows are up to date
         run: sbt githubWorkflowCheck
@@ -144,6 +159,7 @@ jobs:
           java-version: 8
 
       - name: Setup Java (temurin@8)
+        id: setup-java-temurin-8
         if: matrix.java == 'temurin@8'
         uses: actions/setup-java@v3
         with:
@@ -151,6 +167,10 @@ jobs:
           java-version: 8
           jdkFile: ${{ steps.download-java-temurin-8.outputs.jdkFile }}
           cache: sbt
+
+      - name: sbt update
+        if: matrix.java == 'temurin@8' && !steps.setup-java-temurin-8.outputs.cache-hit
+        run: sbt '++${{ matrix.scala }}' reload +update
 
       - name: Download Java (temurin@17)
         id: download-java-temurin-17
@@ -161,6 +181,7 @@ jobs:
           java-version: 17
 
       - name: Setup Java (temurin@17)
+        id: setup-java-temurin-17
         if: matrix.java == 'temurin@17'
         uses: actions/setup-java@v3
         with:
@@ -169,13 +190,22 @@ jobs:
           jdkFile: ${{ steps.download-java-temurin-17.outputs.jdkFile }}
           cache: sbt
 
+      - name: sbt update
+        if: matrix.java == 'temurin@17' && !steps.setup-java-temurin-17.outputs.cache-hit
+        run: sbt '++${{ matrix.scala }}' reload +update
+
       - name: Setup GraalVM (graal_latest@17)
+        id: setup-graalvm-latest-17
         if: matrix.java == 'graal_latest@17'
         uses: graalvm/setup-graalvm@v1
         with:
           version: latest
           java-version: 17
           cache: sbt
+
+      - name: sbt update
+        if: matrix.java == 'graal_latest@17' && !steps.setup-graalvm-latest-17.outputs.cache-hit
+        run: sbt '++${{ matrix.scala }}' reload +update
 
       - name: Download target directories (2.12, sbt-typelevelJVM)
         uses: actions/download-artifact@v3
@@ -235,6 +265,7 @@ jobs:
           java-version: 8
 
       - name: Setup Java (temurin@8)
+        id: setup-java-temurin-8
         if: matrix.java == 'temurin@8'
         uses: actions/setup-java@v3
         with:
@@ -242,6 +273,10 @@ jobs:
           java-version: 8
           jdkFile: ${{ steps.download-java-temurin-8.outputs.jdkFile }}
           cache: sbt
+
+      - name: sbt update
+        if: matrix.java == 'temurin@8' && !steps.setup-java-temurin-8.outputs.cache-hit
+        run: sbt '++${{ matrix.scala }}' reload +update
 
       - name: Download Java (temurin@17)
         id: download-java-temurin-17
@@ -252,6 +287,7 @@ jobs:
           java-version: 17
 
       - name: Setup Java (temurin@17)
+        id: setup-java-temurin-17
         if: matrix.java == 'temurin@17'
         uses: actions/setup-java@v3
         with:
@@ -260,13 +296,22 @@ jobs:
           jdkFile: ${{ steps.download-java-temurin-17.outputs.jdkFile }}
           cache: sbt
 
+      - name: sbt update
+        if: matrix.java == 'temurin@17' && !steps.setup-java-temurin-17.outputs.cache-hit
+        run: sbt '++${{ matrix.scala }}' reload +update
+
       - name: Setup GraalVM (graal_latest@17)
+        id: setup-graalvm-latest-17
         if: matrix.java == 'graal_latest@17'
         uses: graalvm/setup-graalvm@v1
         with:
           version: latest
           java-version: 17
           cache: sbt
+
+      - name: sbt update
+        if: matrix.java == 'graal_latest@17' && !steps.setup-graalvm-latest-17.outputs.cache-hit
+        run: sbt '++${{ matrix.scala }}' reload +update
 
       - name: Submit Dependencies
         uses: scalacenter/sbt-dependency-submission@v2
@@ -294,6 +339,7 @@ jobs:
           java-version: 8
 
       - name: Setup Java (temurin@8)
+        id: setup-java-temurin-8
         if: matrix.java == 'temurin@8'
         uses: actions/setup-java@v3
         with:
@@ -301,6 +347,10 @@ jobs:
           java-version: 8
           jdkFile: ${{ steps.download-java-temurin-8.outputs.jdkFile }}
           cache: sbt
+
+      - name: sbt update
+        if: matrix.java == 'temurin@8' && !steps.setup-java-temurin-8.outputs.cache-hit
+        run: sbt '++${{ matrix.scala }}' reload +update
 
       - name: Download Java (temurin@17)
         id: download-java-temurin-17
@@ -311,6 +361,7 @@ jobs:
           java-version: 17
 
       - name: Setup Java (temurin@17)
+        id: setup-java-temurin-17
         if: matrix.java == 'temurin@17'
         uses: actions/setup-java@v3
         with:
@@ -319,13 +370,22 @@ jobs:
           jdkFile: ${{ steps.download-java-temurin-17.outputs.jdkFile }}
           cache: sbt
 
+      - name: sbt update
+        if: matrix.java == 'temurin@17' && !steps.setup-java-temurin-17.outputs.cache-hit
+        run: sbt '++${{ matrix.scala }}' reload +update
+
       - name: Setup GraalVM (graal_latest@17)
+        id: setup-graalvm-latest-17
         if: matrix.java == 'graal_latest@17'
         uses: graalvm/setup-graalvm@v1
         with:
           version: latest
           java-version: 17
           cache: sbt
+
+      - name: sbt update
+        if: matrix.java == 'graal_latest@17' && !steps.setup-graalvm-latest-17.outputs.cache-hit
+        run: sbt '++${{ matrix.scala }}' reload +update
 
       - name: Generate site
         run: sbt '++${{ matrix.scala }}' docs/tlSite
