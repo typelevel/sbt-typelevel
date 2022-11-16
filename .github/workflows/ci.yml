@@ -59,7 +59,7 @@ jobs:
 
       - name: sbt update
         if: matrix.java == 'temurin@8' && !steps.setup-java-temurin-8.outputs.cache-hit
-        run: sbt 'project ${{ matrix.project }}' '++${{ matrix.scala }}' reload +update
+        run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' reload +update
 
       - name: Download Java (temurin@17)
         id: download-java-temurin-17
@@ -81,7 +81,7 @@ jobs:
 
       - name: sbt update
         if: matrix.java == 'temurin@17' && !steps.setup-java-temurin-17.outputs.cache-hit
-        run: sbt 'project ${{ matrix.project }}' '++${{ matrix.scala }}' reload +update
+        run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' reload +update
 
       - name: Setup GraalVM (graal_latest@17)
         id: setup-graalvm-latest-17
@@ -94,29 +94,29 @@ jobs:
 
       - name: sbt update
         if: matrix.java == 'graal_latest@17' && !steps.setup-graalvm-latest-17.outputs.cache-hit
-        run: sbt 'project ${{ matrix.project }}' '++${{ matrix.scala }}' reload +update
+        run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' reload +update
 
       - name: Check that workflows are up to date
         run: sbt githubWorkflowCheck
 
       - name: Check headers and formatting
         if: matrix.java == 'temurin@8'
-        run: sbt 'project ${{ matrix.project }}' '++${{ matrix.scala }}' headerCheckAll scalafmtCheckAll 'project /' scalafmtSbtCheck
+        run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' headerCheckAll scalafmtCheckAll 'project /' scalafmtSbtCheck
 
       - name: Test
-        run: sbt 'project ${{ matrix.project }}' '++${{ matrix.scala }}' test
+        run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' test
 
       - name: Check scalafix lints
         if: matrix.java == 'temurin@8'
-        run: sbt 'project ${{ matrix.project }}' '++${{ matrix.scala }}' 'scalafixAll --check'
+        run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' 'scalafixAll --check'
 
       - name: Check binary compatibility
         if: matrix.java == 'temurin@8'
-        run: sbt 'project ${{ matrix.project }}' '++${{ matrix.scala }}' mimaReportBinaryIssues
+        run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' mimaReportBinaryIssues
 
       - name: Generate API documentation
         if: matrix.java == 'temurin@8'
-        run: sbt 'project ${{ matrix.project }}' '++${{ matrix.scala }}' doc
+        run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' doc
 
       - name: Make target directories
         if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main')
@@ -170,7 +170,7 @@ jobs:
 
       - name: sbt update
         if: matrix.java == 'temurin@8' && !steps.setup-java-temurin-8.outputs.cache-hit
-        run: sbt '++${{ matrix.scala }}' reload +update
+        run: sbt '++ ${{ matrix.scala }}' reload +update
 
       - name: Download Java (temurin@17)
         id: download-java-temurin-17
@@ -192,7 +192,7 @@ jobs:
 
       - name: sbt update
         if: matrix.java == 'temurin@17' && !steps.setup-java-temurin-17.outputs.cache-hit
-        run: sbt '++${{ matrix.scala }}' reload +update
+        run: sbt '++ ${{ matrix.scala }}' reload +update
 
       - name: Setup GraalVM (graal_latest@17)
         id: setup-graalvm-latest-17
@@ -205,7 +205,7 @@ jobs:
 
       - name: sbt update
         if: matrix.java == 'graal_latest@17' && !steps.setup-graalvm-latest-17.outputs.cache-hit
-        run: sbt '++${{ matrix.scala }}' reload +update
+        run: sbt '++ ${{ matrix.scala }}' reload +update
 
       - name: Download target directories (2.12, sbt-typelevelJVM)
         uses: actions/download-artifact@v3
@@ -239,7 +239,7 @@ jobs:
           SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
           SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
           SONATYPE_CREDENTIAL_HOST: ${{ secrets.SONATYPE_CREDENTIAL_HOST }}
-        run: sbt '++${{ matrix.scala }}' tlRelease
+        run: sbt '++ ${{ matrix.scala }}' tlRelease
 
   dependency-submission:
     name: Submit Dependencies
@@ -276,7 +276,7 @@ jobs:
 
       - name: sbt update
         if: matrix.java == 'temurin@8' && !steps.setup-java-temurin-8.outputs.cache-hit
-        run: sbt '++${{ matrix.scala }}' reload +update
+        run: sbt '++ ${{ matrix.scala }}' reload +update
 
       - name: Download Java (temurin@17)
         id: download-java-temurin-17
@@ -298,7 +298,7 @@ jobs:
 
       - name: sbt update
         if: matrix.java == 'temurin@17' && !steps.setup-java-temurin-17.outputs.cache-hit
-        run: sbt '++${{ matrix.scala }}' reload +update
+        run: sbt '++ ${{ matrix.scala }}' reload +update
 
       - name: Setup GraalVM (graal_latest@17)
         id: setup-graalvm-latest-17
@@ -311,7 +311,7 @@ jobs:
 
       - name: sbt update
         if: matrix.java == 'graal_latest@17' && !steps.setup-graalvm-latest-17.outputs.cache-hit
-        run: sbt '++${{ matrix.scala }}' reload +update
+        run: sbt '++ ${{ matrix.scala }}' reload +update
 
       - name: Submit Dependencies
         uses: scalacenter/sbt-dependency-submission@v2
@@ -350,7 +350,7 @@ jobs:
 
       - name: sbt update
         if: matrix.java == 'temurin@8' && !steps.setup-java-temurin-8.outputs.cache-hit
-        run: sbt '++${{ matrix.scala }}' reload +update
+        run: sbt '++ ${{ matrix.scala }}' reload +update
 
       - name: Download Java (temurin@17)
         id: download-java-temurin-17
@@ -372,7 +372,7 @@ jobs:
 
       - name: sbt update
         if: matrix.java == 'temurin@17' && !steps.setup-java-temurin-17.outputs.cache-hit
-        run: sbt '++${{ matrix.scala }}' reload +update
+        run: sbt '++ ${{ matrix.scala }}' reload +update
 
       - name: Setup GraalVM (graal_latest@17)
         id: setup-graalvm-latest-17
@@ -385,10 +385,10 @@ jobs:
 
       - name: sbt update
         if: matrix.java == 'graal_latest@17' && !steps.setup-graalvm-latest-17.outputs.cache-hit
-        run: sbt '++${{ matrix.scala }}' reload +update
+        run: sbt '++ ${{ matrix.scala }}' reload +update
 
       - name: Generate site
-        run: sbt '++${{ matrix.scala }}' docs/tlSite
+        run: sbt '++ ${{ matrix.scala }}' docs/tlSite
 
       - name: Publish site
         if: github.event_name != 'pull_request' && github.ref == 'refs/heads/series/0.4'

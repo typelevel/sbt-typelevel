@@ -562,7 +562,7 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
     githubWorkflowBuildTimeoutMinutes := Some(60),
     githubWorkflowBuildPreamble := Seq(),
     githubWorkflowBuildPostamble := Seq(),
-    githubWorkflowBuildSbtStepPreamble := Seq(s"++$${{ matrix.scala }}"),
+    githubWorkflowBuildSbtStepPreamble := Seq(s"++ $${{ matrix.scala }}"),
     githubWorkflowBuild := Seq(WorkflowStep.Sbt(List("test"), name = Some("Build project"))),
     githubWorkflowPublishPreamble := Seq(),
     githubWorkflowPublishPostamble := Seq(),
