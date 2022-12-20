@@ -199,7 +199,7 @@ object TypelevelSettingsPlugin extends AutoPlugin {
       scalaVersion.value match {
         case V(V(3, 2, Some(build), _)) if build >= 1 =>
           Seq("-Ygenerate-inkuire")
-        case V(V(3, minor, _, _)) if minor >= 2 =>
+        case V(V(3, minor, _, _)) if minor >= 3 =>
           Seq("-Ygenerate-inkuire")
         case _ =>
           Seq.empty
