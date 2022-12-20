@@ -194,6 +194,14 @@ object TypelevelSettingsPlugin extends AutoPlugin {
           }
         }
     },
+    Compile / doc / scalacOptions ++= {
+      scalaVersion.value match {
+        case V(V(3, minor, Some(build), _)) if minor >= 2 && build >= 1 =>
+          Seq("-Ygenerate-inkuire")
+        case _ =>
+          Seq.empty
+      }
+    },
     javacOptions ++= Seq(
       "-encoding",
       "utf8",
