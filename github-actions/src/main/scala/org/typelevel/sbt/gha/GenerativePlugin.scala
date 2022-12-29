@@ -662,7 +662,7 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
 
       Seq(
         WorkflowStep.Use(
-          UseRef.Public("actions", "cache", "v2"),
+          UseRef.Public("actions", "cache", "v3"),
           name = Some("Cache sbt"),
           params = Map(
             "path" -> Seq(
