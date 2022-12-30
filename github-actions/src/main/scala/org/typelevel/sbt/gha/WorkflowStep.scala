@@ -49,7 +49,7 @@ object WorkflowStep {
         val id = s"download-java-${dist.rendering}-$version"
         List(
           WorkflowStep.Use(
-            UseRef.Public("typelevel", "download-java", "v1"),
+            UseRef.Public("typelevel", "download-java", "v2"),
             name = Some(s"Download Java (${jv.render})"),
             id = Some(id),
             cond = cond,
@@ -77,7 +77,7 @@ object WorkflowStep {
     }
 
   val Tmate: WorkflowStep =
-    Use(UseRef.Public("mxschmitt", "action-tmate", "v2"), name = Some("Setup tmate session"))
+    Use(UseRef.Public("mxschmitt", "action-tmate", "v3"), name = Some("Setup tmate session"))
 
   def ComputeVar(name: String, cmd: String): WorkflowStep =
     Run(
