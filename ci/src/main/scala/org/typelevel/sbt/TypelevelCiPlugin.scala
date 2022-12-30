@@ -63,7 +63,7 @@ object TypelevelCiPlugin extends AutoPlugin {
             WorkflowStep.Sbt(
               List("headerCheckAll", "scalafmtCheckAll", "project /", "scalafmtSbtCheck"),
               name = Some("Check headers and formatting"),
-              cond = Some(primaryJavaCond.value)
+              cond = Some(primaryJavaOSCond.value)
             )
           )
         case (true, false) => // headers
@@ -71,7 +71,7 @@ object TypelevelCiPlugin extends AutoPlugin {
             WorkflowStep.Sbt(
               List("headerCheckAll"),
               name = Some("Check headers"),
-              cond = Some(primaryJavaCond.value)
+              cond = Some(primaryJavaOSCond.value)
             )
           )
         case (false, true) => // formatting
@@ -79,7 +79,7 @@ object TypelevelCiPlugin extends AutoPlugin {
             WorkflowStep.Sbt(
               List("scalafmtCheckAll", "project /", "scalafmtSbtCheck"),
               name = Some("Check formatting"),
-              cond = Some(primaryJavaCond.value)
+              cond = Some(primaryJavaOSCond.value)
             )
           )
         case (false, false) => Nil // nada
@@ -95,7 +95,7 @@ object TypelevelCiPlugin extends AutoPlugin {
             WorkflowStep.Sbt(
               List("scalafixAll --check"),
               name = Some("Check scalafix lints"),
-              cond = Some(primaryJavaCond.value)
+              cond = Some(primaryJavaOSCond.value)
             )
           )
         else Nil
@@ -106,7 +106,7 @@ object TypelevelCiPlugin extends AutoPlugin {
             WorkflowStep.Sbt(
               List("mimaReportBinaryIssues"),
               name = Some("Check binary compatibility"),
-              cond = Some(primaryJavaCond.value)
+              cond = Some(primaryJavaOSCond.value)
             ))
         else Nil
 
@@ -116,7 +116,7 @@ object TypelevelCiPlugin extends AutoPlugin {
             WorkflowStep.Sbt(
               List("doc"),
               name = Some("Generate API documentation"),
-              cond = Some(primaryJavaCond.value)
+              cond = Some(primaryJavaOSCond.value)
             )
           )
         else Nil
@@ -126,9 +126,10 @@ object TypelevelCiPlugin extends AutoPlugin {
     githubWorkflowJavaVersions := Seq(JavaSpec.temurin("8"))
   )
 
-  private val primaryJavaCond = Def.setting {
+  private val primaryJavaOSCond = Def.setting {
     val java = githubWorkflowJavaVersions.value.head
-    s"matrix.java == '${java.render}'"
+    val os = githubWorkflowOSes.value.head
+    s"matrix.java == '${java.render}' && matrix.os == '${os}'"
   }
 
 }
