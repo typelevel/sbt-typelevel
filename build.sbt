@@ -10,6 +10,7 @@ ThisBuild / developers := List(
   tlGitHubDev("ChristopherDavenport", "Christopher Davenport"),
   tlGitHubDev("djspiewak", "Daniel Spiewak")
 )
+ThisBuild / startYear := Some(2022)
 
 ThisBuild / githubWorkflowJavaVersions += JavaSpec.temurin("17")
 
