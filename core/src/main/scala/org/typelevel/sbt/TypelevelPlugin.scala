@@ -21,8 +21,6 @@ import org.typelevel.sbt.gha.GenerativePlugin
 import org.typelevel.sbt.gha.GitHubActionsPlugin
 import sbt._
 
-import scala.collection.immutable
-
 import Keys._
 
 /**
