@@ -193,6 +193,17 @@ object TypelevelSettingsPlugin extends AutoPlugin {
         Seq("-project-version", version.value)
       else Nil
     },
+    Compile / doc / scalacOptions ++= {
+      // Enable Inkuire for Scala 3.2.1+
+      scalaVersion.value match {
+        case V(V(3, 2, Some(build), _)) if build >= 1 =>
+          Seq("-Ygenerate-inkuire")
+        case V(V(3, minor, _, _)) if minor >= 3 =>
+          Seq("-Ygenerate-inkuire")
+        case _ =>
+          Seq.empty
+      }
+    },
     javacOptions ++= Seq(
       "-encoding",
       "utf8",

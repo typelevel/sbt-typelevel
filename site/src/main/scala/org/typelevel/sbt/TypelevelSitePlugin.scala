@@ -159,7 +159,7 @@ object TypelevelSitePlugin extends AutoPlugin {
       def publishSiteWorkflowStep(publishPredicate: RefPredicate) =
         List(
           WorkflowStep.Use(
-            UseRef.Public("peaceiris", "actions-gh-pages", "v3.8.0"),
+            UseRef.Public("peaceiris", "actions-gh-pages", "v3.9.0"),
             Map(
               "github_token" -> s"$${{ secrets.GITHUB_TOKEN }}",
               "publish_dir" -> (ThisBuild / baseDirectory)

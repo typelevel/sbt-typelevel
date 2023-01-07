@@ -112,6 +112,4 @@ object TypelevelPlugin extends AutoPlugin {
     )
   )
 
-  // override for bincompat
-  override def projectSettings = immutable.Seq.empty
 }
