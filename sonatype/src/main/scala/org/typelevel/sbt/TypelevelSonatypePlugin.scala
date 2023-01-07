@@ -65,7 +65,7 @@ object TypelevelSonatypePlugin extends AutoPlugin {
           "s01.oss.sonatype.org"
       }
     },
-    apiURL := apiURL.value.orElse(javadocioUrl.value)
+    apiURL := apiURL.value.orElse(hostedApiUrl.value)
   )
 
   private[sbt] lazy val hostedApiUrl =

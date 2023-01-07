@@ -21,8 +21,6 @@ import org.typelevel.sbt.gha.GenerativePlugin
 import org.typelevel.sbt.gha.GitHubActionsPlugin
 import sbt._
 
-import scala.collection.immutable
-
 import Keys._
 
 /**
@@ -112,6 +110,4 @@ object TypelevelPlugin extends AutoPlugin {
     )
   )
 
-  // override for bincompat
-  override def projectSettings = immutable.Seq.empty
 }
