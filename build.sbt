@@ -12,6 +12,10 @@ ThisBuild / developers := List(
 )
 ThisBuild / startYear := Some(2022)
 
+ThisBuild / githubWorkflowBuildPostamble := List(
+  WorkflowStep.Sbt(List("tlCiReleaseStepSummary"), name = Some("Test Job Summary Creation"))
+)
+
 ThisBuild / githubWorkflowJavaVersions += JavaSpec.temurin("17")
 
 ThisBuild / mergifyStewardConfig ~= {

@@ -30,7 +30,7 @@ object TypelevelSonatypeCiReleasePlugin extends AutoPlugin {
       "Controls whether or not v-prefixed tags should be released from CI (default true)")
     lazy val tlCiReleaseBranches = settingKey[Seq[String]](
       "The branches in your repository to release from in CI on every push. Depending on your versioning scheme, they will be either snapshots or (hash) releases. Leave this empty if you only want CI releases for tags. (default: [])")
-    lazy val tlCreateJobSummary = taskKey[Unit](
+    lazy val tlCiReleaseStepSummary = taskKey[Unit](
       "Populates the Job Summary of GH actions with the build version if the environment variable GITHUB_STEP_SUMMARY is defined")
   }
 
@@ -61,7 +61,7 @@ object TypelevelSonatypeCiReleasePlugin extends AutoPlugin {
 
       tags ++ branches
     },
-    tlCreateJobSummary := {
+    tlCiReleaseStepSummary := {
       Option(System.getenv("GITHUB_STEP_SUMMARY")).fold(
         streams.value.log.error("GITHUB_STEP_SUMMARY is not defined")
       ) { summaryFile =>
