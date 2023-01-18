@@ -32,6 +32,8 @@ object TypelevelSonatypeCiReleasePlugin extends AutoPlugin {
       "The branches in your repository to release from in CI on every push. Depending on your versioning scheme, they will be either snapshots or (hash) releases. Leave this empty if you only want CI releases for tags. (default: [])")
     lazy val tlCiReleaseStepSummary = taskKey[Unit](
       "Populates the Job Summary of GH actions with the build version if the environment variable GITHUB_STEP_SUMMARY is defined")
+    lazy val tlCiReleaseStepSummaryTableInfo = settingKey[Map[String, String]](
+      "Key-value set of information that will be rendered in a table in the job summary")
   }
 
   import autoImport._
@@ -67,13 +69,14 @@ object TypelevelSonatypeCiReleasePlugin extends AutoPlugin {
 
       tags ++ branches
     },
+    tlCiReleaseStepSummaryTableInfo := {
+      Map("**Release version**" -> (ThisBuild / version).value)
+    },
     tlCiReleaseStepSummary := {
       Option(System.getenv("GITHUB_STEP_SUMMARY")).fold(
         streams.value.log.error("GITHUB_STEP_SUMMARY is not defined")
       ) { summaryFile =>
-        val summary: String = renderSummaryTable(
-          Map("**Release version**" -> (ThisBuild / version).value)
-        )
+        val summary: String = renderSummaryTable(tlCiReleaseStepSummaryTableInfo.value)
         IO.write(new File(summaryFile), summary)
       }
     },

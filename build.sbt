@@ -12,6 +12,10 @@ ThisBuild / developers := List(
 )
 ThisBuild / startYear := Some(2022)
 
+ThisBuild / tlCiReleaseStepSummaryTableInfo += (
+  "Scala Versions" -> crossScalaVersions.value.toString
+)
+
 ThisBuild / githubWorkflowBuildPostamble := List(
   WorkflowStep.Sbt(List("tlCiReleaseStepSummary"), name = Some("Test Job Summary Creation"))
 )
