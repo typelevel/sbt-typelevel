@@ -44,6 +44,12 @@ object TypelevelSonatypeCiReleasePlugin extends AutoPlugin {
   override def globalSettings =
     Seq(tlCiReleaseTags := true, tlCiReleaseBranches := Seq())
 
+  private def renderSummaryTable(results: Map[String, String]): String =
+    results
+      .toList
+      .map { case (k, v) => s"| ${k} | ${v} |" }
+      .mkString(s"| Build Results | |\n| -: | :- |\n", "\n", "")
+
   override def buildSettings = Seq(
     githubWorkflowEnv ++= List(
       "SONATYPE_USERNAME",
@@ -65,8 +71,10 @@ object TypelevelSonatypeCiReleasePlugin extends AutoPlugin {
       Option(System.getenv("GITHUB_STEP_SUMMARY")).fold(
         streams.value.log.error("GITHUB_STEP_SUMMARY is not defined")
       ) { summaryFile =>
-        val buildVersion: String = (ThisBuild / version).value
-        IO.write(new File(summaryFile), buildVersion)
+        val summary: String = renderSummaryTable(
+          Map("**Release version**" -> (ThisBuild / version).value)
+        )
+        IO.write(new File(summaryFile), summary)
       }
     },
     githubWorkflowTargetTags += "v*",
