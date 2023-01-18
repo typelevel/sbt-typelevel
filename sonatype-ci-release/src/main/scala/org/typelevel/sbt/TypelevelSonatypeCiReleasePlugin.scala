@@ -48,7 +48,7 @@ object TypelevelSonatypeCiReleasePlugin extends AutoPlugin {
     results
       .toList
       .map { case (k, v) => s"| ${k} | ${v} |" }
-      .mkString(s"| Build Results | |\n| -: | :- |\n", "\n", "")
+      .mkString(s"# Job Summary\n| Build Results | |\n| -: | :- |\n", "\n", "")
 
   override def buildSettings = Seq(
     githubWorkflowEnv ++= List(
