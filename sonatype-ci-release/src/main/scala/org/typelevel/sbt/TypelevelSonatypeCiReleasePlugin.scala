@@ -19,6 +19,7 @@ package org.typelevel.sbt
 import org.typelevel.sbt.gha.GenerativePlugin
 import org.typelevel.sbt.gha.GenerativePlugin.autoImport._
 import org.typelevel.sbt.gha.GitHubActionsPlugin
+import sbt.Keys.{streams, version}
 import sbt._
 
 object TypelevelSonatypeCiReleasePlugin extends AutoPlugin {
@@ -28,6 +29,8 @@ object TypelevelSonatypeCiReleasePlugin extends AutoPlugin {
       "Controls whether or not v-prefixed tags should be released from CI (default true)")
     lazy val tlCiReleaseBranches = settingKey[Seq[String]](
       "The branches in your repository to release from in CI on every push. Depending on your versioning scheme, they will be either snapshots or (hash) releases. Leave this empty if you only want CI releases for tags. (default: [])")
+    lazy val tlCreateJobSummary = taskKey[Unit](
+      "Populates the Job Summary of GH actions with the build version if the environment variable GITHUB_STEP_SUMMARY is defined")
   }
 
   import autoImport._
@@ -57,9 +60,18 @@ object TypelevelSonatypeCiReleasePlugin extends AutoPlugin {
 
       tags ++ branches
     },
+    tlCreateJobSummary := {
+      Option(System.getenv("GITHUB_STEP_SUMMARY")).fold(
+        streams.value.log.error("GITHUB_STEP_SUMMARY is not defined")
+      ) { summaryFile =>
+        val buildVersion: String = (ThisBuild / version).value
+        IO.write(new File(summaryFile), buildVersion)
+      }
+    },
     githubWorkflowTargetTags += "v*",
     githubWorkflowPublish := Seq(
-      WorkflowStep.Sbt(List("tlRelease"), name = Some("Publish"))
+      WorkflowStep.Sbt(List("tlRelease"), name = Some("Publish")),
+      WorkflowStep.Sbt(List("tlCreateJobSummary"), name = Some("Create Job Summary"))
     )
   )
 }
