@@ -19,7 +19,8 @@ package org.typelevel.sbt
 import org.typelevel.sbt.gha.GenerativePlugin
 import org.typelevel.sbt.gha.GenerativePlugin.autoImport._
 import org.typelevel.sbt.gha.GitHubActionsPlugin
-import sbt.Keys.{streams, version}
+import sbt.Keys.streams
+import sbt.Keys.version
 import sbt._
 
 object TypelevelSonatypeCiReleasePlugin extends AutoPlugin {
