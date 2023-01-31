@@ -23,6 +23,8 @@ import laika.helium.config.Favicon
 import laika.helium.config.HeliumIcon
 import laika.helium.config.IconLink
 import laika.helium.config.ImageLink
+import laika.rewrite.link.ApiLinks
+import laika.rewrite.link.LinkConfig
 import laika.sbt.LaikaPlugin
 import laika.theme.ThemeProvider
 import mdoc.MdocPlugin
@@ -45,6 +47,8 @@ object TypelevelSitePlugin extends AutoPlugin {
     lazy val tlSiteHeliumConfig = settingKey[Helium]("The Typelevel Helium configuration")
     lazy val tlSiteHeliumExtensions =
       settingKey[ThemeProvider]("The Typelevel Helium extensions")
+    lazy val tlSiteApiLinks =
+      settingKey[Map[String, URL]]("URLs to API doc roots, by package prefix")
     lazy val tlSiteApiUrl = settingKey[Option[URL]]("URL to the API docs")
     lazy val tlSiteApiModule =
       settingKey[Option[ModuleID]]("The module that publishes API docs")
@@ -85,6 +89,7 @@ object TypelevelSitePlugin extends AutoPlugin {
   override def buildSettings = Seq(
     tlSitePublishBranch := Some("main"),
     tlSitePublishTags := tlSitePublishBranch.value.isEmpty,
+    tlSiteApiLinks := tlSiteApiUrl.value.map("*" -> _).toMap,
     tlSiteApiUrl := None,
     tlSiteApiPackage := None,
     tlSiteRelatedProjects := Seq(TypelevelProject.Cats),
@@ -106,6 +111,12 @@ object TypelevelSitePlugin extends AutoPlugin {
       .value: @nowarn("cat=other-pure-statement"),
     tlSitePreview := previewTask.value,
     Laika / sourceDirectories := Seq(mdocOut.value),
+    laikaConfig := laikaConfig
+      .value
+      .withConfigValue(LinkConfig(apiLinks = tlSiteApiLinks.value.toList.map {
+        case (packagePrefix, baseUri) =>
+          ApiLinks(packagePrefix = packagePrefix, baseUri = baseUri.toString)
+      })),
     laikaTheme := tlSiteHeliumConfig.value.build.extend(tlSiteHeliumExtensions.value),
     mdocVariables := {
       mdocVariables.value ++
