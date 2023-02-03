@@ -12,8 +12,6 @@ ThisBuild / developers := List(
 )
 ThisBuild / startYear := Some(2022)
 
-ThisBuild / libraryDependencies += "org.scalameta" %% "munit" % "1.0.0-M7" % Test
-
 ThisBuild / tlCiReleaseStepSummaryTableInfo += (
   "Scala Versions" -> crossScalaVersions.value.toString
 )
