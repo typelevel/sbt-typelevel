@@ -40,6 +40,7 @@ object TypelevelCiPlugin extends AutoPlugin {
       settingKey[Boolean]("Whether to do MiMa binary issues check in CI (default: true)")
     lazy val tlCiDocCheck =
       settingKey[Boolean]("Whether to build API docs in CI (default: true)")
+    lazy val foo = taskKey[Unit]("foo")
   }
 
   import autoImport._
@@ -125,6 +126,39 @@ object TypelevelCiPlugin extends AutoPlugin {
     },
     githubWorkflowJavaVersions := Seq(JavaSpec.temurin("8"))
   )
+
+  override def projectSettings: Seq[Setting[_]] = Seq(
+    Test / Keys.executeTests := {
+      val results: Tests.Output = (Test / Keys.executeTests).value
+      GitHubActionsPlugin.appendtoStepSummary(renderTestResults(Keys.name.value, results))
+      results
+    }
+  )
+
+  def renderTestResults(projectName: String, results: Tests.Output): String = {
+    val tableHeader: String =
+      s"### $projectName Tests Result\n" +
+        "|SuiteName|Result|Passed|Failed|Errors|Skipped|Ignored|Canceled|Pending|\n" +
+        "|-:|-|-|-|-|-|-|-|-|\n"
+
+    val renderedResults = results.events.map {
+      case (suiteName, suiteResult) =>
+        List(
+          suiteName,
+          suiteResult.result.toString(),
+          suiteResult.passedCount.toString(),
+          suiteResult.failureCount.toString(),
+          suiteResult.errorCount.toString(),
+          suiteResult.skippedCount.toString(),
+          suiteResult.ignoredCount.toString(),
+          suiteResult.canceledCount.toString(),
+          suiteResult.pendingCount.toString()
+        ).mkString("|", "|", "|")
+    }
+
+    if (renderedResults.nonEmpty) renderedResults.mkString(tableHeader, "\n", "\n")
+    else ""
+  }
 
   private val primaryJavaOSCond = Def.setting {
     val java = githubWorkflowJavaVersions.value.head

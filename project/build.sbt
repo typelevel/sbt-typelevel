@@ -28,3 +28,6 @@ Compile / unmanagedResourceDirectories ++= modules.map { module =>
 libraryDependencies ++= Seq(
   "io.get-coursier" %% "coursier" % "2.1.0-RC5"
 )
+
+ThisBuild / libraryDependencySchemes ++= Seq(
+  "org.scala-lang.modules" %% "scala-xml" % VersionScheme.Always)

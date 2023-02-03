@@ -19,8 +19,8 @@ package org.typelevel.sbt
 import org.typelevel.sbt.gha.GenerativePlugin
 import org.typelevel.sbt.gha.GenerativePlugin.autoImport._
 import org.typelevel.sbt.gha.GitHubActionsPlugin
-import sbt.Keys.streams
 import sbt.Keys.version
+import sbt.Keys.publish
 import sbt._
 
 object TypelevelSonatypeCiReleasePlugin extends AutoPlugin {
@@ -30,10 +30,8 @@ object TypelevelSonatypeCiReleasePlugin extends AutoPlugin {
       "Controls whether or not v-prefixed tags should be released from CI (default true)")
     lazy val tlCiReleaseBranches = settingKey[Seq[String]](
       "The branches in your repository to release from in CI on every push. Depending on your versioning scheme, they will be either snapshots or (hash) releases. Leave this empty if you only want CI releases for tags. (default: [])")
-    lazy val tlCiReleaseStepSummary = taskKey[Unit](
-      "Populates the Job Summary of GH actions with the build version if the environment variable GITHUB_STEP_SUMMARY is defined")
     lazy val tlCiReleaseStepSummaryTableInfo = settingKey[Map[String, String]](
-      "Key-value set of information that will be rendered in a table in the job summary")
+      "Key-value set of information that will be rendered in a table in the job summary (default: [Release version -> ThisBuild/version])")
   }
 
   import autoImport._
@@ -45,12 +43,6 @@ object TypelevelSonatypeCiReleasePlugin extends AutoPlugin {
 
   override def globalSettings =
     Seq(tlCiReleaseTags := true, tlCiReleaseBranches := Seq())
-
-  private def renderSummaryTable(results: Map[String, String]): String =
-    results
-      .toList
-      .map { case (k, v) => s"| ${k} | ${v} |" }
-      .mkString(s"# Job Summary\n| Build Results | |\n| -: | :- |\n", "\n", "")
 
   override def buildSettings = Seq(
     githubWorkflowEnv ++= List(
@@ -72,17 +64,24 @@ object TypelevelSonatypeCiReleasePlugin extends AutoPlugin {
     tlCiReleaseStepSummaryTableInfo := {
       Map("**Release version**" -> (ThisBuild / version).value)
     },
-    tlCiReleaseStepSummary := {
-      Option(System.getenv("GITHUB_STEP_SUMMARY")).fold(
-        streams.value.log.error("GITHUB_STEP_SUMMARY is not defined")
-      ) { summaryFile =>
-        val summary: String = renderSummaryTable(tlCiReleaseStepSummaryTableInfo.value)
-        IO.write(new File(summaryFile), summary)
-      }
-    },
     githubWorkflowTargetTags += "v*",
     githubWorkflowPublish := Seq(
-      WorkflowStep.Sbt(List("tlRelease", "tlCreateJobSummary"), name = Some("Publish"))
+      WorkflowStep.Sbt(List("tlRelease"), name = Some("Publish"))
     )
+  )
+
+  private def renderSummaryTable(results: Map[String, String]): String =
+    results
+      .toList
+      .map { case (k, v) => s"| ${k} | ${v} |" }
+      .mkString(s"# Job Summary\n| Build Results | |\n| -: | :- |\n", "\n", "")
+
+  override def projectSettings: Seq[Setting[_]] = Seq(
+    publish := {
+      GitHubActionsPlugin.appendtoStepSummary(
+        renderSummaryTable(tlCiReleaseStepSummaryTableInfo.value)
+      )
+      publish.value
+    }
   )
 }
