@@ -74,7 +74,7 @@ object TypelevelSonatypeCiReleasePlugin extends AutoPlugin {
     results
       .toList
       .map { case (k, v) => s"| ${k} | ${v} |" }
-      .mkString(s"# Job Summary\n| Build Results | |\n| -: | :- |\n", "\n", "")
+      .mkString(s"| Build Results | |\n| -: | :- |\n", "\n", "\n")
 
   override def projectSettings: Seq[Setting[_]] = Seq(
     publish := {

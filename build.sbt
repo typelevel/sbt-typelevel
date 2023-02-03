@@ -18,10 +18,6 @@ ThisBuild / tlCiReleaseStepSummaryTableInfo += (
   "Scala Versions" -> crossScalaVersions.value.toString
 )
 
-ThisBuild / githubWorkflowBuildPostamble := List(
-  WorkflowStep.Sbt(List("tlCiReleaseStepSummary"), name = Some("Test Job Summary Creation"))
-)
-
 ThisBuild / githubWorkflowJavaVersions += JavaSpec.temurin("17")
 
 ThisBuild / mergifyStewardConfig ~= {

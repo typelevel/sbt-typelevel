@@ -40,7 +40,6 @@ object TypelevelCiPlugin extends AutoPlugin {
       settingKey[Boolean]("Whether to do MiMa binary issues check in CI (default: true)")
     lazy val tlCiDocCheck =
       settingKey[Boolean]("Whether to build API docs in CI (default: true)")
-    lazy val foo = taskKey[Unit]("foo")
   }
 
   import autoImport._
