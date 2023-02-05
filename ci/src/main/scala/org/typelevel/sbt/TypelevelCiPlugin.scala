@@ -144,7 +144,7 @@ object TypelevelCiPlugin extends AutoPlugin {
       s"### ${projectName} Tests Results\n" +
         s"To rerun them locally use `++${scalaVersion} ${projectName}/test`\n" +
         "|SuiteName|Result|Passed|Failed|Errors|Skipped|Ignored|Canceled|Pending|\n" +
-        "|-:|-|-|-|-|-|-|-|-|\n\n"
+        "|-:|-|-|-|-|-|-|-|-|\n"
 
     val renderedResults = results.events.map {
       case (suiteName, suiteResult) =>
@@ -161,7 +161,7 @@ object TypelevelCiPlugin extends AutoPlugin {
         ).mkString("|", "|", "|")
     }
 
-    if (renderedResults.nonEmpty) renderedResults.mkString(tableHeader, "\n", "\n")
+    if (renderedResults.nonEmpty) renderedResults.mkString(tableHeader, "\n", "\n\n")
     else ""
   }
 
