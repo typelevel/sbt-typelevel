@@ -77,33 +77,35 @@ object TypelevelSonatypeCiReleasePlugin extends AutoPlugin {
     results
       .toList
       .map { case (k, v) => s"| ${k} | ${v} |" }
-      .mkString(s"| Build Results | |\n| -: | :- |\n", "\n", "\n")
+      .mkString(s"| Build Result | Value |\n| -: | :- |\n", "\n", "\n\n")
 
   override def projectSettings: Seq[Setting[_]] = Seq(
     publish := {
       val table: Map[String, String] = tlCiReleaseStepSummaryTableInfo.value
+      val projectName: String = name.value
       val maybeMavenResolverUrl: Option[(String, String)] =
         (ThisBuild / publishTo).value.collect {
           case x: MavenRepo => (x.name, x.root)
           case x: MavenRepository => (x.name, x.root)
         }
 
+      val header: String = s"### ${projectName} Publication Summary\n"
+
       val textToRender: String =
-        if (tlCiAddResolverInfoToSummary.value) {
-          maybeMavenResolverUrl.fold(renderSummaryTable(table)) {
+        maybeMavenResolverUrl
+          .filter(_ => tlCiAddResolverInfoToSummary.value)
+          .fold(renderSummaryTable(table)) {
             case (n, u) =>
-              val tableString: String =
-                renderSummaryTable(table + ("Resolver" -> s""""${n}" -> ${u} """))
+              val newTable: Map[String, String] = table + ("Resolver" -> s""""${n}" -> ${u}""")
 
               val instructions: String =
                 s"To configure your build to use this published version set\n" +
-                  s"""`resolvers += Resolver.url("${n}", url("${u}"))`"""
+                  s"""`resolvers += Resolver.url("${n}", url("${u}"))`\n\n"""
 
-              tableString + "\n" + instructions
+              renderSummaryTable(newTable) + instructions
           }
-        } else renderSummaryTable(table)
 
-      GitHubActionsPlugin.appendtoStepSummary(textToRender)
+      GitHubActionsPlugin.appendtoStepSummary(header + textToRender)
 
       publish.value
     }
