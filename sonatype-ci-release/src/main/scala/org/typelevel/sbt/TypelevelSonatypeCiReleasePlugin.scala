@@ -19,8 +19,7 @@ package org.typelevel.sbt
 import org.typelevel.sbt.gha.GenerativePlugin
 import org.typelevel.sbt.gha.GenerativePlugin.autoImport._
 import org.typelevel.sbt.gha.GitHubActionsPlugin
-import sbt.Keys.publish
-import sbt.Keys.version
+import sbt.Keys._
 import sbt._
 
 object TypelevelSonatypeCiReleasePlugin extends AutoPlugin {
@@ -32,6 +31,8 @@ object TypelevelSonatypeCiReleasePlugin extends AutoPlugin {
       "The branches in your repository to release from in CI on every push. Depending on your versioning scheme, they will be either snapshots or (hash) releases. Leave this empty if you only want CI releases for tags. (default: [])")
     lazy val tlCiReleaseStepSummaryTableInfo = settingKey[Map[String, String]](
       "Key-value set of information that will be rendered in a table in the job summary (default: [Release version -> ThisBuild/version])")
+    lazy val tlCiAddResolverInfoToSummary = settingKey[Boolean](
+      "If true adds the resolver url and instructions to the job summary (default: true)")
   }
 
   import autoImport._
@@ -62,8 +63,10 @@ object TypelevelSonatypeCiReleasePlugin extends AutoPlugin {
       tags ++ branches
     },
     tlCiReleaseStepSummaryTableInfo := {
-      Map("**Release version**" -> (ThisBuild / version).value)
+      val map: Map[String, String] = Map("Release version" -> (ThisBuild / version).value)
+      (ThisBuild / apiURL).value.map(_.toString).fold(map)(r => map + ("Api URL" -> r))
     },
+    tlCiAddResolverInfoToSummary := true,
     githubWorkflowTargetTags += "v*",
     githubWorkflowPublish := Seq(
       WorkflowStep.Sbt(List("tlRelease"), name = Some("Publish"))
@@ -78,9 +81,30 @@ object TypelevelSonatypeCiReleasePlugin extends AutoPlugin {
 
   override def projectSettings: Seq[Setting[_]] = Seq(
     publish := {
-      GitHubActionsPlugin.appendtoStepSummary(
-        renderSummaryTable(tlCiReleaseStepSummaryTableInfo.value)
-      )
+      val table: Map[String, String] = tlCiReleaseStepSummaryTableInfo.value
+      val maybeMavenResolverUrl: Option[(String, String)] =
+        (ThisBuild / publishTo).value.collect {
+          case x: MavenRepo => (x.name, x.root)
+          case x: MavenRepository => (x.name, x.root)
+        }
+
+      val textToRender: String =
+        if (tlCiAddResolverInfoToSummary.value) {
+          maybeMavenResolverUrl.fold(renderSummaryTable(table)) {
+            case (n, u) =>
+              val tableString: String =
+                renderSummaryTable(table + ("Resolver" -> s""""${n}" -> ${u} """))
+
+              val instructions: String =
+                s"To configure your build to use this published version set\n" +
+                  s"""`resolvers += Resolver.url("${n}", url("${u}"))`"""
+
+              tableString + "\n" + instructions
+          }
+        } else renderSummaryTable(table)
+
+      GitHubActionsPlugin.appendtoStepSummary(textToRender)
+
       publish.value
     }
   )

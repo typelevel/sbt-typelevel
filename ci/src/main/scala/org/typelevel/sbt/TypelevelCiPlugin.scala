@@ -129,14 +129,20 @@ object TypelevelCiPlugin extends AutoPlugin {
   override def projectSettings: Seq[Setting[_]] = Seq(
     Test / Keys.executeTests := {
       val results: Tests.Output = (Test / Keys.executeTests).value
-      GitHubActionsPlugin.appendtoStepSummary(renderTestResults(Keys.name.value, results))
+      GitHubActionsPlugin.appendtoStepSummary(
+        renderTestResults(Keys.name.value, Keys.version.value, results)
+      )
       results
     }
   )
 
-  def renderTestResults(projectName: String, results: Tests.Output): String = {
+  private def renderTestResults(
+      projectName: String,
+      scalaVersion: String,
+      results: Tests.Output): String = {
     val tableHeader: String =
-      s"### $projectName Tests Result\n" +
+      s"### ${projectName} Tests Results\n" +
+        s"To rerun them locally use `++${scalaVersion} ${projectName}/test`\n" +
         "|SuiteName|Result|Passed|Failed|Errors|Skipped|Ignored|Canceled|Pending|\n" +
         "|-:|-|-|-|-|-|-|-|-|\n"
 
