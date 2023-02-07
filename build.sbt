@@ -12,10 +12,6 @@ ThisBuild / developers := List(
 )
 ThisBuild / startYear := Some(2022)
 
-ThisBuild / tlCiReleaseStepSummaryTableInfo += (
-  "Scala Versions" -> crossScalaVersions.value.mkString(",")
-)
-
 ThisBuild / githubWorkflowJavaVersions += JavaSpec.temurin("17")
 
 ThisBuild / mergifyStewardConfig ~= {

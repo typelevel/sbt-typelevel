@@ -120,7 +120,7 @@ object GitHubActionsPlugin extends AutoPlugin {
     }
   }
 
-  def appendtoStepSummary(summaryText: String) =
+  private[typelevel] def appendtoStepSummary(summaryText: String) =
     Option(System.getenv("GITHUB_STEP_SUMMARY")).map { summaryFile =>
       IO.write(new File(summaryFile), summaryText, append = true)
     }
