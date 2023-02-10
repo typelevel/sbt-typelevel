@@ -115,8 +115,8 @@ object MergifyPlugin extends AutoPlugin {
       .dependsOn(ThisBuild / mergifyGenerate)
       .value,
     githubWorkflowCheck := githubWorkflowCheck.dependsOn(ThisBuild / mergifyCheck).value,
-    internallyCalculatedMergifyLabelPaths := {
-      val labelPaths = internallyCalculatedMergifyLabelPaths.value
+    ThisBuild / internallyCalculatedMergifyLabelPaths := {
+      val labelPaths = (ThisBuild / internallyCalculatedMergifyLabelPaths).value
       projectLabel.value.fold(labelPaths) {
         case (label, path) =>
           val add = labelPaths.get(label) match {
