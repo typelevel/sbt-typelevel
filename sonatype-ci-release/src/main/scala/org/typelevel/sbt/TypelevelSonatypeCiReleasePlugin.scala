@@ -19,6 +19,7 @@ package org.typelevel.sbt
 import org.typelevel.sbt.gha.GenerativePlugin
 import org.typelevel.sbt.gha.GenerativePlugin.autoImport._
 import org.typelevel.sbt.gha.GitHubActionsPlugin
+import sbt.Keys._
 import sbt._
 
 object TypelevelSonatypeCiReleasePlugin extends AutoPlugin {
@@ -61,5 +62,46 @@ object TypelevelSonatypeCiReleasePlugin extends AutoPlugin {
     githubWorkflowPublish := Seq(
       WorkflowStep.Sbt(List("tlRelease"), name = Some("Publish"))
     )
+  )
+
+  private def renderSummaryTable(results: Map[String, String]): String =
+    results
+      .toList
+      .map { case (k, v) => s"| ${k} | ${v} |" }
+      .mkString(s"| Build Result | Value |\n| -: | :- |\n", "\n", "\n\n")
+
+  override def projectSettings: Seq[Setting[_]] = Seq(
+    publish := {
+      val result: Unit = publish.value
+
+      val table: Map[String, String] = {
+        val map: Map[String, String] = Map("Release version" -> (ThisBuild / version).value)
+        (ThisBuild / apiURL).value.map(_.toString).fold(map)(r => map + ("Api URL" -> r))
+      }
+      val projectName: String = name.value
+      val maybeMavenResolverUrl: Option[(String, String)] =
+        (ThisBuild / publishTo).value.collect {
+          case x: MavenRepo => (x.name, x.root)
+          case x: MavenRepository => (x.name, x.root)
+        }
+
+      val header: String = s"### ${projectName} Publication Summary\n"
+
+      val textToRender: String =
+        maybeMavenResolverUrl.fold(renderSummaryTable(table)) {
+          case (n, u) =>
+            val newTable: Map[String, String] = table + ("Resolver" -> s""""${n}" -> ${u}""")
+
+            val instructions: String =
+              s"To configure your build to use this published version set\n" +
+                s"""`resolvers += Resolver.url("${n}", url("${u}"))`\n\n"""
+
+            renderSummaryTable(newTable) + instructions
+        }
+
+      GitHubActionsPlugin.appendtoStepSummary(header + textToRender)
+
+      result
+    }
   )
 }

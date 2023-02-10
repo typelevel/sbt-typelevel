@@ -126,6 +126,45 @@ object TypelevelCiPlugin extends AutoPlugin {
     githubWorkflowJavaVersions := Seq(JavaSpec.temurin("8"))
   )
 
+  override def projectSettings: Seq[Setting[_]] = Seq(
+    Test / Keys.executeTests := {
+      val results: Tests.Output = (Test / Keys.executeTests).value
+      GitHubActionsPlugin.appendtoStepSummary(
+        renderTestResults(Keys.name.value, Keys.scalaVersion.value, results)
+      )
+      results
+    }
+  )
+
+  private def renderTestResults(
+      projectName: String,
+      scalaVersion: String,
+      results: Tests.Output): String = {
+    val tableHeader: String =
+      s"### ${projectName} Tests Results\n" +
+        s"To rerun them locally use `++${scalaVersion} ${projectName}/test`\n" +
+        "|SuiteName|Result|Passed|Failed|Errors|Skipped|Ignored|Canceled|Pending|\n" +
+        "|-:|-|-|-|-|-|-|-|-|\n"
+
+    val renderedResults = results.events.map {
+      case (suiteName, suiteResult) =>
+        List(
+          suiteName,
+          suiteResult.result.toString(),
+          suiteResult.passedCount.toString(),
+          suiteResult.failureCount.toString(),
+          suiteResult.errorCount.toString(),
+          suiteResult.skippedCount.toString(),
+          suiteResult.ignoredCount.toString(),
+          suiteResult.canceledCount.toString(),
+          suiteResult.pendingCount.toString()
+        ).mkString("|", "|", "|")
+    }
+
+    if (renderedResults.nonEmpty) renderedResults.mkString(tableHeader, "\n", "\n\n")
+    else ""
+  }
+
   private val primaryJavaOSCond = Def.setting {
     val java = githubWorkflowJavaVersions.value.head
     val os = githubWorkflowOSes.value.head
