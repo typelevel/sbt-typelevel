@@ -152,9 +152,14 @@ object TypelevelSettingsPlugin extends AutoPlugin {
     scalacOptions ++= {
       if (tlIsScala3.value && crossScalaVersions.value.forall(_.startsWith("3.")))
         Seq("-Ykind-projector:underscores")
-      else if (tlIsScala3.value)
-        Seq("-language:implicitConversions", "-Ykind-projector", "-source:3.0-migration")
-      else
+      else if (tlIsScala3.value) {
+        val migrationFlag = scalaVersion.value match {
+          case V(V(3, minor, _, _)) if minor < 2 => "-source:3.0-migration"
+          case V(V(3, 2, _, _)) => "-source:3.2-migration"
+          case V(V(3, minor, _, _)) if minor > 2 => "-source:future-migration"
+        }
+        Seq("-language:implicitConversions", "-Ykind-projector", migrationFlag)
+      } else
         Seq("-language:_")
     },
     Test / scalacOptions ++= {
