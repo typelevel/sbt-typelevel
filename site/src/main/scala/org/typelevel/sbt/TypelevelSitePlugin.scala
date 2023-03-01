@@ -155,31 +155,47 @@ object TypelevelSitePlugin extends AutoPlugin {
 
       val fonts = Seq(
         FontDefinition(
-          Font.embedResource(s"$laikaFontPath/Lato/Lato-Regular.ttf").webCSS("https://fonts.googleapis.com/css?family=Lato:400,700"),
-          "Lato", FontWeight.Normal, FontStyle.Normal
+          Font
+            .embedResource(s"$laikaFontPath/Lato/Lato-Regular.ttf")
+            .webCSS("https://fonts.googleapis.com/css?family=Lato:400,700"),
+          "Lato",
+          FontWeight.Normal,
+          FontStyle.Normal
         ),
         FontDefinition(
           Font.embedResource(s"$laikaFontPath/Lato/Lato-Italic.ttf"),
-          "Lato", FontWeight.Normal, FontStyle.Italic
+          "Lato",
+          FontWeight.Normal,
+          FontStyle.Italic
         ),
         FontDefinition(
           Font.embedResource(s"$laikaFontPath/Lato/Lato-Bold.ttf"),
-          "Lato", FontWeight.Bold, FontStyle.Normal
+          "Lato",
+          FontWeight.Bold,
+          FontStyle.Normal
         ),
         FontDefinition(
           Font.embedResource(s"$laikaFontPath/Lato/Lato-BoldItalic.ttf"),
-          "Lato", FontWeight.Bold, FontStyle.Italic
+          "Lato",
+          FontWeight.Bold,
+          FontStyle.Italic
         ),
         // Fira Code is the default used by Laika, but that has ligatures
         // Fira Mono is basically the same font, but without ligatures: yay!
         FontDefinition(
-          Font.embedResource(s"$tlFontPath/FiraMono/FiraMono-Medium.ttf").webCSS("https://fonts.googleapis.com/css?family=Fira+Mono:500"),
-          "Fira Mono", FontWeight.Normal, FontStyle.Normal
+          Font
+            .embedResource(s"$tlFontPath/FiraMono/FiraMono-Medium.ttf")
+            .webCSS("https://fonts.googleapis.com/css?family=Fira+Mono:500"),
+          "Fira Mono",
+          FontWeight.Normal,
+          FontStyle.Normal
         ),
         FontDefinition(
           Font.embedResource(s"$laikaFontPath/icofont/fonts/icofont.ttf"),
-          "IcoFont", FontWeight.Normal, FontStyle.Normal
-        ),
+          "IcoFont",
+          FontWeight.Normal,
+          FontStyle.Normal
+        )
       )
 
       Helium
@@ -228,11 +244,13 @@ object TypelevelSitePlugin extends AutoPlugin {
             IconLink.external("https://twitter.com/typelevel", HeliumIcon.twitter)
           )
         )
-        .site.fontResources(fonts: _*)
-        .site.fontFamilies (
+        .site
+        .fontResources(fonts: _*)
+        .site
+        .fontFamilies(
           body = "Lato",
           headlines = "Lato",
-          code = "Fira Mono", // this bit is changed from Laika defaults
+          code = "Fira Mono" // this bit is changed from Laika defaults
         )
     },
     tlSiteGenerate := List(
