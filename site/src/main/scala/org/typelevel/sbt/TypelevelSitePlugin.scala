@@ -244,9 +244,9 @@ object TypelevelSitePlugin extends AutoPlugin {
             IconLink.external("https://twitter.com/typelevel", HeliumIcon.twitter)
           )
         )
-        .site
+        .all
         .fontResources(fonts: _*)
-        .site
+        .all
         .fontFamilies(
           body = "Lato",
           headlines = "Lato",
