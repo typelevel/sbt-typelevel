@@ -25,7 +25,10 @@ import laika.helium.config.IconLink
 import laika.helium.config.ImageLink
 import laika.sbt.LaikaPlugin
 import laika.theme.ThemeProvider
-import laika.theme.config.{Font, FontDefinition, FontStyle, FontWeight}
+import laika.theme.config.Font
+import laika.theme.config.FontDefinition
+import laika.theme.config.FontStyle
+import laika.theme.config.FontWeight
 import mdoc.MdocPlugin
 import org.typelevel.sbt.site._
 import sbt._
