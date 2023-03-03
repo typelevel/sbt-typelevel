@@ -20,6 +20,7 @@ import org.typelevel.sbt.gha.GenerativePlugin
 import org.typelevel.sbt.gha.GenerativePlugin.autoImport._
 import org.typelevel.sbt.gha.GitHubActionsPlugin
 import sbt.Keys._
+import TypelevelKernelPlugin.mkCommand
 import sbt._
 
 object TypelevelSonatypeCiReleasePlugin extends AutoPlugin {
@@ -62,46 +63,44 @@ object TypelevelSonatypeCiReleasePlugin extends AutoPlugin {
     githubWorkflowPublish := Seq(
       WorkflowStep.Sbt(List("tlRelease"), name = Some("Publish"))
     )
+  ) ++ addCommandAlias(
+    "tlRelease",
+    mkCommand(
+      List(
+        "reload",
+        "project /",
+        "+mimaReportBinaryIssues",
+        "+publish",
+        "tlSonatypeBundleReleaseIfRelevant"))
   )
 
-  private def renderSummaryTable(results: Map[String, String]): String =
-    results
-      .toList
-      .map { case (k, v) => s"| ${k} | ${v} |" }
-      .mkString(s"| Build Result | Value |\n| -: | :- |\n", "\n", "\n\n")
+  def appendToSummary(
+      projectName: String,
+      projectVersion: String,
+      apiURL: Option[URL],
+      publishTo: Option[Resolver],
+      imthefirst: Boolean
+  ): Unit = {
+    val projectApiUrl: String =
+      apiURL.map(u => s"[api-docs](${u.toString})").getOrElse("")
 
-  override def projectSettings: Seq[Setting[_]] = Seq(
-    publish := {
-      val result: Unit = publish.value
-
-      val table: Map[String, String] = {
-        val map: Map[String, String] = Map("Release version" -> (ThisBuild / version).value)
-        (ThisBuild / apiURL).value.map(_.toString).fold(map)(r => map + ("Api URL" -> r))
+    val projectResolverInstructions: String = publishTo
+      .collect {
+        case x: MavenRepo =>
+          s"""`resolvers += Resolver.url("${x.name}", url("${x.root}"))`"""
+        case x: MavenRepository =>
+          s"""`resolvers += Resolver.url("${x.name}", url("${x.root}"))`"""
       }
-      val projectName: String = name.value
-      val maybeMavenResolverUrl: Option[(String, String)] =
-        (ThisBuild / publishTo).value.collect {
-          case x: MavenRepo => (x.name, x.root)
-          case x: MavenRepository => (x.name, x.root)
-        }
+      .getOrElse("")
 
-      val header: String = s"### ${projectName} Publication Summary\n"
-
-      val textToRender: String =
-        maybeMavenResolverUrl.fold(renderSummaryTable(table)) {
-          case (n, u) =>
-            val newTable: Map[String, String] = table + ("Resolver" -> s""""${n}" -> ${u}""")
-
-            val instructions: String =
-              s"To configure your build to use this published version set\n" +
-                s"""`resolvers += Resolver.url("${n}", url("${u}"))`\n\n"""
-
-            renderSummaryTable(newTable) + instructions
-        }
-
-      GitHubActionsPlugin.appendtoStepSummary(header + textToRender)
-
-      result
+    if (imthefirst) {
+      GitHubActionsPlugin.appendtoStepSummary(
+        "|Project|Version|Api Docs|Resolver|\n|-:|:-|:-|:-|\n"
+      )
     }
-  )
+
+    GitHubActionsPlugin.appendtoStepSummary(
+      s"|$projectName|$projectVersion|$projectApiUrl|$projectResolverInstructions|\n"
+    )
+  }
 }
