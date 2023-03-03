@@ -25,6 +25,10 @@ import laika.helium.config.IconLink
 import laika.helium.config.ImageLink
 import laika.sbt.LaikaPlugin
 import laika.theme.ThemeProvider
+import laika.theme.config.Font
+import laika.theme.config.FontDefinition
+import laika.theme.config.FontStyle
+import laika.theme.config.FontWeight
 import mdoc.MdocPlugin
 import org.typelevel.sbt.site._
 import sbt._
@@ -146,6 +150,57 @@ object TypelevelSitePlugin extends AutoPlugin {
       tlSiteApiUrl.value.orElse(javadocioUrl).orElse(fallbackUrl)
     },
     tlSiteHeliumConfig := {
+      // default fontPath and fonts taken from Laika:
+      // instead of allowing for more fonts to be added, all the fonts must be respecified, to avoid "redundant embedding of unused fonts"
+      // as a result, these things have to just be defined again if we want to change them, and we do
+      val laikaFontPath = "laika/helium/fonts"
+      val tlFontPath = "org/typelevel/sbt/site/fonts"
+
+      val fonts = Seq(
+        FontDefinition(
+          Font
+            .embedResource(s"$laikaFontPath/Lato/Lato-Regular.ttf")
+            .webCSS("https://fonts.googleapis.com/css?family=Lato:400,700"),
+          "Lato",
+          FontWeight.Normal,
+          FontStyle.Normal
+        ),
+        FontDefinition(
+          Font.embedResource(s"$laikaFontPath/Lato/Lato-Italic.ttf"),
+          "Lato",
+          FontWeight.Normal,
+          FontStyle.Italic
+        ),
+        FontDefinition(
+          Font.embedResource(s"$laikaFontPath/Lato/Lato-Bold.ttf"),
+          "Lato",
+          FontWeight.Bold,
+          FontStyle.Normal
+        ),
+        FontDefinition(
+          Font.embedResource(s"$laikaFontPath/Lato/Lato-BoldItalic.ttf"),
+          "Lato",
+          FontWeight.Bold,
+          FontStyle.Italic
+        ),
+        // Fira Code is the default used by Laika, but that has ligatures
+        // Fira Mono is basically the same font, but without ligatures: yay!
+        FontDefinition(
+          Font
+            .embedResource(s"$tlFontPath/FiraMono/FiraMono-Medium.ttf")
+            .webCSS("https://fonts.googleapis.com/css?family=Fira+Mono:500"),
+          "Fira Mono",
+          FontWeight.Normal,
+          FontStyle.Normal
+        ),
+        FontDefinition(
+          Font.embedResource(s"$laikaFontPath/icofont/fonts/icofont.ttf"),
+          "IcoFont",
+          FontWeight.Normal,
+          FontStyle.Normal
+        )
+      )
+
       Helium
         .defaults
         .site
@@ -191,6 +246,14 @@ object TypelevelSitePlugin extends AutoPlugin {
             IconLink.external("https://discord.gg/XF3CXcMzqD", HeliumIcon.chat),
             IconLink.external("https://twitter.com/typelevel", HeliumIcon.twitter)
           )
+        )
+        .all
+        .fontResources(fonts: _*)
+        .all
+        .fontFamilies(
+          body = "Lato",
+          headlines = "Lato",
+          code = "Fira Mono" // this bit is changed from Laika defaults
         )
     },
     tlSiteGenerate := List(
