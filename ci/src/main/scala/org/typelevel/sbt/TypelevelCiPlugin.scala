@@ -142,15 +142,9 @@ object TypelevelCiPlugin extends AutoPlugin {
       results: Tests.Output): String = {
 
     val testHeader: String =
-      s"""|### ${projectName} Tests Results
+      s"""|### ${projectName} Tests Results: ${results.overall}
           |To run them locally use `++${scalaVersion} ${projectName}/test`
           |""".stripMargin
-
-    val testSummary: String =
-      results
-        .summaries
-        .map { case Tests.Summary(name, text) => s"$name: $text" }
-        .mkString("", "\n", "\n\n")
 
     val tableHeader: String =
       s"""|<details>
@@ -177,7 +171,7 @@ object TypelevelCiPlugin extends AutoPlugin {
     val table: String = tableBody.mkString(tableHeader, "\n", "\n</details>\n\n")
 
     if (results.events.nonEmpty)
-      testHeader + testSummary + table
+      testHeader + table
     else ""
   }
 
