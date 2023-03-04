@@ -21,7 +21,6 @@ import org.typelevel.sbt.gha.GenerativePlugin.autoImport._
 import org.typelevel.sbt.gha.GitHubActionsPlugin
 import sbt.Keys._
 import sbt._
-
 import xerial.sbt.Sonatype.autoImport._
 
 object TypelevelSonatypeCiReleasePlugin extends AutoPlugin {
