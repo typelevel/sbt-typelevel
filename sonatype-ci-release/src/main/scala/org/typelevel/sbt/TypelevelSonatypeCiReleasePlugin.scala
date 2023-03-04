@@ -43,6 +43,9 @@ object TypelevelSonatypeCiReleasePlugin extends AutoPlugin {
   override def globalSettings =
     Seq(tlCiReleaseTags := true, tlCiReleaseBranches := Seq())
 
+  override def projectSettings =
+    Seq(commands += tlCiReleaseCommand)
+
   override def buildSettings = Seq(
     githubWorkflowEnv ++= List(
       "SONATYPE_USERNAME",
@@ -66,7 +69,7 @@ object TypelevelSonatypeCiReleasePlugin extends AutoPlugin {
     )
   )
 
-  private def sonatypeBundleReleaseIfRelevant: Command =
+  private def tlCiReleaseCommand: Command =
     Command.command("tlCiRelease") { state =>
       val newState = Command.process("tlRelease", state)
       newState.getSetting(version).foreach { v =>
