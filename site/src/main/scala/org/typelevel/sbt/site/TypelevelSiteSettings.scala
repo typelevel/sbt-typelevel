@@ -22,6 +22,10 @@ import laika.ast.Span
 import laika.ast.TemplateString
 import laika.helium.Helium
 import laika.helium.config._
+import laika.theme.config.Font
+import laika.theme.config.FontDefinition
+import laika.theme.config.FontStyle
+import laika.theme.config.FontWeight
 import org.typelevel.sbt.TypelevelGitHubPlugin.gitHubUserRepo
 import sbt.Def._
 import sbt.Keys.licenses
@@ -55,6 +59,59 @@ object TypelevelSiteSettings {
     Favicon.external("https://typelevel.org/img/favicon.png", "32x32", "image/png")
   )
 
+  val fonts = {
+    // default fontPath and fonts taken from Laika:
+    // instead of allowing for more fonts to be added, all the fonts must be respecified, to avoid "redundant embedding of unused fonts"
+    // as a result, these things have to just be defined again if we want to change them, and we do
+    val laikaFontPath = "laika/helium/fonts"
+    val tlFontPath = "org/typelevel/sbt/site/fonts"
+
+    Seq(
+      FontDefinition(
+        Font
+          .embedResource(s"$laikaFontPath/Lato/Lato-Regular.ttf")
+          .webCSS("https://fonts.googleapis.com/css?family=Lato:400,700"),
+        "Lato",
+        FontWeight.Normal,
+        FontStyle.Normal
+      ),
+      FontDefinition(
+        Font.embedResource(s"$laikaFontPath/Lato/Lato-Italic.ttf"),
+        "Lato",
+        FontWeight.Normal,
+        FontStyle.Italic
+      ),
+      FontDefinition(
+        Font.embedResource(s"$laikaFontPath/Lato/Lato-Bold.ttf"),
+        "Lato",
+        FontWeight.Bold,
+        FontStyle.Normal
+      ),
+      FontDefinition(
+        Font.embedResource(s"$laikaFontPath/Lato/Lato-BoldItalic.ttf"),
+        "Lato",
+        FontWeight.Bold,
+        FontStyle.Italic
+      ),
+      // Fira Code is the default used by Laika, but that has ligatures
+      // Fira Mono is basically the same font, but without ligatures: yay!
+      FontDefinition(
+        Font
+          .embedResource(s"$tlFontPath/FiraMono/FiraMono-Medium.ttf")
+          .webCSS("https://fonts.googleapis.com/css?family=Fira+Mono:500"),
+        "Fira Mono",
+        FontWeight.Normal,
+        FontStyle.Normal
+      ),
+      FontDefinition(
+        Font.embedResource(s"$laikaFontPath/icofont/fonts/icofont.ttf"),
+        "IcoFont",
+        FontWeight.Normal,
+        FontStyle.Normal
+      )
+    )
+  }
+
   val defaults: Initialize[Helium] = setting {
     GenericSiteSettings
       .defaults
@@ -74,6 +131,14 @@ object TypelevelSiteSettings {
       .topNavigationBar(
         homeLink = defaultHomeLink,
         navLinks = List(chatLink, twitterLink)
+      )
+      .all
+      .fontResources(fonts: _*)
+      .all
+      .fontFamilies(
+        body = "Lato",
+        headlines = "Lato",
+        code = "Fira Mono" // this bit is changed from Laika defaults
       )
   }
 

@@ -21,6 +21,7 @@ ThisBuild / mergifyStewardConfig ~= {
 }
 ThisBuild / mergifySuccessConditions += MergifyCondition.Custom("#approved-reviews-by>=1")
 ThisBuild / mergifyLabelPaths += { "docs" -> file("docs") }
+ThisBuild / mergifyLabelPaths ~= { _ - "unidoc" }
 ThisBuild / mergifyPrRules += MergifyPrRule(
   "assign scala-steward's PRs for review",
   List(MergifyCondition.Custom("author=typelevel-steward[bot]")),
