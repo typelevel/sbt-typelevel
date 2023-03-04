@@ -144,7 +144,7 @@ object TypelevelCiPlugin extends AutoPlugin {
     val testHeader: String =
       s"""|### ${projectName} Tests Results
           |To run them locally use `++${scalaVersion} ${projectName}/test`
-          |"""
+          |""".stripMargin
 
     val testSummary: String =
       results
@@ -157,7 +157,7 @@ object TypelevelCiPlugin extends AutoPlugin {
           |
           ||SuiteName|Result|Passed|Failed|Errors|Skipped|Ignored|Canceled|Pending|
           ||-:|-|-|-|-|-|-|-|-|
-          |"""
+          |""".stripMargin
 
     val tableBody = results.events.map {
       case (suiteName, suiteResult) =>
