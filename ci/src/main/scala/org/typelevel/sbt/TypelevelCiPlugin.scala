@@ -130,7 +130,7 @@ object TypelevelCiPlugin extends AutoPlugin {
     Test / Keys.executeTests := {
       val results: Tests.Output = (Test / Keys.executeTests).value
       GitHubActionsPlugin.appendtoStepSummary(
-        renderTestResults(Keys.name.value, Keys.scalaVersion.value, results)
+        renderTestResults(Keys.thisProject.value.id, Keys.scalaVersion.value, results)
       )
       results
     }
