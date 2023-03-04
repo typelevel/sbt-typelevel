@@ -78,7 +78,7 @@ object TypelevelSonatypeCiReleasePlugin extends AutoPlugin {
             s"""|```scala
                 |resolvers += "${repo.name}" at "${repo.root}"
                 |```
-                |"""
+                |""".stripMargin
         }
 
         GitHubActionsPlugin.appendtoStepSummary(
