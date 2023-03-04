@@ -239,7 +239,7 @@ jobs:
           SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
           SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
           SONATYPE_CREDENTIAL_HOST: ${{ secrets.SONATYPE_CREDENTIAL_HOST }}
-        run: sbt '++ ${{ matrix.scala }}' tlRelease
+        run: sbt '++ ${{ matrix.scala }}' tlCiRelease
 
   dependency-submission:
     name: Submit Dependencies

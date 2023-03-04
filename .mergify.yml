@@ -154,14 +154,6 @@ pull_request_rules:
       add:
       - sonatype-ci-release
       remove: []
-- name: Label unidoc PRs
-  conditions:
-  - files~=^unidoc/
-  actions:
-    label:
-      add:
-      - unidoc
-      remove: []
 - name: Label versioning PRs
   conditions:
   - files~=^versioning/
