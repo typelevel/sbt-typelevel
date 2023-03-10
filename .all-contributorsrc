@@ -1,0 +1,228 @@
+{
+  "projectName": "sbt-typelevel",
+  "projectOwner": "typelevel",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 64,
+  "commit": true,
+  "commitConvention": "none",
+  "contributorsSortAlphabetically": true,
+  "contributors": [
+    {
+      "login": "TonioGela",
+      "name": "Antonio Gelameris",
+      "avatar_url": "https://avatars.githubusercontent.com/u/41690956?v=4",
+      "profile": "https://toniogela.dev/",
+      "contributions": [
+        "code",
+        "review"
+      ]
+    },
+    {
+      "login": "armanbilge",
+      "name": "Arman Bilge",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3119428?v=4",
+      "profile": "https://github.com/armanbilge",
+      "contributions": [
+        "code",
+        "review",
+        "doc"
+      ]
+    },
+    {
+      "login": "bpholt",
+      "name": "Brian P. Holt",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1455476?v=4",
+      "profile": "https://www.planetholt.com/",
+      "contributions": [
+        "code",
+        "ideas"
+      ]
+    },
+    {
+      "login": "bplommer",
+      "name": "Ben Plommer",
+      "avatar_url": "https://avatars.githubusercontent.com/u/8990749?v=4",
+      "profile": "https://github.com/bplommer",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "ChristopherDavenport",
+      "name": "Christopher Davenport",
+      "avatar_url": "https://avatars.githubusercontent.com/u/10272700?v=4",
+      "profile": "https://christopherdavenport.github.io/sonatype-stats/",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "danicheg",
+      "name": "Daniel Esik",
+      "avatar_url": "https://avatars.githubusercontent.com/u/19841757?v=4",
+      "profile": "https://indieweb.social/@danicheg",
+      "contributions": [
+        "code",
+        "doc"
+      ]
+    },
+    {
+      "login": "DavidGregory084",
+      "name": "David Gregory",
+      "avatar_url": "https://avatars.githubusercontent.com/u/2992938?v=4",
+      "profile": "https://dgregory.dev/",
+      "contributions": [
+        "code",
+        "review"
+      ]
+    },
+    {
+      "login": "djspiewak",
+      "name": "Daniel Spiewak",
+      "avatar_url": "https://avatars.githubusercontent.com/u/752?v=4",
+      "profile": "https://github.com/djspiewak",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "i10416",
+      "name": "110416",
+      "avatar_url": "https://avatars.githubusercontent.com/u/39330037?v=4",
+      "profile": "https://github.com/i10416",
+      "contributions": [
+        "research"
+      ]
+    },
+    {
+      "login": "iRevive",
+      "name": "Maksym Ochenashko",
+      "avatar_url": "https://avatars.githubusercontent.com/u/6395483?v=4",
+      "profile": "https://ochenashko.com/",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "isomarcte",
+      "name": "David Strawn",
+      "avatar_url": "https://avatars.githubusercontent.com/u/6734045?v=4",
+      "profile": "https://github.com/isomarcte",
+      "contributions": [
+        "doc"
+      ]
+    },
+    {
+      "login": "j-mie6",
+      "name": "Jamie Willis",
+      "avatar_url": "https://avatars.githubusercontent.com/u/5148976?v=4",
+      "profile": "https://github.com/j-mie6",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "jenshalm",
+      "name": "Jens Halm",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3116929?v=4",
+      "profile": "http://www.planet42.org/",
+      "contributions": [
+        "code",
+        "doc"
+      ]
+    },
+    {
+      "login": "osleonard",
+      "name": "Akinmolayan Olushola",
+      "avatar_url": "https://avatars.githubusercontent.com/u/4851473?v=4",
+      "profile": "https://github.com/osleonard",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "pjfanning",
+      "name": "PJ Fanning",
+      "avatar_url": "https://avatars.githubusercontent.com/u/11783444?v=4",
+      "profile": "https://medium.com/@pjfanning",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "Quafadas",
+      "name": "Simon Parten",
+      "avatar_url": "https://avatars.githubusercontent.com/u/24899792?v=4",
+      "profile": "https://github.com/Quafadas",
+      "contributions": [
+        "doc"
+      ]
+    },
+    {
+      "login": "reardonj",
+      "name": "Justin Reardon",
+      "avatar_url": "https://avatars.githubusercontent.com/u/142968?v=4",
+      "profile": "https://github.com/reardonj",
+      "contributions": [
+        "research"
+      ]
+    },
+    {
+      "login": "rossabaker",
+      "name": "Ross A. Baker",
+      "avatar_url": "https://avatars.githubusercontent.com/u/142698?v=4",
+      "profile": "https://rossabaker.com/",
+      "contributions": [
+        "code",
+        "ideas",
+        "review"
+      ]
+    },
+    {
+      "login": "satorg",
+      "name": "Sergey Torgashov",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3954178?v=4",
+      "profile": "https://github.com/satorg",
+      "contributions": [
+        "code",
+        "review"
+      ]
+    },
+    {
+      "login": "valencik",
+      "name": "Andrew Valencik",
+      "avatar_url": "https://avatars.githubusercontent.com/u/5440389?v=4",
+      "profile": "https://github.com/valencik",
+      "contributions": [
+        "code",
+        "doc",
+        "tool"
+      ]
+    },
+    {
+      "login": "vasilmkd",
+      "name": "Vasil Vasilev",
+      "avatar_url": "https://avatars.githubusercontent.com/u/7115459?v=4",
+      "profile": "https://www.linkedin.com/in/vasilvasilev97",
+      "contributions": [
+        "code",
+        "ideas"
+      ]
+    },
+    {
+      "login": "zetashift",
+      "name": "zetashift",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1857826?v=4",
+      "profile": "https://github.com/zetashift",
+      "contributions": [
+        "code"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "linkToUsage": false
+}
