@@ -221,6 +221,16 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "samspills",
+      "name": "Sam Pillsworth",
+      "avatar_url": "https://avatars.githubusercontent.com/u/4977741?v=4",
+      "profile": "https://github.com/samspills",
+      "contributions": [
+        "ideas",
+        "review"
+      ]
     }
   ],
   "contributorsPerLine": 7,
