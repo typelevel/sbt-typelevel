@@ -9,6 +9,7 @@
   "imageSize": 64,
   "commit": true,
   "commitConvention": "none",
+  "contributorsSortAlphabetically": true,
   "contributors": [
     {
       "login": "TonioGela",
