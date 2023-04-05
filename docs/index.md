@@ -122,7 +122,8 @@ lazy val tests = crossProject(JVMPlatform, JSPlatform)
 
 ### Configure GitHub Actions
 
-Run `githubWorkflowGenerate` in sbt to automatically generate the GitHub Actions workflows.  These consist of two YML files: `./.github/workflows/ci.yml` and `./.github/workflows/clean.yml` which you may have to add to your git repository.
+Run `githubWorkflowGenerate` in sbt to automatically generate the GitHub Actions workflows.
+You should commit to these to your repository.
 This will create a CI matrix parallelized on Scala version and target platform (JVM, JS, etc.) and includes steps for running tests and checking binary compatibility.
 It will also setup a job for publishing tagged releases e.g. `v0.4.5` and snapshots to Sonatype/Maven.
 
