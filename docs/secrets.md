@@ -2,7 +2,7 @@
 
 To publish to [Sonatype/Maven Central](https://central.sonatype.org/) you must obtain and install the following secrets on your repository:
 
-- `SONATYPE_USERNAME` and `SONATYPE_PASSWORD`
+- `SONATYPE_USERNAME` and `SONATYPE_PASSWORD` not your Sonatype/jira login credentials! The following section provides instructions for obtaining these.
 - `PGP_SECRET`
 
 Note that `PGP_PASSPHRASE` is not required for publishing with **sbt-typelevel**, although it is supported if you already have a passphrase-protected key.
