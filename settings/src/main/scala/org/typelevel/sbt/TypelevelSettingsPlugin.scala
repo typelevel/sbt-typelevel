@@ -150,12 +150,18 @@ object TypelevelSettingsPlugin extends AutoPlugin {
       }
     },
     scalacOptions ++= {
-      if (tlIsScala3.value && crossScalaVersions.value.forall(_.startsWith("3.")))
-        Seq("-Ykind-projector:underscores")
-      else if (tlIsScala3.value)
-        Seq("-language:implicitConversions", "-Ykind-projector", "-source:3.0-migration")
-      else
-        Seq("-language:_")
+      scalaVersion.value match {
+        case V(V(3, _, _, _)) if crossScalaVersions.value.forall(_.startsWith("3.")) =>
+          Seq("-Ykind-projector:underscores")
+        
+        case V(V(3, _, _, _)) =>
+          Seq("-language:implicitConversions", "-Ykind-projector", "-source:3.0-migration")
+
+        case V(V(2, minor, _, _)) if minor >= 13 =>
+          Seq("-language:_", "-Xsource:3")
+
+        case _ => Seq("-language:_")
+      }
     },
     Test / scalacOptions ++= {
       if (tlIsScala3.value)
