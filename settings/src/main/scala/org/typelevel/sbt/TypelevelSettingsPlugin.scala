@@ -153,7 +153,7 @@ object TypelevelSettingsPlugin extends AutoPlugin {
       scalaVersion.value match {
         case V(V(3, _, _, _)) if crossScalaVersions.value.forall(_.startsWith("3.")) =>
           Seq("-Ykind-projector:underscores")
-        
+
         case V(V(3, _, _, _)) =>
           Seq("-language:implicitConversions", "-Ykind-projector", "-source:3.0-migration")
 
