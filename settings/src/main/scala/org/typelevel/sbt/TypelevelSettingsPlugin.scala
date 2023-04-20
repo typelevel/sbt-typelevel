@@ -157,7 +157,7 @@ object TypelevelSettingsPlugin extends AutoPlugin {
         case V(V(3, _, _, _)) =>
           Seq("-language:implicitConversions", "-Ykind-projector", "-source:3.0-migration")
 
-        case V(V(2, minor, _, _)) if minor >= 13 =>
+        case V(V(2, minor, _, _)) if minor >= 12 =>
           Seq("-language:_", "-Xsource:3")
 
         case _ => Seq("-language:_")
