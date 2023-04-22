@@ -73,6 +73,9 @@ trait GenerativeKeys {
   lazy val githubWorkflowPublishCond = settingKey[Option[String]](
     "A set of conditionals to apply to the publish job to further restrict its run (default: [])")
 
+  lazy val githubWorkflowStewardValidatorConfig = settingKey[Option[File]](
+    "The location of the Scala Steward config to validate (default: `.scala-steward.conf`, if exists)")
+
   lazy val githubWorkflowJavaVersions = settingKey[Seq[JavaSpec]](
     "A list of Java versions to be used for the build job. The publish job will use the *first* of these versions. (default: [temurin@11])")
   lazy val githubWorkflowScalaVersions = settingKey[Seq[String]](

@@ -694,6 +694,8 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
         WorkflowStep.SetupJava(githubWorkflowJavaVersions.value.toList) :::
         githubWorkflowGeneratedCacheSteps.value.toList
     },
+    githubWorkflowStewardValidatorConfig :=
+      Some(file(".scala-steward.conf")).filter(_.exists()),
     githubWorkflowGeneratedCI := {
       val uploadStepsOpt =
         if (githubWorkflowPublishTargetBranches
@@ -719,28 +721,45 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
           needs = List("build")
         )).filter(_ => !githubWorkflowPublishTargetBranches.value.isEmpty)
 
-      Seq(
-        WorkflowJob(
-          "build",
-          "Build and Test",
-          githubWorkflowJobSetup.value.toList :::
-            githubWorkflowBuildPreamble.value.toList :::
-            WorkflowStep.Run(
-              List(s"${sbt.value} githubWorkflowCheck"),
-              name = Some("Check that workflows are up to date")) ::
-            githubWorkflowBuild.value.toList :::
-            githubWorkflowBuildPostamble.value.toList :::
-            uploadStepsOpt,
-          sbtStepPreamble = githubWorkflowBuildSbtStepPreamble.value.toList,
-          oses = githubWorkflowOSes.value.toList,
-          scalas = githubWorkflowScalaVersions.value.toList,
-          javas = githubWorkflowJavaVersions.value.toList,
-          matrixFailFast = githubWorkflowBuildMatrixFailFast.value,
-          matrixAdds = githubWorkflowBuildMatrixAdditions.value,
-          matrixIncs = githubWorkflowBuildMatrixInclusions.value.toList,
-          matrixExcs = githubWorkflowBuildMatrixExclusions.value.toList,
-          runsOnExtraLabels = githubWorkflowBuildRunsOnExtraLabels.value.toList
-        )) ++ publishJobOpt ++ githubWorkflowAddedJobs.value
+      val stewardJobOpt =
+        githubWorkflowStewardValidatorConfig
+          .value
+          .toSeq
+          .map { config =>
+            WorkflowJob(
+              "validate-steward",
+              "Validate Scala Steward Config",
+              WorkflowStep.Checkout ::
+                WorkflowStep.SetupJava(List(JavaSpec.temurin("17"))) :::
+                WorkflowStep.Use(
+                  UseRef.Public("coursier", "setup-action", "v1"),
+                  Map("apps" -> "scala-steward")
+                ) ::
+                WorkflowStep.Run(List(s"scala-steward validate-repo-config $config")) :: Nil
+            )
+          }
+
+      Seq(WorkflowJob(
+        "build",
+        "Build and Test",
+        githubWorkflowJobSetup.value.toList :::
+          githubWorkflowBuildPreamble.value.toList :::
+          WorkflowStep.Run(
+            List(s"${sbt.value} githubWorkflowCheck"),
+            name = Some("Check that workflows are up to date")) ::
+          githubWorkflowBuild.value.toList :::
+          githubWorkflowBuildPostamble.value.toList :::
+          uploadStepsOpt,
+        sbtStepPreamble = githubWorkflowBuildSbtStepPreamble.value.toList,
+        oses = githubWorkflowOSes.value.toList,
+        scalas = githubWorkflowScalaVersions.value.toList,
+        javas = githubWorkflowJavaVersions.value.toList,
+        matrixFailFast = githubWorkflowBuildMatrixFailFast.value,
+        matrixAdds = githubWorkflowBuildMatrixAdditions.value,
+        matrixIncs = githubWorkflowBuildMatrixInclusions.value.toList,
+        matrixExcs = githubWorkflowBuildMatrixExclusions.value.toList,
+        runsOnExtraLabels = githubWorkflowBuildRunsOnExtraLabels.value.toList
+      )) ++ publishJobOpt ++ stewardJobOpt ++ githubWorkflowAddedJobs.value
     }
   )
 
