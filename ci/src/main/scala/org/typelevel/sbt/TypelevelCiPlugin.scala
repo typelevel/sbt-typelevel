@@ -40,6 +40,10 @@ object TypelevelCiPlugin extends AutoPlugin {
       settingKey[Boolean]("Whether to do MiMa binary issues check in CI (default: true)")
     lazy val tlCiDocCheck =
       settingKey[Boolean]("Whether to build API docs in CI (default: true)")
+
+    lazy val tlCiStewardValidateConfig = settingKey[Option[File]](
+      "The location of the Scala Steward config to validate (default: `.scala-steward.conf`, if exists)")
+
   }
 
   import autoImport._
@@ -123,7 +127,27 @@ object TypelevelCiPlugin extends AutoPlugin {
 
       style ++ test ++ scalafix ++ mima ++ doc
     },
-    githubWorkflowJavaVersions := Seq(JavaSpec.temurin("8"))
+    githubWorkflowJavaVersions := Seq(JavaSpec.temurin("8")),
+    tlCiStewardValidateConfig :=
+      Some(file(".scala-steward.conf")).filter(_.exists()),
+    githubWorkflowAddedJobs ++= {
+      tlCiStewardValidateConfig
+        .value
+        .toList
+        .map { config =>
+          WorkflowJob(
+            "validate-steward",
+            "Validate Steward Config",
+            WorkflowStep.Checkout ::
+              WorkflowStep.SetupJava(List(JavaSpec.temurin("17"))) :::
+              WorkflowStep.Use(
+                UseRef.Public("coursier", "setup-action", "v1"),
+                Map("apps" -> "scala-steward")
+              ) ::
+              WorkflowStep.Run(List(s"scala-steward validate-repo-config $config")) :: Nil
+          )
+        }
+    }
   )
 
   override def projectSettings: Seq[Setting[_]] = Seq(
