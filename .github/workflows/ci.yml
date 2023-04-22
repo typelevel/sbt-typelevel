@@ -204,7 +204,7 @@ jobs:
         run: sbt '++ ${{ matrix.scala }}' tlCiRelease
 
   validate-steward:
-    name: Validate Scala Steward Config
+    name: Validate Steward Config
     strategy:
       matrix:
         os: [ubuntu-latest]

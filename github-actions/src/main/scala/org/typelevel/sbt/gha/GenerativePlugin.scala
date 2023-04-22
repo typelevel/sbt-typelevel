@@ -728,7 +728,7 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
           .map { config =>
             WorkflowJob(
               "validate-steward",
-              "Validate Scala Steward Config",
+              "Validate Steward Config",
               WorkflowStep.Checkout ::
                 WorkflowStep.SetupJava(List(JavaSpec.temurin("17"))) :::
                 WorkflowStep.Use(
