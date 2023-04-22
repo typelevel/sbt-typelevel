@@ -22,7 +22,6 @@ import org.typelevel.sbt.kernel.GitHelper
 import org.typelevel.sbt.kernel.V
 import sbt._
 import sbtcrossproject.CrossPlugin.autoImport._
-import sbtcrossproject.CrossType
 
 import java.io.File
 import java.lang.management.ManagementFactory
