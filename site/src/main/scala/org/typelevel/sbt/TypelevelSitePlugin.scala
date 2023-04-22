@@ -244,7 +244,7 @@ object TypelevelSitePlugin extends AutoPlugin {
               HeliumIcon.github,
               options = Styles("svg-link")),
             IconLink.external("https://discord.gg/XF3CXcMzqD", HeliumIcon.chat),
-            IconLink.external("https://twitter.com/typelevel", HeliumIcon.twitter)
+            IconLink.external("https://fosstodon.org/@typelevel", TypelevelHeliumIcon.mastodon)
           )
         )
         .all
