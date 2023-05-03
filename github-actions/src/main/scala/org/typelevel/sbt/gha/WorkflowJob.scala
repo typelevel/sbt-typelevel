@@ -20,7 +20,7 @@ final case class WorkflowJob(
     id: String,
     name: String,
     steps: List[WorkflowStep],
-    sbtStepPreamble: List[String] = List(s"++ $${{ matrix.scala }}"),
+    sbtStepPreamble: List[String] = List.empty,
     cond: Option[String] = None,
     env: Map[String, String] = Map(),
     oses: List[String] = List("ubuntu-latest"),
