@@ -79,3 +79,18 @@ Then, export your secret key with the following command and set it as the `PGP_S
 gpg --armor --export-secret-keys $LONG_ID | base64
 ```
 If your key is passphrase-protected, you should also set the `PGP_PASSPHRASE` secret.
+
+## Scripted Setup
+
+If you'd rather use 1Password to store your keys, instead of a GPG keyring, [Brian Holt](https://github.com/bpholt)
+has written [a script](https://gist.github.com/bpholt/15824aee2c5c7d9c78beea3f94c46f33) that will generate a GPG
+keypair and write the necessary secrets to your GitHub repository. After installing the
+[1Password](https://1password.com/downloads/command-line/) and [GitHub](https://cli.github.com) CLIs, [download the
+script](https://gist.githubusercontent.com/bpholt/15824aee2c5c7d9c78beea3f94c46f33/raw/4169cf5fc56a3f818a347e4f8e782c9503debb03/generate-publishing-keypair.sh)
+and modify the [bash variables](https://gist.github.com/bpholt/15824aee2c5c7d9c78beea3f94c46f33#file-generate-publishing-keypair-sh-L37-L42)
+within to reflect your configuration.
+
+In order for the script to pull your Sonatype access token from 1Password, add a new 1Password entry for the Sonatype
+user. (The name of this 1Password entry goes in the `PUBLISHING_USER` environment variable in the script.) In this
+entry, add a new section named "User Token" with `username` and `password` fields populated with the values from
+Sonatype's **Access User Token**.
