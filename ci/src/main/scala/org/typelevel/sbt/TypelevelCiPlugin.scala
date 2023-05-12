@@ -144,7 +144,8 @@ object TypelevelCiPlugin extends AutoPlugin {
                 UseRef.Public("coursier", "setup-action", "v1"),
                 Map("apps" -> "scala-steward")
               ) ::
-              WorkflowStep.Run(List(s"scala-steward validate-repo-config $config")) :: Nil
+              WorkflowStep.Run(List(s"scala-steward validate-repo-config $config")) :: Nil,
+            scalas = List.empty
           )
         }
     }

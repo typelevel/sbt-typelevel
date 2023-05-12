@@ -27,7 +27,7 @@ ThisBuild / mergifyPrRules += MergifyPrRule(
     MergifyAction.RequestReviews.fromUsers("armanbilge")
   )
 )
-
+ThisBuild / mergifyRequiredJobs ++= Seq("validate-steward", "site")
 ThisBuild / scalafixDependencies ++= Seq(
   "com.github.liancheng" %% "organize-imports" % "0.6.0"
 )

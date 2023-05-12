@@ -432,9 +432,7 @@ ${indent(rendered.mkString("\n"), 1)}"""
     val body = s"""name: ${wrap(job.name)}${renderedNeeds}${renderedCond}
 strategy:${renderedFailFast}
   matrix:
-    os:${compileList(job.oses, 3)}
-    scala:${compileList(job.scalas, 3)}
-    java:${compileList(job.javas.map(_.render), 3)}${renderedMatrices}
+${buildMatrix(2, "os" -> job.oses, "scala" -> job.scalas, "java" -> job.javas.map(_.render))}${renderedMatrices}
 runs-on: ${runsOn}${renderedEnvironment}${renderedContainer}${renderedEnv}
 steps:
 ${indent(job.steps.map(compileStep(_, sbt, job.sbtStepPreamble, declareShell = declareShell)).mkString("\n\n"), 1)}"""
@@ -442,6 +440,15 @@ ${indent(job.steps.map(compileStep(_, sbt, job.sbtStepPreamble, declareShell = d
 
     s"${job.id}:\n${indent(body, 1)}"
   }
+
+  private def buildMatrix(level: Int, prefixWithEntries: (String, List[String])*): String =
+    prefixWithEntries
+      .collect {
+        case (prefix, entries) if entries.nonEmpty =>
+          s"$prefix:${compileList(entries, level + 1)}"
+      }
+      .map(indent(_, level))
+      .mkString("\n")
 
   def compileWorkflow(
       name: String,
@@ -714,7 +721,8 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
             githubWorkflowPublishPostamble.value.toList,
           cond = Some(publicationCond.value),
           oses = githubWorkflowOSes.value.toList.take(1),
-          scalas = List(scalaVersion.value),
+          scalas = List.empty,
+          sbtStepPreamble = List.empty,
           javas = List(githubWorkflowJavaVersions.value.head),
           needs = List("build")
         )).filter(_ => !githubWorkflowPublishTargetBranches.value.isEmpty)
@@ -878,6 +886,7 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
 
     // expand the matrix
     keys
+      .filterNot(matrix.getOrElse(_, Nil).isEmpty)
       .foldLeft(List(List.empty[String])) { (cells, key) =>
         val values = matrix.getOrElse(key, Nil)
         cells.flatMap { cell => values.map(v => cell ::: v :: Nil) }
