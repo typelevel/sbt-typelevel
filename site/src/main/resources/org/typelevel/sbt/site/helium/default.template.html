@@ -4,7 +4,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="generator" content="Laika 0.18.1 + Helium Theme" />
+    <meta name="generator" content="Laika 0.19.1 + Helium Theme" />
     <title>${cursor.currentDocument.title}</title>
     @:for(laika.site.metadata.authors)
       <meta name="author" content="${_}"/>
@@ -18,8 +18,8 @@
     @:for(helium.webFonts)
       <link rel="stylesheet" href="${_}">
     @:@
-    @:linkCSS { paths = ${helium.site.includeCSS} }
-    @:linkJS { paths = ${helium.site.includeJS} }
+    @:linkCSS
+    @:linkJS
     @:heliumInitVersions
     @:heliumInitPreview(container)
     <script> /* for avoiding page load transitions */ </script>
@@ -37,7 +37,7 @@
         <div id="version-menu-container">
           <a id="version-menu-toggle" class="text-link drop-down-toggle" href="#">
             @:if(laika.versioned)
-            ${helium.topBar.versionPrefix} ${laika.versions.currentVersion.displayValue}
+            ${helium.site.topNavigation.versionPrefix} ${laika.versions.currentVersion.displayValue}
             @:else
             Documentation
             @:@
@@ -50,15 +50,23 @@
         @:@
       </div>
 
-      ${?helium.topBar.home}
+      ${?helium.site.topNavigation.home}
 
-      ${?helium.topBar.links}
+      <div class="row links">
+        @:for(helium.site.topNavigation.links)
+        ${_}
+        @:@
+      </div>
 
     </header>
 
     <nav id="sidebar">
 
-      ${?helium.topBar.phoneLinks}
+      <div class="row">
+        @:for(helium.site.topNavigation.phoneLinks)
+        ${_}
+        @:@
+      </div>
 
       @:navigationTree {
         entries = [
