@@ -53,4 +53,4 @@ lazy val unidocs = project
 
 ### How can I customize my website's appearance?
 
-We refer you to the comprehensive [Laika manual](https://planet42.github.io/Laika/index.html) and specifically the [`laikaTheme` setting](https://planet42.github.io/Laika/0.18/02-running-laika/01-sbt-plugin.html#laikatheme-setting).
+We refer you to the comprehensive [Laika manual](https://planet42.github.io/Laika/index.html) and specifically the [`laikaTheme` setting](https://planet42.github.io/Laika/latest/02-running-laika/01-sbt-plugin.html#laikatheme-setting).
