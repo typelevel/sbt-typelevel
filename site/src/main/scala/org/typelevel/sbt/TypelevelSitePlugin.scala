@@ -23,6 +23,7 @@ import laika.helium.config.Favicon
 import laika.helium.config.HeliumIcon
 import laika.helium.config.IconLink
 import laika.helium.config.ImageLink
+import laika.io.model.FilePath
 import laika.sbt.LaikaPlugin
 import laika.theme.ThemeProvider
 import laika.theme.config.Font
@@ -34,6 +35,7 @@ import org.typelevel.sbt.site._
 import sbt._
 
 import scala.annotation.nowarn
+
 import Keys._
 import MdocPlugin.autoImport._
 import LaikaPlugin.autoImport._
@@ -41,7 +43,6 @@ import gha.GenerativePlugin
 import GenerativePlugin.autoImport._
 import TypelevelKernelPlugin._
 import TypelevelKernelPlugin.autoImport._
-import laika.io.model.FilePath
 
 object TypelevelSitePlugin extends AutoPlugin {
 
