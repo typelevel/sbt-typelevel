@@ -17,7 +17,7 @@
 package org.typelevel.sbt.site
 
 import cats.effect.Resource
-import cats.effect.Sync
+import cats.effect.kernel.Async
 import laika.ast.Path
 import laika.config.Config
 import laika.io.model.InputTree
@@ -60,15 +60,15 @@ object TypelevelHeliumExtensions {
       scala3: Boolean,
       apiUrl: Option[URL]
   ): ThemeProvider = new ThemeProvider {
-    def build[F[_]](implicit F: Sync[F]): Resource[F, Theme[F]] =
+    def build[F[_]](implicit F: Async[F]): Resource[F, Theme[F]] =
       ThemeBuilder[F]("Typelevel Helium Extensions")
         .addInputs(
           InputTree[F]
-            .addStream(
+            .addInputStream(
               F.blocking(getClass.getResourceAsStream("helium/default.template.html")),
               DefaultTemplatePath.forHTML
             )
-            .addStream(
+            .addInputStream(
               F.blocking(getClass.getResourceAsStream("helium/site/styles.css")),
               Path.Root / "site" / "styles.css"
             )

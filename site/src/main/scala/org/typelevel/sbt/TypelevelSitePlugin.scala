@@ -34,7 +34,6 @@ import org.typelevel.sbt.site._
 import sbt._
 
 import scala.annotation.nowarn
-
 import Keys._
 import MdocPlugin.autoImport._
 import LaikaPlugin.autoImport._
@@ -42,6 +41,7 @@ import gha.GenerativePlugin
 import GenerativePlugin.autoImport._
 import TypelevelKernelPlugin._
 import TypelevelKernelPlugin.autoImport._
+import laika.io.model.FilePath
 
 object TypelevelSitePlugin extends AutoPlugin {
 
@@ -340,8 +340,9 @@ object TypelevelSitePlugin extends AutoPlugin {
 
       val applyFlags = applyIf(laikaIncludeEPUB.value, _.withEPUBDownloads)
         .andThen(applyIf(laikaIncludePDF.value, _.withPDFDownloads))
-        .andThen(
-          applyIf(laikaIncludeAPI.value, _.withAPIDirectory(Settings.apiTargetDirectory.value)))
+        .andThen(applyIf(
+          laikaIncludeAPI.value,
+          _.withAPIDirectory(FilePath.fromJavaFile(Settings.apiTargetDirectory.value))))
         .andThen(applyIf(previewConfig.isVerbose, _.verbose))
 
       val config = ServerConfig

@@ -16,9 +16,10 @@
 
 package org.typelevel.sbt.site
 
-import cats.effect.Sync
+import cats.effect.kernel.Async
 import laika.bundle.ExtensionBundle
 import laika.factory.Format
+import laika.io.descriptor.ThemeDescriptor
 import laika.io.model.InputTree
 import laika.theme.Theme
 import laika.theme.ThemeProvider
@@ -26,7 +27,7 @@ import laika.theme.ThemeProvider
 final class LaikaThemeProviderOps private[sbt] (provider: ThemeProvider) {
 
   def extend(extensions: ThemeProvider): ThemeProvider = new ThemeProvider {
-    def build[F[_]: Sync] = for {
+    def build[F[_]: Async] = for {
       base <- provider.build
       ext <- extensions.build
     } yield {
@@ -42,6 +43,7 @@ final class LaikaThemeProviderOps private[sbt] (provider: ThemeProvider) {
       }
 
       new Theme[F] {
+        override def descriptor: ThemeDescriptor = base.descriptor.extendWith(ext.descriptor)
         override def inputs: InputTree[F] = overrideInputs(base.inputs, ext.inputs)
         override def extensions: Seq[ExtensionBundle] = base.extensions ++ ext.extensions
         override def treeProcessor: Format => Theme.TreeProcessor[F] = fmt =>
