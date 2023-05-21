@@ -8,7 +8,7 @@ sbt-typelevel configures [sbt](https://www.scala-sbt.org/) for developing, testi
 - git-based dynamic versioning
 - Binary-compatibility checking with [MiMa](https://github.com/lightbend/mima), following [early semantic versioning](https://www.scala-lang.org/blog/2021/02/16/preventing-version-conflicts-with-versionscheme.html#early-semver-and-sbt-version-policy)
 - CI publishing of releases and snapshots to Sonatype/Maven
-- CI deployed GitHub pages websites, generated with [mdoc](https://github.com/scalameta/mdoc/) and [Laika](https://github.com/planet42/laika)
+- CI deployed GitHub pages websites, generated with [mdoc](https://github.com/scalameta/mdoc/) and [Laika](https://github.com/typelevel/Laika)
 - Auto-populated settings for various boilerplate (SCM info, API doc urls, Scala.js sourcemaps, etc.)
 
 ## Adopters

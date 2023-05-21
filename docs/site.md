@@ -1,6 +1,6 @@
 # sbt-typelevel-site
 
-**sbt-typelevel-site** is an optional plugin for generating websites with [mdoc](https://scalameta.org/mdoc/) and [Laika](https://planet42.github.io/Laika/) and deploying to GitHub Pages from CI. You can add it to your build alongside either the  **sbt-typelevel** or **sbt-typelevel-ci-release** plugin or also use it stand-alone.
+**sbt-typelevel-site** is an optional plugin for generating websites with [mdoc](https://scalameta.org/mdoc/) and [Laika](https://typelevel.org/Laika/) and deploying to GitHub Pages from CI. You can add it to your build alongside either the  **sbt-typelevel** or **sbt-typelevel-ci-release** plugin or also use it stand-alone.
 
 ## Quick start
 
@@ -21,7 +21,7 @@ lazy val docs = project.in(file("site")).enablePlugins(TypelevelSitePlugin)
 
 Place your `.md` files in the `docs/` directory of your project. To preview locally, run `docs/tlSitePreview`. This will start a preview server at http://localhost:4242.
 
-The site is generated using [mdoc](https://scalameta.org/mdoc/) and [Laika](https://planet42.github.io/Laika/) and published to the `gh-pages` branch on every push to the specified branch.
+The site is generated using [mdoc](https://scalameta.org/mdoc/) and [Laika](https://typelevel.org/Laika/) and published to the `gh-pages` branch on every push to the specified branch.
 
 You will also need to configure your repository settings:
 
@@ -53,4 +53,4 @@ lazy val unidocs = project
 
 ### How can I customize my website's appearance?
 
-We refer you to the comprehensive [Laika manual](https://planet42.github.io/Laika/index.html) and specifically the [`laikaTheme` setting](https://planet42.github.io/Laika/0.18/02-running-laika/01-sbt-plugin.html#laikatheme-setting).
+We refer you to the comprehensive [Laika manual](https://typelevel.org/Laika/index.html) and specifically the [`laikaTheme` setting](https://typelevel.org/Laika/0.18/02-running-laika/01-sbt-plugin.html#laikatheme-setting).
