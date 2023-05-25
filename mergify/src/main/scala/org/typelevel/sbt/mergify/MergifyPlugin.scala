@@ -18,6 +18,7 @@ package org.typelevel.sbt.mergify
 
 import org.typelevel.sbt.gha._
 import sbt._
+import sbtcrossproject.CrossPlugin.autoImport._
 
 import java.nio.file.Path
 
@@ -152,13 +153,7 @@ object MergifyPlugin extends AutoPlugin {
   }
 
   private lazy val projectLabel = Def.setting {
-    val path = (Compile / sourceDirectories)
-      .?
-      .value
-      .getOrElse(Seq.empty)
-      .map(_.toPath)
-      .foldLeft(baseDirectory.value.toPath)(commonAncestor(_, _))
-
+    val path = crossProjectBaseDirectory.?.value.getOrElse(baseDirectory.value).toPath
     val label = path.getFileName.toString
 
     def isRoot = path == (LocalRootProject / baseDirectory).value.toPath
