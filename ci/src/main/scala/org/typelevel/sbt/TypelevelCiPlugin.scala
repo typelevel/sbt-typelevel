@@ -16,19 +16,23 @@
 
 package org.typelevel.sbt
 
-import com.typesafe.tools.mima.plugin.MimaPlugin
 import org.typelevel.sbt.gha.GenerativePlugin
 import org.typelevel.sbt.gha.GenerativePlugin.autoImport._
 import org.typelevel.sbt.gha.GitHubActionsPlugin
+import org.typelevel.sbt.gha.WorkflowStep
 import sbt._
+
+import scala.language.experimental.macros
+
+import Keys._
 
 object TypelevelCiPlugin extends AutoPlugin {
 
-  override def requires = GitHubActionsPlugin && GenerativePlugin && MimaPlugin
+  override def requires = GitHubActionsPlugin && GenerativePlugin
   override def trigger = allRequirements
 
   object autoImport {
-    def tlCrossRootProject: CrossRootProject = CrossRootProject()
+    def tlCrossRootProject: CrossRootProject = macro CrossRootProjectMacros.crossRootProjectImpl
 
     lazy val tlCiHeaderCheck =
       settingKey[Boolean]("Whether to do header check in CI (default: false)")
@@ -41,6 +45,9 @@ object TypelevelCiPlugin extends AutoPlugin {
     lazy val tlCiDocCheck =
       settingKey[Boolean]("Whether to build API docs in CI (default: true)")
 
+    lazy val tlCiDependencyGraphJob =
+      settingKey[Boolean]("Whether to add a job to submit dependencies to GH (default: true)")
+
     lazy val tlCiStewardValidateConfig = settingKey[Option[File]](
       "The location of the Scala Steward config to validate (default: `.scala-steward.conf`, if exists)")
 
@@ -52,8 +59,9 @@ object TypelevelCiPlugin extends AutoPlugin {
     tlCiHeaderCheck := false,
     tlCiScalafmtCheck := false,
     tlCiScalafixCheck := false,
-    tlCiMimaBinaryIssueCheck := true,
-    tlCiDocCheck := true,
+    tlCiMimaBinaryIssueCheck := false,
+    tlCiDocCheck := false,
+    tlCiDependencyGraphJob := true,
     githubWorkflowTargetBranches ++= Seq(
       "!update/**", // ignore steward branches
       "!pr/**" // escape-hatch to disable ci on a branch
@@ -128,6 +136,23 @@ object TypelevelCiPlugin extends AutoPlugin {
       style ++ test ++ scalafix ++ mima ++ doc
     },
     githubWorkflowJavaVersions := Seq(JavaSpec.temurin("8")),
+    githubWorkflowAddedJobs ++= {
+      val dependencySubmission =
+        if (tlCiDependencyGraphJob.value)
+          List(
+            WorkflowJob(
+              "dependency-submission",
+              "Submit Dependencies",
+              scalas = List(scalaVersion.value),
+              javas = List(githubWorkflowJavaVersions.value.head),
+              steps = githubWorkflowJobSetup.value.toList :+
+                WorkflowStep.DependencySubmission,
+              cond = Some("github.event_name != 'pull_request'")
+            ))
+        else Nil
+
+      dependencySubmission
+    },
     tlCiStewardValidateConfig :=
       Some(file(".scala-steward.conf")).filter(_.exists()),
     githubWorkflowAddedJobs ++= {

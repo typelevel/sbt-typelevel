@@ -16,7 +16,7 @@
 
 package org.typelevel.sbt
 
-import com.typesafe.sbt.SbtGit.git
+import com.github.sbt.git.SbtGit.git
 import org.typelevel.sbt.kernel.GitHelper
 import sbt._
 
@@ -51,7 +51,21 @@ object TypelevelGitHubPlugin extends AutoPlugin {
         sLog.value.info(s"set scmInfo to https://github.com/$user/$repo")
         gitHubScmInfo(user, repo)
     },
-    homepage := homepage.value.orElse(scmInfo.value.map(_.browseUrl))
+    homepage := homepage.value.orElse(scmInfo.value.map(_.browseUrl)),
+    developers := {
+      gitHubUserRepo
+        .value
+        .toList
+        .map {
+          case (user, repo) =>
+            Developer(
+              user,
+              s"$repo contributors",
+              s"@$user",
+              url(s"https://github.com/$user/$repo/contributors")
+            )
+        }
+    }
   )
 
   override def projectSettings: Seq[Setting[_]] = Seq(
@@ -59,6 +73,7 @@ object TypelevelGitHubPlugin extends AutoPlugin {
       val tagOrHash =
         GitHelper.getTagOrHash(git.gitCurrentTags.value, git.gitHeadCommit.value)
       val userRepo = gitHubUserRepo.value
+      val infoOpt = scmInfo.value
 
       if (tlIsScala3.value)
         tagOrHash.toSeq flatMap { vh =>
@@ -66,7 +81,13 @@ object TypelevelGitHubPlugin extends AutoPlugin {
             case (user, repo) => Seq(s"-source-links:github://${user}/${repo}", "-revision", vh)
           }
         }
-      else Nil // TODO move from settings plugin
+      else
+        tagOrHash.toSeq flatMap { vh =>
+          infoOpt.toSeq flatMap { info =>
+            val path = s"${info.browseUrl}/blob/${vh}€{FILE_PATH}.scala"
+            Seq("-doc-source-url", path)
+          }
+        }
     }
   )
 
