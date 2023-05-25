@@ -40,6 +40,8 @@ trait GenerativeKeys {
     "Whether to use sbt's native thin client, default is false since this can cause issues (see https://github.com/sbt/sbt/issues/6468)")
   lazy val githubWorkflowIncludeClean =
     settingKey[Boolean]("Whether to include the clean.yml file (default: true)")
+  lazy val githubWorkflowConcurrency = settingKey[Option[Concurrency]](
+    s"Use concurrency to ensure that only a single workflow within the same concurrency group will run at a time. (default: '$${{ github.workflow }} @ $${{ github.ref }}')")
 
   lazy val githubWorkflowBuildMatrixFailFast = settingKey[Option[Boolean]](
     "Whether or not to enable the fail-fast strategy (default: None/Enabled)")
@@ -51,6 +53,8 @@ trait GenerativeKeys {
     settingKey[Seq[MatrixExclude]]("A list of matrix exclusions (default: [])")
   lazy val githubWorkflowBuildRunsOnExtraLabels = settingKey[Seq[String]](
     "A list of additional labels to append to each run of the matrix executions")
+  lazy val githubWorkflowBuildTimeoutMinutes = settingKey[Option[Int]](
+    "The maximum number of minutes to let the build job run before GitHub automatically cancels it (default: 60)")
 
   lazy val githubWorkflowBuildPreamble = settingKey[Seq[WorkflowStep]](
     "A list of steps to insert after base setup but before compiling and testing (default: [])")
@@ -72,6 +76,8 @@ trait GenerativeKeys {
     "A set of branch predicates which will be applied to determine whether the current branch gets a publication stage; if empty, publish will be skipped entirely (default: [== main])")
   lazy val githubWorkflowPublishCond = settingKey[Option[String]](
     "A set of conditionals to apply to the publish job to further restrict its run (default: [])")
+  lazy val githubWorkflowPublishTimeoutMinutes = settingKey[Option[Int]](
+    "The maximum number of minutes to let the publish job run before GitHub automatically cancels it (default: None)")
 
   lazy val githubWorkflowJavaVersions = settingKey[Seq[JavaSpec]](
     "A list of Java versions to be used for the build job. The publish job will use the *first* of these versions. (default: [temurin@11])")

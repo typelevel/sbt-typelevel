@@ -1,9 +1,3 @@
-header img {
-  height: 40px;
-  width: auto;
-  margin-top: 6px;
-}
-
 h1>code {
   font-size: var(--header1-font-size);
 }
