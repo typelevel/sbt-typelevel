@@ -52,13 +52,19 @@ object TypelevelSettingsPlugin extends AutoPlugin {
   override def projectSettings = Seq(
     pomIncludeRepository := { _ => false },
     libraryDependencies ++= {
-      if (tlIsScala3.value)
-        Nil
-      else
-        Seq(
-          compilerPlugin("com.olegpy" %% "better-monadic-for" % "0.3.1"),
-          compilerPlugin("org.typelevel" % "kind-projector" % "0.13.2" cross CrossVersion.full)
-        )
+      val plugins =
+        if (tlIsScala3.value)
+          Nil
+        else
+          Seq(
+            compilerPlugin("com.olegpy" %% "better-monadic-for" % "0.3.1"),
+            compilerPlugin(
+              "org.typelevel" % "kind-projector" % "0.13.2" cross CrossVersion.full)
+          )
+
+      Seq(
+        "org.typelevel" %% "scalac-compat-annotation" % "0.1.0" % CompileTime
+      ) ++ plugins
     },
 
     // Adapted from Rob Norris' post at https://tpolecat.github.io/2014/04/11/scalac-flags.html
