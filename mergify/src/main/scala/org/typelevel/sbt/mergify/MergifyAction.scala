@@ -23,6 +23,8 @@ import io.circe.syntax._
 import org.typelevel.sbt.mergify.MergifyAction.RequestReviews._
 import sbt.librarymanagement.Developer
 
+import scala.annotation.nowarn
+
 sealed abstract class MergifyAction {
   private[mergify] def name = getClass.getSimpleName.toLowerCase
 }
@@ -159,6 +161,6 @@ object MergifyAction {
       Encoder[JsonObject].contramap(_ => JsonObject.empty)
   }
 
+  @nowarn("cat=unused")
   private[this] object Dummy extends MergifyAction
-
 }

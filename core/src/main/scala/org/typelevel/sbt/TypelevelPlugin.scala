@@ -21,8 +21,6 @@ import org.typelevel.sbt.gha.GenerativePlugin
 import org.typelevel.sbt.gha.GitHubActionsPlugin
 import sbt._
 
-import scala.collection.immutable
-
 import Keys._
 
 /**
@@ -68,7 +66,7 @@ object TypelevelPlugin extends AutoPlugin {
       }
     },
     startYear := Some(java.time.YearMonth.now().getYear()),
-    licenses += "Apache-2.0" -> url("https://www.apache.org/licenses/LICENSE-2.0.txt"),
+    licenses += License.Apache2,
     tlCiHeaderCheck := true,
     tlCiScalafmtCheck := true,
     tlCiReleaseBranches := Seq("main"),
@@ -79,7 +77,7 @@ object TypelevelPlugin extends AutoPlugin {
     githubWorkflowBuildMatrixExclusions ++= {
       val defaultScala = (ThisBuild / scalaVersion).value
       for {
-        scala <- githubWorkflowScalaVersions.value.filterNot(_ == defaultScala)
+        scala <- githubWorkflowScalaVersions.value.filterNot(defaultScala.startsWith(_))
         java <- githubWorkflowJavaVersions.value.tail // default java is head
       } yield MatrixExclude(Map("scala" -> scala, "java" -> java.render))
     }
@@ -111,8 +109,5 @@ object TypelevelPlugin extends AutoPlugin {
       )
     )
   )
-
-  // override for bincompat
-  override def projectSettings = immutable.Seq.empty
 
 }

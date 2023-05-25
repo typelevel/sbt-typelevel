@@ -14,26 +14,6 @@
  * limitations under the License.
  */
 
-package org.typelevel.sbt
+package org.typelevel.sbt.gha
 
-import sbt._
-
-import TypelevelCiPlugin.autoImport._
-
-object TypelevelCiReleasePlugin extends AutoPlugin {
-
-  override def requires =
-    TypelevelVersioningPlugin &&
-      TypelevelMimaPlugin &&
-      TypelevelCiPlugin &&
-      TypelevelSonatypeCiReleasePlugin &&
-      TypelevelCiSigningPlugin
-
-  override def trigger = allRequirements
-
-  override def buildSettings = Seq(
-    tlCiMimaBinaryIssueCheck := true,
-    tlCiDocCheck := true
-  )
-
-}
+final case class Concurrency(group: String, cancelInProgress: Option[Boolean] = None)

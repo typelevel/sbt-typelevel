@@ -16,7 +16,7 @@
 
 package org.typelevel.sbt
 
-import com.typesafe.sbt.SbtGit.git
+import com.github.sbt.git.SbtGit.git
 import org.scalajs.sbtplugin.ScalaJSPlugin
 import org.typelevel.sbt.kernel.GitHelper
 import sbt._
