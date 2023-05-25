@@ -22,10 +22,6 @@ import laika.ast.Span
 import laika.ast.TemplateString
 import laika.helium.Helium
 import laika.helium.config._
-import laika.theme.config.Font
-import laika.theme.config.FontDefinition
-import laika.theme.config.FontStyle
-import laika.theme.config.FontWeight
 import org.typelevel.sbt.TypelevelGitHubPlugin.gitHubUserRepo
 import sbt.Def._
 import sbt.Keys.licenses
