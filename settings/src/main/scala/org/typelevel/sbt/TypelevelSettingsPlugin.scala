@@ -20,7 +20,6 @@ import com.github.sbt.git.GitPlugin
 import org.typelevel.sbt.kernel.V
 import sbt._
 import sbtcrossproject.CrossPlugin.autoImport._
-import sbtcrossproject.CrossType
 
 import java.io.File
 import java.lang.management.ManagementFactory
@@ -259,17 +258,18 @@ object TypelevelSettingsPlugin extends AutoPlugin {
   private val perConfigSettings = Seq(
     unmanagedSourceDirectories ++= {
       def extraDirs(suffix: String) =
-        if (crossProjectPlatform.?.value.isDefined)
-          List(CrossType.Pure, CrossType.Full).flatMap {
-            _.sharedSrcDir(baseDirectory.value, Defaults.nameForSrc(configuration.value.name))
+        crossProjectCrossType.?.value match {
+          case Some(crossType) =>
+            crossType
+              .sharedSrcDir(baseDirectory.value, Defaults.nameForSrc(configuration.value.name))
               .toList
               .map(f => file(f.getPath + suffix))
-          }
-        else
-          List(
-            baseDirectory.value / "src" / Defaults.nameForSrc(
-              configuration.value.name) / s"scala$suffix"
-          )
+          case None =>
+            List(
+              baseDirectory.value / "src" /
+                Defaults.nameForSrc(configuration.value.name) / s"scala$suffix"
+            )
+        }
 
       CrossVersion.partialVersion(scalaVersion.value) match {
         case Some((2, y)) if y <= 12 => extraDirs("-2.12-")

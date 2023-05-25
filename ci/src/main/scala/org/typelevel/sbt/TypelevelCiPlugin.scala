@@ -47,6 +47,10 @@ object TypelevelCiPlugin extends AutoPlugin {
 
     lazy val tlCiDependencyGraphJob =
       settingKey[Boolean]("Whether to add a job to submit dependencies to GH (default: true)")
+
+    lazy val tlCiStewardValidateConfig = settingKey[Option[File]](
+      "The location of the Scala Steward config to validate (default: `.scala-steward.conf`, if exists)")
+
   }
 
   import autoImport._
@@ -148,6 +152,27 @@ object TypelevelCiPlugin extends AutoPlugin {
         else Nil
 
       dependencySubmission
+    },
+    tlCiStewardValidateConfig :=
+      Some(file(".scala-steward.conf")).filter(_.exists()),
+    githubWorkflowAddedJobs ++= {
+      tlCiStewardValidateConfig
+        .value
+        .toList
+        .map { config =>
+          WorkflowJob(
+            "validate-steward",
+            "Validate Steward Config",
+            WorkflowStep.Checkout ::
+              WorkflowStep.Use(
+                UseRef.Public("coursier", "setup-action", "v1"),
+                Map("apps" -> "scala-steward")
+              ) ::
+              WorkflowStep.Run(List(s"scala-steward validate-repo-config $config")) :: Nil,
+            scalas = List.empty,
+            javas = List.empty
+          )
+        }
     }
   )
 
@@ -155,7 +180,7 @@ object TypelevelCiPlugin extends AutoPlugin {
     Test / Keys.executeTests := {
       val results: Tests.Output = (Test / Keys.executeTests).value
       GitHubActionsPlugin.appendtoStepSummary(
-        renderTestResults(Keys.name.value, Keys.scalaVersion.value, results)
+        renderTestResults(Keys.thisProject.value.id, Keys.scalaVersion.value, results)
       )
       results
     }

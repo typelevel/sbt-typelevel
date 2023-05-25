@@ -140,7 +140,6 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        scala: [2.12.17]
         java: [temurin@8]
     runs-on: ${{ matrix.os }}
     timeout-minutes: 45
@@ -170,7 +169,7 @@ jobs:
 
       - name: sbt update
         if: matrix.java == 'temurin@8' && steps.setup-java-temurin-8.outputs.cache-hit == 'false'
-        run: sbt '++ ${{ matrix.scala }}' reload +update
+        run: sbt reload +update
 
       - name: Download Java (temurin@17)
         id: download-java-temurin-17
@@ -192,7 +191,7 @@ jobs:
 
       - name: sbt update
         if: matrix.java == 'temurin@17' && steps.setup-java-temurin-17.outputs.cache-hit == 'false'
-        run: sbt '++ ${{ matrix.scala }}' reload +update
+        run: sbt reload +update
 
       - name: Setup GraalVM (graal_latest@17)
         id: setup-graalvm-latest-17
@@ -205,7 +204,7 @@ jobs:
 
       - name: sbt update
         if: matrix.java == 'graal_latest@17' && steps.setup-graalvm-latest-17.outputs.cache-hit == 'false'
-        run: sbt '++ ${{ matrix.scala }}' reload +update
+        run: sbt reload +update
 
       - name: Download target directories (2.12, sbt-typelevelJVM)
         uses: actions/download-artifact@v3
@@ -239,7 +238,7 @@ jobs:
           SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
           SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
           SONATYPE_CREDENTIAL_HOST: ${{ secrets.SONATYPE_CREDENTIAL_HOST }}
-        run: sbt '++ ${{ matrix.scala }}' tlCiRelease
+        run: sbt tlCiRelease
 
   dependency-submission:
     name: Submit Dependencies
@@ -316,12 +315,27 @@ jobs:
       - name: Submit Dependencies
         uses: scalacenter/sbt-dependency-submission@v2
 
+  validate-steward:
+    name: Validate Steward Config
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout current branch (fast)
+        uses: actions/checkout@v3
+
+      - uses: coursier/setup-action@v1
+        with:
+          apps: scala-steward
+
+      - run: scala-steward validate-repo-config .scala-steward.conf
+
   site:
     name: Generate Site
     strategy:
       matrix:
         os: [ubuntu-latest]
-        scala: [2.12.17]
         java: [temurin@8]
     runs-on: ${{ matrix.os }}
     steps:
@@ -350,7 +364,7 @@ jobs:
 
       - name: sbt update
         if: matrix.java == 'temurin@8' && steps.setup-java-temurin-8.outputs.cache-hit == 'false'
-        run: sbt '++ ${{ matrix.scala }}' reload +update
+        run: sbt reload +update
 
       - name: Download Java (temurin@17)
         id: download-java-temurin-17
@@ -372,7 +386,7 @@ jobs:
 
       - name: sbt update
         if: matrix.java == 'temurin@17' && steps.setup-java-temurin-17.outputs.cache-hit == 'false'
-        run: sbt '++ ${{ matrix.scala }}' reload +update
+        run: sbt reload +update
 
       - name: Setup GraalVM (graal_latest@17)
         id: setup-graalvm-latest-17
@@ -385,10 +399,10 @@ jobs:
 
       - name: sbt update
         if: matrix.java == 'graal_latest@17' && steps.setup-graalvm-latest-17.outputs.cache-hit == 'false'
-        run: sbt '++ ${{ matrix.scala }}' reload +update
+        run: sbt reload +update
 
       - name: Generate site
-        run: sbt '++ ${{ matrix.scala }}' docs/tlSite
+        run: sbt docs/tlSite
 
       - name: Publish site
         if: github.event_name != 'pull_request' && github.ref == 'refs/heads/series/0.4'

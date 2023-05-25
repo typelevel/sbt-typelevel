@@ -29,7 +29,7 @@ ThisBuild / mergifyPrRules += MergifyPrRule(
     MergifyAction.RequestReviews.fromUsers("armanbilge")
   )
 )
-
+ThisBuild / mergifyRequiredJobs ++= Seq("validate-steward", "site")
 ThisBuild / scalafixDependencies ++= Seq(
   "com.github.liancheng" %% "organize-imports" % "0.6.0"
 )
@@ -214,7 +214,7 @@ lazy val docs = project
       "sbt-crossproject" -> url("https://github.com/portable-scala/sbt-crossproject"),
       "mima" -> url("https://github.com/lightbend/mima"),
       "mdoc" -> url("https://scalameta.org/mdoc/"),
-      "Laika" -> url("https://planet42.github.io/Laika/"),
+      "Laika" -> url("https://typelevel.org/Laika/"),
       "sbt-unidoc" -> url("https://github.com/sbt/sbt-unidoc")
     ),
     tlSiteIsTypelevelProject := true,
