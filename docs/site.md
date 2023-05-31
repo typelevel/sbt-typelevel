@@ -19,7 +19,7 @@ ThisBuild / tlSitePublishBranch := Some("main")
 lazy val docs = project.in(file("site")).enablePlugins(TypelevelSitePlugin)
 ```
 
-Place your `.md` files in the `docs/` directory of your project. To preview locally, run `docs/tlSitePreview`. This will start a preview server at http://localhost:4242.
+Place your `.md` files in the `docs/` directory of your project. To preview locally, run `docs/tlSitePreview`. This will start a preview server at http://localhost:4242. Be sure to include an `index.md` file for the service to default point to.
 
 The site is generated using [mdoc](https://scalameta.org/mdoc/) and [Laika](https://typelevel.org/Laika/) and published to the `gh-pages` branch on every push to the specified branch.
 
