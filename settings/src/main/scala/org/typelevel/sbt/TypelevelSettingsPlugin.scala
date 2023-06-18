@@ -122,7 +122,20 @@ object TypelevelSettingsPlugin extends AutoPlugin {
 
       val warningsDotty = Seq.empty
 
+      val warnings33 = Seq(
+        "-Wunused:implicits",
+        "-Wunused:explicits",
+        "-Wunused:imports",
+        "-Wunused:locals",
+        "-Wunused:params",
+        "-Wunused:privates",
+        "-Wvalue-discard"
+      )
+
       scalaVersion.value match {
+        case V(V(3, minor, _, _)) if minor >= 3 =>
+          warnings33
+
         case V(V(3, _, _, _)) =>
           warningsDotty
 
