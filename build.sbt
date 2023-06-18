@@ -30,9 +30,6 @@ ThisBuild / mergifyPrRules += MergifyPrRule(
   )
 )
 ThisBuild / mergifyRequiredJobs ++= Seq("validate-steward", "site")
-ThisBuild / scalafixDependencies ++= Seq(
-  "com.github.liancheng" %% "organize-imports" % "0.6.0"
-)
 
 val MunitVersion = "0.7.29"
 
