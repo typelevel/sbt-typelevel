@@ -120,11 +120,11 @@ jobs:
 
       - name: Make target directories
         if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main')
-        run: mkdir -p github/target github-actions/target kernel/target versioning/target ci-release/target scalafix/target .jvm/target mdocs/target site/target ci-signing/target mergify/target unidoc/target .native/target mima/target no-publish/target sonatype/target ci/target sonatype-ci-release/target core/target settings/target target .js/target project/target
+        run: mkdir -p github/target github-actions/target kernel/target versioning/target ci-release/target scalafix/target site/target ci-signing/target mergify/target unidoc/target mima/target no-publish/target sonatype/target ci/target sonatype-ci-release/target core/target settings/target project/target
 
       - name: Compress target directories
         if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main')
-        run: tar cf targets.tar github/target github-actions/target kernel/target versioning/target ci-release/target scalafix/target .jvm/target mdocs/target site/target ci-signing/target mergify/target unidoc/target .native/target mima/target no-publish/target sonatype/target ci/target sonatype-ci-release/target core/target settings/target target .js/target project/target
+        run: tar cf targets.tar github/target github-actions/target kernel/target versioning/target ci-release/target scalafix/target site/target ci-signing/target mergify/target unidoc/target mima/target no-publish/target sonatype/target ci/target sonatype-ci-release/target core/target settings/target project/target
 
       - name: Upload target directories
         if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main')
