@@ -11,8 +11,11 @@ ThisBuild / developers ++= List(
 )
 ThisBuild / startYear := Some(2022)
 
-ThisBuild / githubWorkflowJavaVersions ++=
-  Seq(JavaSpec.temurin("17"), JavaSpec(JavaSpec.Distribution.GraalVM("latest"), "17"))
+ThisBuild / githubWorkflowJavaVersions ++= Seq(
+  JavaSpec.temurin("11"),
+  JavaSpec.temurin("17"),
+  JavaSpec(JavaSpec.Distribution.GraalVM("latest"), "17")
+)
 
 ThisBuild / githubWorkflowPublishTimeoutMinutes := Some(45)
 
