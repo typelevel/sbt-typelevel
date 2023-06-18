@@ -481,7 +481,7 @@ ${indent(job.steps.map(compileStep(_, sbt, job.sbtStepPreamble, declareShell = d
     prefixWithEntries
       .collect {
         case (prefix, entries) if entries.nonEmpty =>
-          s"$prefix:${compileList(entries, level + 1)}"
+          s"$prefix:${compileList(entries, 1)}"
       }
       .map(indent(_, level))
       .mkString("\n")
