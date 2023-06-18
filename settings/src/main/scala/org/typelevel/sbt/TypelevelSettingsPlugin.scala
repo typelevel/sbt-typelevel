@@ -122,7 +122,20 @@ object TypelevelSettingsPlugin extends AutoPlugin {
 
       val warningsDotty = Seq.empty
 
+      val warnings33 = Seq(
+        "-Wunused:implicits",
+        "-Wunused:explicits",
+        "-Wunused:imports",
+        "-Wunused:locals",
+        "-Wunused:params",
+        "-Wunused:privates",
+        "-Wvalue-discard"
+      )
+
       scalaVersion.value match {
+        case V(V(3, minor, _, _)) if minor >= 3 =>
+          warnings33
+
         case V(V(3, _, _, _)) =>
           warningsDotty
 
@@ -167,12 +180,18 @@ object TypelevelSettingsPlugin extends AutoPlugin {
       }
     },
     scalacOptions ++= {
-      if (tlIsScala3.value && crossScalaVersions.value.forall(_.startsWith("3.")))
-        Seq("-Ykind-projector:underscores")
-      else if (tlIsScala3.value)
-        Seq("-language:implicitConversions", "-Ykind-projector", "-source:3.0-migration")
-      else
-        Seq("-language:_")
+      scalaVersion.value match {
+        case V(V(3, _, _, _)) if crossScalaVersions.value.forall(_.startsWith("3.")) =>
+          Seq("-Ykind-projector:underscores")
+
+        case V(V(3, _, _, _)) =>
+          Seq("-language:implicitConversions", "-Ykind-projector")
+
+        case V(V(2, minor, _, _)) if minor >= 12 =>
+          Seq("-language:_", "-Xsource:3")
+
+        case _ => Seq("-language:_")
+      }
     },
     Test / scalacOptions ++= {
       if (tlIsScala3.value)
@@ -214,20 +233,6 @@ object TypelevelSettingsPlugin extends AutoPlugin {
       "utf8",
       "-Xlint:all"
     ),
-
-    // TODO make these respect Compile/Test config
-    scalacOptions ++= {
-      if (tlFatalWarnings.value)
-        Seq("-Xfatal-warnings")
-      else
-        Seq.empty
-    },
-    javacOptions ++= {
-      if (tlFatalWarnings.value)
-        Seq("-Werror")
-      else
-        Seq.empty
-    },
     scalacOptions ++= {
       val (releaseOption, newTargetOption, oldTargetOption) =
         withJdkRelease(tlJdkRelease.value)(
@@ -262,6 +267,22 @@ object TypelevelSettingsPlugin extends AutoPlugin {
   ) ++ inConfig(Compile)(perConfigSettings) ++ inConfig(Test)(perConfigSettings)
 
   private val perConfigSettings = Seq(
+    scalacOptions := {
+      val old = scalacOptions.value
+      val flag = "-Werror"
+      if (tlFatalWarnings.value)
+        if (!old.contains(flag)) old :+ flag else old
+      else
+        old.filterNot(_ == flag)
+    },
+    javacOptions ++= {
+      val old = javacOptions.value
+      val flag = "-Werror"
+      if (tlFatalWarnings.value)
+        if (!old.contains(flag)) old :+ flag else old
+      else
+        old.filterNot(_ == flag)
+    },
     unmanagedSourceDirectories ++= {
       def extraDirs(suffix: String) =
         crossProjectCrossType.?.value match {
