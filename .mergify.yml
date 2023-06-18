@@ -12,8 +12,9 @@ pull_request_rules:
   - or:
     - body~=labels:.*early-semver-patch
     - body~=labels:.*early-semver-minor
-  - status-success=Build and Test (ubuntu-latest, 2.12.17, temurin@8, rootJVM)
-  - status-success=Build and Test (ubuntu-latest, 2.12.17, temurin@17, rootJVM)
+  - status-success=Build and Test (ubuntu-latest, 2.12, temurin@8, sbt-typelevelJVM)
+  - status-success=Build and Test (ubuntu-latest, 2.12, temurin@17, sbt-typelevelJVM)
+  - status-success=Build and Test (ubuntu-latest, 2.12, graal_latest@17, sbt-typelevelJVM)
   - status-success=Validate Steward Config (ubuntu-latest)
   - status-success=Generate Site (ubuntu-latest, temurin@8)
   - '#approved-reviews-by>=1'
