@@ -269,7 +269,7 @@ object TypelevelSettingsPlugin extends AutoPlugin {
   private val perConfigSettings = Seq(
     scalacOptions := {
       val old = scalacOptions.value
-      val flag = "-Xfatal-warnings"
+      val flag = "-Werror"
       if (tlFatalWarnings.value)
         if (!old.contains(flag)) old :+ flag else old
       else
