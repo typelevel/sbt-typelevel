@@ -852,6 +852,7 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
   }
 
   override def projectSettings = Seq(
+    githubWorkflowArtifactUpload := publishArtifact.value,
     Global / internalTargetAggregation ++= {
       if (githubWorkflowArtifactUpload.value)
         Seq(target.value)
