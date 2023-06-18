@@ -52,6 +52,13 @@ object TypelevelGitHubPlugin extends AutoPlugin {
         gitHubScmInfo(user, repo)
     },
     homepage := homepage.value.orElse(scmInfo.value.map(_.browseUrl)),
+    releaseNotesURL := {
+      val tag = git.gitCurrentTags.value.headOption
+      gitHubUserRepo.value.flatMap {
+        case (user, repo) =>
+          tag.map(v => url(s"https://github.com/$user/$repo/releases/tag/$v"))
+      }
+    },
     developers := {
       gitHubUserRepo
         .value
