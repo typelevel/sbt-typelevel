@@ -107,10 +107,19 @@ object WorkflowStep {
   val Tmate: WorkflowStep =
     Use(UseRef.Public("mxschmitt", "action-tmate", "v3"), name = Some("Setup tmate session"))
 
-  val DependencySubmission: WorkflowStep =
+  def DependencySubmission(
+      workingDirectory: Option[String],
+      modulesIgnore: Option[List[String]],
+      configsIgnore: Option[List[String]],
+      token: Option[String]
+  ): WorkflowStep =
     Use(
       UseRef.Public("scalacenter", "sbt-dependency-submission", "v2"),
-      name = Some("Submit Dependencies")
+      name = Some("Submit Dependencies"),
+      params = workingDirectory.map("working-directory" -> _).toMap ++
+        modulesIgnore.map(_.mkString(" ")).map("modules-ignore" -> _).toMap ++
+        configsIgnore.map(_.mkString(" ")).map("configs-ignore" -> _).toMap ++
+        token.map("token" -> _).toMap
     )
 
   def ComputeVar(name: String, cmd: String): WorkflowStep =

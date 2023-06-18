@@ -246,7 +246,6 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        scala: [2.12.18]
         java: [temurin@8]
     runs-on: ${{ matrix.os }}
     steps:
@@ -314,6 +313,9 @@ jobs:
 
       - name: Submit Dependencies
         uses: scalacenter/sbt-dependency-submission@v2
+        with:
+          modules-ignore: sbt-typelevelJVM docs sbt-typelevelNative sbt-typelevel sbt-typelevelJS
+          configs-ignore: test scala-tool scala-doc-tool
 
   validate-steward:
     name: Validate Steward Config

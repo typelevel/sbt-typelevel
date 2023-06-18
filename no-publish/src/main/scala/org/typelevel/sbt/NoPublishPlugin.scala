@@ -21,12 +21,26 @@ import sbt._
 import Keys._
 
 object NoPublishPlugin extends AutoPlugin {
+  object autoImport {
+    lazy val noPublishProjectRefs = settingKey[Seq[ProjectRef]]("List of no-publish projects")
+  }
+  import autoImport._
+
+  private lazy val noPublishInternalAggregation =
+    settingKey[Seq[ProjectRef]]("Aggregates all the no-publish projects")
+
   override def trigger = noTrigger
+
+  override def globalSettings = Seq(
+    noPublishInternalAggregation := Seq(),
+    noPublishProjectRefs := noPublishInternalAggregation.value
+  )
 
   override def projectSettings = Seq(
     publish := {},
     publishLocal := {},
     publishArtifact := false,
-    publish / skip := true
+    publish / skip := true,
+    Global / noPublishInternalAggregation += thisProjectRef.value
   )
 }

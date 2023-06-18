@@ -16,6 +16,7 @@
 
 package org.typelevel.sbt
 
+import org.typelevel.sbt.NoPublishPlugin.autoImport._
 import org.typelevel.sbt.gha.GenerativePlugin
 import org.typelevel.sbt.gha.GenerativePlugin.autoImport._
 import org.typelevel.sbt.gha.GitHubActionsPlugin
@@ -23,8 +24,6 @@ import org.typelevel.sbt.gha.WorkflowStep
 import sbt._
 
 import scala.language.experimental.macros
-
-import Keys._
 
 object TypelevelCiPlugin extends AutoPlugin {
 
@@ -143,10 +142,15 @@ object TypelevelCiPlugin extends AutoPlugin {
             WorkflowJob(
               "dependency-submission",
               "Submit Dependencies",
-              scalas = List(scalaVersion.value),
+              scalas = Nil,
               javas = List(githubWorkflowJavaVersions.value.head),
               steps = githubWorkflowJobSetup.value.toList :+
-                WorkflowStep.DependencySubmission,
+                WorkflowStep.DependencySubmission(
+                  None,
+                  Some(noPublishProjectRefs.value.toList.map(_.project)),
+                  Some(List("test", "scala-tool", "scala-doc-tool")),
+                  None
+                ),
               cond = Some("github.event_name != 'pull_request'")
             ))
         else Nil
