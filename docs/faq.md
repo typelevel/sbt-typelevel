@@ -99,13 +99,14 @@ ThisBuild / tlSonatypeUseLegacyHost := true
 
 Check out the [**sbt-typelevel-site**](site.md) plugin.
 
-## How do I manage my Scala.js version?
+## How do I manage my Scala.js and Scala Native versions?
 
-We recommend explicitly setting your Scala.js version in `project/plugins.sbt`.
+We recommend explicitly setting your Scala.js and Scala Native versions in `project/plugins.sbt`.
 
 ```scala
 addSbtPlugin("org.scala-js" % "sbt-scalajs" % "@LATEST_SJS_VERSION@")
+addSbtPlugin("org.scala-native" % "sbt-scala-native" % "@LATEST_NATIVE_VERSION@")
 ```
 
-**sbt-typelevel** ships with a conservative Scala.js version to enable certain settings.
-If one of your dependencies requires a newer Scala.js version you may experience failures in the `scalaJSLink` CI step.
+**sbt-typelevel** ships with a conservative Scala.js and Scala Native version to enable certain settings.
+If one of your dependencies requires a newer version you may experience failures in the `scalaJSLink` or `nativeLink` CI steps.
