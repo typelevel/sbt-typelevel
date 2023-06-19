@@ -244,8 +244,8 @@ lazy val docs = project
 
       val latestScalaJSVersion =
         getLatestVersion(s"org.scala-js:scalajs-library_2.13:").getOrElse(scalaJSVersion)
-      val latestNativeVersion = getLatestVersion(s"org.scala-native:nativelib_native0.4_3:")
-        .getOrElse(nativeVersion)
+      val latestNativeVersion =
+        getLatestVersion(s"org.scala-native:nativelib_native0.4_3:").getOrElse(nativeVersion)
 
       Map(
         "START_YEAR" -> startYear,
