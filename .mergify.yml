@@ -15,7 +15,8 @@ pull_request_rules:
   - status-success=Build and Test (ubuntu-latest, 2.12, temurin@8, sbt-typelevelJVM)
   - status-success=Build and Test (ubuntu-latest, 2.12, temurin@11, sbt-typelevelJVM)
   - status-success=Build and Test (ubuntu-latest, 2.12, temurin@17, sbt-typelevelJVM)
-  - status-success=Build and Test (ubuntu-latest, 2.12, graal_latest@17, sbt-typelevelJVM)
+  - status-success=Build and Test (ubuntu-latest, 2.12, graalvm@17, sbt-typelevelJVM)
+  - status-success=Build and Test (ubuntu-latest, 2.12, corretto@17, sbt-typelevelJVM)
   - status-success=Validate Steward Config (ubuntu-latest)
   - status-success=Generate Site (ubuntu-latest, temurin@8)
   - '#approved-reviews-by>=1'
