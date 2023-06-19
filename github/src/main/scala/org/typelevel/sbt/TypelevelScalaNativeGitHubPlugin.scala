@@ -28,7 +28,6 @@ object TypelevelScalaNativeGitHubPlugin extends AutoPlugin {
   override def trigger = allRequirements
   override def requires = ScalaNativePlugin && TypelevelKernelPlugin
 
-
   override def projectSettings = Seq(
     scalacOptions ++= {
       val flag = "-P:scalanative:mapSourceURI:"
