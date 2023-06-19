@@ -39,7 +39,7 @@ object TypelevelSonatypePlugin extends AutoPlugin {
 
   override def buildSettings =
     Seq(
-      tlSonatypeUseLegacyHost := true,
+      tlSonatypeUseLegacyHost := false,
       autoAPIMappings := true
     ) ++ addCommandAlias(
       "tlRelease",
