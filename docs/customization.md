@@ -27,7 +27,7 @@ Instead of using the super-plugins, for finer-grained control you can always add
 ### sbt-typelevel-sonatype
 - `TypelevelSonatypePlugin`: Sets up publishing to Sonatype/Maven.
 - `tlRelease` (command): check binary-compatibility and `+publish` to Sonatype
-- `tlSonatypeUseLegacyHost` (setting): publish to `oss.sonatype.org` instead of `s01.oss.sonatype.org` (default: true)
+- `tlSonatypeUseLegacyHost` (setting): publish to `oss.sonatype.org` instead of `s01.oss.sonatype.org` (default: false)
 
 ### sbt-typelevel-settings
 - `TypelevelSettingsPlugin`: Good and/or opinionated defaults for scalac settings etc., inspired by sbt-tpolecat.

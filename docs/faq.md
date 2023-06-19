@@ -87,9 +87,12 @@ val root = tlCrossRootProject
   .aggregate(core, io, node, scodec, protocols, reactiveStreams, benchmark)
 ```
 
-## How do I publish to `s01.oss.sonatype.org`?
+## How do I publish to `oss.sonatype.org` instead of `s01.oss.sonatype.org`?
+
+Note that `oss.sonatype.org` is the legacy host and there is an [open invitation to migrate to the new host](https://central.sonatype.org/news/20210223_new-users-on-s01/#why-are-we-doing-this).
+
 ```scala
-ThisBuild / tlSonatypeUseLegacyHost := false
+ThisBuild / tlSonatypeUseLegacyHost := true
 ```
 
 ## How do I publish a website like this one?
