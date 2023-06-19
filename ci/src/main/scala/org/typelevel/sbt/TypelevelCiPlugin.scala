@@ -74,7 +74,7 @@ object TypelevelCiPlugin extends AutoPlugin {
             WorkflowStep.Sbt(
               List("headerCheckAll", "scalafmtCheckAll", "project /", "scalafmtSbtCheck"),
               name = Some("Check headers and formatting"),
-              cond = Some(primaryJavaOSCond.value)
+              cond = Some(primaryAxisCond.value)
             )
           )
         case (true, false) => // headers
@@ -82,7 +82,7 @@ object TypelevelCiPlugin extends AutoPlugin {
             WorkflowStep.Sbt(
               List("headerCheckAll"),
               name = Some("Check headers"),
-              cond = Some(primaryJavaOSCond.value)
+              cond = Some(primaryAxisCond.value)
             )
           )
         case (false, true) => // formatting
@@ -90,7 +90,7 @@ object TypelevelCiPlugin extends AutoPlugin {
             WorkflowStep.Sbt(
               List("scalafmtCheckAll", "project /", "scalafmtSbtCheck"),
               name = Some("Check formatting"),
-              cond = Some(primaryJavaOSCond.value)
+              cond = Some(primaryAxisCond.value)
             )
           )
         case (false, false) => Nil // nada
@@ -106,7 +106,7 @@ object TypelevelCiPlugin extends AutoPlugin {
             WorkflowStep.Sbt(
               List("scalafixAll --check"),
               name = Some("Check scalafix lints"),
-              cond = Some(primaryJavaOSCond.value)
+              cond = Some(primaryAxisCond.value)
             )
           )
         else Nil
@@ -117,7 +117,7 @@ object TypelevelCiPlugin extends AutoPlugin {
             WorkflowStep.Sbt(
               List("mimaReportBinaryIssues"),
               name = Some("Check binary compatibility"),
-              cond = Some(primaryJavaOSCond.value)
+              cond = Some(primaryAxisCond.value)
             ))
         else Nil
 
@@ -127,7 +127,7 @@ object TypelevelCiPlugin extends AutoPlugin {
             WorkflowStep.Sbt(
               List("doc"),
               name = Some("Generate API documentation"),
-              cond = Some(primaryJavaOSCond.value)
+              cond = Some(primaryAxisCond.value)
             )
           )
         else Nil
@@ -229,10 +229,22 @@ object TypelevelCiPlugin extends AutoPlugin {
     else ""
   }
 
-  private val primaryJavaOSCond = Def.setting {
+  private val primaryAxisCond = Def.setting {
     val java = githubWorkflowJavaVersions.value.head
     val os = githubWorkflowOSes.value.head
-    s"matrix.java == '${java.render}' && matrix.os == '${os}'"
+
+    // disjoint keys have unique sources so this condition should not consider them
+    val disjointKeys = githubWorkflowArtifactDownloadExtraKeys.value
+    val additionalAxes = githubWorkflowBuildMatrixAdditions
+      .value
+      .toList
+      .collect {
+        case (k, primary :: _) if !disjointKeys.contains(k) =>
+          s" && matrix.$k == '$primary'"
+      }
+      .mkString
+
+    s"matrix.java == '${java.render}' && matrix.os == '${os}'$additionalAxes"
   }
 
 }
