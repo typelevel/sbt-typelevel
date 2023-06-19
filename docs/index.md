@@ -78,8 +78,8 @@ ThisBuild / developers := List(
   tlGitHubDev("armanbilge", "Arman Bilge")
 )
 
-// true by default, set to false to publish to s01.oss.sonatype.org
-ThisBuild / tlSonatypeUseLegacyHost := true
+// false by default, set to true to publish to oss.sonatype.org
+ThisBuild / tlSonatypeUseLegacyHost := false
 
 val Scala213 = "2.13.8"
 ThisBuild / crossScalaVersions := Seq(Scala213, "3.1.1")
