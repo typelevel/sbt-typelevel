@@ -27,7 +27,7 @@ jobs:
     name: Build and Test
     strategy:
       matrix:
-        os: [ubuntu-latest]
+        os: [ubuntu-latest, macos-latest, windows-latest]
         scala: [2.12]
         java:
           - temurin@8
@@ -36,9 +36,31 @@ jobs:
           - graalvm@17
           - corretto@17
         project: [sbt-typelevelJVM]
+        exclude:
+          - java: temurin@11
+            os: macos-latest
+          - java: temurin@11
+            os: windows-latest
+          - java: temurin@17
+            os: macos-latest
+          - java: temurin@17
+            os: windows-latest
+          - java: graalvm@17
+            os: macos-latest
+          - java: graalvm@17
+            os: windows-latest
+          - java: corretto@17
+            os: macos-latest
+          - java: corretto@17
+            os: windows-latest
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
     steps:
+      - name: Ignore line ending differences in git
+        if: contains(runner.os, 'windows')
+        shell: bash
+        run: git config --global core.autocrlf false
+
       - name: Checkout current branch (full)
         uses: actions/checkout@v3
         with:
@@ -55,6 +77,7 @@ jobs:
 
       - name: sbt update
         if: matrix.java == 'temurin@8' && steps.setup-java-temurin-8.outputs.cache-hit == 'false'
+        shell: bash
         run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' reload +update
 
       - name: Setup Java (temurin@11)
@@ -68,6 +91,7 @@ jobs:
 
       - name: sbt update
         if: matrix.java == 'temurin@11' && steps.setup-java-temurin-11.outputs.cache-hit == 'false'
+        shell: bash
         run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' reload +update
 
       - name: Setup Java (temurin@17)
@@ -81,6 +105,7 @@ jobs:
 
       - name: sbt update
         if: matrix.java == 'temurin@17' && steps.setup-java-temurin-17.outputs.cache-hit == 'false'
+        shell: bash
         run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' reload +update
 
       - name: Setup Java (graalvm@17)
@@ -94,6 +119,7 @@ jobs:
 
       - name: sbt update
         if: matrix.java == 'graalvm@17' && steps.setup-java-graalvm-17.outputs.cache-hit == 'false'
+        shell: bash
         run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' reload +update
 
       - name: Setup Java (corretto@17)
@@ -107,36 +133,45 @@ jobs:
 
       - name: sbt update
         if: matrix.java == 'corretto@17' && steps.setup-java-corretto-17.outputs.cache-hit == 'false'
+        shell: bash
         run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' reload +update
 
       - name: Check that workflows are up to date
+        shell: bash
         run: sbt githubWorkflowCheck
 
       - name: Check headers and formatting
         if: matrix.java == 'temurin@8' && matrix.os == 'ubuntu-latest'
+        shell: bash
         run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' headerCheckAll scalafmtCheckAll 'project /' scalafmtSbtCheck
 
       - name: Check scalafix lints
         if: matrix.java == 'temurin@8' && matrix.os == 'ubuntu-latest'
+        shell: bash
         run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' 'scalafixAll --check'
 
       - name: Test
+        shell: bash
         run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' test
 
       - name: Check binary compatibility
         if: matrix.java == 'temurin@8' && matrix.os == 'ubuntu-latest'
+        shell: bash
         run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' mimaReportBinaryIssues
 
       - name: Generate API documentation
         if: matrix.java == 'temurin@8' && matrix.os == 'ubuntu-latest'
+        shell: bash
         run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' doc
 
       - name: Make target directories
         if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main')
+        shell: bash
         run: mkdir -p github/target github-actions/target kernel/target versioning/target ci-release/target scalafix/target site/target ci-signing/target mergify/target unidoc/target mima/target no-publish/target sonatype/target ci/target sonatype-ci-release/target core/target settings/target project/target
 
       - name: Compress target directories
         if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main')
+        shell: bash
         run: tar cf targets.tar github/target github-actions/target kernel/target versioning/target ci-release/target scalafix/target site/target ci-signing/target mergify/target unidoc/target mima/target no-publish/target sonatype/target ci/target sonatype-ci-release/target core/target settings/target project/target
 
       - name: Upload target directories
@@ -157,6 +192,10 @@ jobs:
     runs-on: ${{ matrix.os }}
     timeout-minutes: 45
     steps:
+      - name: Ignore line ending differences in git
+        if: contains(runner.os, 'windows')
+        run: git config --global core.autocrlf false
+
       - name: Checkout current branch (full)
         uses: actions/checkout@v3
         with:
@@ -270,6 +309,10 @@ jobs:
         java: [temurin@8]
     runs-on: ${{ matrix.os }}
     steps:
+      - name: Ignore line ending differences in git
+        if: contains(runner.os, 'windows')
+        run: git config --global core.autocrlf false
+
       - name: Checkout current branch (full)
         uses: actions/checkout@v3
         with:
@@ -370,6 +413,10 @@ jobs:
         java: [temurin@8]
     runs-on: ${{ matrix.os }}
     steps:
+      - name: Ignore line ending differences in git
+        if: contains(runner.os, 'windows')
+        run: git config --global core.autocrlf false
+
       - name: Checkout current branch (full)
         uses: actions/checkout@v3
         with:

@@ -18,6 +18,15 @@ ThisBuild / githubWorkflowJavaVersions ++= Seq(
   JavaSpec.corretto("17")
 )
 
+ThisBuild / githubWorkflowOSes ++= Seq("macos-latest", "windows-latest")
+
+ThisBuild / githubWorkflowBuildMatrixExclusions ++= {
+  for {
+    java <- githubWorkflowJavaVersions.value.tail
+    os <- githubWorkflowOSes.value.tail
+  } yield MatrixExclude(Map("java" -> java.render, "os" -> os))
+}
+
 ThisBuild / githubWorkflowPublishTimeoutMinutes := Some(45)
 
 ThisBuild / mergifyStewardConfig ~= {

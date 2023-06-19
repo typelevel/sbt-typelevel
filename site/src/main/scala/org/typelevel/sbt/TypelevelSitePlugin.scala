@@ -168,12 +168,16 @@ object TypelevelSitePlugin extends AutoPlugin {
             UseRef.Public("peaceiris", "actions-gh-pages", "v3.9.3"),
             Map(
               "github_token" -> s"$${{ secrets.GITHUB_TOKEN }}",
-              "publish_dir" -> (ThisBuild / baseDirectory)
-                .value
-                .toPath
-                .toAbsolutePath
-                .relativize((laikaSite / target).value.toPath)
-                .toString,
+              "publish_dir" -> {
+                val path = (ThisBuild / baseDirectory)
+                  .value
+                  .toPath
+                  .toAbsolutePath
+                  .relativize((laikaSite / target).value.toPath)
+
+                // os-independent path rendering ...
+                (0 until path.getNameCount).map(path.getName).mkString("/")
+              },
               "keep_files" -> tlSiteKeepFiles.value.toString
             ),
             name = Some("Publish site"),
