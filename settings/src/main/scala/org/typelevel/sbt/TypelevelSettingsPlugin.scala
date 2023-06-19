@@ -234,10 +234,15 @@ object TypelevelSettingsPlugin extends AutoPlugin {
       "-Xlint:all"
     ),
     scalacOptions ++= {
-      val (releaseOption, newTargetOption, oldTargetOption) =
+      val (javaOutputVersionOption, releaseOption, newTargetOption, oldTargetOption) =
         withJdkRelease(tlJdkRelease.value)(
-          (Seq.empty[String], Seq.empty[String], Seq.empty[String])) { n =>
-          (Seq("-release", n.toString), Seq(s"-target:$n"), Seq("-target:jvm-1.8"))
+          (Seq.empty[String], Seq.empty[String], Seq.empty[String], Seq.empty[String])) { n =>
+          (
+            Seq("-java-output-version", n.toString),
+            Seq("-release", n.toString),
+            Seq(s"-target:$n"),
+            Seq("-target:jvm-1.8")
+          )
         }
 
       scalaVersion.value match {
@@ -253,8 +258,11 @@ object TypelevelSettingsPlugin extends AutoPlugin {
         case V(V(2, 13, Some(build), _)) if build >= 9 =>
           releaseOption
 
-        case V(V(3, _, _, _)) =>
+        case V(V(3, minor, _, _)) if minor <= 1 =>
           releaseOption
+
+        case V(V(3, minor, _, _)) if minor >= 2 =>
+          javaOutputVersionOption
 
         case _ =>
           Seq.empty
