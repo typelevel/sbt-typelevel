@@ -58,7 +58,6 @@ Instead of using the super-plugins, for finer-grained control you can always add
 
 ### sbt-typelevel
 - `TypelevelPlugin`: The super-super-plugin intended for bootstrapping the typical Typelevel project. Sets up CI release including snapshots, scalac settings, headers, and formatting.
-- `tlFatalWarningsInCi` (setting): Convert compiler warnings into errors under CI builds (default: true).
 
 ### sbt-typelevel-site
 -  `TypelevelSitePlugin`: Sets up an [mdoc](https://scalameta.org/mdoc/)/[Laika](https://typelevel.org/Laika/)-generated website, automatically published to GitHub pages in CI.

@@ -44,7 +44,7 @@ You may also want to (globally) install the [sbt-rewarn](https://github.com/rtim
 If you are using **sbt-typelevel** fatal warnings are on by default in CI.
 
 ```scala
-ThisBuild / tlFatalWarningsInCi := false
+ThisBuild / tlFatalWarnings := false
 ```
 
 If you are only using **sbt-typelevel-ci-release**, you are completely in charge of your own `scalacOptions`, including fatal warnings.

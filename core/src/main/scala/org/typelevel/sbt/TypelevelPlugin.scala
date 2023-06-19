@@ -39,21 +39,17 @@ object TypelevelPlugin extends AutoPlugin {
   override def trigger = allRequirements
 
   object autoImport {
+    @deprecated("No longer has an effect. Use `tlFatalWarnings` instead.", "0.5.0")
     lazy val tlFatalWarningsInCi = settingKey[Boolean](
       "Convert compiler warnings into errors under CI builds (default: true)")
   }
 
-  import autoImport._
   import TypelevelKernelPlugin.mkCommand
   import TypelevelCiPlugin.autoImport._
   import TypelevelSettingsPlugin.autoImport._
   import TypelevelSonatypeCiReleasePlugin.autoImport._
   import GenerativePlugin.autoImport._
   import GitHubActionsPlugin.autoImport._
-
-  override def globalSettings = Seq(
-    tlFatalWarningsInCi := true
-  )
 
   override def buildSettings = Seq(
     organization := "org.typelevel",
@@ -70,7 +66,7 @@ object TypelevelPlugin extends AutoPlugin {
     tlCiHeaderCheck := true,
     tlCiScalafmtCheck := true,
     tlCiReleaseBranches := Seq("main"),
-    Def.derive(tlFatalWarnings := (tlFatalWarningsInCi.value && githubIsWorkflowBuild.value)),
+    Def.derive(tlFatalWarnings := githubIsWorkflowBuild.value),
     githubWorkflowJavaVersions := {
       Seq(JavaSpec.temurin(tlJdkRelease.value.getOrElse(8).toString))
     },
@@ -81,24 +77,7 @@ object TypelevelPlugin extends AutoPlugin {
         java <- githubWorkflowJavaVersions.value.tail // default java is head
       } yield MatrixExclude(Map("scala" -> scala, "java" -> java.render))
     }
-  ) ++ addCommandAlias(
-    "prePR",
-    mkCommand(
-      List(
-        "reload",
-        "project /",
-        "clean",
-        "githubWorkflowGenerate",
-        "headerCreateAll",
-        "scalafmtAll",
-        "scalafmtSbt",
-        "set ThisBuild / tlFatalWarnings := tlFatalWarningsInCi.value",
-        "Test / compile",
-        "doc",
-        "session clear"
-      )
-    )
-  ) ++ addCommandAlias(
+  ) ++ addPrePRCommandAlias ++ addCommandAlias(
     "tlPrePrBotHook",
     mkCommand(
       List(
@@ -108,6 +87,31 @@ object TypelevelPlugin extends AutoPlugin {
         "scalafmtSbt"
       )
     )
+  )
+
+  // partially re-implemnents addCommandAlias
+  // this is so we can use the value of other settings to generate command
+  private def addPrePRCommandAlias: Seq[Setting[_]] = Seq(
+    GlobalScope / onLoad := {
+      val header = tlCiHeaderCheck.value
+      val scalafmt = tlCiScalafmtCheck.value
+      val scalafix = tlCiScalafixCheck.value
+
+      (GlobalScope / Keys.onLoad).value.compose { (state: State) =>
+        val command = mkCommand(
+          List("project /", "githubWorkflowGenerate") ++
+            List("+headerCreateAll").filter(_ => header) ++
+            List("+scalafmtAll", "scalafmtSbt").filter(_ => scalafmt) ++
+            List("+scalafixAll").filter(_ => scalafix)
+        )
+        BasicCommands.addAlias(state, "prePR", command)
+      }
+    },
+    GlobalScope / Keys.onUnload := {
+      (GlobalScope / Keys.onUnload)
+        .value
+        .compose((state: State) => BasicCommands.removeAlias(state, "prePR"))
+    }
   )
 
 }
