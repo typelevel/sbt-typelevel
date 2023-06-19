@@ -218,15 +218,22 @@ lazy val docs = project
   .settings(
     laikaConfig ~= { _.withRawContent },
     tlSiteApiPackage := Some("org.typelevel.sbt"),
-    tlSiteRelatedProjects := Seq(
-      "typelevel.g8" -> url("https://github.com/typelevel/typelevel.g8"),
-      "sbt" -> url("https://www.scala-sbt.org/"),
-      "sbt-crossproject" -> url("https://github.com/portable-scala/sbt-crossproject"),
-      "mima" -> url("https://github.com/lightbend/mima"),
-      "mdoc" -> url("https://scalameta.org/mdoc/"),
-      "Laika" -> url("https://typelevel.org/Laika/"),
-      "sbt-unidoc" -> url("https://github.com/sbt/sbt-unidoc")
-    ),
+    tlSiteHelium ~= {
+      import laika.helium.config._
+      _.site.mainNavigation(appendLinks = Seq(
+        ThemeNavigationSection(
+          "Related Projects",
+          TextLink.external("https://github.com/typelevel/typelevel.g8", "typelevel.g8"),
+          TextLink.external("https://www.scala-sbt.org/", "sbt"),
+          TextLink
+            .external("https://github.com/portable-scala/sbt-crossproject", "sbt-crossproject"),
+          TextLink.external("https://github.com/lightbend/mima", "MiMa"),
+          TextLink.external("https://scalameta.org/mdoc/", "mdoc"),
+          TextLink.external("https://typelevel.org/Laika/", "Laika"),
+          TextLink.external("https://github.com/sbt/sbt-unidoc", "sbt-unidoc")
+        )
+      ))
+    },
     mdocVariables ++= {
       import coursier.complete.Complete
       import java.time._
