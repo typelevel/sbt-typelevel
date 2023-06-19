@@ -236,18 +236,21 @@ lazy val docs = project
 
       val startYear = YearMonth.now().getYear.toString
 
-      val sjsVersionFuture =
-        Complete().withInput(s"org.scala-js:scalajs-library_2.13:").complete().future()
-      val sjsVersion =
-        try {
-          Await.result(sjsVersionFuture, 5.seconds)._2.last
-        } catch {
-          case ex: TimeoutException => scalaJSVersion // not the latest but better than nothing
-        }
+      def getLatestVersion(dep: String) = {
+        import scala.util.Try
+        val fut = Complete().withInput(dep).complete().future()
+        Try(Await.result(fut, 5.seconds)._2.last).toOption
+      }
+
+      val latestScalaJSVersion =
+        getLatestVersion(s"org.scala-js:scalajs-library_2.13:").getOrElse(scalaJSVersion)
+      val latestNativeVersion =
+        getLatestVersion(s"org.scala-native:nativelib_native0.4_3:").getOrElse(nativeVersion)
 
       Map(
         "START_YEAR" -> startYear,
-        "LATEST_SJS_VERSION" -> sjsVersion
+        "LATEST_SJS_VERSION" -> latestScalaJSVersion,
+        "LATEST_NATIVE_VERSION" -> latestNativeVersion
       )
     }
   )
