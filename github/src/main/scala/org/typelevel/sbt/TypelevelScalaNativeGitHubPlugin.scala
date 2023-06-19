@@ -17,9 +17,10 @@
 package org.typelevel.sbt
 
 import com.github.sbt.git.SbtGit.git
-import scala.scalanative.sbtplugin.ScalaNativePlugin
 import org.typelevel.sbt.kernel.GitHelper
 import sbt._
+
+import scala.scalanative.sbtplugin.ScalaNativePlugin
 
 import Keys._
 
@@ -27,7 +28,6 @@ object TypelevelScalaNativeGitHubPlugin extends AutoPlugin {
   override def trigger = allRequirements
   override def requires = ScalaNativePlugin && TypelevelKernelPlugin
 
-  import TypelevelKernelPlugin.autoImport._
 
   override def projectSettings = Seq(
     scalacOptions ++= {
