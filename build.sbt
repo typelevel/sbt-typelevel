@@ -218,7 +218,6 @@ lazy val docs = project
       "Laika" -> url("https://typelevel.org/Laika/"),
       "sbt-unidoc" -> url("https://github.com/sbt/sbt-unidoc")
     ),
-    tlSiteIsTypelevelProject := true,
     mdocVariables ++= {
       import coursier.complete.Complete
       import java.time._
