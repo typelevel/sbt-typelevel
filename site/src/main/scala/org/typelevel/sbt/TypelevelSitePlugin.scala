@@ -47,8 +47,8 @@ object TypelevelSitePlugin extends AutoPlugin {
 
     lazy val tlSiteHelium = settingKey[Helium]("The Helium theme configuration and extensions")
     lazy val tlSiteIsTypelevelProject =
-      settingKey[Boolean](
-        "Indicates whether the generated site should be pre-populated with UI elements specific to Typelevel projects (default: false)")
+      settingKey[Option[TypelevelProject]](
+        "Indicates whether the generated site should be pre-populated with UI elements specific to Typelevel Organization or Affiliate projects (default: None)")
 
     lazy val tlSiteApiUrl = settingKey[Option[URL]]("URL to the API docs")
     lazy val tlSiteApiModule =
@@ -70,6 +70,7 @@ object TypelevelSitePlugin extends AutoPlugin {
     lazy val tlSitePreview = taskKey[Unit](
       "Start a live-reload preview server (combines mdoc --watch with laikaPreview)")
 
+    type TypelevelProject = site.TypelevelProject
     val TypelevelProject = site.TypelevelProject
   }
 
@@ -119,11 +120,16 @@ object TypelevelSitePlugin extends AutoPlugin {
         ) ++
         tlSiteApiUrl.value.map("API_URL" -> _.toString).toMap
     },
-    tlSiteIsTypelevelProject := organization.value == "org.typelevel",
+    tlSiteIsTypelevelProject := {
+      if (organization.value == "org.typelevel")
+        Some(TypelevelProject.Organization)
+      else
+        None
+    },
     tlSiteHeliumConfig := TypelevelSiteSettings.defaults.value,
     tlSiteHeliumExtensions := GenericSiteSettings.themeExtensions.value,
     tlSiteHelium := {
-      if (tlSiteIsTypelevelProject.value) tlSiteHeliumConfig.value
+      if (tlSiteIsTypelevelProject.value.isDefined) tlSiteHeliumConfig.value
       else GenericSiteSettings.defaults.value
     },
     tlSiteApiUrl := {
