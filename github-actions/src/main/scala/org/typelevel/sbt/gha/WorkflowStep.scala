@@ -49,12 +49,15 @@ object WorkflowStep {
         cond = Some(s"$cond && steps.${setupId}.outputs.cache-hit == 'false'")
       )
 
+    val SetupJavaAction = UseRef.Public("actions", "setup-java", "v3")
+    val SetupGraalVMAction = UseRef.Public("graalvm", "setup-graalvm", "v1")
+
     versions flatMap {
       case jv @ JavaSpec(JavaSpec.Distribution.GraalVM(graalVersion), javaVersion) =>
         val setupId = s"setup-graalvm-${graalVersion}-$javaVersion"
         val cond = s"matrix.java == '${jv.render}'"
         WorkflowStep.Use(
-          UseRef.Public("graalvm", "setup-graalvm", "v1"),
+          SetupGraalVMAction,
           name = Some(s"Setup GraalVM (${jv.render})"),
           id = Some(setupId),
           cond = Some(cond),
@@ -62,38 +65,12 @@ object WorkflowStep {
             Map("version" -> graalVersion, "java-version" -> javaVersion, "cache" -> "sbt")
         ) :: sbtUpdateStep(cond, setupId) :: Nil
 
-      case jv @ JavaSpec(dist, version) if dist.isTlIndexed =>
-        val cond = s"matrix.java == '${jv.render}'"
-        val downloadId = s"download-java-${dist.rendering}-$version"
-        val setupId = s"setup-java-${dist.rendering}-$version"
-        List(
-          WorkflowStep.Use(
-            UseRef.Public("typelevel", "download-java", "v2"),
-            name = Some(s"Download Java (${jv.render})"),
-            id = Some(downloadId),
-            cond = Some(cond),
-            params = Map("distribution" -> dist.rendering, "java-version" -> version)
-          ),
-          WorkflowStep.Use(
-            UseRef.Public("actions", "setup-java", "v3"),
-            name = Some(s"Setup Java (${jv.render})"),
-            id = Some(setupId),
-            cond = Some(cond),
-            params = Map(
-              "distribution" -> "jdkfile",
-              "java-version" -> version,
-              "jdkFile" -> s"$${{ steps.$downloadId.outputs.jdkFile }}",
-              "cache" -> "sbt"
-            )
-          ),
-          sbtUpdateStep(cond, setupId)
-        )
-
       case jv @ JavaSpec(dist, version) =>
         val setupId = s"setup-java-${dist.rendering}-$version"
         val cond = s"matrix.java == '${jv.render}'"
+
         WorkflowStep.Use(
-          UseRef.Public("actions", "setup-java", "v3"),
+          if (dist == JavaSpec.Distribution.GraalVM) SetupGraalVMAction else SetupJavaAction,
           name = Some(s"Setup Java (${jv.render})"),
           id = Some(setupId),
           cond = Some(cond),
