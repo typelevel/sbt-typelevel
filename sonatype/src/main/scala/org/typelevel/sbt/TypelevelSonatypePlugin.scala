@@ -32,7 +32,7 @@ object TypelevelSonatypePlugin extends AutoPlugin {
 
   object autoImport {
     lazy val tlSonatypeUseLegacyHost =
-      settingKey[Boolean]("Publish to oss.sonatype.org instead of s01 (default: true)")
+      settingKey[Boolean]("Publish to oss.sonatype.org instead of s01 (default: false)")
   }
 
   import autoImport._
