@@ -132,7 +132,7 @@ object TypelevelCiPlugin extends AutoPlugin {
           )
         else Nil
 
-      style ++ test ++ scalafix ++ mima ++ doc
+      style ++ scalafix ++ test ++ mima ++ doc
     },
     githubWorkflowJavaVersions := Seq(JavaSpec.temurin("8")),
     githubWorkflowAddedJobs ++= {
