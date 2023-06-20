@@ -22,7 +22,7 @@ import sbtcrossproject.CrossPlugin
 import sbtcrossproject.CrossPlugin.autoImport._
 import sbtcrossproject.Platform
 
-object BspControlPlugin extends AutoPlugin {
+object TypelevelBspPlugin extends AutoPlugin {
   override def trigger = allRequirements
   override def requires: Plugins = CrossPlugin
 
