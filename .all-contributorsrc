@@ -39,7 +39,8 @@
       "profile": "https://www.planetholt.com/",
       "contributions": [
         "code",
-        "ideas"
+        "ideas",
+        "tool"
       ]
     },
     {
@@ -230,6 +231,35 @@
       "contributions": [
         "ideas",
         "review"
+      ]
+    },
+    {
+      "login": "etspaceman",
+      "name": "Eric Meisel",
+      "avatar_url": "https://avatars.githubusercontent.com/u/630953?v=4",
+      "profile": "https://github.com/etspaceman",
+      "contributions": [
+        "bug",
+        "code"
+      ]
+    },
+    {
+      "login": "mzuehlke",
+      "name": "Marco Zühlke",
+      "avatar_url": "https://avatars.githubusercontent.com/u/204523?v=4",
+      "profile": "https://github.com/mzuehlke",
+      "contributions": [
+        "code",
+        "doc"
+      ]
+    },
+    {
+      "login": "amumurst",
+      "name": "Amund Murstad",
+      "avatar_url": "https://avatars.githubusercontent.com/u/4258408?v=4",
+      "profile": "https://github.com/amumurst",
+      "contributions": [
+        "code"
       ]
     }
   ],
