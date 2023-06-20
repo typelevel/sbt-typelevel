@@ -35,7 +35,7 @@ Instead of using the super-plugins, for finer-grained control you can always add
 ### sbt-typelevel-settings
 - `TypelevelSettingsPlugin`: Good and/or opinionated defaults for scalac settings etc., inspired by sbt-tpolecat.
 - `tlFatalWarnings` (setting): Convert compiler warnings into errors (default: false).
-- `tlJdkRelease` (setting): JVM target version for the compiled bytecode (default: None).
+- `tlJdkRelease` (setting): JVM target version for the compiled bytecode (default: Some(8)).
 
 ### sbt-typelevel-github
 - `TypelevelGitHubPlugin`: Populates boilerplate settings assuming you are using GitHub.
