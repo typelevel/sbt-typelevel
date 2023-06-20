@@ -40,9 +40,9 @@ object TypelevelCiPlugin extends AutoPlugin {
     lazy val tlCiScalafixCheck =
       settingKey[Boolean]("Whether to do scalafix check in CI (default: false)")
     lazy val tlCiMimaBinaryIssueCheck =
-      settingKey[Boolean]("Whether to do MiMa binary issues check in CI (default: true)")
+      settingKey[Boolean]("Whether to do MiMa binary issues check in CI (default: false)")
     lazy val tlCiDocCheck =
-      settingKey[Boolean]("Whether to build API docs in CI (default: true)")
+      settingKey[Boolean]("Whether to build API docs in CI (default: false)")
 
     lazy val tlCiDependencyGraphJob =
       settingKey[Boolean]("Whether to add a job to submit dependencies to GH (default: true)")

@@ -37,7 +37,7 @@ object TypelevelSettingsPlugin extends AutoPlugin {
       settingKey[Boolean]("Convert compiler warnings into errors (default: false)")
     lazy val tlJdkRelease =
       settingKey[Option[Int]](
-        "JVM target version for the compiled bytecode, None results in default scalac and javac behavior (no --release flag is specified). (default: None, supported values: 8, 9, 10, 11, 12, 13, 14, 15, 16, 17)")
+        "JVM target version for the compiled bytecode, None results in default scalac and javac behavior (no compiler flag is added) (default: Some(8))")
   }
 
   import autoImport._

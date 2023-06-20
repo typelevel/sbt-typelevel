@@ -1,13 +1,9 @@
 # sbt-typelevel-site
 
-<<<<<<< HEAD
 **sbt-typelevel-site** is an optional plugin for generating websites with [mdoc](https://scalameta.org/mdoc/)
-and [Laika](https://planet42.github.io/Laika/) and deploying to GitHub Pages from CI.
+and [Laika](https://typelevel.org/Laika/) and deploying to GitHub Pages from CI.
 You can add it to your build alongside either the  **sbt-typelevel** or **sbt-typelevel-ci-release** plugin
 or also use it stand-alone.
-=======
-**sbt-typelevel-site** is an optional plugin for generating websites with [mdoc](https://scalameta.org/mdoc/) and [Laika](https://typelevel.org/Laika/) and deploying to GitHub Pages from CI. You can add it to your build alongside either the  **sbt-typelevel** or **sbt-typelevel-ci-release** plugin or also use it stand-alone.
->>>>>>> series/0.4
 
 ## Quick start
 
@@ -29,12 +25,8 @@ lazy val docs = project.in(file("site")).enablePlugins(TypelevelSitePlugin)
 Place your `.md` files in the `docs/` directory of your project. To preview locally, run `docs/tlSitePreview`.
 This will start a preview server at http://localhost:4242.
 
-<<<<<<< HEAD
-The site is generated using [mdoc](https://scalameta.org/mdoc/) and [Laika](https://planet42.github.io/Laika/)
+The site is generated using [mdoc](https://scalameta.org/mdoc/) and [Laika](https://typelevel.org/Laika/)
 and published to the `gh-pages` branch on every push to the specified branch.
-=======
-The site is generated using [mdoc](https://scalameta.org/mdoc/) and [Laika](https://typelevel.org/Laika/) and published to the `gh-pages` branch on every push to the specified branch.
->>>>>>> series/0.4
 
 You will also need to configure your repository settings:
 
@@ -88,7 +80,7 @@ With the flag above (which defaults to `false`) these additional settings apply:
 ### Customization
 
 All customization options are based on Laika's configuration APIs for which we refer you to the comprehensive [Laika manual][Laika]
-and specifically the [`laikaTheme` setting](https://planet42.github.io/Laika/0.18/02-running-laika/01-sbt-plugin.html#laikatheme-setting).
+and specifically the [`laikaTheme` setting](https://typelevel.org/Laika/latest/02-running-laika/01-sbt-plugin.html#laikatheme-setting).
 
 @:callout(warning)
 For all code examples in the Laika manual you need to replace `Helium.defaults` with `tlSiteHelium.value`
@@ -122,13 +114,13 @@ Some of the customization options which are most likely of interest in the conte
 For a complete list of customization options please see the full [Laika] documentation.
 
 
-[Laika]: https://planet42.github.io/Laika/index.html
+[Laika]: https://typelevel.org/Laika/
 [http4s]: https://http4s.org/
-[Versioned Documentation]: https://planet42.github.io/Laika/0.18/03-preparing-content/01-directory-structure.html#versioned-documentation
-[Website Landing Page]: https://planet42.github.io/Laika/0.18/03-preparing-content/03-theme-settings.html#website-landing-page
-[Colors]: https://planet42.github.io/Laika/0.18/03-preparing-content/03-theme-settings.html#colors
-[Fonts]: https://planet42.github.io/Laika/0.18/03-preparing-content/03-theme-settings.html#fonts
-[laika-nav]: https://planet42.github.io/Laika/0.18/03-preparing-content/03-theme-settings.html#navigation-links-favicons
+[Versioned Documentation]: https://typelevel.org/Laika/latest/03-preparing-content/01-directory-structure.html#versioned-documentation
+[Website Landing Page]: https://typelevel.org/Laika/latest/03-preparing-content/03-theme-settings.html#website-landing-page
+[Colors]: https://typelevel.org/Laika/latest/03-preparing-content/03-theme-settings.html#colors
+[Fonts]: https://typelevel.org/Laika/latest/03-preparing-content/03-theme-settings.html#fonts
+[laika-nav]: https://typelevel.org/Laika/latest/03-preparing-content/03-theme-settings.html#navigation-links-favicons-footer
 
 
 ## FAQ
@@ -157,10 +149,3 @@ lazy val unidocs = project
     ScalaUnidoc / unidoc / unidocProjectFilter := inProjects(core.jvm, heffalump)
   )
 ```
-<<<<<<< HEAD
-=======
-
-### How can I customize my website's appearance?
-
-We refer you to the comprehensive [Laika manual](https://typelevel.org/Laika/index.html) and specifically the [`laikaTheme` setting](https://typelevel.org/Laika/0.18/02-running-laika/01-sbt-plugin.html#laikatheme-setting).
->>>>>>> series/0.4
