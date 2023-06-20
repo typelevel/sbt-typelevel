@@ -77,17 +77,7 @@ object TypelevelPlugin extends AutoPlugin {
         java <- githubWorkflowJavaVersions.value.tail // default java is head
       } yield MatrixExclude(Map("scala" -> scala, "java" -> java.render))
     }
-  ) ++ addPrePRCommandAlias ++ addCommandAlias(
-    "tlPrePrBotHook",
-    mkCommand(
-      List(
-        "githubWorkflowGenerate",
-        "+headerCreateAll",
-        "+scalafmtAll",
-        "scalafmtSbt"
-      )
-    )
-  )
+  ) ++ addPrePRCommandAlias ++ addTlPrePRBotHookCommandAlias
 
   // partially re-implemnents addCommandAlias
   // this is so we can use the value of other settings to generate command
@@ -111,6 +101,27 @@ object TypelevelPlugin extends AutoPlugin {
       (GlobalScope / Keys.onUnload)
         .value
         .compose((state: State) => BasicCommands.removeAlias(state, "prePR"))
+    }
+  )
+
+  private def addTlPrePRBotHookCommandAlias: Seq[Setting[_]] = Seq(
+    GlobalScope / onLoad := {
+      val header = tlCiHeaderCheck.value
+      val scalafmt = tlCiScalafmtCheck.value
+
+      (GlobalScope / Keys.onLoad).value.compose { (state: State) =>
+        val command = mkCommand(
+          List("githubWorkflowGenerate") ++
+            List("+headerCreateAll").filter(_ => header) ++
+            List("+scalafmtAll", "scalafmtSbt").filter(_ => scalafmt)
+        )
+        BasicCommands.addAlias(state, "tlPrePrBotHook", command)
+      }
+    },
+    GlobalScope / Keys.onUnload := {
+      (GlobalScope / Keys.onUnload)
+        .value
+        .compose((state: State) => BasicCommands.removeAlias(state, "tlPrePrBotHook"))
     }
   )
 
