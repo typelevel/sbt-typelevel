@@ -63,7 +63,7 @@ object TypelevelSettingsPlugin extends AutoPlugin {
           )
 
       Seq(
-        "org.typelevel" %% "scalac-compat-annotation" % "0.1.0" % CompileTime
+        "org.typelevel" %% "scalac-compat-annotation" % "0.1.1" % CompileTime
       ) ++ plugins
     },
 
