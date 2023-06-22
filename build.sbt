@@ -14,7 +14,7 @@ ThisBuild / startYear := Some(2022)
 ThisBuild / githubWorkflowJavaVersions ++= Seq(
   JavaSpec.temurin("11"),
   JavaSpec.temurin("17"),
-  JavaSpec.graalvm("11"),
+  JavaSpec(JavaSpec.Distribution.GraalVM("22.3.2"), "11"),
   JavaSpec.graalvm("17"),
   JavaSpec.corretto("11"),
   JavaSpec.corretto("17"),

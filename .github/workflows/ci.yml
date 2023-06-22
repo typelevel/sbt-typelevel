@@ -33,7 +33,7 @@ jobs:
           - temurin@8
           - temurin@11
           - temurin@17
-          - graalvm@11
+          - graal_22.3.2@11
           - graalvm@17
           - corretto@11
           - corretto@17
@@ -49,9 +49,9 @@ jobs:
             os: macos-latest
           - java: temurin@17
             os: windows-latest
-          - java: graalvm@11
+          - java: graal_22.3.2@11
             os: macos-latest
-          - java: graalvm@11
+          - java: graal_22.3.2@11
             os: windows-latest
           - java: graalvm@17
             os: macos-latest
@@ -128,17 +128,17 @@ jobs:
         shell: bash
         run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' reload +update
 
-      - name: Setup Java (graalvm@11)
-        id: setup-java-graalvm-11
-        if: matrix.java == 'graalvm@11'
+      - name: Setup GraalVM (graal_22.3.2@11)
+        id: setup-graalvm-22.3.2-11
+        if: matrix.java == 'graal_22.3.2@11'
         uses: graalvm/setup-graalvm@v1
         with:
-          distribution: graalvm
+          version: 22.3.2
           java-version: 11
           cache: sbt
 
       - name: sbt update
-        if: matrix.java == 'graalvm@11' && steps.setup-java-graalvm-11.outputs.cache-hit == 'false'
+        if: matrix.java == 'graal_22.3.2@11' && steps.setup-graalvm-22.3.2-11.outputs.cache-hit == 'false'
         shell: bash
         run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' reload +update
 
@@ -316,17 +316,17 @@ jobs:
         if: matrix.java == 'temurin@17' && steps.setup-java-temurin-17.outputs.cache-hit == 'false'
         run: sbt reload +update
 
-      - name: Setup Java (graalvm@11)
-        id: setup-java-graalvm-11
-        if: matrix.java == 'graalvm@11'
+      - name: Setup GraalVM (graal_22.3.2@11)
+        id: setup-graalvm-22.3.2-11
+        if: matrix.java == 'graal_22.3.2@11'
         uses: graalvm/setup-graalvm@v1
         with:
-          distribution: graalvm
+          version: 22.3.2
           java-version: 11
           cache: sbt
 
       - name: sbt update
-        if: matrix.java == 'graalvm@11' && steps.setup-java-graalvm-11.outputs.cache-hit == 'false'
+        if: matrix.java == 'graal_22.3.2@11' && steps.setup-graalvm-22.3.2-11.outputs.cache-hit == 'false'
         run: sbt reload +update
 
       - name: Setup Java (graalvm@17)
@@ -485,17 +485,17 @@ jobs:
         if: matrix.java == 'temurin@17' && steps.setup-java-temurin-17.outputs.cache-hit == 'false'
         run: sbt '++ ${{ matrix.scala }}' reload +update
 
-      - name: Setup Java (graalvm@11)
-        id: setup-java-graalvm-11
-        if: matrix.java == 'graalvm@11'
+      - name: Setup GraalVM (graal_22.3.2@11)
+        id: setup-graalvm-22.3.2-11
+        if: matrix.java == 'graal_22.3.2@11'
         uses: graalvm/setup-graalvm@v1
         with:
-          distribution: graalvm
+          version: 22.3.2
           java-version: 11
           cache: sbt
 
       - name: sbt update
-        if: matrix.java == 'graalvm@11' && steps.setup-java-graalvm-11.outputs.cache-hit == 'false'
+        if: matrix.java == 'graal_22.3.2@11' && steps.setup-graalvm-22.3.2-11.outputs.cache-hit == 'false'
         run: sbt '++ ${{ matrix.scala }}' reload +update
 
       - name: Setup Java (graalvm@17)
@@ -641,17 +641,17 @@ jobs:
         if: matrix.java == 'temurin@17' && steps.setup-java-temurin-17.outputs.cache-hit == 'false'
         run: sbt reload +update
 
-      - name: Setup Java (graalvm@11)
-        id: setup-java-graalvm-11
-        if: matrix.java == 'graalvm@11'
+      - name: Setup GraalVM (graal_22.3.2@11)
+        id: setup-graalvm-22.3.2-11
+        if: matrix.java == 'graal_22.3.2@11'
         uses: graalvm/setup-graalvm@v1
         with:
-          distribution: graalvm
+          version: 22.3.2
           java-version: 11
           cache: sbt
 
       - name: sbt update
-        if: matrix.java == 'graalvm@11' && steps.setup-java-graalvm-11.outputs.cache-hit == 'false'
+        if: matrix.java == 'graal_22.3.2@11' && steps.setup-graalvm-22.3.2-11.outputs.cache-hit == 'false'
         run: sbt reload +update
 
       - name: Setup Java (graalvm@17)
