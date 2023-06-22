@@ -14,8 +14,12 @@ ThisBuild / startYear := Some(2022)
 ThisBuild / githubWorkflowJavaVersions ++= Seq(
   JavaSpec.temurin("11"),
   JavaSpec.temurin("17"),
+  JavaSpec.graalvm("11"),
   JavaSpec.graalvm("17"),
-  JavaSpec.corretto("17")
+  JavaSpec.corretto("11"),
+  JavaSpec.corretto("17"),
+  JavaSpec.openj9("11"),
+  JavaSpec.openj9("17"),
 )
 
 ThisBuild / githubWorkflowOSes ++= Seq("macos-latest", "windows-latest")

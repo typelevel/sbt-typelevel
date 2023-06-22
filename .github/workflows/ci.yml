@@ -33,8 +33,12 @@ jobs:
           - temurin@8
           - temurin@11
           - temurin@17
+          - graalvm@11
           - graalvm@17
+          - corretto@11
           - corretto@17
+          - openj9@11
+          - openj9@17
         project: [sbt-typelevelJVM]
         exclude:
           - java: temurin@11
@@ -45,13 +49,29 @@ jobs:
             os: macos-latest
           - java: temurin@17
             os: windows-latest
+          - java: graalvm@11
+            os: macos-latest
+          - java: graalvm@11
+            os: windows-latest
           - java: graalvm@17
             os: macos-latest
           - java: graalvm@17
             os: windows-latest
+          - java: corretto@11
+            os: macos-latest
+          - java: corretto@11
+            os: windows-latest
           - java: corretto@17
             os: macos-latest
           - java: corretto@17
+            os: windows-latest
+          - java: openj9@11
+            os: macos-latest
+          - java: openj9@11
+            os: windows-latest
+          - java: openj9@17
+            os: macos-latest
+          - java: openj9@17
             os: windows-latest
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
@@ -108,6 +128,20 @@ jobs:
         shell: bash
         run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' reload +update
 
+      - name: Setup Java (graalvm@11)
+        id: setup-java-graalvm-11
+        if: matrix.java == 'graalvm@11'
+        uses: graalvm/setup-graalvm@v1
+        with:
+          distribution: graalvm
+          java-version: 11
+          cache: sbt
+
+      - name: sbt update
+        if: matrix.java == 'graalvm@11' && steps.setup-java-graalvm-11.outputs.cache-hit == 'false'
+        shell: bash
+        run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' reload +update
+
       - name: Setup Java (graalvm@17)
         id: setup-java-graalvm-17
         if: matrix.java == 'graalvm@17'
@@ -122,6 +156,20 @@ jobs:
         shell: bash
         run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' reload +update
 
+      - name: Setup Java (corretto@11)
+        id: setup-java-corretto-11
+        if: matrix.java == 'corretto@11'
+        uses: actions/setup-java@v3
+        with:
+          distribution: corretto
+          java-version: 11
+          cache: sbt
+
+      - name: sbt update
+        if: matrix.java == 'corretto@11' && steps.setup-java-corretto-11.outputs.cache-hit == 'false'
+        shell: bash
+        run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' reload +update
+
       - name: Setup Java (corretto@17)
         id: setup-java-corretto-17
         if: matrix.java == 'corretto@17'
@@ -133,6 +181,34 @@ jobs:
 
       - name: sbt update
         if: matrix.java == 'corretto@17' && steps.setup-java-corretto-17.outputs.cache-hit == 'false'
+        shell: bash
+        run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' reload +update
+
+      - name: Setup Java (openj9@11)
+        id: setup-java-openj9-11
+        if: matrix.java == 'openj9@11'
+        uses: actions/setup-java@v3
+        with:
+          distribution: openj9
+          java-version: 11
+          cache: sbt
+
+      - name: sbt update
+        if: matrix.java == 'openj9@11' && steps.setup-java-openj9-11.outputs.cache-hit == 'false'
+        shell: bash
+        run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' reload +update
+
+      - name: Setup Java (openj9@17)
+        id: setup-java-openj9-17
+        if: matrix.java == 'openj9@17'
+        uses: actions/setup-java@v3
+        with:
+          distribution: openj9
+          java-version: 17
+          cache: sbt
+
+      - name: sbt update
+        if: matrix.java == 'openj9@17' && steps.setup-java-openj9-17.outputs.cache-hit == 'false'
         shell: bash
         run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' reload +update
 
@@ -240,6 +316,19 @@ jobs:
         if: matrix.java == 'temurin@17' && steps.setup-java-temurin-17.outputs.cache-hit == 'false'
         run: sbt reload +update
 
+      - name: Setup Java (graalvm@11)
+        id: setup-java-graalvm-11
+        if: matrix.java == 'graalvm@11'
+        uses: graalvm/setup-graalvm@v1
+        with:
+          distribution: graalvm
+          java-version: 11
+          cache: sbt
+
+      - name: sbt update
+        if: matrix.java == 'graalvm@11' && steps.setup-java-graalvm-11.outputs.cache-hit == 'false'
+        run: sbt reload +update
+
       - name: Setup Java (graalvm@17)
         id: setup-java-graalvm-17
         if: matrix.java == 'graalvm@17'
@@ -253,6 +342,19 @@ jobs:
         if: matrix.java == 'graalvm@17' && steps.setup-java-graalvm-17.outputs.cache-hit == 'false'
         run: sbt reload +update
 
+      - name: Setup Java (corretto@11)
+        id: setup-java-corretto-11
+        if: matrix.java == 'corretto@11'
+        uses: actions/setup-java@v3
+        with:
+          distribution: corretto
+          java-version: 11
+          cache: sbt
+
+      - name: sbt update
+        if: matrix.java == 'corretto@11' && steps.setup-java-corretto-11.outputs.cache-hit == 'false'
+        run: sbt reload +update
+
       - name: Setup Java (corretto@17)
         id: setup-java-corretto-17
         if: matrix.java == 'corretto@17'
@@ -264,6 +366,32 @@ jobs:
 
       - name: sbt update
         if: matrix.java == 'corretto@17' && steps.setup-java-corretto-17.outputs.cache-hit == 'false'
+        run: sbt reload +update
+
+      - name: Setup Java (openj9@11)
+        id: setup-java-openj9-11
+        if: matrix.java == 'openj9@11'
+        uses: actions/setup-java@v3
+        with:
+          distribution: openj9
+          java-version: 11
+          cache: sbt
+
+      - name: sbt update
+        if: matrix.java == 'openj9@11' && steps.setup-java-openj9-11.outputs.cache-hit == 'false'
+        run: sbt reload +update
+
+      - name: Setup Java (openj9@17)
+        id: setup-java-openj9-17
+        if: matrix.java == 'openj9@17'
+        uses: actions/setup-java@v3
+        with:
+          distribution: openj9
+          java-version: 17
+          cache: sbt
+
+      - name: sbt update
+        if: matrix.java == 'openj9@17' && steps.setup-java-openj9-17.outputs.cache-hit == 'false'
         run: sbt reload +update
 
       - name: Download target directories (2.12, sbt-typelevelJVM)
@@ -357,6 +485,19 @@ jobs:
         if: matrix.java == 'temurin@17' && steps.setup-java-temurin-17.outputs.cache-hit == 'false'
         run: sbt '++ ${{ matrix.scala }}' reload +update
 
+      - name: Setup Java (graalvm@11)
+        id: setup-java-graalvm-11
+        if: matrix.java == 'graalvm@11'
+        uses: graalvm/setup-graalvm@v1
+        with:
+          distribution: graalvm
+          java-version: 11
+          cache: sbt
+
+      - name: sbt update
+        if: matrix.java == 'graalvm@11' && steps.setup-java-graalvm-11.outputs.cache-hit == 'false'
+        run: sbt '++ ${{ matrix.scala }}' reload +update
+
       - name: Setup Java (graalvm@17)
         id: setup-java-graalvm-17
         if: matrix.java == 'graalvm@17'
@@ -370,6 +511,19 @@ jobs:
         if: matrix.java == 'graalvm@17' && steps.setup-java-graalvm-17.outputs.cache-hit == 'false'
         run: sbt '++ ${{ matrix.scala }}' reload +update
 
+      - name: Setup Java (corretto@11)
+        id: setup-java-corretto-11
+        if: matrix.java == 'corretto@11'
+        uses: actions/setup-java@v3
+        with:
+          distribution: corretto
+          java-version: 11
+          cache: sbt
+
+      - name: sbt update
+        if: matrix.java == 'corretto@11' && steps.setup-java-corretto-11.outputs.cache-hit == 'false'
+        run: sbt '++ ${{ matrix.scala }}' reload +update
+
       - name: Setup Java (corretto@17)
         id: setup-java-corretto-17
         if: matrix.java == 'corretto@17'
@@ -381,6 +535,32 @@ jobs:
 
       - name: sbt update
         if: matrix.java == 'corretto@17' && steps.setup-java-corretto-17.outputs.cache-hit == 'false'
+        run: sbt '++ ${{ matrix.scala }}' reload +update
+
+      - name: Setup Java (openj9@11)
+        id: setup-java-openj9-11
+        if: matrix.java == 'openj9@11'
+        uses: actions/setup-java@v3
+        with:
+          distribution: openj9
+          java-version: 11
+          cache: sbt
+
+      - name: sbt update
+        if: matrix.java == 'openj9@11' && steps.setup-java-openj9-11.outputs.cache-hit == 'false'
+        run: sbt '++ ${{ matrix.scala }}' reload +update
+
+      - name: Setup Java (openj9@17)
+        id: setup-java-openj9-17
+        if: matrix.java == 'openj9@17'
+        uses: actions/setup-java@v3
+        with:
+          distribution: openj9
+          java-version: 17
+          cache: sbt
+
+      - name: sbt update
+        if: matrix.java == 'openj9@17' && steps.setup-java-openj9-17.outputs.cache-hit == 'false'
         run: sbt '++ ${{ matrix.scala }}' reload +update
 
       - name: Submit Dependencies
@@ -461,6 +641,19 @@ jobs:
         if: matrix.java == 'temurin@17' && steps.setup-java-temurin-17.outputs.cache-hit == 'false'
         run: sbt reload +update
 
+      - name: Setup Java (graalvm@11)
+        id: setup-java-graalvm-11
+        if: matrix.java == 'graalvm@11'
+        uses: graalvm/setup-graalvm@v1
+        with:
+          distribution: graalvm
+          java-version: 11
+          cache: sbt
+
+      - name: sbt update
+        if: matrix.java == 'graalvm@11' && steps.setup-java-graalvm-11.outputs.cache-hit == 'false'
+        run: sbt reload +update
+
       - name: Setup Java (graalvm@17)
         id: setup-java-graalvm-17
         if: matrix.java == 'graalvm@17'
@@ -474,6 +667,19 @@ jobs:
         if: matrix.java == 'graalvm@17' && steps.setup-java-graalvm-17.outputs.cache-hit == 'false'
         run: sbt reload +update
 
+      - name: Setup Java (corretto@11)
+        id: setup-java-corretto-11
+        if: matrix.java == 'corretto@11'
+        uses: actions/setup-java@v3
+        with:
+          distribution: corretto
+          java-version: 11
+          cache: sbt
+
+      - name: sbt update
+        if: matrix.java == 'corretto@11' && steps.setup-java-corretto-11.outputs.cache-hit == 'false'
+        run: sbt reload +update
+
       - name: Setup Java (corretto@17)
         id: setup-java-corretto-17
         if: matrix.java == 'corretto@17'
@@ -485,6 +691,32 @@ jobs:
 
       - name: sbt update
         if: matrix.java == 'corretto@17' && steps.setup-java-corretto-17.outputs.cache-hit == 'false'
+        run: sbt reload +update
+
+      - name: Setup Java (openj9@11)
+        id: setup-java-openj9-11
+        if: matrix.java == 'openj9@11'
+        uses: actions/setup-java@v3
+        with:
+          distribution: openj9
+          java-version: 11
+          cache: sbt
+
+      - name: sbt update
+        if: matrix.java == 'openj9@11' && steps.setup-java-openj9-11.outputs.cache-hit == 'false'
+        run: sbt reload +update
+
+      - name: Setup Java (openj9@17)
+        id: setup-java-openj9-17
+        if: matrix.java == 'openj9@17'
+        uses: actions/setup-java@v3
+        with:
+          distribution: openj9
+          java-version: 17
+          cache: sbt
+
+      - name: sbt update
+        if: matrix.java == 'openj9@17' && steps.setup-java-openj9-17.outputs.cache-hit == 'false'
         run: sbt reload +update
 
       - name: Generate site
