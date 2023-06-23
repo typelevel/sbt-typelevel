@@ -54,7 +54,7 @@ object WorkflowStep {
 
     versions flatMap {
       case jv @ JavaSpec(JavaSpec.Distribution.GraalVM(graalVersion), javaVersion) =>
-        val setupId = s"setup-graalvm-${graalVersion}-$javaVersion"
+        val setupId = s"setup-graalvm-${graalVersion}-$javaVersion".replace('.', '_')
         val cond = s"matrix.java == '${jv.render}'"
         WorkflowStep.Use(
           SetupGraalVMAction,
@@ -66,7 +66,7 @@ object WorkflowStep {
         ) :: sbtUpdateStep(cond, setupId) :: Nil
 
       case jv @ JavaSpec(dist, version) =>
-        val setupId = s"setup-java-${dist.rendering}-$version"
+        val setupId = s"setup-java-${dist.rendering}-$version".replace('.', '_')
         val cond = s"matrix.java == '${jv.render}'"
 
         WorkflowStep.Use(
