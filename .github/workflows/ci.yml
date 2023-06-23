@@ -329,7 +329,7 @@ jobs:
 
       - name: sbt update
         if: matrix.java == 'temurin@8' && steps.setup-java-temurin-8.outputs.cache-hit == 'false'
-        run: sbt '++ ${{ matrix.scala }}' reload +update
+        run: sbt reload +update
 
       - name: Setup Java (temurin@11)
         id: setup-java-temurin-11
@@ -342,7 +342,7 @@ jobs:
 
       - name: sbt update
         if: matrix.java == 'temurin@11' && steps.setup-java-temurin-11.outputs.cache-hit == 'false'
-        run: sbt '++ ${{ matrix.scala }}' reload +update
+        run: sbt reload +update
 
       - name: Setup Java (temurin@17)
         id: setup-java-temurin-17
@@ -355,7 +355,7 @@ jobs:
 
       - name: sbt update
         if: matrix.java == 'temurin@17' && steps.setup-java-temurin-17.outputs.cache-hit == 'false'
-        run: sbt '++ ${{ matrix.scala }}' reload +update
+        run: sbt reload +update
 
       - name: Setup Java (graalvm@17)
         id: setup-java-graalvm-17
@@ -368,7 +368,7 @@ jobs:
 
       - name: sbt update
         if: matrix.java == 'graalvm@17' && steps.setup-java-graalvm-17.outputs.cache-hit == 'false'
-        run: sbt '++ ${{ matrix.scala }}' reload +update
+        run: sbt reload +update
 
       - name: Setup Java (corretto@17)
         id: setup-java-corretto-17
@@ -381,7 +381,7 @@ jobs:
 
       - name: sbt update
         if: matrix.java == 'corretto@17' && steps.setup-java-corretto-17.outputs.cache-hit == 'false'
-        run: sbt '++ ${{ matrix.scala }}' reload +update
+        run: sbt reload +update
 
       - name: Submit Dependencies
         uses: scalacenter/sbt-dependency-submission@v2

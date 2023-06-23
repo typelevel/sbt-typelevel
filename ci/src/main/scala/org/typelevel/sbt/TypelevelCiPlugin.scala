@@ -143,6 +143,7 @@ object TypelevelCiPlugin extends AutoPlugin {
               "dependency-submission",
               "Submit Dependencies",
               scalas = Nil,
+              sbtStepPreamble = Nil,
               javas = List(githubWorkflowJavaVersions.value.head),
               steps = githubWorkflowJobSetup.value.toList :+
                 WorkflowStep.DependencySubmission(
