@@ -36,7 +36,7 @@ object JavaSpec {
   object Distribution {
     case object Temurin extends Distribution("temurin")
     case object Corretto extends Distribution("corretto")
-    case object OpenJ9 extends Distribution("openj9")
+    case object OpenJ9 extends Distribution("adopt-openj9")
     case object Oracle extends Distribution("oracle")
     case object Zulu extends Distribution("zulu")
     case object Liberica extends Distribution("liberica")
