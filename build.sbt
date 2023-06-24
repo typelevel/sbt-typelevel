@@ -17,7 +17,7 @@ ThisBuild / githubWorkflowJavaVersions ++= Seq(
   JavaSpec(JavaSpec.Distribution.GraalVM("22.3.2"), "11"),
   JavaSpec.graalvm("17"),
   JavaSpec.corretto("17"),
-  JavaSpec.openj9("17")
+  JavaSpec.semeru("17")
 )
 
 ThisBuild / githubWorkflowOSes ++= Seq("macos-latest", "windows-latest")
