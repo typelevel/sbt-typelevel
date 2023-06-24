@@ -28,19 +28,25 @@ object JavaSpec {
   def temurin(version: String): JavaSpec = JavaSpec(Distribution.Temurin, version)
   def corretto(version: String): JavaSpec = JavaSpec(Distribution.Corretto, version)
   def graalvm(version: String): JavaSpec = JavaSpec(Distribution.GraalVM, version)
+  @deprecated("Use `semeru`", "0.5.0")
   def openj9(version: String): JavaSpec = JavaSpec(Distribution.OpenJ9, version)
   def oracle(version: String): JavaSpec = JavaSpec(Distribution.Oracle, version)
+  def semeru(version: String): JavaSpec = JavaSpec(Distribution.Semeru, version)
+  def microsoft(version: String): JavaSpec = JavaSpec(Distribution.Microsoft, version)
 
   sealed abstract class Distribution(val rendering: String) extends Product with Serializable
 
   object Distribution {
     case object Temurin extends Distribution("temurin")
     case object Corretto extends Distribution("corretto")
+    @deprecated("Use `semeru`", "0.5.0")
     case object OpenJ9 extends Distribution("adopt-openj9")
     case object Oracle extends Distribution("oracle")
     case object Zulu extends Distribution("zulu")
     case object Liberica extends Distribution("liberica")
     final case class GraalVM(version: String) extends Distribution(version)
     case object GraalVM extends Distribution("graalvm")
+    case object Semeru extends Distribution("semeru")
+    case object Microsoft extends Distribution("microsoft")
   }
 }
