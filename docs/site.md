@@ -70,7 +70,13 @@ a set of additional defaults will be enabled on top of the generic defaults list
 * A default footer for Typelevel projects is added to the bottom of each page.
 * Theme support for the browser's dark mode is disabled.
 
-Typelevel projects can opt out of these additional defaults with the following setting:
+If you are an affiliate project you can explicitly opt in to these settings:
+
+```scala
+tlSiteIsTypelevelProject := Some(TypelevelProject.Affiliate)
+```
+
+Finally, Typelevel projects can also opt out of these additional defaults:
 
 ```scala
 tlSiteIsTypelevelProject := None
