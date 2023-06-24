@@ -24,7 +24,7 @@ final case class WorkflowJob(
     cond: Option[String] = None,
     env: Map[String, String] = Map(),
     oses: List[String] = List("ubuntu-latest"),
-    scalas: List[String] = List("2.13.6"),
+    scalas: List[String] = List("2.13.11"),
     javas: List[JavaSpec] = List(JavaSpec.temurin("11")),
     needs: List[String] = List(),
     matrixFailFast: Option[Boolean] = None,
