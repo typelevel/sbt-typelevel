@@ -49,6 +49,8 @@ object TypelevelSettingsPlugin extends AutoPlugin {
     Def.derive(scalaVersion := crossScalaVersions.value.last, default = true)
   )
 
+  private def onlyScala3 = Def.setting(crossScalaVersions.value.forall(_.startsWith("3.")))
+
   override def projectSettings = Seq(
     pomIncludeRepository := { _ => false },
     libraryDependencies ++= {
@@ -181,7 +183,7 @@ object TypelevelSettingsPlugin extends AutoPlugin {
     },
     scalacOptions ++= {
       scalaVersion.value match {
-        case V(V(3, _, _, _)) if crossScalaVersions.value.forall(_.startsWith("3.")) =>
+        case V(V(3, _, _, _)) if onlyScala3.value =>
           Seq("-Ykind-projector:underscores")
 
         case V(V(3, _, _, _)) =>
@@ -216,6 +218,17 @@ object TypelevelSettingsPlugin extends AutoPlugin {
       if (tlIsScala3.value)
         Seq("-project-version", version.value)
       else Nil
+    },
+    Compile / doc / scalacOptions ++= {
+      // When cross-building with non Scala 3 targets, turn on wiki syntax
+      // this is used to enable the old scaladoc2 syntax for italics, bold, etc
+      // on a pure Scala 3 project, it's preferred to use the new markdown syntax
+      scalaVersion.value match {
+        case V(V(3, _, _, _)) if !onlyScala3.value =>
+          Seq("-comment-syntax:wiki")
+        case _ =>
+          Seq.empty
+      }
     },
     Compile / doc / scalacOptions ++= {
       // Enable Inkuire for Scala 3.2.1+
