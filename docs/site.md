@@ -61,20 +61,20 @@ On top of the defaults of Laika standalone, sbt-typelevel-site adds:
 
 #### Additional Defaults for Typelevel Projects
 
-If the generated documentation is for a Typelevel project, you can optionally enable a set of additional defaults
-on top of the generic defaults listed in the previous section:
-
-```scala
-tlSiteIsTypelevelProject := true
-```
-
-With the flag above (which defaults to `false`) these additional settings apply:
+If the generated documentation is for a Typelevel project (meaning its `organization` setting is `org.typelevel`),
+a set of additional defaults will be enabled on top of the generic defaults listed in the previous section:
 
 * The home link in the top navigation bar carries the Typelevel logo and points to the Typelevel site.
 * Links to the Typelevel Discord and Typelevel Twitter are inserted into the top navigation bar.
-* The Typelevel favicons are used for the generared site.
+* The Typelevel favicons are used for the generated site.
 * A default footer for Typelevel projects is added to the bottom of each page.
 * Theme support for the browser's dark mode is disabled.
+
+Typelevel projects can opt out of these additional defaults with the following setting:
+
+```scala
+tlSiteIsTypelevelProject := None
+```
 
 
 ### Customization
