@@ -67,7 +67,7 @@ object TypelevelSiteSettings {
   val platinumTl = Color.hex("e6e8ea") //e2e4e6?
   val offWhiteTl = Color.hex("f2f3f4")
   // Extra colours to supplement
-  val lightPinkGrey = Color.hex("f9eded") // was ffe7e7 (Arman liked this one)
+  val lightPinkGrey = Color.hex("f6f0f0") // was ffe7e7 (Arman liked this one)
   val slateBlue = Color.hex("335C67")
   val lightSlateBlue = Color.hex("9ac2c9")
   val softYellow = Color.hex("f7f0c8") //f3eab2
@@ -108,6 +108,22 @@ object TypelevelSiteSettings {
         warningLight = softYellow,
         error = slateBlue,
         errorLight = pinkTl,
+      )
+      .site.syntaxHighlightingColors(
+        base = ColorQuintet(
+          gunmetalTl,
+          Color.hex("73a6ad"), // comments
+          Color.hex("b2adb4"), // ?
+          pinkTl,              // identifier
+          platinumTl           // base colour
+        ),
+        wheel = ColorQuintet(
+          Color.hex("8fa1c9"), // substitution, annotation
+          Color.hex("81e67b"), // keyword, escape-sequence
+          Color.hex("ffde6d"), // declaration name
+          Color.hex("759EB8"), // literals
+          coralTl              // type/class name
+        )
       )
   }
 
