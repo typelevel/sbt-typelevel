@@ -64,13 +64,13 @@ object TypelevelSiteSettings {
   val pinkTl = Color.hex("ffb4b5")
   val whiteTl = Color.hex("ffffff")
   val gunmetalTl = Color.hex("21303f")
-  val platinumTl = Color.hex("e6e8ea") //e2e4e6?
+  val platinumTl = Color.hex("e6e8ea") // e2e4e6?
   val offWhiteTl = Color.hex("f2f3f4")
   // Extra colours to supplement
   val lightPinkGrey = Color.hex("f6f0f0") // was ffe7e7 (Arman liked this one)
   val slateBlue = Color.hex("335C67")
   val lightSlateBlue = Color.hex("9ac2c9")
-  val softYellow = Color.hex("f7f0c8") //f3eab2
+  val softYellow = Color.hex("f7f0c8") // f3eab2
 
   val defaults: Initialize[Helium] = setting {
     GenericSiteSettings
@@ -92,7 +92,8 @@ object TypelevelSiteSettings {
         homeLink = defaultHomeLink,
         navLinks = List(chatLink, mastodonLink)
       )
-      .site.themeColors(
+      .site
+      .themeColors(
         primary = brightRedTl,
         secondary = slateBlue,
         primaryMedium = coralTl,
@@ -101,28 +102,30 @@ object TypelevelSiteSettings {
         background = whiteTl,
         bgGradient = (platinumTl, offWhiteTl)
       )
-      .site.messageColors(
+      .site
+      .messageColors(
         info = slateBlue,
         infoLight = lightSlateBlue,
         warning = slateBlue,
         warningLight = softYellow,
         error = slateBlue,
-        errorLight = pinkTl,
+        errorLight = pinkTl
       )
-      .site.syntaxHighlightingColors(
+      .site
+      .syntaxHighlightingColors(
         base = ColorQuintet(
           gunmetalTl,
           Color.hex("73a6ad"), // comments
           Color.hex("b2adb4"), // ?
-          pinkTl,              // identifier
-          platinumTl           // base colour
+          pinkTl, // identifier
+          platinumTl // base colour
         ),
         wheel = ColorQuintet(
           Color.hex("8fa1c9"), // substitution, annotation
           Color.hex("81e67b"), // keyword, escape-sequence
           Color.hex("ffde6d"), // declaration name
           Color.hex("759EB8"), // literals
-          coralTl              // type/class name
+          coralTl // type/class name
         )
       )
   }
