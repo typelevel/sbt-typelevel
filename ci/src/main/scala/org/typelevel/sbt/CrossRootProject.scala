@@ -48,6 +48,38 @@ final class CrossRootProject private (
       native.configure(transforms: _*)
     )
 
+  def configureRoot(transforms: (Project => Project)*): CrossRootProject =
+    new CrossRootProject(
+      all.configure(transforms: _*),
+      jvm,
+      js,
+      native
+    )
+
+  def configureJVM(transforms: (Project => Project)*): CrossRootProject =
+    new CrossRootProject(
+      all,
+      jvm.configure(transforms: _*),
+      js,
+      native
+    )
+
+  def configureJS(transforms: (Project => Project)*): CrossRootProject =
+    new CrossRootProject(
+      all,
+      jvm,
+      js.configure(transforms: _*),
+      native
+    )
+
+  def configureNative(transforms: (Project => Project)*): CrossRootProject =
+    new CrossRootProject(
+      all,
+      jvm,
+      js,
+      native.configure(transforms: _*)
+    )
+
   def enablePlugins(ns: Plugins*): CrossRootProject =
     new CrossRootProject(
       all.enablePlugins(ns: _*),
