@@ -67,10 +67,11 @@ object TypelevelSiteSettings {
   val platinumTl = Color.hex("e6e8ea") // e2e4e6?
   val offWhiteTl = Color.hex("f2f3f4")
   // Extra colours to supplement
-  val lightPinkGrey = Color.hex("f6f0f0") // was ffe7e7 (Arman liked this one)
+  val lightPink = Color.hex("ffe7e7")
+  val lightPinkGrey = Color.hex("f7f3f3") //f6f0f0
   val slateBlue = Color.hex("335C67")
-  val lightSlateBlue = Color.hex("9ac2c9")
-  val softYellow = Color.hex("f7f0c8") // f3eab2
+  val lightSlateBlue = Color.hex("ddeaed") //cce0e4
+  val softYellow = Color.hex("f9f5d9") // f3eab2
 
   val defaults: Initialize[Helium] = setting {
     GenericSiteSettings
@@ -94,7 +95,7 @@ object TypelevelSiteSettings {
       )
       .site
       .themeColors(
-        primary = brightRedTl,
+        primary = redTl,
         secondary = slateBlue,
         primaryMedium = coralTl,
         primaryLight = lightPinkGrey,
@@ -109,7 +110,7 @@ object TypelevelSiteSettings {
         warning = slateBlue,
         warningLight = softYellow,
         error = slateBlue,
-        errorLight = pinkTl
+        errorLight = lightPink
       )
       .site
       .syntaxHighlightingColors(
