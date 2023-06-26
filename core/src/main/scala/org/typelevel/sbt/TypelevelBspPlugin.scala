@@ -29,7 +29,7 @@ object TypelevelBspPlugin extends AutoPlugin {
   object autoImport {
     lazy val tlBspCrossProjectPlatforms: SettingKey[Set[Platform]] =
       settingKey[Set[Platform]](
-        "set of platforms for which BSP should be enabled (default: not initialized)")
+        "A set of platforms for which BSP should be enabled (default: not initialized)")
   }
 
   import autoImport._
