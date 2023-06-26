@@ -70,7 +70,7 @@ object TypelevelSiteSettings {
   val lightPinkGrey = Color.hex("f9eded") // was ffe7e7 (Arman liked this one)
   val slateBlue = Color.hex("335C67")
   val lightSlateBlue = Color.hex("9ac2c9")
-  val softYellow = Color.hex("f3eab2")
+  val softYellow = Color.hex("f7f0c8") //f3eab2
 
   val defaults: Initialize[Helium] = setting {
     GenericSiteSettings
