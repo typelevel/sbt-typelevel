@@ -80,7 +80,7 @@ Instead of using the super-plugins, for finer-grained control you can always add
 ### sbt-typelevel
 `TypelevelPlugin`: The super-super-plugin intended for bootstrapping the typical Typelevel project. Sets up CI release including snapshots, scalac settings, headers, and formatting.
 
-`TypelevelBspPlugin`: A plugin that controls for which cross-project platforms the `bspEnabled` setting should be set to `true. By default it becomes enabled for `JVMPlatform` only.
+`TypelevelBspPlugin`: A plugin that controls for which cross-project platforms the `bspEnabled` setting should be set to `true`. By default it becomes enabled for `JVMPlatform` only.
 - `tlBspCrossProjectPlatforms` (setting): A set of platforms for which BSP should be enabled (default: not initialized)
 
 ### sbt-typelevel-site
