@@ -48,7 +48,7 @@ Instead of using the super-plugins, for finer-grained control you can always add
 `TypelevelScalaNativeGitHubPlugin`: Points your sourcemaps to GitHub permalinks. Only activated for Scala Native projects.
 
 ### sbt-typelevel-ci
-`TypelevelCiPlugin`: Sets up GitHub actions to run tests and check binary-compatibility in CI.
+`TypelevelCiPlugin`: Sets up GitHub actions to run tests and submit dependencies for vulnerability scanning. You can optionally enable checks for headers, formatting, scalafix, MiMa, and scaladoc.
 - `tlCiHeaderCheck` (setting): Whether to do header check in CI (default: `false`).
 - `tlCiScalafmtCheck` (setting): Whether to do scalafmt check in CI (default: `false`).
 - `tlCiScalafixCheck` (setting): Whether to do scalafix check in CI (default: `false`).
