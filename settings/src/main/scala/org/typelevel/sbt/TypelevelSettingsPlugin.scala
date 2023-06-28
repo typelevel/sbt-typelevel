@@ -64,9 +64,10 @@ object TypelevelSettingsPlugin extends AutoPlugin {
               "org.typelevel" % "kind-projector" % "0.13.2" cross CrossVersion.full)
           )
 
-      Seq(
-        "org.typelevel" %% "scalac-compat-annotation" % "0.1.2" % CompileTime
-      ) ++ plugins
+      val scalacCompat =
+        Seq(CompileTime, Test).map("org.typelevel" %% "scalac-compat-annotation" % "0.1.2" % _)
+
+      scalacCompat ++ plugins
     },
 
     // Adapted from Rob Norris' post at https://tpolecat.github.io/2014/04/11/scalac-flags.html
