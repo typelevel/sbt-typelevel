@@ -123,7 +123,8 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/5148976?v=4",
       "profile": "https://github.com/j-mie6",
       "contributions": [
-        "code"
+        "code",
+        "design"
       ]
     },
     {
@@ -264,5 +265,6 @@
     }
   ],
   "contributorsPerLine": 7,
-  "linkToUsage": false
+  "linkToUsage": false,
+  "commitType": "docs"
 }
