@@ -23,6 +23,8 @@ import laika.helium.config.Favicon
 import laika.helium.config.HeliumIcon
 import laika.helium.config.IconLink
 import laika.helium.config.ImageLink
+import laika.rewrite.link.ApiLinks
+import laika.rewrite.link.LinkConfig
 import laika.sbt.LaikaPlugin
 import laika.theme.ThemeProvider
 import laika.theme.config.Font
@@ -54,6 +56,9 @@ object TypelevelSitePlugin extends AutoPlugin {
       settingKey[Option[ModuleID]]("The module that publishes API docs")
     lazy val tlSiteApiPackage = settingKey[Option[String]](
       "The top-level package for your API docs (e.g. org.typlevel.sbt)")
+    lazy val tlSiteApiIndexUrl =
+      settingKey[Option[URL]](
+        "The URL of the index page for the top-level package of your API docs")
     lazy val tlSiteRelatedProjects =
       settingKey[Seq[(String, URL)]]("A list of related projects (default: cats)")
 
@@ -90,6 +95,7 @@ object TypelevelSitePlugin extends AutoPlugin {
     tlSitePublishBranch := Some("main"),
     tlSitePublishTags := tlSitePublishBranch.value.isEmpty,
     tlSiteApiUrl := None,
+    tlSiteApiIndexUrl := None,
     tlSiteApiPackage := None,
     tlSiteRelatedProjects := Seq(TypelevelProject.Cats),
     tlSiteKeepFiles := true,
@@ -110,6 +116,12 @@ object TypelevelSitePlugin extends AutoPlugin {
       .value: @nowarn("cat=other-pure-statement"),
     tlSitePreview := previewTask.value,
     Laika / sourceDirectories := Seq(mdocOut.value),
+    laikaConfig := {
+      val currentConfig = laikaConfig.value
+      tlSiteApiUrl.value.fold(currentConfig) { apiUrl =>
+        currentConfig.withConfigValue(LinkConfig(apiLinks = Seq(ApiLinks(apiUrl.toString))))
+      }
+    },
     laikaTheme := tlSiteHeliumConfig.value.build.extend(tlSiteHeliumExtensions.value),
     mdocVariables := {
       mdocVariables.value ++
@@ -118,7 +130,7 @@ object TypelevelSitePlugin extends AutoPlugin {
           "PRERELEASE_VERSION" -> currentPreRelease.value.getOrElse(version.value),
           "SNAPSHOT_VERSION" -> version.value
         ) ++
-        tlSiteApiUrl.value.map("API_URL" -> _.toString).toMap
+        tlSiteApiIndexUrl.value.map("API_URL" -> _.toString).toMap
     },
     tlSiteHeliumExtensions := TypelevelHeliumExtensions(
       licenses.value.headOption,
@@ -139,8 +151,7 @@ object TypelevelSitePlugin extends AutoPlugin {
         val o = moduleId.organization
         val n = cross(moduleId.name)
         val v = version
-        val p = tlSiteApiPackage.value.fold("")(_.replace('.', '/') + "/index.html")
-        url(s"https://www.javadoc.io/doc/$o/$n/$v/$p")
+        url(s"https://www.javadoc.io/doc/$o/$n/$v/")
       }
       lazy val fallbackUrl = for {
         moduleId <- (ThisProject / tlSiteApiModule).value
@@ -148,6 +159,10 @@ object TypelevelSitePlugin extends AutoPlugin {
       } yield url(apiURL)
 
       tlSiteApiUrl.value.orElse(javadocioUrl).orElse(fallbackUrl)
+    },
+    tlSiteApiIndexUrl := tlSiteApiUrl.value.map { apiURL =>
+      val apiIndex = tlSiteApiPackage.value.fold("")(_.replace('.', '/') + "/index.html")
+      apiURL.toURI.resolve(apiIndex).toURL
     },
     tlSiteHeliumConfig := {
       // default fontPath and fonts taken from Laika:
@@ -232,9 +247,9 @@ object TypelevelSitePlugin extends AutoPlugin {
             "https://typelevel.org",
             Image.external(s"https://typelevel.org/img/logo.svg")
           ),
-          navLinks = tlSiteApiUrl.value.toList.map { url =>
+          navLinks = tlSiteApiIndexUrl.value.toList.map { apiIndex =>
             IconLink.external(
-              url.toString,
+              apiIndex.toString,
               HeliumIcon.api,
               options = Styles("svg-link")
             )
