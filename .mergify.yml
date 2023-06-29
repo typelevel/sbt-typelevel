@@ -8,11 +8,21 @@
 pull_request_rules:
 - name: merge scala-steward's PRs
   conditions:
-  - author=scala-steward
+  - author=typelevel-steward[bot]
   - or:
     - body~=labels:.*early-semver-patch
     - body~=labels:.*early-semver-minor
-  - status-success=Build and Test (ubuntu-latest, 2.12.16, temurin@8, rootJVM)
+  - status-success=Build and Test (ubuntu-latest, 2.12, temurin@8, sbt-typelevelJVM)
+  - status-success=Build and Test (ubuntu-latest, 2.12, temurin@11, sbt-typelevelJVM)
+  - status-success=Build and Test (ubuntu-latest, 2.12, temurin@17, sbt-typelevelJVM)
+  - status-success=Build and Test (ubuntu-latest, 2.12, graal_22.3.2@11, sbt-typelevelJVM)
+  - status-success=Build and Test (ubuntu-latest, 2.12, graalvm@17, sbt-typelevelJVM)
+  - status-success=Build and Test (ubuntu-latest, 2.12, corretto@17, sbt-typelevelJVM)
+  - status-success=Build and Test (ubuntu-latest, 2.12, semeru@17, sbt-typelevelJVM)
+  - status-success=Build and Test (macos-latest, 2.12, temurin@8, sbt-typelevelJVM)
+  - status-success=Build and Test (windows-latest, 2.12, temurin@8, sbt-typelevelJVM)
+  - status-success=Validate Steward Config (ubuntu-latest)
+  - status-success=Generate Site (ubuntu-latest, temurin@8)
   - '#approved-reviews-by>=1'
   actions:
     merge: {}
@@ -152,14 +162,6 @@ pull_request_rules:
       add:
       - sonatype-ci-release
       remove: []
-- name: Label unidoc PRs
-  conditions:
-  - files~=^unidoc/
-  actions:
-    label:
-      add:
-      - unidoc
-      remove: []
 - name: Label versioning PRs
   conditions:
   - files~=^versioning/
@@ -168,3 +170,10 @@ pull_request_rules:
       add:
       - versioning
       remove: []
+- name: assign scala-steward's PRs for review
+  conditions:
+  - author=typelevel-steward[bot]
+  actions:
+    request_reviews:
+      users:
+      - armanbilge

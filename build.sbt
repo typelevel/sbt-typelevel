@@ -1,26 +1,54 @@
 name := "sbt-typelevel"
 
-ThisBuild / tlBaseVersion := "0.4"
-ThisBuild / tlCiReleaseBranches := Seq("series/0.4")
+ThisBuild / tlBaseVersion := "0.5"
 ThisBuild / tlCiReleaseBranches += "feature/site-artifact"
-ThisBuild / tlSitePublishBranch := Some("series/0.4")
-ThisBuild / crossScalaVersions := Seq("2.12.16")
-ThisBuild / developers := List(
+ThisBuild / crossScalaVersions := Seq("2.12.18")
+ThisBuild / developers ++= List(
   tlGitHubDev("armanbilge", "Arman Bilge"),
   tlGitHubDev("rossabaker", "Ross A. Baker"),
   tlGitHubDev("ChristopherDavenport", "Christopher Davenport"),
   tlGitHubDev("djspiewak", "Daniel Spiewak")
 )
+ThisBuild / startYear := Some(2022)
 
-ThisBuild / mergifyStewardConfig ~= { _.map(_.copy(mergeMinors = true)) }
-ThisBuild / mergifySuccessConditions += MergifyCondition.Custom("#approved-reviews-by>=1")
-ThisBuild / mergifyLabelPaths += { "docs" -> file("docs") }
-
-ThisBuild / scalafixDependencies ++= Seq(
-  "com.github.liancheng" %% "organize-imports" % "0.6.0"
+ThisBuild / githubWorkflowJavaVersions ++= Seq(
+  JavaSpec.temurin("11"),
+  JavaSpec.temurin("17"),
+  JavaSpec(JavaSpec.Distribution.GraalVM("22.3.2"), "11"),
+  JavaSpec.graalvm("17"),
+  JavaSpec.corretto("17"),
+  JavaSpec.semeru("17")
 )
 
-lazy val root = tlCrossRootProject.aggregate(
+ThisBuild / githubWorkflowOSes ++= Seq("macos-latest", "windows-latest")
+
+ThisBuild / githubWorkflowBuildMatrixExclusions ++= {
+  for {
+    java <- githubWorkflowJavaVersions.value.tail
+    os <- githubWorkflowOSes.value.tail
+  } yield MatrixExclude(Map("java" -> java.render, "os" -> os))
+}
+
+ThisBuild / githubWorkflowPublishTimeoutMinutes := Some(45)
+
+ThisBuild / mergifyStewardConfig ~= {
+  _.map(_.copy(mergeMinors = true, author = "typelevel-steward[bot]"))
+}
+ThisBuild / mergifySuccessConditions += MergifyCondition.Custom("#approved-reviews-by>=1")
+ThisBuild / mergifyLabelPaths += { "docs" -> file("docs") }
+ThisBuild / mergifyLabelPaths ~= { _ - "unidoc" }
+ThisBuild / mergifyPrRules += MergifyPrRule(
+  "assign scala-steward's PRs for review",
+  List(MergifyCondition.Custom("author=typelevel-steward[bot]")),
+  List(
+    MergifyAction.RequestReviews.fromUsers("armanbilge")
+  )
+)
+ThisBuild / mergifyRequiredJobs ++= Seq("validate-steward", "site")
+
+val MunitVersion = "0.7.29"
+
+lazy val `sbt-typelevel` = tlCrossRootProject.aggregate(
   kernel,
   noPublish,
   settings,
@@ -45,7 +73,8 @@ lazy val kernel = project
   .in(file("kernel"))
   .enablePlugins(SbtPlugin)
   .settings(
-    name := "sbt-typelevel-kernel"
+    name := "sbt-typelevel-kernel",
+    libraryDependencies += "org.scalameta" %% "munit" % MunitVersion % Test
   )
 
 lazy val noPublish = project
@@ -192,13 +221,51 @@ lazy val docs = project
     name := "sbt-typelevel-website",
     laikaConfig ~= { _.withRawContent },
     tlSiteApiPackage := Some("org.typelevel.sbt"),
-    tlSiteRelatedProjects := Seq(
-      "typelevel.g8" -> url("https://github.com/typelevel/typelevel.g8"),
-      "sbt" -> url("https://www.scala-sbt.org/"),
-      "sbt-crossproject" -> url("https://github.com/portable-scala/sbt-crossproject"),
-      "mima" -> url("https://github.com/lightbend/mima"),
-      "mdoc" -> url("https://scalameta.org/mdoc/"),
-      "Laika" -> url("https://planet42.github.io/Laika/"),
-      "sbt-unidoc" -> url("https://github.com/sbt/sbt-unidoc")
-    )
+    tlSiteHelium ~= {
+      import laika.helium.config._
+      _.site.mainNavigation(appendLinks = Seq(
+        ThemeNavigationSection(
+          "Related Projects",
+          TextLink.external("https://github.com/typelevel/typelevel.g8", "typelevel.g8"),
+          TextLink.external("https://www.scala-sbt.org/", "sbt"),
+          TextLink
+            .external("https://github.com/portable-scala/sbt-crossproject", "sbt-crossproject"),
+          TextLink.external("https://github.com/lightbend/mima", "MiMa"),
+          TextLink.external("https://scalameta.org/mdoc/", "mdoc"),
+          TextLink.external("https://typelevel.org/Laika/", "Laika"),
+          TextLink.external("https://github.com/sbt/sbt-unidoc", "sbt-unidoc"),
+          TextLink.external(
+            "https://github.com/scalacenter/sbt-dependency-submission",
+            "sbt-dependency-submission"),
+          TextLink
+            .external("https://github.com/scala-steward-org/scala-steward", "Scala Steward")
+        )
+      ))
+    },
+    mdocVariables ++= {
+      import coursier.complete.Complete
+      import java.time._
+      import scala.concurrent._
+      import scala.concurrent.duration._
+      import scala.concurrent.ExecutionContext.Implicits._
+
+      val startYear = YearMonth.now().getYear.toString
+
+      def getLatestVersion(dep: String) = {
+        import scala.util.Try
+        val fut = Complete().withInput(dep).complete().future()
+        Try(Await.result(fut, 5.seconds)._2.last).toOption
+      }
+
+      val latestScalaJSVersion =
+        getLatestVersion(s"org.scala-js:scalajs-library_2.13:").getOrElse(scalaJSVersion)
+      val latestNativeVersion =
+        getLatestVersion(s"org.scala-native:nativelib_native0.4_3:").getOrElse(nativeVersion)
+
+      Map(
+        "START_YEAR" -> startYear,
+        "LATEST_SJS_VERSION" -> latestScalaJSVersion,
+        "LATEST_NATIVE_VERSION" -> latestNativeVersion
+      )
+    }
   )

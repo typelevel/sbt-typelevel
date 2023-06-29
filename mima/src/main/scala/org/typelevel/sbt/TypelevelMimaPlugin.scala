@@ -65,7 +65,7 @@ object TypelevelMimaPlugin extends AutoPlugin {
 
   override def projectSettings = Seq[Setting[_]](
     mimaReportBinaryIssues := {
-      if (tlSkipIrrelevantScalas.value && (mimaReportBinaryIssues / skip).value)
+      if (!publishArtifact.value || (tlSkipIrrelevantScalas.value && (mimaReportBinaryIssues / skip).value))
         ()
       else mimaReportBinaryIssues.value
     },

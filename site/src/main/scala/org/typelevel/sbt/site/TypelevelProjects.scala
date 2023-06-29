@@ -18,7 +18,11 @@ package org.typelevel.sbt.site
 
 import sbt._
 
+sealed abstract class TypelevelProject
 object TypelevelProject {
+  private[sbt] case object Organization extends TypelevelProject
+  case object Affiliate extends TypelevelProject
+
   val Cats = tl("cats")
   val CatsEffect = tl("cats-effect")
   val Discipline = gh("discipline")

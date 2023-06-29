@@ -18,6 +18,7 @@ package org.typelevel.sbt.mergify
 
 import org.typelevel.sbt.gha._
 import sbt._
+import sbtcrossproject.CrossPlugin.autoImport._
 
 import java.nio.file.Path
 
@@ -64,7 +65,8 @@ object MergifyPlugin extends AutoPlugin {
   override def buildSettings: Seq[Setting[_]] = Seq(
     mergifyStewardConfig := Some(MergifyStewardConfig()),
     mergifyRequiredJobs := Seq("build"),
-    mergifyLabelPaths := Map.empty,
+    mergifyLabelPaths := internallyCalculatedMergifyLabelPaths.value,
+    internallyCalculatedMergifyLabelPaths := Map.empty,
     mergifySuccessConditions := jobSuccessConditions.value,
     mergifyPrRules := {
       val baseDir = (LocalRootProject / baseDirectory).value.toPath
@@ -114,8 +116,8 @@ object MergifyPlugin extends AutoPlugin {
       .dependsOn(ThisBuild / mergifyGenerate)
       .value,
     githubWorkflowCheck := githubWorkflowCheck.dependsOn(ThisBuild / mergifyCheck).value,
-    ThisBuild / mergifyLabelPaths := {
-      val labelPaths = (ThisBuild / mergifyLabelPaths).value
+    ThisBuild / internallyCalculatedMergifyLabelPaths := {
+      val labelPaths = (ThisBuild / internallyCalculatedMergifyLabelPaths).value
       projectLabel.value.fold(labelPaths) {
         case (label, path) =>
           val add = labelPaths.get(label) match {
@@ -125,6 +127,10 @@ object MergifyPlugin extends AutoPlugin {
           labelPaths + (add._1 -> add._2.toFile)
       }
     }
+  )
+
+  private lazy val internallyCalculatedMergifyLabelPaths = settingKey[Map[String, File]](
+    "The map from label to file path used to calculate the default value of mergifyLabelPaths. For internal use only."
   )
 
   private lazy val jobSuccessConditions = Def.setting {
@@ -147,13 +153,7 @@ object MergifyPlugin extends AutoPlugin {
   }
 
   private lazy val projectLabel = Def.setting {
-    val path = (Compile / sourceDirectories)
-      .?
-      .value
-      .getOrElse(Seq.empty)
-      .map(_.toPath)
-      .foldLeft(baseDirectory.value.toPath)(commonAncestor(_, _))
-
+    val path = crossProjectBaseDirectory.?.value.getOrElse(baseDirectory.value).toPath
     val label = path.getFileName.toString
 
     def isRoot = path == (LocalRootProject / baseDirectory).value.toPath

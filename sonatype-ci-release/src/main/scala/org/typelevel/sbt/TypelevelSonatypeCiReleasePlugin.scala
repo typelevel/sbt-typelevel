@@ -19,7 +19,9 @@ package org.typelevel.sbt
 import org.typelevel.sbt.gha.GenerativePlugin
 import org.typelevel.sbt.gha.GenerativePlugin.autoImport._
 import org.typelevel.sbt.gha.GitHubActionsPlugin
+import sbt.Keys._
 import sbt._
+import xerial.sbt.Sonatype.autoImport._
 
 object TypelevelSonatypeCiReleasePlugin extends AutoPlugin {
 
@@ -40,11 +42,10 @@ object TypelevelSonatypeCiReleasePlugin extends AutoPlugin {
   override def globalSettings =
     Seq(tlCiReleaseTags := true, tlCiReleaseBranches := Seq())
 
+  override def projectSettings =
+    Seq(commands += tlCiReleaseCommand)
+
   override def buildSettings = Seq(
-    githubWorkflowEnv ++= List(
-      "SONATYPE_USERNAME",
-      "SONATYPE_PASSWORD",
-      "SONATYPE_CREDENTIAL_HOST").map(k => k -> s"$${{ secrets.$k }}").toMap,
     githubWorkflowPublishTargetBranches := {
       val branches =
         tlCiReleaseBranches.value.map(b => RefPredicate.Equals(Ref.Branch(b)))
@@ -59,7 +60,32 @@ object TypelevelSonatypeCiReleasePlugin extends AutoPlugin {
     },
     githubWorkflowTargetTags += "v*",
     githubWorkflowPublish := Seq(
-      WorkflowStep.Sbt(List("tlRelease"), name = Some("Publish"))
+      WorkflowStep.Sbt(List("tlCiRelease"), name = Some("Publish"), env = env)
     )
   )
+
+  private val env = List("SONATYPE_USERNAME", "SONATYPE_PASSWORD", "SONATYPE_CREDENTIAL_HOST")
+    .map(k => k -> s"$${{ secrets.$k }}")
+    .toMap
+
+  private def tlCiReleaseCommand: Command =
+    Command.command("tlCiRelease") { state =>
+      val newState = Command.process("tlRelease", state)
+      newState.getSetting(version).foreach { v =>
+        val resolver = newState.getSetting(sonatypeDefaultResolver).fold("") {
+          case repo: MavenRepository =>
+            s"""|```scala
+                |resolvers += "${repo.name}" at "${repo.root}"
+                |```
+                |""".stripMargin
+        }
+
+        GitHubActionsPlugin.appendtoStepSummary(
+          s"""|## Published `$v`
+              |${resolver}""".stripMargin
+        )
+      }
+      newState
+    }
+
 }

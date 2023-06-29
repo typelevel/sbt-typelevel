@@ -16,11 +16,14 @@
 
 package org.typelevel.sbt
 
+import com.github.sbt.git.SbtGit.git
+import org.typelevel.sbt.kernel.GitHelper
 import sbt._
 
 import scala.util.Try
 
 import Keys._
+import TypelevelKernelPlugin.autoImport._
 
 object TypelevelGitHubPlugin extends AutoPlugin {
 
@@ -48,7 +51,51 @@ object TypelevelGitHubPlugin extends AutoPlugin {
         sLog.value.info(s"set scmInfo to https://github.com/$user/$repo")
         gitHubScmInfo(user, repo)
     },
-    homepage := homepage.value.orElse(scmInfo.value.map(_.browseUrl))
+    homepage := homepage.value.orElse(scmInfo.value.map(_.browseUrl)),
+    releaseNotesURL := {
+      val tag = git.gitCurrentTags.value.headOption
+      gitHubUserRepo.value.flatMap {
+        case (user, repo) =>
+          tag.map(v => url(s"https://github.com/$user/$repo/releases/tag/$v"))
+      }
+    },
+    developers := {
+      gitHubUserRepo
+        .value
+        .toList
+        .map {
+          case (user, repo) =>
+            Developer(
+              user,
+              s"$repo contributors",
+              s"@$user",
+              url(s"https://github.com/$user/$repo/contributors")
+            )
+        }
+    }
+  )
+
+  override def projectSettings: Seq[Setting[_]] = Seq(
+    Compile / doc / scalacOptions ++= {
+      val tagOrHash =
+        GitHelper.getTagOrHash(git.gitCurrentTags.value, git.gitHeadCommit.value)
+      val userRepo = gitHubUserRepo.value
+      val infoOpt = scmInfo.value
+
+      if (tlIsScala3.value)
+        tagOrHash.toSeq flatMap { vh =>
+          userRepo.toSeq flatMap {
+            case (user, repo) => Seq(s"-source-links:github://${user}/${repo}", "-revision", vh)
+          }
+        }
+      else
+        tagOrHash.toSeq flatMap { vh =>
+          infoOpt.toSeq flatMap { info =>
+            val path = s"${info.browseUrl}/blob/${vh}€{FILE_PATH}.scala"
+            Seq("-doc-source-url", path)
+          }
+        }
+    }
   )
 
   private def gitHubScmInfo(user: String, repo: String) =

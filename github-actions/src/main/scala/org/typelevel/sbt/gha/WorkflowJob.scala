@@ -20,11 +20,11 @@ final case class WorkflowJob(
     id: String,
     name: String,
     steps: List[WorkflowStep],
-    sbtStepPreamble: List[String] = List(s"++$${{ matrix.scala }}"),
+    sbtStepPreamble: List[String] = List(s"++ $${{ matrix.scala }}"),
     cond: Option[String] = None,
     env: Map[String, String] = Map(),
     oses: List[String] = List("ubuntu-latest"),
-    scalas: List[String] = List("2.13.6"),
+    scalas: List[String] = List("2.13"),
     javas: List[JavaSpec] = List(JavaSpec.temurin("11")),
     needs: List[String] = List(),
     matrixFailFast: Option[Boolean] = None,
@@ -33,4 +33,6 @@ final case class WorkflowJob(
     matrixExcs: List[MatrixExclude] = List(),
     runsOnExtraLabels: List[String] = List(),
     container: Option[JobContainer] = None,
-    environment: Option[JobEnvironment] = None)
+    environment: Option[JobEnvironment] = None,
+    concurrency: Option[Concurrency] = None,
+    timeoutMinutes: Option[Int] = None)

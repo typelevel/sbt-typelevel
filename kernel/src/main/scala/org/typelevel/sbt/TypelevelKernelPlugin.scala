@@ -16,6 +16,8 @@
 
 package org.typelevel.sbt
 
+import org.typelevel.sbt.kernel.GitHelper
+import org.typelevel.sbt.kernel.V
 import sbt._
 import sbt.plugins.JvmPlugin
 
@@ -27,6 +29,8 @@ object TypelevelKernelPlugin extends AutoPlugin {
   override def trigger = allRequirements
 
   object autoImport {
+    lazy val CompileTime: Configuration = config("compile-time").hide
+
     lazy val tlIsScala3 = settingKey[Boolean]("True if building with Scala 3")
     lazy val tlSkipIrrelevantScalas = settingKey[Boolean](
       "Sets skip := true for compile/test/publish/etc. tasks on a project if the current scalaVersion is not in that project's crossScalaVersions (default: false)")
@@ -37,6 +41,7 @@ object TypelevelKernelPlugin extends AutoPlugin {
           BasicCommands.addAlias(BasicCommands.removeAlias(s, name), name, contents)
         }
       })
+
   }
 
   import autoImport._
@@ -50,6 +55,8 @@ object TypelevelKernelPlugin extends AutoPlugin {
       addCommandAlias("tlReleaseLocal", mkCommand(List("reload", "project /", "+publishLocal")))
 
   override def projectSettings = Seq(
+    ivyConfigurations += CompileTime,
+    Compile / unmanagedClasspath ++= update.value.select(configurationFilter(CompileTime.name)),
     (Test / test) := {
       if (tlSkipIrrelevantScalas.value && (Test / test / skip).value)
         ()
@@ -80,6 +87,36 @@ object TypelevelKernelPlugin extends AutoPlugin {
         val ver = (LocalRootProject / scalaVersion).value
         (task / tlSkipIrrelevantScalas).value && !cross.contains(ver)
       }
+    }
+  }
+
+  private[sbt] lazy val currentRelease: Def.Initialize[Option[String]] = Def.setting {
+    // some tricky logic here ...
+    // if the latest release is a pre-release (e.g., M or RC)
+    // and there are no stable releases it is bincompatible with,
+    // then for all effective purposes it is the current release
+
+    val release = previousReleases.value match {
+      case head :: tail if head.isPrerelease =>
+        tail
+          .filterNot(_.isPrerelease)
+          .find(head.copy(prerelease = None).mustBeBinCompatWith(_))
+          .orElse(Some(head))
+      case releases => releases.headOption
+    }
+
+    release.map(_.toString)
+  }
+
+  // latest tagged release, including pre-releases
+  private[sbt] lazy val currentPreRelease: Def.Initialize[Option[String]] = Def.setting {
+    previousReleases.value.headOption.map(_.toString)
+  }
+
+  private[this] lazy val previousReleases: Def.Initialize[List[V]] = Def.setting {
+    val currentVersion = V(version.value).map(_.copy(prerelease = None))
+    GitHelper.previousReleases(fromHead = true, strict = false).filter { v =>
+      currentVersion.forall(v.copy(prerelease = None) <= _)
     }
   }
 

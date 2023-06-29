@@ -19,14 +19,38 @@ package org.typelevel.sbt
 import sbt._
 
 import Keys._
+import NoPublishGlobalPlugin.noPublishInternalAggregation
 
 object NoPublishPlugin extends AutoPlugin {
+
   override def trigger = noTrigger
 
   override def projectSettings = Seq(
     publish := {},
     publishLocal := {},
     publishArtifact := false,
-    publish / skip := true
+    publish / skip := true,
+    Global / noPublishInternalAggregation += thisProjectRef.value
   )
+}
+
+object NoPublishGlobalPlugin extends AutoPlugin {
+
+  // triggered even if NoPublishPlugin is not used in the build
+  override def trigger = allRequirements
+
+  object autoImport {
+    lazy val noPublishProjectRefs = settingKey[Seq[ProjectRef]]("List of no-publish projects")
+  }
+
+  import autoImport._
+
+  private[sbt] lazy val noPublishInternalAggregation =
+    settingKey[Seq[ProjectRef]]("Aggregates all the no-publish projects")
+
+  override def globalSettings = Seq(
+    noPublishInternalAggregation := Seq(),
+    noPublishProjectRefs := noPublishInternalAggregation.value
+  )
+
 }

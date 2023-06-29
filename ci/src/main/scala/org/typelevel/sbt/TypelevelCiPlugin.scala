@@ -16,19 +16,22 @@
 
 package org.typelevel.sbt
 
-import com.typesafe.tools.mima.plugin.MimaPlugin
+import org.typelevel.sbt.NoPublishGlobalPlugin.autoImport._
 import org.typelevel.sbt.gha.GenerativePlugin
 import org.typelevel.sbt.gha.GenerativePlugin.autoImport._
 import org.typelevel.sbt.gha.GitHubActionsPlugin
+import org.typelevel.sbt.gha.WorkflowStep
 import sbt._
+
+import scala.language.experimental.macros
 
 object TypelevelCiPlugin extends AutoPlugin {
 
-  override def requires = GitHubActionsPlugin && GenerativePlugin && MimaPlugin
+  override def requires = GitHubActionsPlugin && GenerativePlugin
   override def trigger = allRequirements
 
   object autoImport {
-    def tlCrossRootProject: CrossRootProject = CrossRootProject()
+    def tlCrossRootProject: CrossRootProject = macro CrossRootProjectMacros.crossRootProjectImpl
 
     lazy val tlCiHeaderCheck =
       settingKey[Boolean]("Whether to do header check in CI (default: false)")
@@ -37,9 +40,16 @@ object TypelevelCiPlugin extends AutoPlugin {
     lazy val tlCiScalafixCheck =
       settingKey[Boolean]("Whether to do scalafix check in CI (default: false)")
     lazy val tlCiMimaBinaryIssueCheck =
-      settingKey[Boolean]("Whether to do MiMa binary issues check in CI (default: true)")
+      settingKey[Boolean]("Whether to do MiMa binary issues check in CI (default: false)")
     lazy val tlCiDocCheck =
-      settingKey[Boolean]("Whether to build API docs in CI (default: true)")
+      settingKey[Boolean]("Whether to build API docs in CI (default: false)")
+
+    lazy val tlCiDependencyGraphJob =
+      settingKey[Boolean]("Whether to add a job to submit dependencies to GH (default: true)")
+
+    lazy val tlCiStewardValidateConfig = settingKey[Option[File]](
+      "The location of the Scala Steward config to validate (default: `.scala-steward.conf`, if exists)")
+
   }
 
   import autoImport._
@@ -48,8 +58,9 @@ object TypelevelCiPlugin extends AutoPlugin {
     tlCiHeaderCheck := false,
     tlCiScalafmtCheck := false,
     tlCiScalafixCheck := false,
-    tlCiMimaBinaryIssueCheck := true,
-    tlCiDocCheck := true,
+    tlCiMimaBinaryIssueCheck := false,
+    tlCiDocCheck := false,
+    tlCiDependencyGraphJob := true,
     githubWorkflowTargetBranches ++= Seq(
       "!update/**", // ignore steward branches
       "!pr/**" // escape-hatch to disable ci on a branch
@@ -63,7 +74,7 @@ object TypelevelCiPlugin extends AutoPlugin {
             WorkflowStep.Sbt(
               List("headerCheckAll", "scalafmtCheckAll", "project /", "scalafmtSbtCheck"),
               name = Some("Check headers and formatting"),
-              cond = Some(primaryJavaCond.value)
+              cond = Some(primaryAxisCond.value)
             )
           )
         case (true, false) => // headers
@@ -71,7 +82,7 @@ object TypelevelCiPlugin extends AutoPlugin {
             WorkflowStep.Sbt(
               List("headerCheckAll"),
               name = Some("Check headers"),
-              cond = Some(primaryJavaCond.value)
+              cond = Some(primaryAxisCond.value)
             )
           )
         case (false, true) => // formatting
@@ -79,7 +90,7 @@ object TypelevelCiPlugin extends AutoPlugin {
             WorkflowStep.Sbt(
               List("scalafmtCheckAll", "project /", "scalafmtSbtCheck"),
               name = Some("Check formatting"),
-              cond = Some(primaryJavaCond.value)
+              cond = Some(primaryAxisCond.value)
             )
           )
         case (false, false) => Nil // nada
@@ -95,7 +106,7 @@ object TypelevelCiPlugin extends AutoPlugin {
             WorkflowStep.Sbt(
               List("scalafixAll --check"),
               name = Some("Check scalafix lints"),
-              cond = Some(primaryJavaCond.value)
+              cond = Some(primaryAxisCond.value)
             )
           )
         else Nil
@@ -106,7 +117,7 @@ object TypelevelCiPlugin extends AutoPlugin {
             WorkflowStep.Sbt(
               List("mimaReportBinaryIssues"),
               name = Some("Check binary compatibility"),
-              cond = Some(primaryJavaCond.value)
+              cond = Some(primaryAxisCond.value)
             ))
         else Nil
 
@@ -116,19 +127,125 @@ object TypelevelCiPlugin extends AutoPlugin {
             WorkflowStep.Sbt(
               List("doc"),
               name = Some("Generate API documentation"),
-              cond = Some(primaryJavaCond.value)
+              cond = Some(primaryAxisCond.value)
             )
           )
         else Nil
 
-      style ++ test ++ scalafix ++ mima ++ doc
+      style ++ scalafix ++ test ++ mima ++ doc
     },
-    githubWorkflowJavaVersions := Seq(JavaSpec.temurin("8"))
+    githubWorkflowJavaVersions := Seq(JavaSpec.temurin("8")),
+    githubWorkflowAddedJobs ++= {
+      val dependencySubmission =
+        if (tlCiDependencyGraphJob.value)
+          List(
+            WorkflowJob(
+              "dependency-submission",
+              "Submit Dependencies",
+              scalas = Nil,
+              sbtStepPreamble = Nil,
+              javas = List(githubWorkflowJavaVersions.value.head),
+              steps = githubWorkflowJobSetup.value.toList :+
+                WorkflowStep.DependencySubmission(
+                  None,
+                  Some(noPublishProjectRefs.value.toList.map(_.project)),
+                  Some(List("test", "scala-tool", "scala-doc-tool")),
+                  None
+                ),
+              cond = Some("github.event_name != 'pull_request'")
+            ))
+        else Nil
+
+      dependencySubmission
+    },
+    tlCiStewardValidateConfig :=
+      Some(file(".scala-steward.conf")).filter(_.exists()),
+    githubWorkflowAddedJobs ++= {
+      tlCiStewardValidateConfig
+        .value
+        .toList
+        .map { config =>
+          WorkflowJob(
+            "validate-steward",
+            "Validate Steward Config",
+            WorkflowStep.Checkout ::
+              WorkflowStep.Use(
+                UseRef.Public("coursier", "setup-action", "v1"),
+                Map("apps" -> "scala-steward")
+              ) ::
+              WorkflowStep.Run(List(s"scala-steward validate-repo-config $config")) :: Nil,
+            scalas = List.empty,
+            javas = List.empty
+          )
+        }
+    }
   )
 
-  private val primaryJavaCond = Def.setting {
+  override def projectSettings: Seq[Setting[_]] = Seq(
+    Test / Keys.executeTests := {
+      val results: Tests.Output = (Test / Keys.executeTests).value
+      GitHubActionsPlugin.appendtoStepSummary(
+        renderTestResults(Keys.thisProject.value.id, Keys.scalaVersion.value, results)
+      )
+      results
+    }
+  )
+
+  private def renderTestResults(
+      projectName: String,
+      scalaVersion: String,
+      results: Tests.Output): String = {
+
+    val testHeader: String =
+      s"""|### ${projectName} Tests Results: ${results.overall}
+          |To run them locally use `++${scalaVersion} ${projectName}/test`
+          |""".stripMargin
+
+    val tableHeader: String =
+      s"""|<details>
+          |
+          ||SuiteName|Result|Passed|Failed|Errors|Skipped|Ignored|Canceled|Pending|
+          ||-:|-|-|-|-|-|-|-|-|
+          |""".stripMargin
+
+    val tableBody = results.events.map {
+      case (suiteName, suiteResult) =>
+        List(
+          suiteName,
+          suiteResult.result.toString(),
+          suiteResult.passedCount.toString(),
+          suiteResult.failureCount.toString(),
+          suiteResult.errorCount.toString(),
+          suiteResult.skippedCount.toString(),
+          suiteResult.ignoredCount.toString(),
+          suiteResult.canceledCount.toString(),
+          suiteResult.pendingCount.toString()
+        ).mkString("|", "|", "|")
+    }
+
+    val table: String = tableBody.mkString(tableHeader, "\n", "\n</details>\n\n")
+
+    if (results.events.nonEmpty)
+      testHeader + table
+    else ""
+  }
+
+  private val primaryAxisCond = Def.setting {
     val java = githubWorkflowJavaVersions.value.head
-    s"matrix.java == '${java.render}'"
+    val os = githubWorkflowOSes.value.head
+
+    // disjoint keys have unique sources so this condition should not consider them
+    val disjointKeys = githubWorkflowArtifactDownloadExtraKeys.value
+    val additionalAxes = githubWorkflowBuildMatrixAdditions
+      .value
+      .toList
+      .collect {
+        case (k, primary :: _) if !disjointKeys.contains(k) =>
+          s" && matrix.$k == '$primary'"
+      }
+      .mkString
+
+    s"matrix.java == '${java.render}' && matrix.os == '${os}'$additionalAxes"
   }
 
 }

@@ -24,3 +24,7 @@ Compile / unmanagedSourceDirectories ++= modules.map { module =>
 Compile / unmanagedResourceDirectories ++= modules.map { module =>
   baseDirectory.value.getParentFile / module / "src" / "main" / "resources"
 }
+
+libraryDependencies ++= Seq(
+  "io.get-coursier" %% "coursier" % "2.1.5"
+)

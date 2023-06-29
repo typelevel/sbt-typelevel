@@ -16,16 +16,14 @@
 
 package org.typelevel.sbt
 
-import com.typesafe.sbt.GitPlugin
-import com.typesafe.sbt.SbtGit.git
-import org.typelevel.sbt.kernel.GitHelper
+import com.github.sbt.git.GitPlugin
 import org.typelevel.sbt.kernel.V
 import sbt._
 import sbtcrossproject.CrossPlugin.autoImport._
-import sbtcrossproject.CrossType
 
 import java.io.File
 import java.lang.management.ManagementFactory
+import scala.annotation.nowarn
 import scala.util.Try
 
 import Keys._
@@ -39,7 +37,7 @@ object TypelevelSettingsPlugin extends AutoPlugin {
       settingKey[Boolean]("Convert compiler warnings into errors (default: false)")
     lazy val tlJdkRelease =
       settingKey[Option[Int]](
-        "JVM target version for the compiled bytecode, None results in default scalac and javac behavior (no --release flag is specified). (default: None, supported values: 8, 9, 10, 11, 12, 13, 14, 15, 16, 17)")
+        "JVM target version for the compiled bytecode, None results in default scalac and javac behavior (no compiler flag is added) (default: Some(8))")
   }
 
   import autoImport._
@@ -47,21 +45,29 @@ object TypelevelSettingsPlugin extends AutoPlugin {
 
   override def globalSettings = Seq(
     tlFatalWarnings := false,
-    tlJdkRelease := None,
+    tlJdkRelease := Some(8),
     Def.derive(scalaVersion := crossScalaVersions.value.last, default = true)
   )
 
+  private def onlyScala3 = Def.setting(crossScalaVersions.value.forall(_.startsWith("3.")))
+
   override def projectSettings = Seq(
-    versionScheme := Some("early-semver"),
     pomIncludeRepository := { _ => false },
     libraryDependencies ++= {
-      if (tlIsScala3.value)
-        Nil
-      else
-        Seq(
-          compilerPlugin("com.olegpy" %% "better-monadic-for" % "0.3.1"),
-          compilerPlugin("org.typelevel" % "kind-projector" % "0.13.2" cross CrossVersion.full)
-        )
+      val plugins =
+        if (tlIsScala3.value)
+          Nil
+        else
+          Seq(
+            compilerPlugin("com.olegpy" %% "better-monadic-for" % "0.3.1"),
+            compilerPlugin(
+              "org.typelevel" % "kind-projector" % "0.13.2" cross CrossVersion.full)
+          )
+
+      val scalacCompat =
+        Seq(CompileTime, Test).map("org.typelevel" %% "scalac-compat-annotation" % "0.1.2" % _)
+
+      scalacCompat ++ plugins
     },
 
     // Adapted from Rob Norris' post at https://tpolecat.github.io/2014/04/11/scalac-flags.html
@@ -72,49 +78,76 @@ object TypelevelSettingsPlugin extends AutoPlugin {
       "-feature",
       "-unchecked"),
     scalacOptions ++= {
-      scalaVersion.value match {
-        case V(V(2, minor, _, _)) if minor < 13 =>
-          Seq("-Yno-adapted-args", "-Ywarn-unused-import")
-        case _ =>
-          Seq.empty
-      }
-    },
-    scalacOptions ++= {
-      val warningsNsc = Seq("-Xlint", "-Ywarn-dead-code")
+      val warningsNsc = Seq(
+        "-Xlint",
+        "-Yno-adapted-args", // similar to '-Xlint:adapted-args' but fails compilation instead of just emitting a warning
+        "-Ywarn-dead-code",
+        "-Ywarn-unused-import"
+      )
 
-      val warnings211 =
-        Seq("-Ywarn-numeric-widen") // In 2.10 this produces a some strange spurious error
+      val warnings211 = Seq(
+        "-Ywarn-numeric-widen" // In 2.10 this produces a some strange spurious error
+      )
 
-      val warnings212 = Seq("-Xlint:-unused,_")
+      val removed212 = Set(
+        "-Xlint",
+        "-Yno-adapted-args", // mostly superseded by '-Xlint:adapted-args'
+        "-Ywarn-unused-import" // superseded by '-Ywarn-unused:imports'
+      )
+      val warnings212 = Seq(
+        // Tune '-Xlint':
+        // - remove 'unused' because it is configured by '-Ywarn-unused'
+        "-Xlint:_,-unused",
+        // Tune '-Ywarn-unused':
+        // - remove 'nowarn' because 2.13 can detect more unused cases than 2.12
+        // - remove 'privates' because 2.12 can incorrectly detect some private objects as unused
+        "-Ywarn-unused:_,-nowarn,-privates"
+      )
 
-      val removed213 = Set("-Xlint:-unused,_", "-Xlint")
+      val removed213 = Set(
+        "-Xlint:_,-unused", // reconfigured for 2.13
+        "-Ywarn-unused:_,-nowarn,-privates", // mostly superseded by "-Wunused"
+        "-Ywarn-dead-code", // superseded by "-Wdead-code"
+        "-Ywarn-numeric-widen" // superseded by "-Wnumeric-widen"
+      )
       val warnings213 = Seq(
-        "-Xlint:deprecation",
-        "-Wunused:nowarn",
         "-Wdead-code",
         "-Wextra-implicit",
         "-Wnumeric-widen",
+        "-Wunused", // all choices are enabled by default
+        "-Wvalue-discard",
+        // Tune '-Xlint':
+        // - remove 'implicit-recursion' due to backward incompatibility with 2.12
+        // - remove 'recurse-with-default' due to backward incompatibility with 2.12
+        // - remove 'unused' because it is configured by '-Wunused'
+        "-Xlint:_,-implicit-recursion,-recurse-with-default,-unused"
+      )
+
+      val warningsDotty = Seq.empty
+
+      val warnings33 = Seq(
         "-Wunused:implicits",
         "-Wunused:explicits",
         "-Wunused:imports",
         "-Wunused:locals",
         "-Wunused:params",
-        "-Wunused:patvars",
         "-Wunused:privates",
         "-Wvalue-discard"
       )
 
-      val warningsDotty = Seq.empty
-
       scalaVersion.value match {
+        case V(V(3, minor, _, _)) if minor >= 3 =>
+          warnings33
+
         case V(V(3, _, _, _)) =>
           warningsDotty
 
         case V(V(2, minor, _, _)) if minor >= 13 =>
-          (warnings211 ++ warnings212 ++ warnings213 ++ warningsNsc).filterNot(removed213)
+          (warnings211 ++ warnings212 ++ warnings213 ++ warningsNsc)
+            .filterNot(removed212 ++ removed213)
 
         case V(V(2, minor, _, _)) if minor >= 12 =>
-          warnings211 ++ warnings212 ++ warningsNsc
+          (warnings211 ++ warnings212 ++ warningsNsc).filterNot(removed212)
 
         case V(V(2, minor, _, _)) if minor >= 11 =>
           warnings211 ++ warningsNsc
@@ -150,12 +183,18 @@ object TypelevelSettingsPlugin extends AutoPlugin {
       }
     },
     scalacOptions ++= {
-      if (tlIsScala3.value && crossScalaVersions.value.forall(_.startsWith("3.")))
-        Seq("-Ykind-projector:underscores")
-      else if (tlIsScala3.value)
-        Seq("-language:implicitConversions", "-Ykind-projector", "-source:3.0-migration")
-      else
-        Seq("-language:_")
+      scalaVersion.value match {
+        case V(V(3, _, _, _)) if onlyScala3.value =>
+          Seq("-Ykind-projector:underscores")
+
+        case V(V(3, _, _, _)) =>
+          Seq("-language:implicitConversions", "-Ykind-projector")
+
+        case V(V(2, minor, _, _)) if minor >= 12 =>
+          Seq("-language:_", "-Xsource:3")
+
+        case _ => Seq("-language:_")
+      }
     },
     Test / scalacOptions ++= {
       if (tlIsScala3.value)
@@ -163,38 +202,44 @@ object TypelevelSettingsPlugin extends AutoPlugin {
       else
         Seq("-Yrangepos")
     },
-    Compile / console / scalacOptions --= Seq(
-      "-Xlint",
-      "-Ywarn-unused-import",
-      "-Wextra-implicit",
-      "-Wunused:implicits",
-      "-Wunused:explicits",
-      "-Wunused:imports",
-      "-Wunused:locals",
-      "-Wunused:params",
-      "-Wunused:patvars",
-      "-Wunused:privates"
-    ),
+    Compile / console / scalacOptions := scalacOptions.value.filterNot { opt =>
+      opt.startsWith("-Xlint") ||
+      PartialFunction.cond(scalaVersion.value) {
+        case V(V(2, minor, _, _)) if minor >= 13 =>
+          opt.startsWith("-Wunused") || opt == "-Wextra-implicit"
+        case V(V(2, minor, _, _)) if minor >= 12 =>
+          opt.startsWith("-Ywarn-unused")
+      }
+    },
     Test / console / scalacOptions := (Compile / console / scalacOptions).value,
     Compile / doc / scalacOptions ++= {
+      Seq("-sourcepath", (LocalRootProject / baseDirectory).value.getAbsolutePath)
+    },
+    Compile / doc / scalacOptions ++= {
       if (tlIsScala3.value)
-        Seq("-sourcepath", (LocalRootProject / baseDirectory).value.getAbsolutePath)
-      else {
-
-        val tagOrHash =
-          GitHelper.getTagOrHash(git.gitCurrentTags.value, git.gitHeadCommit.value)
-
-        val infoOpt = scmInfo.value
-        tagOrHash.toSeq flatMap { vh =>
-          infoOpt.toSeq flatMap { info =>
-            val path = s"${info.browseUrl}/blob/${vh}€{FILE_PATH}.scala"
-            Seq(
-              "-doc-source-url",
-              path,
-              "-sourcepath",
-              (LocalRootProject / baseDirectory).value.getAbsolutePath)
-          }
-        }
+        Seq("-project-version", version.value)
+      else Nil
+    },
+    Compile / doc / scalacOptions ++= {
+      // When cross-building with non Scala 3 targets, turn on wiki syntax
+      // this is used to enable the old scaladoc2 syntax for italics, bold, etc
+      // on a pure Scala 3 project, it's preferred to use the new markdown syntax
+      scalaVersion.value match {
+        case V(V(3, _, _, _)) if !onlyScala3.value =>
+          Seq("-comment-syntax:wiki")
+        case _ =>
+          Seq.empty
+      }
+    },
+    Compile / doc / scalacOptions ++= {
+      // Enable Inkuire for Scala 3.2.1+
+      scalaVersion.value match {
+        case V(V(3, 2, Some(build), _)) if build >= 1 =>
+          Seq("-Ygenerate-inkuire")
+        case V(V(3, minor, _, _)) if minor >= 3 =>
+          Seq("-Ygenerate-inkuire")
+        case _ =>
+          Seq.empty
       }
     },
     javacOptions ++= Seq(
@@ -202,25 +247,16 @@ object TypelevelSettingsPlugin extends AutoPlugin {
       "utf8",
       "-Xlint:all"
     ),
-
-    // TODO make these respect Compile/Test config
     scalacOptions ++= {
-      if (tlFatalWarnings.value)
-        Seq("-Xfatal-warnings")
-      else
-        Seq.empty
-    },
-    javacOptions ++= {
-      if (tlFatalWarnings.value)
-        Seq("-Werror")
-      else
-        Seq.empty
-    },
-    scalacOptions ++= {
-      val (releaseOption, newTargetOption, oldTargetOption) =
+      val (javaOutputVersionOption, releaseOption, newTargetOption, oldTargetOption) =
         withJdkRelease(tlJdkRelease.value)(
-          (Seq.empty[String], Seq.empty[String], Seq.empty[String])) { n =>
-          (Seq("-release", n.toString), Seq(s"-target:$n"), Seq("-target:jvm-1.8"))
+          (Seq.empty[String], Seq.empty[String], Seq.empty[String], Seq.empty[String])) { n =>
+          (
+            Seq("-java-output-version", n.toString),
+            Seq("-release", n.toString),
+            Seq(s"-target:$n"),
+            Seq("-target:jvm-1.8")
+          )
         }
 
       scalaVersion.value match {
@@ -230,11 +266,17 @@ object TypelevelSettingsPlugin extends AutoPlugin {
         case V(V(2, 12, Some(build), _)) if build >= 5 =>
           releaseOption ++ oldTargetOption
 
-        case V(V(2, 13, _, _)) =>
+        case V(V(2, 13, Some(build), _)) if build <= 8 =>
           releaseOption ++ newTargetOption
 
-        case V(V(3, _, _, _)) =>
+        case V(V(2, 13, Some(build), _)) if build >= 9 =>
           releaseOption
+
+        case V(V(3, minor, _, _)) if minor <= 1 =>
+          releaseOption
+
+        case V(V(3, minor, _, _)) if minor >= 2 =>
+          javaOutputVersionOption
 
         case _ =>
           Seq.empty
@@ -247,19 +289,36 @@ object TypelevelSettingsPlugin extends AutoPlugin {
   ) ++ inConfig(Compile)(perConfigSettings) ++ inConfig(Test)(perConfigSettings)
 
   private val perConfigSettings = Seq(
+    scalacOptions := {
+      val old = scalacOptions.value
+      val flag = "-Werror"
+      if (tlFatalWarnings.value)
+        if (!old.contains(flag)) old :+ flag else old
+      else
+        old.filterNot(_ == flag)
+    },
+    javacOptions ++= {
+      val old = javacOptions.value
+      val flag = "-Werror"
+      if (tlFatalWarnings.value)
+        if (!old.contains(flag)) old :+ flag else old
+      else
+        old.filterNot(_ == flag)
+    },
     unmanagedSourceDirectories ++= {
       def extraDirs(suffix: String) =
-        if (crossProjectPlatform.?.value.isDefined)
-          List(CrossType.Pure, CrossType.Full).flatMap {
-            _.sharedSrcDir(baseDirectory.value, Defaults.nameForSrc(configuration.value.name))
+        crossProjectCrossType.?.value match {
+          case Some(crossType) =>
+            crossType
+              .sharedSrcDir(baseDirectory.value, Defaults.nameForSrc(configuration.value.name))
               .toList
               .map(f => file(f.getPath + suffix))
-          }
-        else
-          List(
-            baseDirectory.value / "src" / Defaults.nameForSrc(
-              configuration.value.name) / s"scala$suffix"
-          )
+          case None =>
+            List(
+              baseDirectory.value / "src" /
+                Defaults.nameForSrc(configuration.value.name) / s"scala$suffix"
+            )
+        }
 
       CrossVersion.partialVersion(scalaVersion.value) match {
         case Some((2, y)) if y <= 12 => extraDirs("-2.12-")
@@ -270,7 +329,19 @@ object TypelevelSettingsPlugin extends AutoPlugin {
     },
     packageSrc / mappings ++= {
       val base = sourceManaged.value
-      managedSources.value.map(file => file -> file.relativeTo(base).get.getPath)
+      managedSources.value.map { file =>
+        file.relativeTo(base) match {
+          case Some(relative) => file -> relative.getPath
+          case None =>
+            throw new RuntimeException(
+              s"""|Expected managed sources in:
+                  |$base
+                  |But found them here:
+                  |$file
+                  |""".stripMargin
+            )
+        }
+      }
     }
   )
 
@@ -278,9 +349,9 @@ object TypelevelSettingsPlugin extends AutoPlugin {
     jdkRelease.fold(default) {
       case 8 if isJava8 => default
       case n if n >= 8 =>
-        if (javaRuntimeVersion < n) {
+        if (javaMajorVersion < n) {
           sys.error(
-            s"Target JDK is $n but you are using an older JDK $javaRuntimeVersion. Please switch to JDK >= $n.")
+            s"Target JDK is $n but you are using an older JDK $javaMajorVersion. Please switch to JDK >= $n.")
         } else {
           f(n)
         }
@@ -289,21 +360,21 @@ object TypelevelSettingsPlugin extends AutoPlugin {
           s"Target JDK is $n, which is not supported by `sbt-typelevel`. Please select a JDK >= 8.")
     }
 
-  private val javaRuntimeVersion: Int =
-    System.getProperty("java.version").split("""\.""") match {
-      case Array("1", "8", _*) => 8
-      case Array(feature, _*) => feature.toInt
-    }
+  private val javaMajorVersion: Int =
+    System.getProperty("java.version").stripPrefix("1.").takeWhile(_.isDigit).toInt
 
-  private val isJava8: Boolean = javaRuntimeVersion == 8
+  private val isJava8: Boolean = javaMajorVersion == 8
 
   private val javaApiMappings = {
     // scaladoc doesn't support this automatically before 2.13
-    val baseUrl = javaRuntimeVersion match {
-      case v if v < 11 => url(s"https://docs.oracle.com/javase/${v}/docs/api/")
-      case v => url(s"https://docs.oracle.com/en/java/javase/${v}/docs/api/java.base/")
-    }
-    doc / apiMappings ~= { old =>
+    doc / apiMappings := {
+      val old = (doc / apiMappings).value
+
+      val baseUrl = tlJdkRelease.value.getOrElse(javaMajorVersion) match {
+        case v if v < 11 => url(s"https://docs.oracle.com/javase/${v}/docs/api/")
+        case v => url(s"https://docs.oracle.com/en/java/javase/${v}/docs/api/java.base/")
+      }
+
       val runtimeMXBean = ManagementFactory.getRuntimeMXBean
       val oldSchool = Try(
         if (runtimeMXBean.isBootClassPathSupported)
@@ -319,4 +390,7 @@ object TypelevelSettingsPlugin extends AutoPlugin {
       oldSchool ++ newSchool ++ old
     }
   }
+
+  @nowarn("cat=unused")
+  private[this] def unused(): Unit = ()
 }

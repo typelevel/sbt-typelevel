@@ -32,14 +32,14 @@ object TypelevelSonatypePlugin extends AutoPlugin {
 
   object autoImport {
     lazy val tlSonatypeUseLegacyHost =
-      settingKey[Boolean]("Publish to oss.sonatype.org instead of s01 (default: true)")
+      settingKey[Boolean]("Publish to oss.sonatype.org instead of s01 (default: false)")
   }
 
   import autoImport._
 
   override def buildSettings =
     Seq(
-      tlSonatypeUseLegacyHost := true,
+      tlSonatypeUseLegacyHost := false,
       autoAPIMappings := true
     ) ++ addCommandAlias(
       "tlRelease",
@@ -65,7 +65,7 @@ object TypelevelSonatypePlugin extends AutoPlugin {
           "s01.oss.sonatype.org"
       }
     },
-    apiURL := apiURL.value.orElse(javadocioUrl.value)
+    apiURL := apiURL.value.orElse(hostedApiUrl.value)
   )
 
   private[sbt] lazy val hostedApiUrl =

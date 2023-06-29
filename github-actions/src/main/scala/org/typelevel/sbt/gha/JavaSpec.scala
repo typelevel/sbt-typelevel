@@ -27,37 +27,26 @@ object JavaSpec {
 
   def temurin(version: String): JavaSpec = JavaSpec(Distribution.Temurin, version)
   def corretto(version: String): JavaSpec = JavaSpec(Distribution.Corretto, version)
-  def graalvm(version: String): JavaSpec = JavaSpec(Distribution.LatestGraalVM, version)
+  def graalvm(version: String): JavaSpec = JavaSpec(Distribution.GraalVM, version)
+  @deprecated("Use `semeru`", "0.5.0")
   def openj9(version: String): JavaSpec = JavaSpec(Distribution.OpenJ9, version)
   def oracle(version: String): JavaSpec = JavaSpec(Distribution.Oracle, version)
+  def semeru(version: String): JavaSpec = JavaSpec(Distribution.Semeru, version)
+  def microsoft(version: String): JavaSpec = JavaSpec(Distribution.Microsoft, version)
 
-  @deprecated(
-    "Use single-arg overload to get the latest GraalVM for a Java version. If you need a specific GraalVM then use JavaSpec(Distribution.GraalVM(graal), version)",
-    "0.4.6")
-  def graalvm(graal: String, version: String): JavaSpec =
-    JavaSpec(Distribution.GraalVM(graal), version)
-
-  sealed abstract class Distribution(val rendering: String) extends Product with Serializable {
-    private[gha] def isTlIndexed: Boolean = false
-  }
-
-  // marker for distributions in the typelevel jdk index
-  private[gha] sealed abstract class TlDistribution(rendering: String)
-      extends Distribution(rendering) {
-    override def isTlIndexed = true
-  }
+  sealed abstract class Distribution(val rendering: String) extends Product with Serializable
 
   object Distribution {
-    case object Temurin extends TlDistribution("temurin")
-    case object Corretto extends TlDistribution("corretto")
-    case object LatestGraalVM extends TlDistribution("graalvm")
-    case object OpenJ9 extends TlDistribution("openj9")
-    case object Oracle extends TlDistribution("oracle")
-
+    case object Temurin extends Distribution("temurin")
+    case object Corretto extends Distribution("corretto")
+    @deprecated("Use `semeru`", "0.5.0")
+    case object OpenJ9 extends Distribution("adopt-openj9")
+    case object Oracle extends Distribution("oracle")
     case object Zulu extends Distribution("zulu")
-    @deprecated("AdoptOpenJDK been transitioned to Adoptium Temurin", "0.4.6")
-    case object Adopt extends Distribution("adopt-hotspot")
     case object Liberica extends Distribution("liberica")
     final case class GraalVM(version: String) extends Distribution(version)
+    case object GraalVM extends Distribution("graalvm")
+    case object Semeru extends Distribution("semeru")
+    case object Microsoft extends Distribution("microsoft")
   }
 }

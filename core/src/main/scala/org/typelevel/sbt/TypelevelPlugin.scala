@@ -21,8 +21,6 @@ import org.typelevel.sbt.gha.GenerativePlugin
 import org.typelevel.sbt.gha.GitHubActionsPlugin
 import sbt._
 
-import scala.collection.immutable
-
 import Keys._
 
 /**
@@ -41,21 +39,17 @@ object TypelevelPlugin extends AutoPlugin {
   override def trigger = allRequirements
 
   object autoImport {
+    @deprecated("No longer has an effect. Use `tlFatalWarnings` instead.", "0.5.0")
     lazy val tlFatalWarningsInCi = settingKey[Boolean](
       "Convert compiler warnings into errors under CI builds (default: true)")
   }
 
-  import autoImport._
   import TypelevelKernelPlugin.mkCommand
   import TypelevelCiPlugin.autoImport._
   import TypelevelSettingsPlugin.autoImport._
   import TypelevelSonatypeCiReleasePlugin.autoImport._
   import GenerativePlugin.autoImport._
   import GitHubActionsPlugin.autoImport._
-
-  override def globalSettings = Seq(
-    tlFatalWarningsInCi := true
-  )
 
   override def buildSettings = Seq(
     organization := "org.typelevel",
@@ -68,52 +62,67 @@ object TypelevelPlugin extends AutoPlugin {
       }
     },
     startYear := Some(java.time.YearMonth.now().getYear()),
-    licenses += "Apache-2.0" -> url("https://www.apache.org/licenses/LICENSE-2.0.txt"),
+    licenses += License.Apache2,
     tlCiHeaderCheck := true,
     tlCiScalafmtCheck := true,
     tlCiReleaseBranches := Seq("main"),
-    Def.derive(tlFatalWarnings := (tlFatalWarningsInCi.value && githubIsWorkflowBuild.value)),
+    Def.derive(tlFatalWarnings := githubIsWorkflowBuild.value),
+    githubWorkflowJavaVersions := {
+      Seq(JavaSpec.temurin(tlJdkRelease.value.getOrElse(8).toString))
+    },
     githubWorkflowBuildMatrixExclusions ++= {
       val defaultScala = (ThisBuild / scalaVersion).value
       for {
-        scala <- githubWorkflowScalaVersions.value.filterNot(_ == defaultScala)
+        scala <- githubWorkflowScalaVersions.value.filterNot(defaultScala.startsWith(_))
         java <- githubWorkflowJavaVersions.value.tail // default java is head
       } yield MatrixExclude(Map("scala" -> scala, "java" -> java.render))
     }
-  ) ++ addCommandAlias(
-    "prePR",
-    mkCommand(
-      List(
-        "reload",
-        "project /",
-        "clean",
-        "githubWorkflowGenerate",
-        "headerCreateAll",
-        "scalafmtAll",
-        "scalafmtSbt",
-        "set ThisBuild / tlFatalWarnings := tlFatalWarningsInCi.value",
-        "Test / compile",
-        "reload"
-      )
-    )
-  ) ++ addCommandAlias(
-    "tlPrePrBotHook",
-    mkCommand(
-      List(
-        "githubWorkflowGenerate",
-        "+headerCreateAll",
-        "+scalafmtAll",
-        "scalafmtSbt"
-      )
-    )
+  ) ++ addPrePRCommandAlias ++ addTlPrePRBotHookCommandAlias
+
+  // partially re-implemnents addCommandAlias
+  // this is so we can use the value of other settings to generate command
+  private def addPrePRCommandAlias: Seq[Setting[_]] = Seq(
+    GlobalScope / onLoad := {
+      val header = tlCiHeaderCheck.value
+      val scalafmt = tlCiScalafmtCheck.value
+      val scalafix = tlCiScalafixCheck.value
+
+      (GlobalScope / Keys.onLoad).value.compose { (state: State) =>
+        val command = mkCommand(
+          List("project /", "githubWorkflowGenerate") ++
+            List("+headerCreateAll").filter(_ => header) ++
+            List("+scalafmtAll", "scalafmtSbt").filter(_ => scalafmt) ++
+            List("+scalafixAll").filter(_ => scalafix)
+        )
+        BasicCommands.addAlias(state, "prePR", command)
+      }
+    },
+    GlobalScope / Keys.onUnload := {
+      (GlobalScope / Keys.onUnload)
+        .value
+        .compose((state: State) => BasicCommands.removeAlias(state, "prePR"))
+    }
   )
 
-  // override for bincompat
-  override def projectSettings = immutable.Seq.empty
+  private def addTlPrePRBotHookCommandAlias: Seq[Setting[_]] = Seq(
+    GlobalScope / onLoad := {
+      val header = tlCiHeaderCheck.value
+      val scalafmt = tlCiScalafmtCheck.value
 
-  private val primaryJavaCond = Def.setting {
-    val java = githubWorkflowJavaVersions.value.head
-    s"matrix.java == '${java.render}'"
-  }
+      (GlobalScope / Keys.onLoad).value.compose { (state: State) =>
+        val command = mkCommand(
+          List("githubWorkflowGenerate") ++
+            List("+headerCreateAll").filter(_ => header) ++
+            List("+scalafmtAll", "scalafmtSbt").filter(_ => scalafmt)
+        )
+        BasicCommands.addAlias(state, "tlPrePrBotHook", command)
+      }
+    },
+    GlobalScope / Keys.onUnload := {
+      (GlobalScope / Keys.onUnload)
+        .value
+        .compose((state: State) => BasicCommands.removeAlias(state, "tlPrePrBotHook"))
+    }
+  )
 
 }

@@ -2,7 +2,7 @@
 
 ## How do I cut a release?
 
-Create a release on GitHub with a v-prefixed, semantically-versioned tag (or, tag a commit locally and push to GitHub). This will start a CI release. Example tags: `v0.4.2`, `v1.2.3`, `v1.0.0-M1`, `v1.2.0-RC2`. 
+Create a release on GitHub with a v-prefixed, semantically-versioned tag (or, tag a commit locally and push to GitHub). This will start a CI release. Example tags: `v0.4.2`, `v1.2.3`, `v1.0.0-M1`, `v1.2.0-RC2`.
 
 It is also possible to run the release process entirely locally by invoking the `tlRelease` command, assuming that you have correctly configured your PGP keys and Sonatype credentials.
 
@@ -44,7 +44,7 @@ You may also want to (globally) install the [sbt-rewarn](https://github.com/rtim
 If you are using **sbt-typelevel** fatal warnings are on by default in CI.
 
 ```scala
-ThisBuild / tlFatalWarningsInCi := false
+ThisBuild / tlFatalWarnings := false
 ```
 
 If you are only using **sbt-typelevel-ci-release**, you are completely in charge of your own `scalacOptions`, including fatal warnings.
@@ -87,22 +87,26 @@ val root = tlCrossRootProject
   .aggregate(core, io, node, scodec, protocols, reactiveStreams, benchmark)
 ```
 
-## How do I publish to `s01.oss.sonatype.org`?
+## How do I publish to `oss.sonatype.org` instead of `s01.oss.sonatype.org`?
+
+Note that `oss.sonatype.org` is the legacy host and there is an [open invitation to migrate to the new host](https://central.sonatype.org/news/20210223_new-users-on-s01/#why-are-we-doing-this).
+
 ```scala
-ThisBuild / tlSonatypeUseLegacyHost := false
+ThisBuild / tlSonatypeUseLegacyHost := true
 ```
 
 ## How do I publish a website like this one?
 
 Check out the [**sbt-typelevel-site**](site.md) plugin.
 
-## How do I manage my Scala.js version?
+## How do I manage my Scala.js and Scala Native versions?
 
-We recommend explicitly setting your Scala.js version in `project/plugins.sbt`.
+We recommend explicitly setting your Scala.js and Scala Native versions in `project/plugins.sbt`.
 
 ```scala
-addSbtPlugin("org.scala-js" % "sbt-scalajs" % "1.10.0")
+addSbtPlugin("org.scala-js" % "sbt-scalajs" % "@LATEST_SJS_VERSION@")
+addSbtPlugin("org.scala-native" % "sbt-scala-native" % "@LATEST_NATIVE_VERSION@")
 ```
 
-**sbt-typelevel** ships with a conservative Scala.js version to enable certain settings.
-If one of your dependencies requires a newer Scala.js version you may experience failures in the `scalaJSLink` CI step.
+**sbt-typelevel** ships with a conservative Scala.js and Scala Native version to enable certain settings.
+If one of your dependencies requires a newer version you may experience failures in the `scalaJSLink` or `nativeLink` CI steps.

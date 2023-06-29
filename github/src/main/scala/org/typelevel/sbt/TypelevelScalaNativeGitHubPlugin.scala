@@ -17,22 +17,20 @@
 package org.typelevel.sbt
 
 import com.github.sbt.git.SbtGit.git
-import org.scalajs.sbtplugin.ScalaJSPlugin
 import org.typelevel.sbt.kernel.GitHelper
 import sbt._
 
+import scala.scalanative.sbtplugin.ScalaNativePlugin
+
 import Keys._
 
-object TypelevelScalaJSGitHubPlugin extends AutoPlugin {
+object TypelevelScalaNativeGitHubPlugin extends AutoPlugin {
   override def trigger = allRequirements
-  override def requires = ScalaJSPlugin && TypelevelKernelPlugin
-
-  import TypelevelKernelPlugin.autoImport._
-  import ScalaJSPlugin.autoImport._
+  override def requires = ScalaNativePlugin && TypelevelKernelPlugin
 
   override def projectSettings = Seq(
     scalacOptions ++= {
-      val flag = if (tlIsScala3.value) "-scalajs-mapSourceURI:" else "-P:scalajs:mapSourceURI:"
+      val flag = "-P:scalanative:mapSourceURI:"
 
       val tagOrHash =
         GitHelper.getTagOrHash(git.gitCurrentTags.value, git.gitHeadCommit.value)
@@ -46,9 +44,6 @@ object TypelevelScalaJSGitHubPlugin extends AutoPlugin {
           s"$flag$l->$g"
         }
       }
-    },
-    scalaJSLinkerConfig := {
-      scalaJSLinkerConfig.value.withBatchMode(sys.env.get("GITHUB_ACTIONS").contains("true"))
     }
   )
 }

@@ -8,7 +8,7 @@ sbt-typelevel configures [sbt](https://www.scala-sbt.org/) for developing, testi
 - git-based dynamic versioning
 - Binary-compatibility checking with [MiMa](https://github.com/lightbend/mima), following [early semantic versioning](https://www.scala-lang.org/blog/2021/02/16/preventing-version-conflicts-with-versionscheme.html#early-semver-and-sbt-version-policy)
 - CI publishing of releases and snapshots to Sonatype/Maven
-- CI deployed GitHub pages websites, generated with [mdoc](https://github.com/scalameta/mdoc/) and [Laika](https://github.com/planet42/laika)
+- CI deployed GitHub pages websites, generated with [mdoc](https://github.com/scalameta/mdoc/) and [Laika](https://github.com/typelevel/Laika)
 - Auto-populated settings for various boilerplate (SCM info, API doc urls, Scala.js sourcemaps, etc.)
 
 ## Adopters
@@ -71,19 +71,19 @@ ThisBuild / tlBaseVersion := "0.4" // your current series x.y
 
 ThisBuild / organization := "org.typelevel"
 ThisBuild / organizationName := "Typelevel"
-ThisBuild / startYear := Some(2022)
+ThisBuild / startYear := Some(@START_YEAR@)
 ThisBuild / licenses := Seq(License.Apache2)
-ThisBuild / developers := List(
+ThisBuild / developers ++= List(
   // your GitHub handle and name
   tlGitHubDev("armanbilge", "Arman Bilge")
 )
 
-// true by default, set to false to publish to s01.oss.sonatype.org
-ThisBuild / tlSonatypeUseLegacyHost := true
+// false by default, set to true to publish to oss.sonatype.org
+ThisBuild / tlSonatypeUseLegacyHost := false
 
-val Scala213 = "2.13.8"
-ThisBuild / crossScalaVersions := Seq(Scala213, "3.1.1")
-ThisBuild / scalaVersion := Scala213 // the default Scala
+val Scala3 = "3.3.0"
+ThisBuild / crossScalaVersions := Seq("2.13.11", Scala3)
+ThisBuild / scalaVersion := Scala3 // the default Scala
 
 lazy val root = tlCrossRootProject.aggregate(core, heffalump, tests)
 
@@ -92,7 +92,7 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
   .settings(
     name := "woozle-core",
     description := "Core data types and typeclasses",
-    libraryDependencies += "org.typelevel" %%% "cats-core" % "2.7.0"
+    libraryDependencies += "org.typelevel" %%% "cats-core" % "2.9.0"
   )
 
 lazy val heffalump = project
@@ -110,7 +110,7 @@ lazy val tests = crossProject(JVMPlatform, JSPlatform)
   .dependsOn(core)
   .settings(
     name := "woozle-tests",
-    libraryDependencies += "org.scalacheck" %%% "scalacheck" % "1.15.4" % Test
+    libraryDependencies += "org.scalacheck" %%% "scalacheck" % "1.17.0" % Test
   )
 ```
 

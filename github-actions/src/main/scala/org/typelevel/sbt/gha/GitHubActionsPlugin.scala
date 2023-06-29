@@ -120,6 +120,11 @@ object GitHubActionsPlugin extends AutoPlugin {
     }
   }
 
+  private[typelevel] def appendtoStepSummary(summaryText: String) =
+    Option(System.getenv("GITHUB_STEP_SUMMARY")).map { summaryFile =>
+      IO.write(new File(summaryFile), summaryText, append = true)
+    }
+
   override def buildSettings = workflowParseSettings
 
   override def globalSettings = Seq(
