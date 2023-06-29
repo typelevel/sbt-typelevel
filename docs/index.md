@@ -31,6 +31,12 @@ sbt new typelevel/typelevel.g8
 This will guide you through the basic setup to create a new project with **sbt-typelevel** and **sbt-typelevel-site**.
 Check out the [typelevel.g8](https://github.com/typelevel/typelevel.g8) project for more details.
 
+Alternatively, if you don't want to use Giter8, you can add a file called: `.scalafmt.conf` to your project root directory with the contents:
+```scala
+version = "3.7.2"
+runner.dialect = Scala213Source3
+project.includePaths = [] # disables formatting
+```
 
 ### Plugins
 
@@ -117,6 +123,7 @@ lazy val tests = crossProject(JVMPlatform, JSPlatform)
 ### Configure GitHub Actions
 
 Run `githubWorkflowGenerate` in sbt to automatically generate the GitHub Actions workflows.
+You should commit to these to your repository.
 This will create a CI matrix parallelized on Scala version and target platform (JVM, JS, etc.) and includes steps for running tests and checking binary compatibility.
 It will also setup a job for publishing tagged releases e.g. `v0.4.5` and snapshots to Sonatype/Maven.
 
