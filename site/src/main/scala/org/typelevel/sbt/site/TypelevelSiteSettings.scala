@@ -22,6 +22,7 @@ import laika.ast.Span
 import laika.ast.TemplateString
 import laika.helium.Helium
 import laika.helium.config._
+import laika.theme.config.Color
 import org.typelevel.sbt.TypelevelGitHubPlugin.gitHubUserRepo
 import sbt.Def._
 import sbt.Keys.licenses
@@ -55,6 +56,23 @@ object TypelevelSiteSettings {
     Favicon.external("https://typelevel.org/img/favicon.png", "32x32", "image/png")
   )
 
+  // light theme colours
+  // Tl suffix indicates these are lifted directly from somewhere within the Typelevel site
+  val redTl = Color.hex("f8293a")
+  val brightRedTl = Color.hex("fe4559")
+  val coralTl = Color.hex("f86971")
+  val pinkTl = Color.hex("ffb4b5")
+  val whiteTl = Color.hex("ffffff")
+  val gunmetalTl = Color.hex("21303f")
+  val platinumTl = Color.hex("e6e8ea") // e2e4e6?
+  val offWhiteTl = Color.hex("f2f3f4")
+  // Extra colours to supplement
+  val lightPink = Color.hex("ffe7e7")
+  val lightPinkGrey = Color.hex("f7f3f3") // f6f0f0
+  val slateBlue = Color.hex("335C67")
+  val lightSlateBlue = Color.hex("ddeaed") // cce0e4
+  val softYellow = Color.hex("f9f5d9") // f3eab2
+
   val defaults: Initialize[Helium] = setting {
     GenericSiteSettings
       .defaults
@@ -74,6 +92,42 @@ object TypelevelSiteSettings {
       .topNavigationBar(
         homeLink = defaultHomeLink,
         navLinks = List(chatLink, mastodonLink)
+      )
+      .site
+      .themeColors(
+        primary = redTl,
+        secondary = slateBlue,
+        primaryMedium = coralTl,
+        primaryLight = lightPinkGrey,
+        text = gunmetalTl,
+        background = whiteTl,
+        bgGradient = (platinumTl, offWhiteTl)
+      )
+      .site
+      .messageColors(
+        info = slateBlue,
+        infoLight = lightSlateBlue,
+        warning = slateBlue,
+        warningLight = softYellow,
+        error = slateBlue,
+        errorLight = lightPink
+      )
+      .site
+      .syntaxHighlightingColors(
+        base = ColorQuintet(
+          gunmetalTl,
+          Color.hex("73a6ad"), // comments
+          Color.hex("b2adb4"), // ?
+          pinkTl, // identifier
+          platinumTl // base colour
+        ),
+        wheel = ColorQuintet(
+          Color.hex("8fa1c9"), // substitution, annotation
+          Color.hex("81e67b"), // keyword, escape-sequence
+          Color.hex("ffde6d"), // declaration name
+          Color.hex("759EB8"), // literals
+          coralTl // type/class name
+        )
       )
   }
 
