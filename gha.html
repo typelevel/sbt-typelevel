@@ -1,143 +1,156 @@
 <!DOCTYPE html>
 <html lang="en">
+  
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="generator" content="Laika 0.18.1 + Helium Theme" />
-    <title>sbt-typelevel-github-actions</title>
-    
-      <meta name="author" content="Arman Bilge"/>
-    
-      <meta name="author" content="Ross A. Baker"/>
-    
-      <meta name="author" content="Christopher Davenport"/>
-    
-      <meta name="author" content="Daniel Spiewak"/>
-    
-    
-      <meta name="description" content="docs"/>
-    
-    
-      <link rel="icon" sizes="32x32" type="image/png" href="https://typelevel.org/img/favicon.png"/>
-    
-    
-      <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700">
-    
-      <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Fira+Mono:500">
-    
-    <link rel="stylesheet" type="text/css" href="helium/icofont.min.css" />
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="generator" content="Typelevel Laika + Helium Theme" />
+  <title>sbt-typelevel-github-actions</title>
+  
+  <meta name="author" content="sbt-typelevel contributors"/>
+  
+  <meta name="author" content="Arman Bilge"/>
+  
+  <meta name="author" content="Ross A. Baker"/>
+  
+  <meta name="author" content="Christopher Davenport"/>
+  
+  <meta name="author" content="Daniel Spiewak"/>
+  
+  
+  <meta name="description" content="docs"/>
+  
+  
+  
+  <link rel="icon" sizes="32x32" type="image/png" href="https://typelevel.org/img/favicon.png"/>
+  
+  
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700">
+  
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Fira+Mono:500">
+  
+  <link rel="stylesheet" type="text/css" href="helium/icofont.min.css" />
     <link rel="stylesheet" type="text/css" href="helium/laika-helium.css" />
-    <link rel="stylesheet" type="text/css" href="site/styles.css" />
-    <script src="helium/laika-helium.js"></script>
-    
-    
-    <script> /* for avoiding page load transitions */ </script>
-  </head>
+  <script src="helium/laika-helium.js"></script>
+  
+  
+  <script> /* for avoiding page load transitions */ </script>
+</head>
 
   <body>
 
     <header id="top-bar">
 
-      <div class="row">
-        <a id="nav-icon">
-          <i class="icofont-laika" title="Navigation">&#xefa2;</i>
-        </a>
-        
-      </div>
+  <div class="row">
+    <a id="nav-icon">
+      <i class="icofont-laika navigationMenu" title="Navigation">&#xefa2;</i>
+    </a>
+    
+    
+  </div>
 
-      <a class="image-link" href="https://typelevel.org"><img src="https://typelevel.org/img/logo.svg"></a>
+  <a class="image-link" href="https://typelevel.org"><img src="https://typelevel.org/img/logo.svg"></a>
 
-      <span class="row links"><a class="icon-link svg-link" href="https://www.javadoc.io/doc/org.typelevel/sbt-typelevel-docs_2.12/0.4.21/org/typelevel/sbt/index.html"><span title="API"><svg class="svg-icon" width="100%" height="100%" viewBox="0 0 100 100" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+  <div class="row links">
+    
+    <a class="icon-link svg-link" href="https://www.javadoc.io/doc/org.typelevel/sbt-typelevel-docs_2.12/0.5.0-RC5/org/typelevel/sbt/index.html"><span class="api" title="API"><svg class="svg-icon" width="100%" height="100%" viewBox="0 0 100 100" version="1.1" xmlns="http://www.w3.org/2000/svg" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
   <g class="svg-shape">
     <path d="M75,47.5c13.246,0 24,10.754 24,24c0,13.246 -10.754,24 -24,24c-13.246,0 -24,-10.754 -24,-24c0,-13.246 10.754,-24 24,-24Zm-50,-0c13.246,-0 24,10.754 24,24c0,13.246 -10.754,24 -24,24c-13.246,-0 -24,-10.754 -24,-24c0,-13.246 10.754,-24 24,-24Zm2.705,16.735l7.239,0l0.622,-4.904l-21.833,0l-0,4.904l7.589,0l0,22.067l6.383,0l-0,-22.067Zm58.076,7.265c-0,-8.757 -3.698,-14.166 -10.781,-14.166c-7.083,-0 -10.781,5.604 -10.781,14.166c0,8.757 3.698,14.166 10.781,14.166c7.083,0 10.781,-5.604 10.781,-14.166Zm-6.539,0c0,6.538 -1.128,9.496 -4.242,9.496c-2.997,0 -4.242,-2.88 -4.242,-9.496c-0,-6.616 1.206,-9.496 4.242,-9.496c3.036,-0 4.242,2.88 4.242,9.496Zm-29.242,-67c13.246,0 24,10.754 24,24c0,13.246 -10.754,24 -24,24c-13.246,0 -24,-10.754 -24,-24c0,-13.246 10.754,-24 24,-24Zm0.512,9.834c-7.122,-0 -12.609,5.098 -12.609,14.127c-0,9.263 5.215,14.205 12.532,14.205c4.164,0 7.083,-1.634 9.068,-3.658l-2.88,-3.697c-1.518,1.206 -3.153,2.413 -5.838,2.413c-3.697,-0 -6.266,-2.763 -6.266,-9.263c-0,-6.616 2.724,-9.379 6.149,-9.379c2.102,-0 3.892,0.778 5.371,1.984l3.113,-3.775c-2.257,-1.868 -4.748,-2.957 -8.64,-2.957Z"/>
   </g>
-</svg></span></a><a class="icon-link svg-link" href="https://github.com/typelevel/sbt-typelevel"><span title="Source Code"><svg class="svg-icon" width="100%" height="100%" viewBox="0 0 100 100" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+</svg></span></a>
+    
+    <a class="icon-link svg-link" href="https://github.com/typelevel/sbt-typelevel"><span class="github" title="Source Code"><svg class="svg-icon" width="100%" height="100%" viewBox="0 0 100 100" version="1.1" xmlns="http://www.w3.org/2000/svg" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
   <g class="svg-shape">
     <path d="M49.995,1c-27.609,-0 -49.995,22.386 -49.995,50.002c-0,22.09 14.325,40.83 34.194,47.444c2.501,0.458 3.413,-1.086 3.413,-2.412c0,-1.185 -0.043,-4.331 -0.067,-8.503c-13.908,3.021 -16.843,-6.704 -16.843,-6.704c-2.274,-5.773 -5.552,-7.311 -5.552,-7.311c-4.54,-3.103 0.344,-3.042 0.344,-3.042c5.018,0.356 7.658,5.154 7.658,5.154c4.46,7.64 11.704,5.433 14.552,4.156c0.454,-3.232 1.744,-5.436 3.174,-6.685c-11.102,-1.262 -22.775,-5.553 -22.775,-24.713c-0,-5.457 1.949,-9.92 5.147,-13.416c-0.516,-1.265 -2.231,-6.348 0.488,-13.233c0,0 4.199,-1.344 13.751,5.126c3.988,-1.108 8.266,-1.663 12.518,-1.682c4.245,0.019 8.523,0.574 12.517,1.682c9.546,-6.47 13.736,-5.126 13.736,-5.126c2.728,6.885 1.013,11.968 0.497,13.233c3.204,3.496 5.141,7.959 5.141,13.416c0,19.209 -11.691,23.436 -22.83,24.673c1.795,1.544 3.394,4.595 3.394,9.26c0,6.682 -0.061,12.076 -0.061,13.715c0,1.338 0.899,2.894 3.438,2.406c19.853,-6.627 34.166,-25.354 34.166,-47.438c-0,-27.616 -22.389,-50.002 -50.005,-50.002"/>
   </g>
-</svg></span></a><a class="icon-link" href="https://discord.gg/XF3CXcMzqD"><i class="icofont-laika" title="Chat">&#xeed5;</i></a><a class="icon-link" href="https://fosstodon.org/@typelevel"><span class="mastodon" title="Mastodon"><svg class="svg-icon svg-link" width="100%" height="100%" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+</svg></span></a>
+    
+    <a class="icon-link glyph-link" href="https://discord.gg/XF3CXcMzqD"><i class="icofont-laika chat" title="Chat">&#xeed5;</i></a>
+    
+    <a class="icon-link svg-link" href="https://fosstodon.org/@typelevel"><span class="mastodon" title="Mastodon"><svg class="svg-icon" width="100%" height="100%" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg">
   <g class="svg-shape">
     <path d="M11.19 12.195c2.016-.24 3.77-1.475 3.99-2.603.348-1.778.32-4.339.32-4.339 0-3.47-2.286-4.488-2.286-4.488C12.062.238 10.083.017 8.027 0h-.05C5.92.017 3.942.238 2.79.765c0 0-2.285 1.017-2.285 4.488l-.002.662c-.004.64-.007 1.35.011 2.091.083 3.394.626 6.74 3.78 7.57 1.454.383 2.703.463 3.709.408 1.823-.1 2.847-.647 2.847-.647l-.06-1.317s-1.303.41-2.767.36c-1.45-.05-2.98-.156-3.215-1.928a3.614 3.614 0 0 1-.033-.496s1.424.346 3.228.428c1.103.05 2.137-.064 3.188-.189zm1.613-2.47H11.13v-4.08c0-.859-.364-1.295-1.091-1.295-.804 0-1.207.517-1.207 1.541v2.233H7.168V5.89c0-1.024-.403-1.541-1.207-1.541-.727 0-1.091.436-1.091 1.296v4.079H3.197V5.522c0-.859.22-1.541.66-2.046.456-.505 1.052-.764 1.793-.764.856 0 1.504.328 1.933.983L8 4.39l.417-.695c.429-.655 1.077-.983 1.934-.983.74 0 1.336.259 1.791.764.442.505.661 1.187.661 2.046v4.203z"/>
   </g>
-</svg>
-</span></a></span>
+</svg></span></a>
+    
+  </div>  
 
-    </header>
-
+</header>
+    
     <nav id="sidebar">
 
-      <div class="row">
-        <a class="icon-link svg-link" href="https://www.javadoc.io/doc/org.typelevel/sbt-typelevel-docs_2.12/0.4.21/org/typelevel/sbt/index.html"><span title="API"><svg class="svg-icon" width="100%" height="100%" viewBox="0 0 100 100" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+  <div class="row">
+    
+    <a class="icon-link svg-link" href="https://www.javadoc.io/doc/org.typelevel/sbt-typelevel-docs_2.12/0.5.0-RC5/org/typelevel/sbt/index.html"><span class="api" title="API"><svg class="svg-icon" width="100%" height="100%" viewBox="0 0 100 100" version="1.1" xmlns="http://www.w3.org/2000/svg" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
   <g class="svg-shape">
     <path d="M75,47.5c13.246,0 24,10.754 24,24c0,13.246 -10.754,24 -24,24c-13.246,0 -24,-10.754 -24,-24c0,-13.246 10.754,-24 24,-24Zm-50,-0c13.246,-0 24,10.754 24,24c0,13.246 -10.754,24 -24,24c-13.246,-0 -24,-10.754 -24,-24c0,-13.246 10.754,-24 24,-24Zm2.705,16.735l7.239,0l0.622,-4.904l-21.833,0l-0,4.904l7.589,0l0,22.067l6.383,0l-0,-22.067Zm58.076,7.265c-0,-8.757 -3.698,-14.166 -10.781,-14.166c-7.083,-0 -10.781,5.604 -10.781,14.166c0,8.757 3.698,14.166 10.781,14.166c7.083,0 10.781,-5.604 10.781,-14.166Zm-6.539,0c0,6.538 -1.128,9.496 -4.242,9.496c-2.997,0 -4.242,-2.88 -4.242,-9.496c-0,-6.616 1.206,-9.496 4.242,-9.496c3.036,-0 4.242,2.88 4.242,9.496Zm-29.242,-67c13.246,0 24,10.754 24,24c0,13.246 -10.754,24 -24,24c-13.246,0 -24,-10.754 -24,-24c0,-13.246 10.754,-24 24,-24Zm0.512,9.834c-7.122,-0 -12.609,5.098 -12.609,14.127c-0,9.263 5.215,14.205 12.532,14.205c4.164,0 7.083,-1.634 9.068,-3.658l-2.88,-3.697c-1.518,1.206 -3.153,2.413 -5.838,2.413c-3.697,-0 -6.266,-2.763 -6.266,-9.263c-0,-6.616 2.724,-9.379 6.149,-9.379c2.102,-0 3.892,0.778 5.371,1.984l3.113,-3.775c-2.257,-1.868 -4.748,-2.957 -8.64,-2.957Z"/>
   </g>
-</svg></span></a><a class="icon-link svg-link" href="https://github.com/typelevel/sbt-typelevel"><span title="Source Code"><svg class="svg-icon" width="100%" height="100%" viewBox="0 0 100 100" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+</svg></span></a>
+    
+    <a class="icon-link svg-link" href="https://github.com/typelevel/sbt-typelevel"><span class="github" title="Source Code"><svg class="svg-icon" width="100%" height="100%" viewBox="0 0 100 100" version="1.1" xmlns="http://www.w3.org/2000/svg" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
   <g class="svg-shape">
     <path d="M49.995,1c-27.609,-0 -49.995,22.386 -49.995,50.002c-0,22.09 14.325,40.83 34.194,47.444c2.501,0.458 3.413,-1.086 3.413,-2.412c0,-1.185 -0.043,-4.331 -0.067,-8.503c-13.908,3.021 -16.843,-6.704 -16.843,-6.704c-2.274,-5.773 -5.552,-7.311 -5.552,-7.311c-4.54,-3.103 0.344,-3.042 0.344,-3.042c5.018,0.356 7.658,5.154 7.658,5.154c4.46,7.64 11.704,5.433 14.552,4.156c0.454,-3.232 1.744,-5.436 3.174,-6.685c-11.102,-1.262 -22.775,-5.553 -22.775,-24.713c-0,-5.457 1.949,-9.92 5.147,-13.416c-0.516,-1.265 -2.231,-6.348 0.488,-13.233c0,0 4.199,-1.344 13.751,5.126c3.988,-1.108 8.266,-1.663 12.518,-1.682c4.245,0.019 8.523,0.574 12.517,1.682c9.546,-6.47 13.736,-5.126 13.736,-5.126c2.728,6.885 1.013,11.968 0.497,13.233c3.204,3.496 5.141,7.959 5.141,13.416c0,19.209 -11.691,23.436 -22.83,24.673c1.795,1.544 3.394,4.595 3.394,9.26c0,6.682 -0.061,12.076 -0.061,13.715c0,1.338 0.899,2.894 3.438,2.406c19.853,-6.627 34.166,-25.354 34.166,-47.438c-0,-27.616 -22.389,-50.002 -50.005,-50.002"/>
   </g>
-</svg></span></a><a class="icon-link" href="https://discord.gg/XF3CXcMzqD"><i class="icofont-laika" title="Chat">&#xeed5;</i></a><a class="icon-link" href="https://fosstodon.org/@typelevel"><span class="mastodon" title="Mastodon"><svg class="svg-icon svg-link" width="100%" height="100%" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+</svg></span></a>
+    
+    <a class="icon-link glyph-link" href="https://discord.gg/XF3CXcMzqD"><i class="icofont-laika chat" title="Chat">&#xeed5;</i></a>
+    
+    <a class="icon-link svg-link" href="https://fosstodon.org/@typelevel"><span class="mastodon" title="Mastodon"><svg class="svg-icon" width="100%" height="100%" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg">
   <g class="svg-shape">
     <path d="M11.19 12.195c2.016-.24 3.77-1.475 3.99-2.603.348-1.778.32-4.339.32-4.339 0-3.47-2.286-4.488-2.286-4.488C12.062.238 10.083.017 8.027 0h-.05C5.92.017 3.942.238 2.79.765c0 0-2.285 1.017-2.285 4.488l-.002.662c-.004.64-.007 1.35.011 2.091.083 3.394.626 6.74 3.78 7.57 1.454.383 2.703.463 3.709.408 1.823-.1 2.847-.647 2.847-.647l-.06-1.317s-1.303.41-2.767.36c-1.45-.05-2.98-.156-3.215-1.928a3.614 3.614 0 0 1-.033-.496s1.424.346 3.228.428c1.103.05 2.137-.064 3.188-.189zm1.613-2.47H11.13v-4.08c0-.859-.364-1.295-1.091-1.295-.804 0-1.207.517-1.207 1.541v2.233H7.168V5.89c0-1.024-.403-1.541-1.207-1.541-.727 0-1.091.436-1.091 1.296v4.079H3.197V5.522c0-.859.22-1.541.66-2.046.456-.505 1.052-.764 1.793-.764.856 0 1.504.328 1.933.983L8 4.39l.417-.695c.429-.655 1.077-.983 1.934-.983.74 0 1.336.259 1.791.764.442.505.661 1.187.661 2.046v4.203z"/>
   </g>
-</svg>
-</span></a>
-      </div>
+</svg></span></a>
+    
+  </div>
 
-      <ul class="nav-list">
-        <li class="level1"><a href="index.html">sbt-typelevel</a></li>
-        <li class="level1"><a href="site.html">sbt-typelevel-site</a></li>
-        <li class="level1 active"><a href="#">sbt-typelevel-github-actions</a></li>
-        <li class="level1"><a href="secrets.html">Secrets</a></li>
-        <li class="level1"><a href="faq.html">FAQ</a></li>
-        <li class="level1"><a href="customization.html">Customization</a></li>
-      </ul>
+  <ul class="nav-list">
+    <li class="level1 nav-leaf"><a href="index.html">sbt-typelevel</a></li>
+    <li class="level1 nav-leaf"><a href="site.html">sbt-typelevel-site</a></li>
+    <li class="level1 active nav-leaf"><a href="#">sbt-typelevel-github-actions</a></li>
+    <li class="level1 nav-leaf"><a href="secrets.html">Secrets</a></li>
+    <li class="level1 nav-leaf"><a href="faq.html">FAQ</a></li>
+    <li class="level1 nav-leaf"><a href="customization.html">Customization</a></li>
+    <li class="level1 nav-header">Related Projects</li>
+    <li class="level2 nav-leaf"><a href="https://github.com/typelevel/typelevel.g8">typelevel.g8</a></li>
+    <li class="level2 nav-leaf"><a href="https://www.scala-sbt.org/">sbt</a></li>
+    <li class="level2 nav-leaf"><a href="https://github.com/portable-scala/sbt-crossproject">sbt-crossproject</a></li>
+    <li class="level2 nav-leaf"><a href="https://github.com/lightbend/mima">MiMa</a></li>
+    <li class="level2 nav-leaf"><a href="https://scalameta.org/mdoc/">mdoc</a></li>
+    <li class="level2 nav-leaf"><a href="https://typelevel.org/Laika/">Laika</a></li>
+    <li class="level2 nav-leaf"><a href="https://github.com/sbt/sbt-unidoc">sbt-unidoc</a></li>
+    <li class="level2 nav-leaf"><a href="https://github.com/scalacenter/sbt-dependency-submission">sbt-dependency-submission</a></li>
+    <li class="level2 nav-leaf"><a href="https://github.com/scala-steward-org/scala-steward">Scala Steward</a></li>
+  </ul>
 
-      <ul class="nav-list">
-        <li class="level1 nav-header">Related Projects</li>
-        
-          <li class="level2"><a href="https://github.com/typelevel/typelevel.g8">typelevel.g8</a></li>
-        
-          <li class="level2"><a href="https://www.scala-sbt.org/">sbt</a></li>
-        
-          <li class="level2"><a href="https://github.com/portable-scala/sbt-crossproject">sbt-crossproject</a></li>
-        
-          <li class="level2"><a href="https://github.com/lightbend/mima">mima</a></li>
-        
-          <li class="level2"><a href="https://scalameta.org/mdoc/">mdoc</a></li>
-        
-          <li class="level2"><a href="https://typelevel.org/Laika/">Laika</a></li>
-        
-          <li class="level2"><a href="https://github.com/sbt/sbt-unidoc">sbt-unidoc</a></li>
-        
-      </ul>
-
-    </nav>
+</nav>
 
     <div id="container">
 
-      <nav id="page-nav">
-        <p class="header"><a href="#">sbt-typelevel-github-actions</a></p>
+      
+<nav id="page-nav">
+  <p class="header"><a href="#">sbt-typelevel-github-actions</a></p>
 
-        <ul class="nav-list">
-          <li class="level1"><a href="#usage">Usage</a></li>
-          <li class="level1"><a href="#general-plugin">General Plugin</a></li>
-          <li class="level1"><a href="#generative-plugin">Generative Plugin</a></li>
-          <li class="level1"><a href="#tasks">Tasks</a></li>
-          <li class="level2"><a href="#generative-1">Generative</a></li>
-          <li class="level1"><a href="#settings">Settings</a></li>
-          <li class="level2"><a href="#general-1">General</a></li>
-          <li class="level2"><a href="#generative-2">Generative</a></li>
-        </ul>
+  <ul class="nav-list">
+    <li class="level1 nav-leaf"><a href="#usage">Usage</a></li>
+    <li class="level1 nav-leaf"><a href="#general-plugin">General Plugin</a></li>
+    <li class="level1 nav-leaf"><a href="#generative-plugin">Generative Plugin</a></li>
+    <li class="level1 nav-node"><a href="#tasks">Tasks</a></li>
+    <li class="level2 nav-leaf"><a href="#generative-1">Generative</a></li>
+    <li class="level1 nav-node"><a href="#settings">Settings</a></li>
+    <li class="level2 nav-leaf"><a href="#general-1">General</a></li>
+    <li class="level2 nav-leaf"><a href="#generative-2">Generative</a></li>
+  </ul>
 
-        <p class="footer"></p>
-      </nav>
+  <p class="footer"></p>
+</nav>
+
 
       <main class="content">
 
         <h1 id="sbt-typelevel-github-actions" class="title">sbt-typelevel-github-actions</h1>
         <div class="callout info">
-          <i class="icofont-laika">&#xef4e;</i>
+          <i class="icofont-laika info">&#xef4e;</i>
           <p><strong>sbt-typelevel-github-actions</strong> is a mildly modified fork of <a href="https://github.com/djspiewak/sbt-github-actions">djspiewak/sbt-github-actions</a>. This page copies relevant portions of its README for ease of reference.</p>
           <p><strong>sbt-typelevel-github-actions</strong> is published as an independent plugin and is included by default in <strong>sbt-typelevel</strong> and <strong>sbt-typelevel-ci-release</strong>.</p>
         </div>
@@ -145,43 +158,43 @@
         <p>Note that the generative functionality is <em>optional</em> and doesn&#39;t need to be used if undesired.</p>
         <p>An example of how this &quot;source of truth&quot; pattern differs between the two plugins can be seen with <code>crossScalaVersions</code>. With sbt-travisci, the <code>crossScalaVersions</code> and <code>scalaVersion</code> settings are populated from the <code>scala:</code> key in <strong>.travis.yml</strong>. However, with sbt-github-actions, the <code>scala:</code> entry in the job <code>matrix:</code> is populated from the <code>ThisBuild / crossScalaVersions</code> key in your <strong>build.sbt</strong>.</p>
         
-        <h2 id="usage" class="section">Usage<a class="anchor-link right" href="#usage"><i class="icofont-laika">&#xef71;</i></a></h2>
+        <h2 id="usage" class="section"><a class="anchor-link left" href="#usage"><i class="icofont-laika link">&#xef71;</i></a>Usage</h2>
         <p>Add the following to your <code>plugins.sbt</code>:</p>
-        <pre class="keep-together pdf epub"><code class="nohighlight"><span class="identifier">addSbtPlugin</span><span>(</span><span class="string-literal">&quot;org.typelevel&quot;</span><span> % </span><span class="string-literal">&quot;sbt-typelevel-github-actions&quot;</span><span> % </span><span class="string-literal">&quot;0.4.21&quot;</span><span>)</span></code></pre>
+        <pre class="keep-together pdf epub"><code class="nohighlight"><span class="identifier">addSbtPlugin</span><span>(</span><span class="string-literal">&quot;org.typelevel&quot;</span><span> % </span><span class="string-literal">&quot;sbt-typelevel-github-actions&quot;</span><span> % </span><span class="string-literal">&quot;0.5.0-RC5&quot;</span><span>)</span></code></pre>
         <p>To use the generative functionality, run <code>sbt githubWorkflowGenerate</code> and <em>commit the results</em>. If your sbt build is ever changed such that the generated workflow is no longer in sync, the workflow run in GitHub Actions will begin failing and you will need to re-run this task (and commit the results).</p>
         
-        <h2 id="general-plugin" class="section">General Plugin<a class="anchor-link right" href="#general-plugin"><i class="icofont-laika">&#xef71;</i></a></h2>
+        <h2 id="general-plugin" class="section"><a class="anchor-link left" href="#general-plugin"><i class="icofont-laika link">&#xef71;</i></a>General Plugin</h2>
         <p>The <code>GitHubActionsPlugin</code> provides general functionality, giving builds the ability to introspect on their host workflow and whether or not they are running in GitHub Actions. This latter functionality, exposed by the <code>githubIsWorkflowBuild</code> global setting, is the most commonly used functionality of this plugin. If you need behavior within your build which is conditional on whether or not the build is running in CI, this is the setting you should branch on.</p>
         <p><code>githubWorkflowName</code> and <code>githubWorkflowDefinition</code> are designed to allow introspection on the <em>exact</em> definition of the workflow which is running the current build, if any. This kind of introspection is not common, but seems like it could be useful.</p>
         
-        <h2 id="generative-plugin" class="section">Generative Plugin<a class="anchor-link right" href="#generative-plugin"><i class="icofont-laika">&#xef71;</i></a></h2>
+        <h2 id="generative-plugin" class="section"><a class="anchor-link left" href="#generative-plugin"><i class="icofont-laika link">&#xef71;</i></a>Generative Plugin</h2>
         <p>As mentioned above, the <code>GenerativePlugin</code> is designed to make it easier to maintain GitHub Actions builds for sbt projects by generating <strong>ci.yml</strong> and <strong>clean.yml</strong> workflow definition files, and then forcibly failing the build if these files ever fall out of step with the build itself. The <strong>ci.yml</strong> workflow, by default, contains both <code>build</code> and <code>publish</code> jobs, though you will likely need to add extra steps to the <code>githubWorkflowPublishPreamble</code> and/or <code>githubWorkflowEnv</code> (e.g. decrypting and importing a GPG signing key) in order for publication to <em>actually</em> work.</p>
         <p>If a <code>publish</code> job is not desired, simply set <code>githubWorkflowPublishTargetBranches</code> to <code>Seq()</code>. By default, <code>publish</code> is restricted to run on <code>main</code>, and additional restrictions may be configured within the build.</p>
         <p>Ivy, sbt, and Coursier caching are all handled by the generated <strong>ci.yml</strong> by default, as well as standard things like Git checkout, Java setup (using the <a href="https://github.com/typelevel/jdk-index/">Typelevel JDK index</a>), and more. The matrix for the <code>build</code> job will be generated from <code>crossScalaVersions</code> and has additional support for multiple JVMs and OSes. Additionally, compiled artifacts are properly uploaded so that jobs which are dependent on <code>build</code> can avoid redundant work (most notably, <code>publish</code>). Thus, publication is guaranteed to be based on binary files that were generated <em>and</em> tested by the <code>build</code> job, rather than re-generated by <code>publish</code>.</p>
         <p><strong>clean.yml</strong> is generated based on a static description because it <em>should</em> just be the default in all GitHub Actions projects. This is basically a hack to work around the fact that artifacts produced by GitHub Actions workflows count against personal and organization storage limits, but those artifacts also are retained <em>indefinitely</em> up until 2 GB. This is entirely unnecessary and egregious, since artifacts are transient and only useful for passing state between jobs within the same workflow. To make matters more complicated, artifacts from a given workflow are invisible to the GitHub API until that workflow is finished, which is why <strong>clean.yml</strong> has to be a <em>separate</em> workflow rather than part of <strong>ci.yml</strong>. It runs on every push to the repository.</p>
         <p>This plugin is quite prescriptive in that it forcibly manages the contents of the <strong>ci.yml</strong> and <strong>clean.yml</strong> files. By default, <strong>ci.yml</strong> will contain a step which <em>verifies</em> that its contents (and the contents of <strong>clean.yml</strong>) correspond precisely to the most up-to-date generated version of themselves. If this is not the case, then the build is failed. However, there is no restriction in adding <em>other</em> workflows not named <strong>ci.yml</strong> or <strong>clean.yml</strong>. These will be ignored entirely by the plugin.</p>
         
-        <h2 id="tasks" class="section">Tasks<a class="anchor-link right" href="#tasks"><i class="icofont-laika">&#xef71;</i></a></h2>
+        <h2 id="tasks" class="section"><a class="anchor-link left" href="#tasks"><i class="icofont-laika link">&#xef71;</i></a>Tasks</h2>
         
-        <h3 id="generative-1" class="section">Generative<a class="anchor-link right" href="#generative-1"><i class="icofont-laika">&#xef71;</i></a></h3>
+        <h3 id="generative-1" class="section"><a class="anchor-link left" href="#generative-1"><i class="icofont-laika link">&#xef71;</i></a>Generative</h3>
         <ul>
           <li><code>githubWorkflowGenerate</code> – Generates (and overwrites if extant) <strong>ci.yml</strong> and <strong>clean.yml</strong> workflows according to configuration within sbt. The <strong>clean.yml</strong> workflow is something that GitHub Actions should just do by default: it removes old build artifacts to prevent them from running up your storage usage (it has no effect on currently running builds). This workflow is unconfigurable and is simply drawn from the static contents of the <strong>clean.yml</strong> resource file within this repository.</li>
           <li><code>githubWorkflowCheck</code> – Checks to see if the <strong>ci.yml</strong> and <strong>clean.yml</strong> files are equivalent to what would be generated and errors if otherwise. This task is run from within the generated <strong>ci.yml</strong> to ensure that the build and the workflow are kept in sync. As a general rule, any time you change the workflow configuration within sbt, you should regenerate the <strong>ci.yml</strong> and commit the results, but inevitably people forget. This check fails the build if that happens. Note that if you <em>need</em> to manually fiddle with the <strong>ci.yml</strong> contents, for whatever reason, you will need to remove the call to this check from within the workflow, otherwise your build will simply fail.</li>
         </ul>
         
-        <h2 id="settings" class="section">Settings<a class="anchor-link right" href="#settings"><i class="icofont-laika">&#xef71;</i></a></h2>
+        <h2 id="settings" class="section"><a class="anchor-link left" href="#settings"><i class="icofont-laika link">&#xef71;</i></a>Settings</h2>
         
-        <h3 id="general-1" class="section">General<a class="anchor-link right" href="#general-1"><i class="icofont-laika">&#xef71;</i></a></h3>
+        <h3 id="general-1" class="section"><a class="anchor-link left" href="#general-1"><i class="icofont-laika link">&#xef71;</i></a>General</h3>
         <ul>
           <li><code>githubIsWorkflowBuild</code> : <code>Boolean</code> – Indicates whether or not the build is currently running within a GitHub Actions Workflow</li>
           <li><code>githubWorkflowName</code> : <code>String</code> – The name of the currently-running workflow. Will be undefined if not running in GitHub Actions.</li>
           <li><code>githubWorkflowDefinition</code> : <code>Map[String, Any]</code> – The raw (parsed) contents of the workflow YAML definition. Will be undefined if not running in GitHub Actions, or if (for some reason) the workflow could not be identified. Workflows are located by taking the <code>githubWorkflowName</code> and finding the YAML definition which has the corresponding <code>name:</code> key/value pair.</li>
         </ul>
         
-        <h3 id="generative-2" class="section">Generative<a class="anchor-link right" href="#generative-2"><i class="icofont-laika">&#xef71;</i></a></h3>
+        <h3 id="generative-2" class="section"><a class="anchor-link left" href="#generative-2"><i class="icofont-laika link">&#xef71;</i></a>Generative</h3>
         <p>Any and all settings which affect the behavior of the generative plugin should be set in the <code>ThisBuild</code> scope (for example, <code>ThisBuild / crossScalaVersions :=</code> rather than just <code>crossScalaVersions :=</code>). This is important because GitHub Actions workflows are global across the entire build, regardless of how individual projects are configured. A corollary of this is that it is not possible (yet) to have specific subprojects which build with different Scala versions, Java versions, or OSes. This is theoretically possible but it&#39;s very complicated. For now, I&#39;m going to be lazy and wait for someone to say &quot;pretty please&quot; before implementing it.</p>
         
-        <h4 id="general-2" class="section">General<a class="anchor-link right" href="#general-2"><i class="icofont-laika">&#xef71;</i></a></h4>
+        <h4 id="general-2" class="section"><a class="anchor-link left" href="#general-2"><i class="icofont-laika link">&#xef71;</i></a>General</h4>
         <ul>
           <li><code>githubWorkflowGeneratedCI</code> : <code>Seq[WorkflowJob]</code> — Contains a description of the <strong>ci.yml</strong> jobs that will drive the generation if used. This setting can be overridden to customize the jobs (e.g. by adding additional jobs to the workflow).</li>
           <li><code>githubWorkflowGeneratedUploadSteps</code> : <code>Seq[WorkflowStep]</code> – Contains a list of steps which are used to upload generated intermediate artifacts from the <code>build</code> job. This is mostly for reference and introspection purposes; one would not be expected to <em>change</em> this setting.</li>
@@ -199,9 +212,10 @@
           <li><code>githubWorkflowJobSetup</code> : <code>Seq[WorkflowStep]</code> – The automatically-generated checkout, setup, and cache steps which are common to all jobs which touch the build (default: autogenerated)</li>
           <li><code>githubWorkflowEnv</code> : <code>Map[String, String]</code> – An environment which is global to the entire <strong>ci.yml</strong> workflow. Defaults to <code>Map(&quot;GITHUB_TOKEN&quot; -&gt; &quot;${{ secrets.GITHUB_TOKEN }}&quot;)</code> since it&#39;s so commonly needed.</li>
           <li><code>githubWorkflowAddedJobs</code> : <code>Seq[WorkflowJob]</code> – A convenience mechanism for adding extra custom jobs to the <strong>ci.yml</strong> workflow (though you can also do this by modifying <code>githubWorkflowGeneratedCI</code>). Defaults to empty.</li>
+          <li><code>githubWorkflowConcurrency</code> : <code>Option[Concurrency]</code> - Use concurrency to ensure that only a single workflow within the same concurrency group will run at a time. Defaults to <code>${{ github.workflow }} @ ${{ github.ref }}</code>.</li>
         </ul>
         
-        <h4 id="build-job" class="section"><code>build</code> Job<a class="anchor-link right" href="#build-job"><i class="icofont-laika">&#xef71;</i></a></h4>
+        <h4 id="build-job" class="section"><a class="anchor-link left" href="#build-job"><i class="icofont-laika link">&#xef71;</i></a><code>build</code> Job</h4>
         <ul>
           <li><code>githubWorkflowBuildMatrixFailFast</code> : <code>Option[Boolean]</code> – Whether or not to enable the <code>fail-fast</code> strategy for the <code>build</code> job. By default, no strategy option is written to the build configuration (<code>None</code>), which means that the <code>fail-fast</code> strategy <em>is</em> used.</li>
           <li><code>githubWorkflowBuildMatrixAdditions</code> : <code>Map[String, List[String]]</code> – Contains a map of additional <code>matrix:</code> dimensions which will be added to the <code>build</code> job (on top of the auto-generated ones for Scala/Java/JVM version). As an example, this can be used to manually achieve additional matrix expansion for ScalaJS compilation. Matrix variables can be referenced in the conventional way within steps by using the <code>${{ matrix.keynamehere }}</code> syntax. Defaults to empty.</li>
@@ -214,25 +228,30 @@
           <li><code>githubWorkflowScalaVersions</code> : <code>Seq[String]</code> – A list of Scala versions which will be used to <code>build</code> your project. Defaults to <code>crossScalaVersions</code> in <code>build</code>, and simply <code>scalaVersion</code> in <code>publish</code>.</li>
           <li><code>githubWorkflowOSes</code> : <code>Seq[String]</code> – A list of operating systems, which will be ultimately passed to <a href="https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idruns-on">the <code>runs-on:</code> directive</a>, on which to <code>build</code> your project. Defaults to <code>ubuntu-latest</code>. Note that, regardless of the value of this setting, only <code>ubuntu-latest</code> will be used for the <code>publish</code> job. This setting only affects <code>build</code>.</li>
           <li><code>githubWorkflowBuildRunsOnExtraLabels</code> : <code>Seq[String]</code> - A list of additional runs-on labels, which will be combined with the matrix.os from <code>githubWorkflowOSes</code> above allowing for singling out more specific runners.</li>
+          <li><code>githubWorkflowBuildTimeoutMinutes</code> : <code>Option[Int]</code> - The maximum number of minutes to let the build job run before GitHub automatically cancels it. Defaults to 60 minutes.</li>
         </ul>
         
-        <h4 id="publish-job" class="section"><code>publish</code> Job<a class="anchor-link right" href="#publish-job"><i class="icofont-laika">&#xef71;</i></a></h4>
+        <h4 id="publish-job" class="section"><a class="anchor-link left" href="#publish-job"><i class="icofont-laika link">&#xef71;</i></a><code>publish</code> Job</h4>
         <ul>
           <li><code>githubWorkflowPublishPreamble</code> : <code>Seq[WorkflowStep]</code> – Similar to <code>githubWorkflowBuildPreamble</code>, this contains a series of steps which will be inserted into the <code>publish</code> job <em>after</em> setup but <em>before</em> the publication step. Defaults to empty.</li>
           <li><code>githubWorkflowPublishPostamble</code> : <code>Seq[WorkflowStep]</code> – Similar to the <code>Preamble</code> variant, this contains a series of steps which will be inserted into the <code>publish</code> job after publication has completed, but before cleanup. Defaults to empty.</li>
           <li><code>githubWorkflowPublish</code> : <code>Seq[WorkflowStep]</code> – The steps which will be invoked to publish your project. This defaults to <code>[sbt +publish]</code>.</li>
-          <li><code>githubWorkflowPublishTargetBranches</code> : <code>Seq[RefPredicate]</code> – A list of branch predicates which will be applied to determine whether the <code>publish</code> job will run. Defaults to just <code>== main</code>. The supports all of the predicate types currently <a href="https://help.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions#functions">allowed by GitHub Actions</a>. This exists because, while you usually want to run the <code>build</code> job on <em>every</em> branch, <code>publish</code> is obviously much more limited in applicability. If this list is empty, then the <code>publish</code> job will be omitted entirely from the workflow.</li>
+          <li><code>githubWorkflowPublishTargetBranches</code> : <code>Seq[RefPredicate]</code> – A list of branch predicates which will be applied to determine whether the <code>publish</code> job will run. Defaults to just <code>== main</code>. The setting supports all of the predicate types currently <a href="https://help.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions#functions">allowed by GitHub Actions</a>. This exists because, while you usually want to run the <code>build</code> job on <em>every</em> branch, <code>publish</code> is obviously much more limited in applicability. If this list is empty, then the <code>publish</code> job will be omitted entirely from the workflow.</li>
           <li><code>githubWorkflowPublishCond</code> : <code>Option[String]</code> – This is an optional added conditional check on the publish branch, which must be defined using <a href="https://help.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions#about-contexts-and-expressions">GitHub Actions expression syntax</a>, which will be conjoined to determine the <code>if:</code> predicate on the <code>publish</code> job. Defaults to <code>None</code>.</li>
+          <li><code>githubWorkflowPublishTimeoutMinutes</code> : <code>Option[Int]</code> - The maximum number of minutes to let the publish job run before GitHub automatically cancels it. Defaults to empty.</li>
         </ul>
 
-        <hr style="margin-top: 30px"/>
-        <footer style="font-size: 90%; text-align: center">
-          sbt-typelevel is a <a href="https://typelevel.org/">Typelevel</a> project distributed under the <a href="https://www.apache.org/licenses/LICENSE-2.0.txt">Apache-2.0</a> license.
-        </footer>
+        
+<hr class="footer-rule"/>
+<footer>
+  sbt-typelevel is a <a href="https://typelevel.org/">Typelevel</a> project distributed under the <a href="https://www.apache.org/licenses/LICENSE-2.0.txt">Apache-2.0</a> license.
+</footer>
+
 
       </main>
 
     </div>
 
   </body>
+
 </html>

@@ -1,14 +1,20 @@
 digraph {
 
+  cross[label="sbt-crossproject"]
+  fix[label="sbt-scalafix"]
   fmt[label="sbt-scalafmt"]
-  gha[label="sbt-github-actions"]
   git[label="sbt-git"]
   gpg[label="sbt-gpg"]
   header[label="sbt-header"]
+  laika[label="laika-sbt"]
+  mdoc[label="sbt-mdoc"]
   mima[label="sbt-mima-plugin"]
+  sn[label="sbt-scala-native"]
+  sncp[label="sbt-scala-native-crossproject"]
   sonatype[label="sbt-sonatype"]
   sjs[label="sbt-scalajs"]
   sjscp[label="sbt-scalajs-crossproject"]
+  unidoc[label="sbt-unidoc"]
 
   node[color="#FF4C61"];
 
@@ -19,11 +25,13 @@ digraph {
   tlsettings[label="sbt-typelevel-settings"];
   tlsettings -> tlkernel;
   tlsettings -> git;
+  tlsettings -> cross;
 
   tlgithub[label="sbt-typelevel-github"];
   tlgithub -> tlkernel;
   tlgithub -> git;
   tlgithub -> sjs;
+  tlgithub -> sn;
 
   tlversioning[label="sbt-typelevel-versioning"];
   tlversioning -> tlkernel;
@@ -37,19 +45,36 @@ digraph {
   tlsonatype -> tlkernel;
   tlsonatype -> sonatype;
   tlsonatype -> mima;
+  tlsonatype -> unidoc;
+
+  tlgha[label="sbt-typelevel-github-actions"]
 
   tlcisigning[label="sbt-typelevel-ci-signing"];
-  tlcisigning -> gha;
+  tlcisigning -> tlgha;
   tlcisigning -> gpg;
 
   tlsonatypecirelease[label="sbt-typelevel-sonatype-ci-release"];
   tlsonatypecirelease -> tlsonatype;
-  tlsonatypecirelease -> gha;
+  tlsonatypecirelease -> tlgha;
 
   tlci[label="sbt-typelevel-ci"];
   tlci -> tlkernel;
   tlci -> tlnopub;
-  tlci -> gha;
+  tlci -> tlgha;
+
+  tlfix[label="sbt-typelevel-scalafix"];
+  tlfix -> fix;
+
+  tlmergify[label="sbt-typelevel-mergify"];
+  tlmergify -> tlgha;
+
+  tlsite[label="sbt-typelevel-site"];
+  tlsite -> tlkernel;
+  tlsite -> tlgithub;
+  tlsite -> tlgha;
+  tlsite -> tlnopub;
+  tlsite -> mdoc;
+  tlsite -> laika;
 
   node[shape="box"];
 
@@ -60,6 +85,7 @@ digraph {
   tlcirelease -> tlmima;
   tlcirelease -> tlsonatypecirelease;
   tlcirelease -> tlcisigning;
+  tlcirelease -> tlnopub;
 
   tl[label="sbt-typelevel"];
   tl -> tlsettings;
@@ -67,4 +93,5 @@ digraph {
   tl -> fmt;
   tl -> header;
   tl -> sjscp;
+  tl -> sncp;
 }

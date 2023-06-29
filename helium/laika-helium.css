@@ -1,37 +1,37 @@
 :root {
-  --primary-color: #007c99;
-  --primary-light: #ebf6f7;
-  --primary-medium: #a7d4de;
-  --secondary-color: #931813;
-  --text-color: #5f5f5f;
+  --primary-color: #f8293a;
+  --primary-light: #f7f3f3;
+  --primary-medium: #f86971;
+  --secondary-color: #335C67;
+  --text-color: #21303f;
   --bg-color: #ffffff;
-  --gradient-top: #095269;
-  --gradient-bottom: #007c99;
+  --gradient-top: #e6e8ea;
+  --gradient-bottom: #f2f3f4;
   --top-color: var(--primary-color);
   --top-bg: var(--primary-light);
   --top-hover: var(--secondary-color);
   --top-border: var(--primary-medium);
-  --messages-info: #007c99;
-  --messages-info-light: #ebf6f7;
-  --messages-warning: #b1a400;
-  --messages-warning-light: #fcfacd;
-  --messages-error: #d83030;
-  --messages-error-light: #ffe9e3;
-  --syntax-base1: #2a3236;
-  --syntax-base2: #8c878e;
+  --messages-info: #335C67;
+  --messages-info-light: #ddeaed;
+  --messages-warning: #335C67;
+  --messages-warning-light: #f9f5d9;
+  --messages-error: #335C67;
+  --messages-error-light: #ffe7e7;
+  --syntax-base1: #21303f;
+  --syntax-base2: #73a6ad;
   --syntax-base3: #b2adb4;
-  --syntax-base4: #bddcee;
-  --syntax-base5: #e8e8e8;
-  --syntax-wheel1: #e28e93;
-  --syntax-wheel2: #ef9725;
-  --syntax-wheel3: #ffc66d;
-  --syntax-wheel4: #7fb971;
-  --syntax-wheel5: #4dbed4;
+  --syntax-base4: #ffb4b5;
+  --syntax-base5: #e6e8ea;
+  --syntax-wheel1: #8fa1c9;
+  --syntax-wheel2: #81e67b;
+  --syntax-wheel3: #ffde6d;
+  --syntax-wheel4: #759EB8;
+  --syntax-wheel5: #f86971;
   --body-font: "Lato", sans-serif;
   --header-font: "Lato", sans-serif;
   --code-font: "Fira Mono", monospace;
   --body-font-size: 15px;
-  --code-font-size: 14px;
+  --code-font-size: 0.9em;
   --small-font-size: 12px;
   --title-font-size: 34px;
   --header2-font-size: 28px;
@@ -99,6 +99,8 @@ main.content {
 @media (min-width: 1450px) {
   main.content {
     max-width: 1125px;
+  }
+  #page-nav + main.content {
     padding: 15px 310px 15px 45px;
   }
 }
@@ -379,6 +381,16 @@ a:hover .svg-shape {
   fill: var(--secondary-color);
 }
 
+/* footer ========================================== */
+
+.footer-rule {
+  margin-top: 30px;
+}
+footer {
+  font-size: 0.9em;
+  text-align: center;
+}
+
 /* other =========================================== */
 
 blockquote {
@@ -431,10 +443,18 @@ header a:hover, nav .row a:hover {
   cursor: pointer;
   color: var(--top-hover)
 }
-header img, nav .row img {
-  height: 80%;
+
+header .image-link {
+  height: var(--top-bar-height);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+header img {
+  max-height: calc(var(--top-bar-height) - 10px);
   width: auto;
 }
+
 header .row a, nav .row a {
   margin: 0 0 0 20px;
 }
@@ -469,7 +489,7 @@ nav .row {
   bottom: 2px;
 }
 
-.button-link {
+.button-link, #header-left .menu-toggle {
   position: relative;
   bottom: 2px;
   display: inline-block;
@@ -484,30 +504,30 @@ nav .row {
   color: var(--top-bg);
 }
 
-/* version dropdown ============================================== */
+/* menus =================================================== */
 
-.drop-down-toggle:after {
+.menu-toggle:after {
   display: inline-block;
   width: 0;
   height: 0;
   content: "";
-  margin-left: 0.2em;
+  margin-left: 0.5em;
   margin-bottom: 0.1em;
   border-left: 8px solid transparent;
   border-right: 8px solid transparent;
   border-top: 8px solid var(--primary-color);
 }
 
-.drop-down-toggle:hover:after {
+.menu-toggle:hover:after {
   border-top: 8px solid var(--secondary-color);
 }
 
-#version-menu-container {
+.menu-container {
   position: relative;
   display: inline-block;
 }
 
-#version-menu {
+.menu-content {
   display: none;
   position: absolute;
   z-index: 5000;
@@ -519,22 +539,25 @@ nav .row {
   white-space: nowrap;
 }
 
-#version-menu ul.nav-list {
+.menu-content ul.nav-list {
   padding-top: 5px;
   padding-bottom: 5px;
   margin: 0;
 }
-#version-menu .nav-list li {
+.menu-content .nav-list li {
   margin-left: 0;
   margin-bottom: 2px;
 }
-#version-menu .nav-list li a {
+.menu-content .nav-list li a {
   margin: 0;
   line-height: 1.2;
 }
-#version-menu.versions-open {
+.menu-content.menu-open {
   display: block;
 }
+
+/* version menu =================================================== */
+
 .left-column {
   display: inline-block;
   width: 3.5em;
@@ -555,6 +578,25 @@ nav .row {
 .version-label.dev, .version-label.development, .version-label.milestone {
   background-color: yellow;
   color: black;
+}
+
+/* navigation lists - common styles (menus, main nav, page nav) ==== */
+
+.nav-list {
+  font-size: var(--body-font-size);
+}
+
+.nav-list li {
+  margin-left: 10px;
+  margin-bottom: 2px;
+  line-height: 1.1;
+}
+
+.nav-list li a {
+  display: block;
+  padding: 3px 15px 4px 15px;
+  color: var(--primary-color);
+  font-weight: normal;
 }
 
 /* left navigation bar =========================================== */
@@ -588,14 +630,54 @@ nav .row {
   margin-bottom: 15px;
 }
 
-.nav-list li.nav-header {
-  font-size: var(--body-font-size);
+#sidebar ul.nav-list {
+  padding-top: 10px;
+  padding-bottom: 15px;
+  margin: 0 0 0 15px;
+}
+
+#sidebar .nav-list li.level1 {
+  margin-left: -5px;
+  padding: 1px 0;
+  font-size: 1.1em;
+}
+
+#sidebar .nav-list li.level1.nav-node {
+  margin-bottom: 5px;
+  border-bottom: 2px solid var(--secondary-color);
+}
+
+#sidebar .nav-list li.level1 a {
+  margin-left: 0;
+  padding: 3px 15px 4px 15px;
+}
+
+#sidebar .nav-list li.level1.nav-node a {
+  padding-bottom: 1px;
+}
+
+#sidebar .nav-list li.nav-header {
   color: var(--secondary-color);
   display: block;
   padding: 3px 15px;
   font-weight: bold;
   text-transform: uppercase;
   margin-left: -5px;
+  font-size: 1em;
+}
+#sidebar .nav-list li.level1.nav-header { /* for higher specificity */
+  padding: 3px 15px;
+}
+
+#sidebar .nav-list li.nav-header.level2 {
+  margin-left: 10px;
+  margin-top: 5px;
+  font-size: 0.9em;
+}
+
+#sidebar .nav-list .level3 {
+  margin-left: 18px;
+  font-size: 0.9em;
 }
 
 /* right page navigation =========================================== */
@@ -613,8 +695,8 @@ ul.nav-list, #page-nav ul {
   margin: 12px;
 }
 #page-nav .level3 {
-  margin-left: 18px;
-  font-size: var(--code-font-size);
+  margin-left: 24px;
+  font-size: 0.9em;
 }
 #page-nav a {
   display: block;
@@ -632,11 +714,6 @@ ul.nav-list, #page-nav ul {
   border-top: 1px solid var(--primary-medium);
 }
 
-ul.nav-list {
-  padding-top: 10px;
-  padding-bottom: 15px;
-  margin: 0 0 0 15px;
-}
 #page-nav ul.nav-list {
   padding: 0;
   margin: 12px;
@@ -646,20 +723,14 @@ ul.nav-list {
   line-height: 1.5;
 }
 #page-nav .nav-list .level1 {
-  font-size: var(--body-font-size);
+  font-size: 1em;
 }
 #page-nav .nav-list .level2 {
   margin-left: 18px;
-  font-size: var(--code-font-size);
+  font-size: 0.9em;
 }
 #page-nav .nav-list li a {
   padding: 0;
-}
-.nav-list li {
-  margin-left: 10px;
-  margin-bottom: 2px;
-  line-height: 1.1;
-  font-size: var(--body-font-size);
 }
 
 #page-nav li a:hover,
@@ -667,12 +738,7 @@ ul.nav-list {
   background-color: rgba(0, 0, 0, 0.03);
   text-decoration: none;
 }
-.nav-list li a {
-  display: block;
-  padding: 3px 15px 4px 15px;
-  color: var(--primary-color);
-  font-weight: normal;
-}
+
 .nav-list .active a,
 .nav-list .active a:hover,
 #page-nav .header a,
@@ -706,11 +772,22 @@ ul.nav-list {
     display: inline-block;
   }
 }
+@media (max-width: 1450px) {
+  #page-nav.all-screens {
+    display: block;
+    position: static;
+    width: 100%;
+    max-width: var(--content-width);
+    background-color: transparent;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 75px 45px 10px 45px;
+  }
+}
 
 .icofont-laika {
   font-size: 1.75em;
 }
-
 
 pre {
   display: block;
@@ -718,8 +795,7 @@ pre {
   border-radius: 5px;
   padding: 12px 9px 9px 15px;
   margin: 0 0 var(--block-spacing);
-  font-size: var(--code-font-size);
-  line-height: 21px;
+  line-height: 1.4;
   word-break: break-all;
   word-wrap: break-word;
   white-space: pre-wrap;
@@ -733,7 +809,6 @@ code {
   padding: 0 0.1em;
 }
 pre code {
-  font-size: var(--code-font-size);
   color: var(--syntax-base5);
   background-color: transparent;
   padding: 0;
