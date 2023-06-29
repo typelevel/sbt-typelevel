@@ -69,6 +69,7 @@ object TypelevelSiteSettings {
   // Extra colours to supplement
   val lightPink = Color.hex("ffe7e7")
   val lightPinkGrey = Color.hex("f7f3f3") // f6f0f0
+  val lightPinkGreyButDarker = Color.hex("efe7e7")
   val slateBlue = Color.hex("335C67")
   val lightSlateBlue = Color.hex("ddeaed") // cce0e4
   val softYellow = Color.hex("f9f5d9") // f3eab2
@@ -97,11 +98,11 @@ object TypelevelSiteSettings {
       .themeColors(
         primary = redTl,
         secondary = slateBlue,
-        primaryMedium = coralTl,
+        primaryMedium = brightRedTl,
         primaryLight = lightPinkGrey,
         text = gunmetalTl,
         background = whiteTl,
-        bgGradient = (platinumTl, offWhiteTl)
+        bgGradient = (lightPinkGreyButDarker, lightPinkGrey)
       )
       .site
       .messageColors(
