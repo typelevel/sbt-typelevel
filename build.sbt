@@ -1,7 +1,6 @@
 name := "sbt-typelevel"
 
 ThisBuild / tlBaseVersion := "0.5"
-ThisBuild / tlSitePublishBranch := Some("series/0.4")
 ThisBuild / crossScalaVersions := Seq("2.12.18")
 ThisBuild / developers ++= List(
   tlGitHubDev("armanbilge", "Arman Bilge"),
