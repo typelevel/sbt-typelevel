@@ -205,23 +205,23 @@ jobs:
       - name: Make target directories
         if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/feature/site-artifact')
         shell: bash
-        run: mkdir -p github/target github-actions/target kernel/target versioning/target ci-release/target scalafix/target mdocs/target site/target ci-signing/target mergify/target unidoc/target mima/target no-publish/target sonatype/target ci/target sonatype-ci-release/target core/target settings/target project/target
+        run: mkdir -p github/target github-actions/target kernel/target versioning/target ci-release/target scalafix/target site/target ci-signing/target mergify/target unidoc/target mima/target site-ci-release/target no-publish/target sonatype/target ci/target sonatype-ci-release/target core/target settings/target project/target
 
       - name: Compress target directories
         if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/feature/site-artifact')
         shell: bash
-        run: tar cf targets.tar github/target github-actions/target kernel/target versioning/target ci-release/target scalafix/target mdocs/target site/target ci-signing/target mergify/target unidoc/target mima/target no-publish/target sonatype/target ci/target sonatype-ci-release/target core/target settings/target project/target
+        run: tar cf targets.tar github/target github-actions/target kernel/target versioning/target ci-release/target scalafix/target site/target ci-signing/target mergify/target unidoc/target mima/target site-ci-release/target no-publish/target sonatype/target ci/target sonatype-ci-release/target core/target settings/target project/target
 
       - name: Upload target directories
         if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/feature/site-artifact')
         uses: actions/upload-artifact@v3
         with:
-          name: target-${{ matrix.os }}-${{ matrix.java }}-${{ matrix.scala }}-${{ matrix.project }}
+          name: ${{ matrix.os }}-${{ matrix.java }}-${{ matrix.scala }}-${{ matrix.project }}
           path: targets.tar
 
   publish:
     name: Publish Artifacts
-    needs: [build]
+    needs: [build, site]
     if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/feature/site-artifact')
     strategy:
       matrix:
@@ -336,6 +336,16 @@ jobs:
           name: target-${{ matrix.os }}-${{ matrix.java }}-2.12-sbt-typelevelJVM
 
       - name: Inflate target directories (2.12, sbt-typelevelJVM)
+        run: |
+          tar xf targets.tar
+          rm targets.tar
+
+      - name: Download target directories (site)
+        uses: actions/download-artifact@v3
+        with:
+          name: site
+
+      - name: Inflate target directories (site)
         run: |
           tar xf targets.tar
           rm targets.tar
@@ -613,3 +623,40 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: mdocs/target/docs/site
           keep_files: true
+
+      - name: Import signing key
+        if: env.PGP_SECRET != '' && env.PGP_PASSPHRASE == ''
+        env:
+          PGP_SECRET: ${{ secrets.PGP_SECRET }}
+          PGP_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
+        run: echo $PGP_SECRET | base64 -di | gpg --import
+
+      - name: Import signing key and strip passphrase
+        if: env.PGP_SECRET != '' && env.PGP_PASSPHRASE != ''
+        env:
+          PGP_SECRET: ${{ secrets.PGP_SECRET }}
+          PGP_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
+        run: |
+          echo "$PGP_SECRET" | base64 -di > /tmp/signing-key.gpg
+          echo "$PGP_PASSPHRASE" | gpg --pinentry-mode loopback --passphrase-fd 0 --import /tmp/signing-key.gpg
+          (echo "$PGP_PASSPHRASE"; echo; echo) | gpg --command-fd 0 --pinentry-mode loopback --change-passphrase $(gpg --list-secret-keys --with-colons 2> /dev/null | grep '^sec:' | cut --delimiter ':' --fields 5 | tail -n 1)
+
+      - name: Publish site to sonatype
+        if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/feature/site-artifact')
+        env:
+          SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
+          SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
+          SONATYPE_CREDENTIAL_HOST: ${{ secrets.SONATYPE_CREDENTIAL_HOST }}
+        run: sbt docs/publish
+
+      - name: Make target directories
+        run: mkdir -p target
+
+      - name: Compress target directories
+        run: tar cf targets.tar target
+
+      - name: Upload target directories
+        uses: actions/upload-artifact@v3
+        with:
+          name: site
+          path: targets.tar

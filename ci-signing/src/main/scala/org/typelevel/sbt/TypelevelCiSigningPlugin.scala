@@ -26,12 +26,18 @@ import Keys._
 
 object TypelevelCiSigningPlugin extends AutoPlugin {
 
+  object autoImport {
+    lazy val tlCiSigningImportKey = settingKey[Seq[WorkflowStep]]("Steps to import the PGP key")
+  }
+
+  import autoImport._
+
   override def requires = SbtGpg && GitHubActionsPlugin && GenerativePlugin
 
   override def trigger = allRequirements
 
   override def buildSettings = Seq(
-    githubWorkflowPublishPreamble := Seq(
+    tlCiSigningImportKey := Seq(
       WorkflowStep.Run( // if your key is not passphrase-protected
         List("echo $PGP_SECRET | base64 -di | gpg --import"),
         name = Some("Import signing key"),
@@ -48,7 +54,8 @@ object TypelevelCiSigningPlugin extends AutoPlugin {
         cond = Some("env.PGP_SECRET != '' && env.PGP_PASSPHRASE != ''"),
         env = env
       )
-    )
+    ),
+    githubWorkflowPublishPreamble := tlCiSigningImportKey.value
   )
 
   import SbtGpg.autoImport._

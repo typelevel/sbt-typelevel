@@ -16,6 +16,9 @@
 
 package org.typelevel.sbt.gha
 
+import java.nio.file.FileSystems
+import java.nio.file.Path
+
 sealed trait WorkflowStep extends Product with Serializable {
   def id: Option[String]
   def name: Option[String]
@@ -155,5 +158,37 @@ object WorkflowStep {
     def withCond(cond: Option[String]) = copy(cond = cond)
     def withEnv(env: Map[String, String]) = copy(env = env)
     def withTimeoutMinutes(minutes: Option[Int]) = copy(timeoutMinutes = minutes)
+  }
+
+  def upload(paths: List[Path], artifactId: String): List[WorkflowStep] = {
+    val pathStrs = paths.map(path => normalizeSeparators(path.toString))
+
+    val sanitized = pathStrs.map { str =>
+      if (str.indexOf(' ') >= 0) // TODO be less naive
+        s"'$str'"
+      else
+        str
+    }
+
+    val mkdir = WorkflowStep.Run(
+      List(s"mkdir -p ${sanitized.mkString(" ")}"),
+      name = Some("Make target directories"))
+
+    val tar = WorkflowStep.Run(
+      List(s"tar cf targets.tar ${sanitized.mkString(" ")}"),
+      name = Some("Compress target directories"))
+
+    val upload = WorkflowStep.Use(
+      UseRef.Public("actions", "upload-artifact", "v3"),
+      name = Some(s"Upload target directories"),
+      params = Map("name" -> artifactId, "path" -> "targets.tar")
+    )
+
+    List(mkdir, tar, upload)
+  }
+
+  private val PlatformSep = FileSystems.getDefault.getSeparator
+  private def normalizeSeparators(pathStr: String): String = {
+    pathStr.replace(PlatformSep, "/") // *force* unix separators
   }
 }

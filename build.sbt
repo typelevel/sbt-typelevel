@@ -62,11 +62,11 @@ lazy val `sbt-typelevel` = tlCrossRootProject.aggregate(
   ciSigning,
   sonatypeCiRelease,
   ci,
-  core,
   ciRelease,
   site,
-  unidoc,
-  docs
+  siteCiRelease,
+  core,
+  unidoc
 )
 
 lazy val kernel = project
@@ -188,6 +188,22 @@ lazy val ciRelease = project
     ciSigning
   )
 
+lazy val site = project
+  .in(file("site"))
+  .enablePlugins(SbtPlugin)
+  .settings(
+    name := "sbt-typelevel-site"
+  )
+  .dependsOn(kernel, github, githubActions, noPublish)
+
+lazy val siteCiRelease = project
+  .in(file("site-ci-release"))
+  .enablePlugins(SbtPlugin)
+  .settings(
+    name := "sbt-typelevel-site-ci-release"
+  )
+  .dependsOn(site, sonatypeCiRelease, ciSigning)
+
 lazy val core = project
   .in(file("core"))
   .enablePlugins(SbtPlugin)
@@ -196,16 +212,9 @@ lazy val core = project
   )
   .dependsOn(
     ciRelease,
-    settings
+    settings,
+    siteCiRelease
   )
-
-lazy val site = project
-  .in(file("site"))
-  .enablePlugins(SbtPlugin)
-  .settings(
-    name := "sbt-typelevel-site"
-  )
-  .dependsOn(kernel, github, githubActions, noPublish)
 
 lazy val unidoc = project
   .in(file("unidoc"))

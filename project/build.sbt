@@ -11,6 +11,7 @@ val modules = List(
   "no-publish",
   "scalafix",
   "settings",
+  "site-ci-release",
   "site",
   "sonatype",
   "sonatype-ci-release",
