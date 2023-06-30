@@ -26,7 +26,7 @@ import laika.theme.config.Color
 import org.typelevel.sbt.TypelevelGitHubPlugin.gitHubUserRepo
 import sbt.Def._
 import sbt.Keys.licenses
-import laika.ast.Path.Root
+//import laika.ast.Path.Root
 
 object TypelevelSiteSettings {
 
@@ -59,18 +59,18 @@ object TypelevelSiteSettings {
 
   // light theme colours
   // Tl suffix indicates these are lifted directly from somewhere within the Typelevel site
-  //val redTl = Color.hex("f8293a")
+  // val redTl = Color.hex("f8293a")
   val brightRedTl = Color.hex("fe4559")
   val coralTl = Color.hex("f86971")
   val pinkTl = Color.hex("ffb4b5")
   val whiteTl = Color.hex("ffffff")
   val gunmetalTl = Color.hex("21303f")
   val platinumTl = Color.hex("e6e8ea") // e2e4e6?
-  //val offWhiteTl = Color.hex("f2f3f4")
+  // val offWhiteTl = Color.hex("f2f3f4")
   // Extra colours to supplement
   val lightPink = Color.hex("ffe7e7")
-  //val lightPinkGrey = Color.hex("f7f3f3")
-  //val lightPinkGreyButDarker = Color.hex("efe7e7")
+  // val lightPinkGrey = Color.hex("f7f3f3")
+  // val lightPinkGreyButDarker = Color.hex("efe7e7")
   val slateBlue = Color.hex("335C67")
   val mediumSlateBlue = Color.hex("b0cfd8")
   val lightSlateBlue = Color.hex("ddeaed")
@@ -105,13 +105,13 @@ object TypelevelSiteSettings {
       .themeColors(
         primary = interimBlueDark,
         secondary = brightRedTl,
-        // the medium is on slate until the landing page is decoupled
-        primaryMedium = lightSlateBlue, // will be when the landing page text is decoupled mediumSlateBlue
+        // the medium is on slate until the landing page is decoupled (then mediumSlateBlue)
+        primaryMedium = lightSlateBlue,
         primaryLight = lighterSlateBlue,
         text = gunmetalTl,
         background = whiteTl,
         // interim colours, while we wait for light gradient support on landing pages
-        //bgGradient = (mediumSlateBlue, lighterSlateBlue)
+        // bgGradient = (mediumSlateBlue, lighterSlateBlue)
         bgGradient = (interimBlueMedium, interimBlueLight)
       )
       .site
