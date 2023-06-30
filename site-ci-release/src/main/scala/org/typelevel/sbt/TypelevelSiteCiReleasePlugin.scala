@@ -23,7 +23,8 @@ import sbt._
 
 object TypelevelSiteCiReleasePlugin extends AutoPlugin {
 
-  override def requires = TypelevelCiSigningPlugin && TypelevelSitePlugin && TypelevelSonatypeCiReleasePlugin
+  override def requires =
+    TypelevelCiSigningPlugin && TypelevelSitePlugin && TypelevelSonatypeCiReleasePlugin
 
   override def trigger = allRequirements
 
