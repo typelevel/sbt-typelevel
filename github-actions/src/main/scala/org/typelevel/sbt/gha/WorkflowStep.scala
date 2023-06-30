@@ -94,8 +94,8 @@ object WorkflowStep {
       UseRef.Public("scalacenter", "sbt-dependency-submission", "v2"),
       name = Some("Submit Dependencies"),
       params = workingDirectory.map("working-directory" -> _).toMap ++
-        modulesIgnore.map(_.mkString(" ")).map("modules-ignore" -> _).toMap ++
-        configsIgnore.map(_.mkString(" ")).map("configs-ignore" -> _).toMap ++
+        modulesIgnore.filter(_.nonEmpty).map(m => "modules-ignore" -> m.mkString(" ")).toMap ++
+        configsIgnore.filter(_.nonEmpty).map(c => "configs-ignore" -> c.mkString(" ")).toMap ++
         token.map("token" -> _).toMap
     )
 
