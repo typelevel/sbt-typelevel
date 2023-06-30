@@ -627,7 +627,7 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
           githubWorkflowPublishTargetBranches.value.nonEmpty
       if (generate) {
         val keys = githubWorkflowBuildMatrixAdditions.value.keys.toList.sorted
-        val artifactId = MatrixKeys.groupId(keys)
+        val artifactId = "target-" + MatrixKeys.groupId(keys)
         WorkflowStep
           .upload(
             relativePaths.value.toList :+ java.nio.file.Paths.get("project", "target"),
