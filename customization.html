@@ -167,98 +167,124 @@
         <p><code>NoPublishPlugin</code></p>
         
         <h3 id="sbt-typelevel-kernel" class="section"><a class="anchor-link left" href="#sbt-typelevel-kernel"><i class="icofont-laika link">&#xef71;</i></a>sbt-typelevel-kernel</h3>
-        <p><code>TypelevelKernelPlugin</code>
-        - <code>tlIsScala3</code> (setting): <code>true</code>, if <code>scalaVersion</code> is 3.x.
-        - <code>tlSkipIrrelevantScalas</code> (setting): <code>true</code>, if should <code>skip</code> for <code>scalaVersion</code> not in <code>crossScalaVersions</code>.
-        - <code>tlReplaceCommandAlias</code> (method): Replace a <code>addCommandAlias</code> definition.
-        - <code>tlReleaseLocal</code> (command): Alias for <code>+publishLocal</code>.</p>
+        <p><code>TypelevelKernelPlugin</code></p>
+        <ul>
+          <li><code>tlIsScala3</code> (setting): <code>true</code>, if <code>scalaVersion</code> is 3.x.</li>
+          <li><code>tlSkipIrrelevantScalas</code> (setting): <code>true</code>, if should <code>skip</code> for <code>scalaVersion</code> not in <code>crossScalaVersions</code>.</li>
+          <li><code>tlReplaceCommandAlias</code> (method): Replace a <code>addCommandAlias</code> definition.</li>
+          <li><code>tlReleaseLocal</code> (command): Alias for <code>+publishLocal</code>.</li>
+        </ul>
         
         <h3 id="sbt-typelevel-versioning" class="section"><a class="anchor-link left" href="#sbt-typelevel-versioning"><i class="icofont-laika link">&#xef71;</i></a>sbt-typelevel-versioning</h3>
-        <p><code>TypelevelVersioningPlugin</code>: Establishes a git-based, early semantic versioning scheme.
-        - <code>tlBaseVersion</code> (setting): The series your project is in, e.g., 0.2, 3.5.
-        - <code>tlUntaggedAreSnapshots</code> (setting): If true, an untagged commit is given a snapshot version, e.g. <code>0.4.1-17-00218f9-SNAPSHOT</code>. If false, it is given a release version, e.g. <code>0.4.1-17-00218f9</code> (default: true).</p>
+        <p><code>TypelevelVersioningPlugin</code>: Establishes a git-based, early semantic versioning scheme.</p>
+        <ul>
+          <li><code>tlBaseVersion</code> (setting): The series your project is in, e.g., 0.2, 3.5.</li>
+          <li><code>tlUntaggedAreSnapshots</code> (setting): If true, an untagged commit is given a snapshot version, e.g. <code>0.4.1-17-00218f9-SNAPSHOT</code>. If false, it is given a release version, e.g. <code>0.4.1-17-00218f9</code> (default: true).</li>
+        </ul>
         
         <h3 id="sbt-typelevel-mima" class="section"><a class="anchor-link left" href="#sbt-typelevel-mima"><i class="icofont-laika link">&#xef71;</i></a>sbt-typelevel-mima</h3>
-        <p><code>TypelevelMimaPlugin</code>: Determines previous MiMa artifacts via your <code>version</code> setting and git tags.
-        - <code>tlVersionIntroduced</code> (setting): A map <code>scalaBinaryVersion -&gt; version</code> e.g. <code>Map(&quot;2.13&quot; -&gt; &quot;1.5.2&quot;, &quot;3&quot; -&gt; &quot;1.7.1&quot;)</code> used to indicate that a particular <code>crossScalaVersions</code> value was introduced in a given version (default: empty).
-        - <code>tlMimaPreviousVersions</code> (setting): A set of previous versions to compare binary-compatibility against.</p>
+        <p><code>TypelevelMimaPlugin</code>: Determines previous MiMa artifacts via your <code>version</code> setting and git tags.</p>
+        <ul>
+          <li><code>tlVersionIntroduced</code> (setting): A map <code>scalaBinaryVersion -&gt; version</code> e.g. <code>Map(&quot;2.13&quot; -&gt; &quot;1.5.2&quot;, &quot;3&quot; -&gt; &quot;1.7.1&quot;)</code> used to indicate that a particular <code>crossScalaVersions</code> value was introduced in a given version (default: empty).</li>
+          <li><code>tlMimaPreviousVersions</code> (setting): A set of previous versions to compare binary-compatibility against.</li>
+        </ul>
         
         <h3 id="sbt-typelevel-sonatype" class="section"><a class="anchor-link left" href="#sbt-typelevel-sonatype"><i class="icofont-laika link">&#xef71;</i></a>sbt-typelevel-sonatype</h3>
-        <p><code>TypelevelSonatypePlugin</code>: Sets up publishing to Sonatype/Maven.
-        - <code>tlSonatypeUseLegacyHost</code> (setting): Publish to <code>oss.sonatype.org</code> instead of <code>s01.oss.sonatype.org</code> (default: false).
-        - <code>tlRelease</code> (command): Check binary-compatibility and <code>+publish</code> to Sonatype.</p>
+        <p><code>TypelevelSonatypePlugin</code>: Sets up publishing to Sonatype/Maven.</p>
+        <ul>
+          <li><code>tlSonatypeUseLegacyHost</code> (setting): Publish to <code>oss.sonatype.org</code> instead of <code>s01.oss.sonatype.org</code> (default: false).</li>
+          <li><code>tlRelease</code> (command): Check binary-compatibility and <code>+publish</code> to Sonatype.</li>
+        </ul>
         <p><code>TypelevelUnidocPlugin</code>: Sets up publishing a Scaladoc-only artifact to Sonatype/Maven.</p>
         
         <h3 id="sbt-typelevel-settings" class="section"><a class="anchor-link left" href="#sbt-typelevel-settings"><i class="icofont-laika link">&#xef71;</i></a>sbt-typelevel-settings</h3>
-        <p><code>TypelevelSettingsPlugin</code>: Good and/or opinionated defaults for scalac settings etc., inspired by sbt-tpolecat.
-        - <code>tlFatalWarnings</code> (setting): Convert compiler warnings into errors (default: false).
-        - <code>tlJdkRelease</code> (setting): JVM target version for the compiled bytecode (default: Some(8)).</p>
+        <p><code>TypelevelSettingsPlugin</code>: Good and/or opinionated defaults for scalac settings etc., inspired by sbt-tpolecat.</p>
+        <ul>
+          <li><code>tlFatalWarnings</code> (setting): Convert compiler warnings into errors (default: false).</li>
+          <li><code>tlJdkRelease</code> (setting): JVM target version for the compiled bytecode (default: Some(8)).</li>
+        </ul>
         
         <h3 id="sbt-typelevel-github" class="section"><a class="anchor-link left" href="#sbt-typelevel-github"><i class="icofont-laika link">&#xef71;</i></a>sbt-typelevel-github</h3>
-        <p><code>TypelevelGitHubPlugin</code>: Populates boilerplate settings assuming you are using GitHub.
-        - <code>tlGitHubRepo</code> (setting): The name of this repository on GitHub.
-        - <code>tlGitHubDev(user, fullName)</code> (method): Helper to create a <code>Developer</code> entry from a GitHub username.</p>
+        <p><code>TypelevelGitHubPlugin</code>: Populates boilerplate settings assuming you are using GitHub.</p>
+        <ul>
+          <li><code>tlGitHubRepo</code> (setting): The name of this repository on GitHub.</li>
+          <li><code>tlGitHubDev(user, fullName)</code> (method): Helper to create a <code>Developer</code> entry from a GitHub username.</li>
+        </ul>
         <p><code>TypelevelScalaJSGitHubPlugin</code>: Points your sourcemaps to GitHub permalinks. Only activated for Scala.js projects.</p>
         <p><code>TypelevelScalaNativeGitHubPlugin</code>: Points your sourcemaps to GitHub permalinks. Only activated for Scala Native projects.</p>
         
         <h3 id="sbt-typelevel-ci" class="section"><a class="anchor-link left" href="#sbt-typelevel-ci"><i class="icofont-laika link">&#xef71;</i></a>sbt-typelevel-ci</h3>
-        <p><code>TypelevelCiPlugin</code>: Sets up GitHub actions to run tests and submit dependencies for vulnerability scanning. You can optionally enable checks for headers, formatting, scalafix, MiMa, and scaladoc.
-        - <code>tlCiHeaderCheck</code> (setting): Whether to do header check in CI (default: <code>false</code>).
-        - <code>tlCiScalafmtCheck</code> (setting): Whether to do scalafmt check in CI (default: <code>false</code>).
-        - <code>tlCiScalafixCheck</code> (setting): Whether to do scalafix check in CI (default: <code>false</code>).
-        - <code>tlCiMimaBinaryIssueCheck</code> (setting): Whether to do MiMa binary issues check in CI (default: <code>false</code>).
-        - <code>tlCiDocCheck</code> (setting): Whether to build API docs in CI (default: <code>false</code>).
-        - <code>tlCiDependencyGraphJob</code> (setting): Whether to add a job to submit dependencies to GH (default: <code>true</code>)
-        - <code>tlCiStewardValidateConfig</code> (setting): The location of the Scala Steward config to validate (default: <code>.scala-steward.conf</code>, if exists).
-        - <code>tlCrossRootProject</code> (method): helper to create a <code>root</code> project that can aggregate both <code>Project</code>s and <code>CrossProject</code>s. Automatically creates separate jobs in the CI matrix for each platform (JVM, JS, etc.).</p>
+        <p><code>TypelevelCiPlugin</code>: Sets up GitHub actions to run tests and submit dependencies for vulnerability scanning. You can optionally enable checks for headers, formatting, scalafix, MiMa, and scaladoc.</p>
+        <ul>
+          <li><code>tlCiHeaderCheck</code> (setting): Whether to do header check in CI (default: <code>false</code>).</li>
+          <li><code>tlCiScalafmtCheck</code> (setting): Whether to do scalafmt check in CI (default: <code>false</code>).</li>
+          <li><code>tlCiScalafixCheck</code> (setting): Whether to do scalafix check in CI (default: <code>false</code>).</li>
+          <li><code>tlCiMimaBinaryIssueCheck</code> (setting): Whether to do MiMa binary issues check in CI (default: <code>false</code>).</li>
+          <li><code>tlCiDocCheck</code> (setting): Whether to build API docs in CI (default: <code>false</code>).</li>
+          <li><code>tlCiDependencyGraphJob</code> (setting): Whether to add a job to submit dependencies to GH (default: <code>true</code>)</li>
+          <li><code>tlCiStewardValidateConfig</code> (setting): The location of the Scala Steward config to validate (default: <code>.scala-steward.conf</code>, if exists).</li>
+          <li><code>tlCrossRootProject</code> (method): helper to create a <code>root</code> project that can aggregate both <code>Project</code>s and <code>CrossProject</code>s. Automatically creates separate jobs in the CI matrix for each platform (JVM, JS, etc.).</li>
+        </ul>
         
         <h3 id="sbt-typelevel-sonatype-ci-release" class="section"><a class="anchor-link left" href="#sbt-typelevel-sonatype-ci-release"><i class="icofont-laika link">&#xef71;</i></a>sbt-typelevel-sonatype-ci-release</h3>
-        <p><code>TypelevelSonatypeCiReleasePlugin</code>: Sets up GitHub actions to publish to Sonatype in CI.
-        - Requires the <code>SONATYPE_USERNAME</code> and <code>SONATYPE_PASSWORD</code> secrets
-        - <code>tlCiReleaseTags</code> (setting): Controls whether or not v-prefixed tags should be released from CI (default <code>true</code>).
-        - <code>tlCiReleaseBranches</code> (setting): The branches in your repository to release from in CI on every push. Depending on your versioning scheme, they will be either snapshots or (hash) releases. Leave this empty if you only want CI releases for tags. (default: <code>[]</code>).
-        - <code>tlCiRelease</code> (command): Performs a <code>tlRelease</code> from the CI and reports to GH step summary.</p>
+        <p><code>TypelevelSonatypeCiReleasePlugin</code>: Sets up GitHub actions to publish to Sonatype in CI.</p>
+        <ul>
+          <li>Requires the <code>SONATYPE_USERNAME</code> and <code>SONATYPE_PASSWORD</code> secrets</li>
+          <li><code>tlCiReleaseTags</code> (setting): Controls whether or not v-prefixed tags should be released from CI (default <code>true</code>).</li>
+          <li><code>tlCiReleaseBranches</code> (setting): The branches in your repository to release from in CI on every push. Depending on your versioning scheme, they will be either snapshots or (hash) releases. Leave this empty if you only want CI releases for tags. (default: <code>[]</code>).</li>
+          <li><code>tlCiRelease</code> (command): Performs a <code>tlRelease</code> from the CI and reports to GH step summary.</li>
+        </ul>
         
         <h3 id="sbt-typelevel-ci-signing" class="section"><a class="anchor-link left" href="#sbt-typelevel-ci-signing"><i class="icofont-laika link">&#xef71;</i></a>sbt-typelevel-ci-signing</h3>
-        <p><code>TypelevelCiSigningPlugin</code>: Sets up GitHub actions to sign your artifacts in CI.
-        - Requires <code>PGP_SECRET</code> secret, with your base64-encoded PGP key
-        - Optionally set the <code>PGP_PASSPHRASE</code> secret, but we do not recommend passphrase-protected keys for new projects. See discussion in <a href="https://github.com/typelevel/sbt-typelevel/discussions/9#discussioncomment-1251774">#9</a>.</p>
+        <p><code>TypelevelCiSigningPlugin</code>: Sets up GitHub actions to sign your artifacts in CI.</p>
+        <ul>
+          <li>Requires <code>PGP_SECRET</code> secret, with your base64-encoded PGP key</li>
+          <li>Optionally set the <code>PGP_PASSPHRASE</code> secret, but we do not recommend passphrase-protected keys for new projects. See discussion in <a href="https://github.com/typelevel/sbt-typelevel/discussions/9#discussioncomment-1251774">#9</a>.</li>
+        </ul>
         
         <h3 id="sbt-typelevel-ci-release" class="section"><a class="anchor-link left" href="#sbt-typelevel-ci-release"><i class="icofont-laika link">&#xef71;</i></a>sbt-typelevel-ci-release</h3>
         <p><code>TypelevelCiReleasePlugin</code>: The super-plugin that sets you up with versioning, mima, signing, and sonatype publishing, all in GitHub actions.</p>
         
         <h3 id="sbt-typelevel-scalafix" class="section"><a class="anchor-link left" href="#sbt-typelevel-scalafix"><i class="icofont-laika link">&#xef71;</i></a>sbt-typelevel-scalafix</h3>
-        <p><code>TypelevelScalafixPlugin</code>
-        - <code>tlTypelevelScalafixVersion</code> (setting): The version of typelevel-scalafix to add to the scalafix dependency classpath.</p>
+        <p><code>TypelevelScalafixPlugin</code></p>
+        <ul>
+          <li><code>tlTypelevelScalafixVersion</code> (setting): The version of typelevel-scalafix to add to the scalafix dependency classpath.</li>
+        </ul>
         
         <h3 id="sbt-typelevel" class="section"><a class="anchor-link left" href="#sbt-typelevel"><i class="icofont-laika link">&#xef71;</i></a>sbt-typelevel</h3>
         <p><code>TypelevelPlugin</code>: The super-super-plugin intended for bootstrapping the typical Typelevel project. Sets up CI release including snapshots, scalac settings, headers, and formatting.</p>
-        <p><code>TypelevelBspPlugin</code>: A plugin that controls for which cross-project platforms the <code>bspEnabled</code> setting should be set to <code>true</code>. By default it becomes enabled for <code>JVMPlatform</code> only.
-        - <code>tlBspCrossProjectPlatforms</code> (setting): A set of platforms for which BSP should be enabled (default: not initialized)</p>
+        <p><code>TypelevelBspPlugin</code>: A plugin that controls for which cross-project platforms the <code>bspEnabled</code> setting should be set to <code>true</code>. By default it becomes enabled for <code>JVMPlatform</code> only.</p>
+        <ul>
+          <li><code>tlBspCrossProjectPlatforms</code> (setting): A set of platforms for which BSP should be enabled (default: not initialized)</li>
+        </ul>
         
         <h3 id="sbt-typelevel-site" class="section"><a class="anchor-link left" href="#sbt-typelevel-site"><i class="icofont-laika link">&#xef71;</i></a>sbt-typelevel-site</h3>
-        <p><code>TypelevelSitePlugin</code>: Sets up an <a href="https://scalameta.org/mdoc/">mdoc</a>/<a href="https://typelevel.org/Laika/">Laika</a>-generated website, automatically published to GitHub pages in CI.
-        - <code>tlSiteHelium</code> (setting): The Helium theme configuration and extensions.
-        - <code>tlSiteIsTypelevelProject</code> (setting): Indicates whether the generated site should be pre-populated with UI elements specific to Typelevel Organization or Affiliate projects (default: None).
-        - <code>tlSiteApiUrl</code> (setting): URL to the API docs (default: <code>None</code>).
-        - <code>tlSiteApiModule</code> (setting): The module that publishes API docs (default: <code>None</code>).
-        - <code>tlSiteApiPackage</code> (setting): The top-level package for your API docs (e.g. org.typlevel.sbt).
-        - <code>tlSiteKeepFiles</code> (setting): Whether to keep existing files when deploying site (default: <code>true</code>).
-        - <code>tlSiteGenerate</code> (setting): A sequence of workflow steps which generates the site (default: <code>[Sbt(List(&quot;tlSite&quot;))]</code>).
-        - <code>tlSitePublish</code> (setting): A sequence of workflow steps which publishes the site (default: <code>peaceiris/actions-gh-pages</code>).
-        - <code>tlSitePublishBranch</code> (setting): The branch to publish the site from on every push. Set this to <code>None</code> if you only want to update the site on tag releases. (default: <code>main</code>)
-        - <code>tlSitePublishTags</code> (setting): Defines whether the site should be published on tag releases. Note on setting this to <code>true</code> requires the <code>tlSitePublishBranch</code> setting to be set to <code>None</code>. (default: <code>false</code>)
-        - <code>tlSite</code> (task): Generate the site (default: runs mdoc then laika).
-        - <code>tlSitePreview</code> (task): Start a live-reload preview server (combines mdoc --watch with laikaPreview).</p>
+        <p><code>TypelevelSitePlugin</code>: Sets up an <a href="https://scalameta.org/mdoc/">mdoc</a>/<a href="https://typelevel.org/Laika/">Laika</a>-generated website, automatically published to GitHub pages in CI.</p>
+        <ul>
+          <li><code>tlSiteHelium</code> (setting): The Helium theme configuration and extensions.</li>
+          <li><code>tlSiteIsTypelevelProject</code> (setting): Indicates whether the generated site should be pre-populated with UI elements specific to Typelevel Organization or Affiliate projects (default: None).</li>
+          <li><code>tlSiteApiUrl</code> (setting): URL to the API docs (default: <code>None</code>).</li>
+          <li><code>tlSiteApiModule</code> (setting): The module that publishes API docs (default: <code>None</code>).</li>
+          <li><code>tlSiteApiPackage</code> (setting): The top-level package for your API docs (e.g. org.typlevel.sbt).</li>
+          <li><code>tlSiteKeepFiles</code> (setting): Whether to keep existing files when deploying site (default: <code>true</code>).</li>
+          <li><code>tlSiteGenerate</code> (setting): A sequence of workflow steps which generates the site (default: <code>[Sbt(List(&quot;tlSite&quot;))]</code>).</li>
+          <li><code>tlSitePublish</code> (setting): A sequence of workflow steps which publishes the site (default: <code>peaceiris/actions-gh-pages</code>).</li>
+          <li><code>tlSitePublishBranch</code> (setting): The branch to publish the site from on every push. Set this to <code>None</code> if you only want to update the site on tag releases. (default: <code>main</code>)</li>
+          <li><code>tlSitePublishTags</code> (setting): Defines whether the site should be published on tag releases. Note on setting this to <code>true</code> requires the <code>tlSitePublishBranch</code> setting to be set to <code>None</code>. (default: <code>false</code>)</li>
+          <li><code>tlSite</code> (task): Generate the site (default: runs mdoc then laika).</li>
+          <li><code>tlSitePreview</code> (task): Start a live-reload preview server (combines mdoc --watch with laikaPreview).</li>
+        </ul>
         
         <h3 id="sbt-typelevel-mergify" class="section"><a class="anchor-link left" href="#sbt-typelevel-mergify"><i class="icofont-laika link">&#xef71;</i></a>sbt-typelevel-mergify</h3>
-        <p><code>MergifyPlugin</code>: Sets up .mergify.yml file generation
-        - <code>mergifyPrRules</code> (setting): The mergify pull request rules.
-        - <code>mergifyStewardConfig</code> (setting): Config for the automerge rule for Scala Steward PRs, set to <code>None</code> to disable.
-        - <code>mergifyRequiredJobs</code> (setting): Ids for jobs that must succeed for merging (default: <code>[build]</code>).
-        - <code>mergifySuccessConditions</code> (setting): Success conditions for merging (default: auto-generated from <code>mergifyRequiredJobs</code> setting).
-        - <code>mergifyGenerate</code> (task): Generates (and overwrites if extant) a .mergify.yml according to configuration.
-        - <code>mergifyCheck</code> (task): Checks to see if the .mergify.yml files are equivalent to what would be generated and errors if otherwise.</p>
+        <p><code>MergifyPlugin</code>: Sets up .mergify.yml file generation</p>
+        <ul>
+          <li><code>mergifyPrRules</code> (setting): The mergify pull request rules.</li>
+          <li><code>mergifyStewardConfig</code> (setting): Config for the automerge rule for Scala Steward PRs, set to <code>None</code> to disable.</li>
+          <li><code>mergifyRequiredJobs</code> (setting): Ids for jobs that must succeed for merging (default: <code>[build]</code>).</li>
+          <li><code>mergifySuccessConditions</code> (setting): Success conditions for merging (default: auto-generated from <code>mergifyRequiredJobs</code> setting).</li>
+          <li><code>mergifyGenerate</code> (task): Generates (and overwrites if extant) a .mergify.yml according to configuration.</li>
+          <li><code>mergifyCheck</code> (task): Checks to see if the .mergify.yml files are equivalent to what would be generated and errors if otherwise.</li>
+        </ul>
         
         <h2 id="dependency-diagram" class="section"><a class="anchor-link left" href="#dependency-diagram"><i class="icofont-laika link">&#xef71;</i></a>Dependency diagram</h2>
         <p>sbt-typelevel plugins are in red and the super-plugins are boxed.</p>
