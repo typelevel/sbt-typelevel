@@ -39,7 +39,6 @@ object TypelevelMimaPlugin extends AutoPlugin {
   }
 
   import autoImport._
-  import TypelevelKernelPlugin.autoImport._
 
   override def buildSettings = Seq[Setting[_]](
     tlVersionIntroduced := Map.empty,
