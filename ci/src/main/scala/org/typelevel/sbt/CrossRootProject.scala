@@ -18,6 +18,7 @@ package org.typelevel.sbt
 
 import org.typelevel.sbt.gha.GenerativePlugin.autoImport._
 import sbt._
+import Keys._
 
 /**
  * Simultaneously creates a root project, a Scala JVM aggregate project, a Scala.js aggregate
@@ -132,7 +133,8 @@ object CrossRootProject {
     Some((rootProject.all, rootProject.jvm, rootProject.js, rootProject.native))
 
   def apply(id: String): CrossRootProject = new CrossRootProject(
-    Project(id, file(".")),
+    Project(id, file("."))
+      .settings(crossScalaVersions := Nil, scalaVersion := (ThisBuild / scalaVersion).value),
     Project(s"${id}JVM", file(".jvm")),
     Project(s"${id}JS", file(".js")),
     Project(s"${id}Native", file(".native"))

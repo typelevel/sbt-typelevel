@@ -32,6 +32,10 @@ object TypelevelKernelPlugin extends AutoPlugin {
     lazy val CompileTime: Configuration = config("compile-time").hide
 
     lazy val tlIsScala3 = settingKey[Boolean]("True if building with Scala 3")
+
+    @deprecated(
+      "No longer has an effect. Use tlCrossRootProject for your root project.",
+      "0.5.0")
     lazy val tlSkipIrrelevantScalas = settingKey[Boolean](
       "Sets skip := true for compile/test/publish/etc. tasks on a project if the current scalaVersion is not in that project's crossScalaVersions (default: false)")
 
@@ -51,44 +55,14 @@ object TypelevelKernelPlugin extends AutoPlugin {
   )
 
   override def buildSettings =
-    Seq(tlSkipIrrelevantScalas := false) ++
-      addCommandAlias("tlReleaseLocal", mkCommand(List("reload", "project /", "+publishLocal")))
+    addCommandAlias("tlReleaseLocal", mkCommand(List("reload", "project /", "+publishLocal")))
 
   override def projectSettings = Seq(
     ivyConfigurations += CompileTime,
-    Compile / unmanagedClasspath ++= update.value.select(configurationFilter(CompileTime.name)),
-    (Test / test) := {
-      if (tlSkipIrrelevantScalas.value && (Test / test / skip).value)
-        ()
-      else (Test / test).value
-    },
-    (Compile / doc) := {
-      if (tlSkipIrrelevantScalas.value && (Compile / doc / skip).value)
-        (Compile / doc / target).value
-      else (Compile / doc).value
-    },
-    skipIfIrrelevant(compile),
-    skipIfIrrelevant(test),
-    skipIfIrrelevant(doc),
-    skipIfIrrelevant(publishLocal),
-    skipIfIrrelevant(publish)
+    Compile / unmanagedClasspath ++= update.value.select(configurationFilter(CompileTime.name))
   )
 
   private[sbt] def mkCommand(commands: List[String]): String = commands.mkString("; ", "; ", "")
-
-  /**
-   * A setting that will make a task respect the `tlSkipIrrelevantScalas` setting. Note that the
-   * task itself must respect `skip` for this to take effect.
-   */
-  def skipIfIrrelevant[T](task: TaskKey[T]) = {
-    task / skip := {
-      (task / skip).value || {
-        val cross = crossScalaVersions.value
-        val ver = (LocalRootProject / scalaVersion).value
-        (task / tlSkipIrrelevantScalas).value && !cross.contains(ver)
-      }
-    }
-  }
 
   private[sbt] lazy val currentRelease: Def.Initialize[Option[String]] = Def.setting {
     // some tricky logic here ...
