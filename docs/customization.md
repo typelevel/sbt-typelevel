@@ -54,7 +54,8 @@ Instead of using the super-plugins, for finer-grained control you can always add
 - `tlCiScalafixCheck` (setting): Whether to do scalafix check in CI (default: `false`).
 - `tlCiMimaBinaryIssueCheck` (setting): Whether to do MiMa binary issues check in CI (default: `false`).
 - `tlCiDocCheck` (setting): Whether to build API docs in CI (default: `false`).
-- `tlCiDependencyGraphJob` (setting): Whether to add a job to submit dependencies to GH (default: `true`)
+- `tlCiDependencyGraphJob` (setting): Whether to add a job to submit dependencies to GH (default: `true`).
+- `tlCiDependencyIgnoreModules` (setting): "Modules to ignore in dependency submission job (default: no-publish modules).
 - `tlCiStewardValidateConfig` (setting): The location of the Scala Steward config to validate (default: `.scala-steward.conf`, if exists).
 - `tlCrossRootProject` (method): helper to create a `root` project that can aggregate both `Project`s and `CrossProject`s. Automatically creates separate jobs in the CI matrix for each platform (JVM, JS, etc.).
 

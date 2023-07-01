@@ -76,6 +76,7 @@ object TypelevelSitePlugin extends AutoPlugin {
 
   import autoImport._
   import TypelevelGitHubPlugin._
+  import TypelevelCiPlugin.autoImport._
 
   override def requires =
     MdocPlugin && LaikaPlugin && TypelevelGitHubPlugin && GenerativePlugin
@@ -213,6 +214,7 @@ object TypelevelSitePlugin extends AutoPlugin {
           List.empty
       }
     },
+    ThisBuild / tlCiDependencyIgnoreModules += thisProjectRef.value,
     ThisBuild / githubWorkflowAddedJobs +=
       WorkflowJob(
         "site",

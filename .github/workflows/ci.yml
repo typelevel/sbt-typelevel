@@ -486,7 +486,7 @@ jobs:
       - name: Submit Dependencies
         uses: scalacenter/sbt-dependency-submission@v2
         with:
-          modules-ignore: sbt-typelevelJVM sbt-typelevelNative sbt-typelevel sbt-typelevelJS
+          modules-ignore: sbt-typelevelJVM sbt-typelevelNative sbt-typelevel sbt-typelevelJS docs
           configs-ignore: test scala-tool scala-doc-tool
 
   validate-steward:
