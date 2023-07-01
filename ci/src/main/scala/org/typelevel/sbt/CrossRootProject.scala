@@ -18,6 +18,7 @@ package org.typelevel.sbt
 
 import org.typelevel.sbt.gha.GenerativePlugin.autoImport._
 import sbt._
+
 import Keys._
 
 /**
