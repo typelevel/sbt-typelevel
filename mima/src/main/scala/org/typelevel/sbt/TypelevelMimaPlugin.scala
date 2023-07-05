@@ -39,8 +39,6 @@ object TypelevelMimaPlugin extends AutoPlugin {
   }
 
   import autoImport._
-  import TypelevelKernelPlugin.autoImport._
-  import TypelevelKernelPlugin.skipIfIrrelevant
 
   override def buildSettings = Seq[Setting[_]](
     tlVersionIntroduced := Map.empty,
@@ -65,11 +63,9 @@ object TypelevelMimaPlugin extends AutoPlugin {
 
   override def projectSettings = Seq[Setting[_]](
     mimaReportBinaryIssues := {
-      if (!publishArtifact.value || (tlSkipIrrelevantScalas.value && (mimaReportBinaryIssues / skip).value))
-        ()
+      if (!publishArtifact.value) ()
       else mimaReportBinaryIssues.value
     },
-    skipIfIrrelevant(mimaReportBinaryIssues),
     tlMimaPreviousVersions := {
       val introduced = tlVersionIntroduced
         .value

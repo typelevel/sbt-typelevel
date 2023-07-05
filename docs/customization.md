@@ -13,7 +13,6 @@ Instead of using the super-plugins, for finer-grained control you can always add
 `TypelevelKernelPlugin`
 
 - `tlIsScala3` (setting): `true`, if `scalaVersion` is 3.x.
-- `tlSkipIrrelevantScalas` (setting): `true`, if should `skip` for `scalaVersion` not in `crossScalaVersions`.
 - `tlReplaceCommandAlias` (method): Replace a `addCommandAlias` definition.
 - `tlReleaseLocal` (command): Alias for `+publishLocal`.
 
