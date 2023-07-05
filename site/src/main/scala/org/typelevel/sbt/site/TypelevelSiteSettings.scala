@@ -26,7 +26,6 @@ import laika.theme.config.Color
 import org.typelevel.sbt.TypelevelGitHubPlugin.gitHubUserRepo
 import sbt.Def._
 import sbt.Keys.licenses
-//import laika.ast.Path.Root
 
 object TypelevelSiteSettings {
 
@@ -71,15 +70,11 @@ object TypelevelSiteSettings {
   val lightPink = Color.hex("ffe7e7")
   // val lightPinkGrey = Color.hex("f7f3f3")
   // val lightPinkGreyButDarker = Color.hex("efe7e7")
-  val slateBlue = Color.hex("335C67")
-  val mediumSlateBlue = Color.hex("b0cfd8")
-  val lightSlateBlue = Color.hex("ddeaed")
-  val lighterSlateBlue = Color.hex("f4f8fa")
+  val slateBlue = Color.hex("385a70") // 406881
+  val mediumSlateCyan = Color.hex("b0cfd8")
+  val lightSlateCyan = Color.hex("ddeaed")
+  val lighterSlateCyan = Color.hex("f4f8fa")
   val softYellow = Color.hex("f9f5d9") // f3eab2
-
-  val interimBlueDark = Color.hex("385a70")
-  val interimBlueMedium = Color.hex("406881")
-  val interimBlueLight = Color.hex("487692")
 
   val defaults: Initialize[Helium] = setting {
     GenericSiteSettings
@@ -103,24 +98,21 @@ object TypelevelSiteSettings {
       )
       .site
       .themeColors(
-        primary = interimBlueDark,
+        primary = slateBlue,
         secondary = brightRedTl,
-        // the medium is on slate until the landing page is decoupled (then mediumSlateBlue)
-        primaryMedium = lightSlateBlue,
-        primaryLight = lighterSlateBlue,
+        primaryMedium = mediumSlateCyan,
+        primaryLight = lighterSlateCyan,
         text = gunmetalTl,
         background = whiteTl,
-        // interim colours, while we wait for light gradient support on landing pages
-        // bgGradient = (mediumSlateBlue, lighterSlateBlue)
-        bgGradient = (interimBlueMedium, interimBlueLight)
+        bgGradient = (mediumSlateCyan, lighterSlateCyan)
       )
       .site
       .messageColors(
-        info = interimBlueDark,
-        infoLight = lightSlateBlue,
-        warning = interimBlueDark,
+        info = slateBlue,
+        infoLight = lightSlateCyan,
+        warning = slateBlue,
         warningLight = softYellow,
-        error = interimBlueDark,
+        error = slateBlue,
         errorLight = lightPink
       )
       .site
@@ -140,41 +132,5 @@ object TypelevelSiteSettings {
           coralTl // type/class name
         )
       )
-    // just for testing purposes :) this can be removed later when things are finalised
-    /*.site.landingPage(
-    logo = Some(Image.external(s"https://typelevel.org/img/logo.svg")),
-    title = Some("SBT Typelevel"),
-    subtitle = Some("Build Configuration, Done Better than Yesterday?"),
-    latestReleases = Seq(
-      ReleaseInfo("Latest Stable Release", "0.4.23"),
-      ReleaseInfo("Latest Milestone Release", "0.5.0-M5")
-    ),
-    license = Some("Apache 2.0"),
-    titleLinks = Seq(
-      VersionMenu.create(unversionedLabel = "Getting Started"),
-      LinkGroup.create(
-        IconLink.external("https://github.com/abcdefg/", HeliumIcon.github),
-        IconLink.external("https://gitter.im/abcdefg/", HeliumIcon.chat),
-        IconLink.external("https://twitter.com/abcdefg/", HeliumIcon.twitter)
-      )
-    ),
-    documentationLinks = Seq(
-      TextLink.internal(Root / "site.md", "sbt-typelevel-site"),
-      TextLink.internal(Root / "index_.md", "home")
-    ),
-    projectLinks = Seq(
-      TextLink.internal(Root / "site.md", "Text Link"),
-      ButtonLink.external("http://somewhere.com/", "Button Label"),
-      LinkGroup.create(
-        IconLink.internal(Root / "site.md", HeliumIcon.demo),
-        IconLink.internal(Root / "site.md", HeliumIcon.info)
-      )
-    ),
-    teasers = Seq(
-      Teaser("Teaser 1", "Description 1"),
-      Teaser("Teaser 2", "Description 2"),
-      Teaser("Teaser 3", "Description 3")
-    ))*/
   }
-
 }
