@@ -55,7 +55,7 @@ addSbtPlugin("org.typelevel" % "sbt-typelevel-site" % "@VERSION@")
 
 **sbt-typelevel** extends **sbt-typelevel-ci-release** with:
 
-1. **sbt-typelevel-settings**: Good (and/or opinionated ;) defaults for `scalacOptions` and friends. Note that you can also manually add this plugin to a project using **sbt-typelevel-ci-release**.
+1. **sbt-typelevel-settings**: Good (and/or opinionated 😉) defaults for `scalacOptions` and friends. Note that you can also manually add this plugin to a project using **sbt-typelevel-ci-release**.
 2. Automated scalafmt and copyright header checks in CI.
 3. A `prePR` command and other nice-to-haves.
 
