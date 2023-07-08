@@ -30,10 +30,10 @@ object NoPublishPlugin extends AutoPlugin {
     publishLocal := {},
     publishArtifact := false,
     publish / skip := true,
-    Global / noPublishModulesIgnore ++= crossScalaVersions.value.map { v =>
+    Global / noPublishModulesIgnore ++= crossScalaVersions.value.flatMap { v =>
       // the binary versions are needed for the modules-ignore in Submit Dependencies
       // it's best to pick them up here instead of guessing in the CI plugin
-      s"${thisProjectRef.value.project}_${CrossVersion.binaryScalaVersion(v)}"
+      CrossVersion(crossVersion.value, v, CrossVersion.binaryScalaVersion(v)).map(cross => cross(thisProjectRef.value.project))
     }
   )
 }
