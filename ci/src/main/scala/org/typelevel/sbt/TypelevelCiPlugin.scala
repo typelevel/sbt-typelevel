@@ -148,7 +148,7 @@ object TypelevelCiPlugin extends AutoPlugin {
               steps = githubWorkflowJobSetup.value.toList :+
                 WorkflowStep.DependencySubmission(
                   None,
-                  Some(noPublishProjectRefs.value.toList.map(_.project)),
+                  Some(noPublishModulesIgnore.value.toList),
                   Some(List("test", "scala-tool", "scala-doc-tool")),
                   None
                 ),
