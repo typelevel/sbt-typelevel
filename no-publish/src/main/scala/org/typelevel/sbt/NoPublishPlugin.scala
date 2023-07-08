@@ -31,9 +31,9 @@ object NoPublishPlugin extends AutoPlugin {
     publishArtifact := false,
     publish / skip := true,
     Global / noPublishModulesIgnore ++= crossScalaVersions.value.map { v =>
-        // the binary versions are needed for the modules-ignore in Submit Dependencies
-        // it's best to pick them up here instead of guessing in the CI plugin
-        s"${thisProjectRef.value.project}_${CrossVersion.binaryScalaVersion(v)}"
+      // the binary versions are needed for the modules-ignore in Submit Dependencies
+      // it's best to pick them up here instead of guessing in the CI plugin
+      s"${thisProjectRef.value.project}_${CrossVersion.binaryScalaVersion(v)}"
     }
   )
 }
@@ -44,13 +44,14 @@ object NoPublishGlobalPlugin extends AutoPlugin {
   override def trigger = allRequirements
 
   object autoImport {
-    private[sbt] lazy val noPublishModulesIgnore = settingKey[Seq[String]]("List of no-publish projects and their scala cross-versions")
+    private[sbt] lazy val noPublishModulesIgnore =
+      settingKey[Seq[String]]("List of no-publish projects and their scala cross-versions")
   }
 
   import autoImport._
 
   override def globalSettings = Seq(
-    noPublishModulesIgnore := Seq(),
+    noPublishModulesIgnore := Seq()
   )
 
 }
