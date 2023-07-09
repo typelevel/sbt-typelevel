@@ -52,6 +52,13 @@ Instead of using the super-plugins, for finer-grained control you can always add
 
 `TypelevelScalaNativeGitHubPlugin`: Points your sourcemaps to GitHub permalinks. Only activated for Scala Native projects.
 
+### sbt-typelevel-github-actions
+`GitHubActionsPlugin`: Provides general functionality, giving builds the ability to introspect on their host workflow and whether or not they are running in GitHub Actions.
+
+`GenerativePlugin`: Makes it easier to maintain GitHub Actions builds for sbt projects by generating ci.yml and clean.yml workflow definition files.
+
+Both plugins are documented in [**sbt-typelevel-github-actions**](gha.md).
+
 ### sbt-typelevel-ci
 `TypelevelCiPlugin`: Sets up GitHub actions to run tests and submit dependencies for vulnerability scanning. You can optionally enable checks for headers, formatting, scalafix, MiMa, and scaladoc.
 
@@ -80,6 +87,10 @@ Instead of using the super-plugins, for finer-grained control you can always add
 
 ### sbt-typelevel-ci-release
 `TypelevelCiReleasePlugin`: The super-plugin that sets you up with versioning, mima, signing, and sonatype publishing, all in GitHub actions.
+Using this plugin the following 2 settings have new default values:
+
+- `tlCiMimaBinaryIssueCheck` (setting): Whether to do MiMa binary issues check in CI (default: `true`).
+- `tlCiDocCheck` (setting): Whether to build API docs in CI (default: `true`).
 
 ### sbt-typelevel-scalafix
 `TypelevelScalafixPlugin`
