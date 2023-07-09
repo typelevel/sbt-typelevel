@@ -149,7 +149,7 @@ object TypelevelCiPlugin extends AutoPlugin {
                 WorkflowStep.DependencySubmission(
                   None,
                   Some(noPublishModulesIgnore.value.toList),
-                  Some(List("test", "scala-tool", "scala-doc-tool")),
+                  Some(List("test", "scala-tool", "scala-doc-tool", "test-internal")),
                   None
                 ),
               cond = Some("github.event_name != 'pull_request'")
