@@ -19,7 +19,7 @@ package org.typelevel.sbt
 import sbt._
 
 import Keys._
-import NoPublishGlobalPlugin.autoImport.noPublishModulesIgnore
+import NoPublishGlobalPlugin.noPublishModulesIgnore
 
 object NoPublishPlugin extends AutoPlugin {
 
@@ -45,12 +45,8 @@ object NoPublishGlobalPlugin extends AutoPlugin {
   // triggered even if NoPublishPlugin is not used in the build
   override def trigger = allRequirements
 
-  object autoImport {
-    private[sbt] lazy val noPublishModulesIgnore =
-      settingKey[Seq[String]]("List of no-publish projects and their scala cross-versions")
-  }
-
-  import autoImport._
+  private[sbt] lazy val noPublishModulesIgnore =
+    settingKey[Seq[String]]("List of no-publish projects and their scala cross-versions")
 
   override def globalSettings = Seq(
     noPublishModulesIgnore := Seq()
