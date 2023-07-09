@@ -477,7 +477,7 @@ jobs:
         uses: scalacenter/sbt-dependency-submission@v2
         with:
           modules-ignore: sbt-typelevelJVM_2.12 docs_2.12 sbt-typelevelNative_2.12 sbt-typelevelJS_2.12
-          configs-ignore: test scala-tool scala-doc-tool
+          configs-ignore: test scala-tool scala-doc-tool test-internal
 
   validate-steward:
     name: Validate Steward Config
