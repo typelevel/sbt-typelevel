@@ -44,7 +44,6 @@ ThisBuild / mergifyPrRules += MergifyPrRule(
   )
 )
 ThisBuild / mergifyRequiredJobs ++= Seq("validate-steward", "site")
-ThisBuild / tlCiReleaseBranches := Seq("main", "patch/exclude-test-internal") // FIXME: remove!
 
 val MunitVersion = "0.7.29"
 
