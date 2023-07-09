@@ -19,7 +19,7 @@ package org.typelevel.sbt
 import sbt._
 
 import Keys._
-import NoPublishGlobalPlugin.noPublishInternalAggregation
+import NoPublishGlobalPlugin.noPublishModulesIgnore
 
 object NoPublishPlugin extends AutoPlugin {
 
@@ -30,7 +30,13 @@ object NoPublishPlugin extends AutoPlugin {
     publishLocal := {},
     publishArtifact := false,
     publish / skip := true,
-    Global / noPublishInternalAggregation += thisProjectRef.value
+    Global / noPublishModulesIgnore ++= crossScalaVersions.value.flatMap { v =>
+      // the binary versions are needed for the modules-ignore in Submit Dependencies
+      // it's best to pick them up here instead of guessing in the CI plugin
+      CrossVersion(crossVersion.value, v, CrossVersion.binaryScalaVersion(v)).map { cross =>
+        cross(thisProjectRef.value.project)
+      }
+    }
   )
 }
 
@@ -39,18 +45,11 @@ object NoPublishGlobalPlugin extends AutoPlugin {
   // triggered even if NoPublishPlugin is not used in the build
   override def trigger = allRequirements
 
-  object autoImport {
-    lazy val noPublishProjectRefs = settingKey[Seq[ProjectRef]]("List of no-publish projects")
-  }
-
-  import autoImport._
-
-  private[sbt] lazy val noPublishInternalAggregation =
-    settingKey[Seq[ProjectRef]]("Aggregates all the no-publish projects")
+  private[sbt] lazy val noPublishModulesIgnore =
+    settingKey[Seq[String]]("List of no-publish projects and their scala cross-versions")
 
   override def globalSettings = Seq(
-    noPublishInternalAggregation := Seq(),
-    noPublishProjectRefs := noPublishInternalAggregation.value
+    noPublishModulesIgnore := Seq()
   )
 
 }
