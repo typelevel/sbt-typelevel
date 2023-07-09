@@ -146,6 +146,14 @@ pull_request_rules:
       add:
       - site
       remove: []
+- name: Label site-ci-release PRs
+  conditions:
+  - files~=^site-ci-release/
+  actions:
+    label:
+      add:
+      - site-ci-release
+      remove: []
 - name: Label sonatype PRs
   conditions:
   - files~=^sonatype/

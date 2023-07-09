@@ -19,7 +19,6 @@ package org.typelevel.sbt.gha
 import sbt.Keys._
 import sbt._
 
-import java.nio.file.FileSystems
 import scala.io.Source
 
 object GenerativePlugin extends AutoPlugin {
@@ -577,6 +576,7 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
       WorkflowStep.Sbt(List("+publish"), name = Some("Publish project"))),
     githubWorkflowPublishTargetBranches := Seq(RefPredicate.Equals(Ref.Branch("main"))),
     githubWorkflowPublishCond := None,
+    githubWorkflowPublishNeeds := Set("build"),
     githubWorkflowPublishTimeoutMinutes := None,
     githubWorkflowJavaVersions := Seq(JavaSpec.temurin("11")),
     githubWorkflowScalaVersions := {
@@ -601,21 +601,16 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
 
   private val windowsGuard = Some("contains(runner.os, 'windows')")
 
-  private val PlatformSep = FileSystems.getDefault.getSeparator
-  private def normalizeSeparators(pathStr: String): String = {
-    pathStr.replace(PlatformSep, "/") // *force* unix separators
-  }
-
-  private val pathStrs = Def setting {
+  private val relativePaths = Def setting {
     val base = (ThisBuild / baseDirectory).value.toPath
 
     internalTargetAggregation.value map { file =>
       val path = file.toPath
 
       if (path.isAbsolute)
-        normalizeSeparators(base.relativize(path).toString)
+        base.relativize(path)
       else
-        normalizeSeparators(path.toString)
+        path
     }
   }
 
@@ -624,40 +619,21 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
 
   override def buildSettings = settingDefaults ++ Seq(
     githubWorkflowPREventTypes := PREventType.Defaults,
+    githubWorkflowArtifactDownloadExtraArtifacts := Set.empty,
     githubWorkflowArtifactDownloadExtraKeys := Set.empty,
     githubWorkflowGeneratedUploadSteps := {
       val generate =
         githubWorkflowArtifactUpload.value &&
           githubWorkflowPublishTargetBranches.value.nonEmpty
       if (generate) {
-        val sanitized = pathStrs.value map { str =>
-          if (str.indexOf(' ') >= 0) // TODO be less naive
-            s"'$str'"
-          else
-            str
-        }
-
-        val mkdir = WorkflowStep.Run(
-          List(s"mkdir -p ${sanitized.mkString(" ")} project/target"),
-          name = Some("Make target directories"),
-          cond = Some(publicationCond.value))
-
-        val tar = WorkflowStep.Run(
-          List(s"tar cf targets.tar ${sanitized.mkString(" ")} project/target"),
-          name = Some("Compress target directories"),
-          cond = Some(publicationCond.value))
-
         val keys = githubWorkflowBuildMatrixAdditions.value.keys.toList.sorted
-        val artifactId = MatrixKeys.groupId(keys)
-
-        val upload = WorkflowStep.Use(
-          UseRef.Public("actions", "upload-artifact", "v3"),
-          name = Some(s"Upload target directories"),
-          params = Map("name" -> s"target-$artifactId", "path" -> "targets.tar"),
-          cond = Some(publicationCond.value)
-        )
-
-        Seq(mkdir, tar, upload)
+        val artifactId = "target-" + MatrixKeys.groupId(keys)
+        WorkflowStep
+          .upload(
+            relativePaths.value.toList :+ java.nio.file.Paths.get("project", "target"),
+            artifactId
+          )
+          .map(_.withCond(Some(publicationCond.value)))
       } else {
         Seq()
       }
@@ -679,7 +655,7 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
       val exclusions = githubWorkflowBuildMatrixExclusions.value.toList
 
       // we build the list of artifacts, by iterating over all combinations of keys
-      val artifacts =
+      val matrixArtifacts =
         expandMatrix(
           oses,
           scalas,
@@ -690,24 +666,29 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
         ).map {
           case _ :: scala :: _ :: tail => scala :: tail
           case _ => sys.error("Bug generating artifact download steps") // shouldn't happen
+        }.map { v =>
+          val pretty = v.mkString(", ")
+          val id = s"target-$${{ matrix.os }}-$${{ matrix.java }}-${v.mkString("-")}"
+          (pretty, id)
         }
 
+      val artifacts =
+        matrixArtifacts ++ githubWorkflowArtifactDownloadExtraArtifacts.value.map(x => (x, x))
+
       if (githubWorkflowArtifactUpload.value) {
-        artifacts flatMap { v =>
-          val pretty = v.mkString(", ")
+        artifacts flatMap {
+          case (pretty, id) =>
+            val download = WorkflowStep.Use(
+              UseRef.Public("actions", "download-artifact", "v3"),
+              name = Some(s"Download target directories ($pretty)"),
+              params = Map("name" -> id)
+            )
 
-          val download = WorkflowStep.Use(
-            UseRef.Public("actions", "download-artifact", "v3"),
-            name = Some(s"Download target directories ($pretty)"),
-            params =
-              Map("name" -> s"target-$${{ matrix.os }}-$${{ matrix.java }}-${v.mkString("-")}")
-          )
+            val untar = WorkflowStep.Run(
+              List("tar xf targets.tar", "rm targets.tar"),
+              name = Some(s"Inflate target directories ($pretty)"))
 
-          val untar = WorkflowStep.Run(
-            List("tar xf targets.tar", "rm targets.tar"),
-            name = Some(s"Inflate target directories ($pretty)"))
-
-          Seq(download, untar)
+            Seq(download, untar)
         }
       } else {
         Seq()
@@ -753,7 +734,7 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
           scalas = List.empty,
           sbtStepPreamble = List.empty,
           javas = List(githubWorkflowJavaVersions.value.head),
-          needs = List("build"),
+          needs = githubWorkflowPublishNeeds.value.toList.sorted,
           timeoutMinutes = githubWorkflowPublishTimeoutMinutes.value
         )).filter(_ => githubWorkflowPublishTargetBranches.value.nonEmpty)
 
@@ -783,7 +764,7 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
     }
   )
 
-  private val publicationCond = Def setting {
+  private[sbt] val publicationCond = Def setting {
     val publicationCondPre =
       githubWorkflowPublishTargetBranches
         .value

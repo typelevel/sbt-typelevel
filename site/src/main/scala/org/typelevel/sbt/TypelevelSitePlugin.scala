@@ -78,7 +78,7 @@ object TypelevelSitePlugin extends AutoPlugin {
   import TypelevelGitHubPlugin._
 
   override def requires =
-    MdocPlugin && LaikaPlugin && TypelevelGitHubPlugin && GenerativePlugin && NoPublishPlugin
+    MdocPlugin && LaikaPlugin && TypelevelGitHubPlugin && GenerativePlugin
 
   override def globalSettings = Seq(
     tlSiteApiModule := None
@@ -110,6 +110,10 @@ object TypelevelSitePlugin extends AutoPlugin {
       .value: @nowarn("cat=other-pure-statement"),
     tlSitePreview := previewTask.value,
     Laika / sourceDirectories := Seq(mdocOut.value),
+    Compile / packageDoc / mappings := {
+      (laikaSite / mappings).dependsOn(tlSite).value
+    },
+    SettingKey[Set[ModuleID]]("mimaPreviousArtifacts") := Set.empty,
     laikaTheme := tlSiteHelium.value.build,
     mdocVariables := {
       mdocVariables.value ++
@@ -208,6 +212,11 @@ object TypelevelSitePlugin extends AutoPlugin {
         case (false, None) =>
           List.empty
       }
+    },
+    // avoid depending directly on sbt-typelevel-ci
+    ThisBuild / SettingKey[Seq[ProjectRef]]("tlCiDependencyIgnoreModules") := {
+      val old = (ThisBuild / SettingKey[Seq[ProjectRef]]("tlCiDependencyIgnoreModules")).?.value
+      old.getOrElse(Seq.empty) :+ thisProjectRef.value
     },
     ThisBuild / githubWorkflowAddedJobs +=
       WorkflowJob(

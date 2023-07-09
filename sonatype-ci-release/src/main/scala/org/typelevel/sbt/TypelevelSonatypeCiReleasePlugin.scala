@@ -64,9 +64,10 @@ object TypelevelSonatypeCiReleasePlugin extends AutoPlugin {
     )
   )
 
-  private val env = List("SONATYPE_USERNAME", "SONATYPE_PASSWORD", "SONATYPE_CREDENTIAL_HOST")
-    .map(k => k -> s"$${{ secrets.$k }}")
-    .toMap
+  private[sbt] val env = List(
+    "SONATYPE_USERNAME",
+    "SONATYPE_PASSWORD",
+    "SONATYPE_CREDENTIAL_HOST").map(k => k -> s"$${{ secrets.$k }}").toMap
 
   private def tlCiReleaseCommand: Command =
     Command.command("tlCiRelease") { state =>

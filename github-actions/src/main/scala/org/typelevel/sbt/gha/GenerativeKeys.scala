@@ -76,6 +76,8 @@ trait GenerativeKeys {
     "A set of branch predicates which will be applied to determine whether the current branch gets a publication stage; if empty, publish will be skipped entirely (default: [== main])")
   lazy val githubWorkflowPublishCond = settingKey[Option[String]](
     "A set of conditionals to apply to the publish job to further restrict its run (default: [])")
+  lazy val githubWorkflowPublishNeeds =
+    settingKey[Set[String]]("A set of job IDs the publish job needs (default: {build})")
   lazy val githubWorkflowPublishTimeoutMinutes = settingKey[Option[Int]](
     "The maximum number of minutes to let the publish job run before GitHub automatically cancels it (default: None)")
 
@@ -99,6 +101,8 @@ trait GenerativeKeys {
 
   lazy val githubWorkflowArtifactUpload = settingKey[Boolean](
     "Controls whether or not to upload target directories in the event that multiple jobs are running sequentially. Can be set on a per-project basis (default: true)")
+  lazy val githubWorkflowArtifactDownloadExtraArtifacts =
+    settingKey[Set[String]]("Additional artifacts which should be downloaded (default: {})")
   lazy val githubWorkflowArtifactDownloadExtraKeys = settingKey[Set[String]](
     "Additional matrix keys for which *all* artifacts should be downloaded and not just for the primary value (default: {})")
   lazy val githubWorkflowJobSetup = settingKey[Seq[WorkflowStep]](
