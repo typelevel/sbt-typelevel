@@ -34,7 +34,7 @@ object NoPublishPlugin extends AutoPlugin {
       // the binary versions are needed for the modules-ignore in Submit Dependencies
       // it's best to pick them up here instead of guessing in the CI plugin
       CrossVersion(crossVersion.value, v, CrossVersion.binaryScalaVersion(v)).map { cross =>
-        cross(thisProjectRef.value.project)
+        cross(projectID.value.name)
       }
     }
   )
