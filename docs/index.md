@@ -24,7 +24,7 @@ You can find an approximate list of sbt-typelevel adopters [here](https://github
 
 We provide a [Giter8 template](http://www.foundweekends.org/giter8/index.html) for quickly starting projects with familiar workflows and best practices.
 
-```sh
+```
 sbt new typelevel/typelevel.g8
 ```
 
