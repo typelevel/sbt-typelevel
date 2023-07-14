@@ -210,6 +210,49 @@ object GenerativePlugin extends AutoPlugin {
 ${indent(rendered.mkString("\n"), 1)}"""
     }
 
+  def compilePermissionScope(permissionScope: PermissionScope): String = permissionScope match {
+    case PermissionScope.Actions => "actions"
+    case PermissionScope.Checks => "checks"
+    case PermissionScope.Contents => "contents"
+    case PermissionScope.Deployments => "deployments"
+    case PermissionScope.IdToken => "id-token"
+    case PermissionScope.Issues => "issues"
+    case PermissionScope.Discussions => "discussions"
+    case PermissionScope.Packages => "packages"
+    case PermissionScope.Pages => "pages"
+    case PermissionScope.PullRequests => "pull-requests"
+    case PermissionScope.RepositoryProjects => "repository-projects"
+    case PermissionScope.SecurityEvents => "security-events"
+    case PermissionScope.Statuses => "statuses"
+  }
+
+  def compilePermissionsValue(permissionValue: PermissionValue): String =
+    permissionValue match {
+      case PermissionValue.Read => "read"
+      case PermissionValue.Write => "write"
+      case PermissionValue.None => "none"
+    }
+
+  def compilePermissions(permissions: Option[Permissions]): String = {
+    permissions match {
+      case Some(perms) =>
+        val rendered = perms match {
+          case Permissions.ReadAll => " read-all"
+          case Permissions.WriteAll => " write-all"
+          case Permissions.None => " {}"
+          case Permissions.Specify(permMap) =>
+            val map = permMap.map {
+              case (key, value) =>
+                s"${compilePermissionScope(key)}: ${compilePermissionsValue(value)}"
+            }
+            "\n" + indent(map.mkString("\n"), 1)
+        }
+        s"permissions:$rendered"
+
+      case None => ""
+    }
+  }
+
   def compileStep(
       step: WorkflowStep,
       sbt: String,
@@ -382,6 +425,13 @@ ${indent(rendered.mkString("\n"), 1)}"""
       else
         "\n" + renderedEnvPre
 
+    val renderedPermPre = compilePermissions(job.permissions)
+    val renderedPerm =
+      if (renderedPermPre.isEmpty)
+        ""
+      else
+        "\n" + renderedPermPre
+
     val renderedTimeoutMinutes =
       job.timeoutMinutes.map(timeout => s"\ntimeout-minutes: $timeout").getOrElse("")
 
@@ -469,7 +519,7 @@ ${indent(rendered.mkString("\n"), 1)}"""
 strategy:${renderedFailFast}
   matrix:
 ${buildMatrix(2, "os" -> job.oses, "scala" -> job.scalas, "java" -> job.javas.map(_.render))}${renderedMatrices}
-runs-on: ${runsOn}${renderedEnvironment}${renderedContainer}${renderedEnv}${renderedConcurrency}${renderedTimeoutMinutes}
+runs-on: ${runsOn}${renderedEnvironment}${renderedContainer}${renderedPerm}${renderedEnv}${renderedConcurrency}${renderedTimeoutMinutes}
 steps:
 ${indent(job.steps.map(compileStep(_, sbt, job.sbtStepPreamble, declareShell = declareShell)).mkString("\n\n"), 1)}"""
     // format: on
@@ -492,17 +542,24 @@ ${indent(job.steps.map(compileStep(_, sbt, job.sbtStepPreamble, declareShell = d
       tags: List[String],
       paths: Paths,
       prEventTypes: List[PREventType],
+      permissions: Option[Permissions],
       env: Map[String, String],
       concurrency: Option[Concurrency],
       jobs: List[WorkflowJob],
       sbt: String): String = {
 
+    val renderedPermissionsPre = compilePermissions(permissions)
     val renderedEnvPre = compileEnv(env)
     val renderedEnv =
       if (renderedEnvPre.isEmpty)
         ""
       else
         renderedEnvPre + "\n\n"
+    val renderedPerm =
+      if (renderedPermissionsPre.isEmpty)
+        ""
+      else
+        renderedPermissionsPre + "\n\n"
 
     val renderedConcurrency =
       concurrency.map(compileConcurrency).map("\n" + _ + "\n\n").getOrElse("")
@@ -545,7 +602,7 @@ on:
   push:
     branches: [${branches.map(wrap).mkString(", ")}]$renderedTags$renderedPaths
 
-${renderedEnv}${renderedConcurrency}jobs:
+${renderedPerm}${renderedEnv}${renderedConcurrency}jobs:
 ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
 """
   }
@@ -593,6 +650,7 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
     githubWorkflowTargetTags := Seq(),
     githubWorkflowTargetPaths := Paths.None,
     githubWorkflowEnv := Map("GITHUB_TOKEN" -> s"$${{ secrets.GITHUB_TOKEN }}"),
+    githubWorkflowPermissions := None,
     githubWorkflowAddedJobs := Seq()
   )
 
@@ -812,6 +870,7 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
       githubWorkflowTargetTags.value.toList,
       githubWorkflowTargetPaths.value,
       githubWorkflowPREventTypes.value.toList,
+      githubWorkflowPermissions.value,
       githubWorkflowEnv.value,
       githubWorkflowConcurrency.value,
       githubWorkflowGeneratedCI.value.toList,
