@@ -109,7 +109,7 @@ object Permissions {
   }
 }
 
-sealed trait PermissionScope extends Product with Serializable
+sealed abstract class PermissionScope extends Product with Serializable
 
 object PermissionScope {
   case object Actions extends PermissionScope
