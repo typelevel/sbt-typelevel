@@ -16,7 +16,7 @@
 
 package org.typelevel.sbt.gha
 
-sealed trait Permissions extends Product with Serializable
+sealed abstract class Permissions extends Product with Serializable
 
 /**
  * @see
@@ -104,7 +104,7 @@ object Permissions {
   }
 }
 
-sealed trait PermissionScope extends Product with Serializable
+sealed abstract class PermissionScope extends Product with Serializable
 
 object PermissionScope {
   case object Actions extends PermissionScope
@@ -122,7 +122,7 @@ object PermissionScope {
   case object Statuses extends PermissionScope
 }
 
-sealed trait PermissionValue extends Product with Serializable
+sealed abstract class PermissionValue extends Product with Serializable
 
 object PermissionValue {
   case object Read extends PermissionValue
