@@ -33,7 +33,6 @@ object Permissions {
       deployments: PermissionValue,
       idToken: PermissionValue,
       issues: PermissionValue,
-      metadata: PermissionValue,
       packages: PermissionValue,
       pages: PermissionValue,
       pullRequests: PermissionValue,
@@ -48,7 +47,6 @@ object Permissions {
       PermissionScope.Deployments -> deployments,
       PermissionScope.IdToken -> idToken,
       PermissionScope.Issues -> issues,
-      PermissionScope.Metadata -> metadata,
       PermissionScope.Packages -> packages,
       PermissionScope.Pages -> pages,
       PermissionScope.PullRequests -> pullRequests,
@@ -66,7 +64,6 @@ object Permissions {
       deployments = PermissionValue.Write,
       idToken = PermissionValue.None,
       issues = PermissionValue.Write,
-      metadata = PermissionValue.Read,
       packages = PermissionValue.Write,
       pages = PermissionValue.Write,
       pullRequests = PermissionValue.Write,
@@ -82,7 +79,6 @@ object Permissions {
       deployments = PermissionValue.None,
       idToken = PermissionValue.None,
       issues = PermissionValue.None,
-      metadata = PermissionValue.Read,
       packages = PermissionValue.Read,
       pages = PermissionValue.None,
       pullRequests = PermissionValue.None,
@@ -98,7 +94,6 @@ object Permissions {
       deployments = PermissionValue.Read,
       idToken = PermissionValue.Read,
       issues = PermissionValue.Read,
-      metadata = PermissionValue.Read,
       packages = PermissionValue.Read,
       pages = PermissionValue.Read,
       pullRequests = PermissionValue.Read,
@@ -118,7 +113,6 @@ object PermissionScope {
   case object Deployments extends PermissionScope
   case object IdToken extends PermissionScope
   case object Issues extends PermissionScope
-  case object Metadata extends PermissionScope
   case object Discussions extends PermissionScope
   case object Packages extends PermissionScope
   case object Pages extends PermissionScope
