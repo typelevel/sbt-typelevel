@@ -16,7 +16,7 @@
 
 package org.typelevel.sbt.gha
 
-sealed trait Permissions extends Product with Serializable
+sealed abstract class Permissions extends Product with Serializable
 
 /**
  * @see
