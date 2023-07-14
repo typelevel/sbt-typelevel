@@ -26,7 +26,87 @@ object Permissions {
   case object ReadAll extends Permissions
   case object WriteAll extends Permissions
   case object None extends Permissions
-  final case class Specify(values: Map[PermissionScope, PermissionValue]) extends Permissions
+  final case class Specify private (
+      actions: PermissionValue,
+      checks: PermissionValue,
+      contents: PermissionValue,
+      deployments: PermissionValue,
+      idToken: PermissionValue,
+      issues: PermissionValue,
+      metadata: PermissionValue,
+      packages: PermissionValue,
+      pages: PermissionValue,
+      pullRequests: PermissionValue,
+      repositoryProjects: PermissionValue,
+      securityEvents: PermissionValue,
+      statuses: PermissionValue
+  ) extends Permissions {
+    val asMap: Map[PermissionScope, PermissionValue] = Map(
+      PermissionScope.Actions -> actions,
+      PermissionScope.Checks -> checks,
+      PermissionScope.Contents -> contents,
+      PermissionScope.Deployments -> deployments,
+      PermissionScope.IdToken -> idToken,
+      PermissionScope.Issues -> issues,
+      PermissionScope.Metadata -> metadata,
+      PermissionScope.Packages -> packages,
+      PermissionScope.Pages -> pages,
+      PermissionScope.PullRequests -> pullRequests,
+      PermissionScope.RepositoryProjects -> repositoryProjects,
+      PermissionScope.SecurityEvents -> securityEvents,
+      PermissionScope.Statuses -> statuses
+    )
+  }
+  object Specify {
+    // See https://docs.github.com/en/actions/security-guides/automatic-token-authentication#permissions-for-the-github_token
+    val defaultPermissive = Specify(
+      actions = PermissionValue.Write,
+      checks = PermissionValue.Write,
+      contents = PermissionValue.Write,
+      deployments = PermissionValue.Write,
+      idToken = PermissionValue.None,
+      issues = PermissionValue.Write,
+      metadata = PermissionValue.Read,
+      packages = PermissionValue.Write,
+      pages = PermissionValue.Write,
+      pullRequests = PermissionValue.Write,
+      repositoryProjects = PermissionValue.Write,
+      securityEvents = PermissionValue.Write,
+      statuses = PermissionValue.Write
+    )
+
+    val defaultRestrictive = Specify(
+      actions = PermissionValue.None,
+      checks = PermissionValue.None,
+      contents = PermissionValue.Read,
+      deployments = PermissionValue.None,
+      idToken = PermissionValue.None,
+      issues = PermissionValue.None,
+      metadata = PermissionValue.Read,
+      packages = PermissionValue.Read,
+      pages = PermissionValue.None,
+      pullRequests = PermissionValue.None,
+      repositoryProjects = PermissionValue.None,
+      securityEvents = PermissionValue.None,
+      statuses = PermissionValue.None
+    )
+
+    val maxPRAccessFromFork = Specify(
+      actions = PermissionValue.Read,
+      checks = PermissionValue.Read,
+      contents = PermissionValue.Read,
+      deployments = PermissionValue.Read,
+      idToken = PermissionValue.Read,
+      issues = PermissionValue.Read,
+      metadata = PermissionValue.Read,
+      packages = PermissionValue.Read,
+      pages = PermissionValue.Read,
+      pullRequests = PermissionValue.Read,
+      repositoryProjects = PermissionValue.Read,
+      securityEvents = PermissionValue.Read,
+      statuses = PermissionValue.Read
+    )
+  }
 }
 
 sealed trait PermissionScope extends Product with Serializable
@@ -38,6 +118,7 @@ object PermissionScope {
   case object Deployments extends PermissionScope
   case object IdToken extends PermissionScope
   case object Issues extends PermissionScope
+  case object Metadata extends PermissionScope
   case object Discussions extends PermissionScope
   case object Packages extends PermissionScope
   case object Pages extends PermissionScope

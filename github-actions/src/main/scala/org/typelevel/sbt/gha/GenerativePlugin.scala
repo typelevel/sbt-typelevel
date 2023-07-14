@@ -217,6 +217,7 @@ ${indent(rendered.mkString("\n"), 1)}"""
     case PermissionScope.Deployments => "deployments"
     case PermissionScope.IdToken => "id-token"
     case PermissionScope.Issues => "issues"
+    case PermissionScope.Metadata => "metadata"
     case PermissionScope.Discussions => "discussions"
     case PermissionScope.Packages => "packages"
     case PermissionScope.Pages => "pages"
@@ -240,8 +241,8 @@ ${indent(rendered.mkString("\n"), 1)}"""
           case Permissions.ReadAll => " read-all"
           case Permissions.WriteAll => " write-all"
           case Permissions.None => " {}"
-          case Permissions.Specify(permMap) =>
-            val map = permMap.map {
+          case x: Permissions.Specify =>
+            val map = x.asMap.map {
               case (key, value) =>
                 s"${compilePermissionScope(key)}: ${compilePermissionsValue(value)}"
             }

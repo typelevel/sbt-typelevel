@@ -15,7 +15,19 @@ on:
     tags: [v*]
 
 permissions:
-  id-token: write
+  metadata: read
+  checks: write
+  deployments: write
+  packages: write
+  pages: write
+  security-events: write
+  id-token: none
+  repository-projects: write
+  contents: write
+  issues: write
+  actions: write
+  pull-requests: write
+  statuses: write
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

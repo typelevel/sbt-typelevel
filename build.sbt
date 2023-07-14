@@ -47,8 +47,7 @@ ThisBuild / mergifyPrRules += MergifyPrRule(
 )
 ThisBuild / mergifyRequiredJobs ++= Seq("validate-steward", "site")
 
-ThisBuild / githubWorkflowPermissions := Some(
-  Permissions.Specify(Map(PermissionScope.IdToken -> PermissionValue.Write)))
+ThisBuild / githubWorkflowPermissions := Some(Permissions.Specify.defaultPermissive)
 
 val MunitVersion = "0.7.29"
 
