@@ -19,7 +19,6 @@ package org.typelevel.sbt
 import org.typelevel.sbt.NoPublishGlobalPlugin.noPublishModulesIgnore
 import org.typelevel.sbt.gha.GenerativePlugin
 import org.typelevel.sbt.gha.GenerativePlugin.autoImport._
-import org.typelevel.sbt.Typel.autoImport._
 import org.typelevel.sbt.gha.GitHubActionsPlugin
 import org.typelevel.sbt.gha.WorkflowStep
 import sbt._
