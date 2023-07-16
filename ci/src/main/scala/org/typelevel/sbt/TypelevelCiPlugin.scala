@@ -19,6 +19,7 @@ package org.typelevel.sbt
 import org.typelevel.sbt.NoPublishGlobalPlugin.noPublishModulesIgnore
 import org.typelevel.sbt.gha.GenerativePlugin
 import org.typelevel.sbt.gha.GenerativePlugin.autoImport._
+import org.typelevel.sbt.Typel.autoImport._
 import org.typelevel.sbt.gha.GitHubActionsPlugin
 import org.typelevel.sbt.gha.WorkflowStep
 import sbt._
@@ -171,7 +172,11 @@ object TypelevelCiPlugin extends AutoPlugin {
             WorkflowStep.Checkout ::
               WorkflowStep.Use(
                 UseRef.Public("coursier", "setup-action", "v1"),
-                Map("apps" -> "scala-steward")
+                Map("apps" -> "scala-steward") ++ githubWorkflowJavaVersions
+                  .value
+                  .headOption
+                  .map(v => Map("jvm" -> v.version))
+                  .getOrElse(Map.empty)
               ) ::
               WorkflowStep.Run(List(s"scala-steward validate-repo-config $config")) :: Nil,
             scalas = List.empty,
