@@ -43,7 +43,7 @@ object WorkflowStep {
 
   def SetupJava(versions: List[JavaSpec], enableCaching: Boolean = true): List[WorkflowStep] = {
     def sbtUpdateStep(cond: String, setupId: String) =
-      if (includeSbt)
+      if (enableCaching)
         List(
           WorkflowStep.Sbt(
             List("reload", "+update"),
@@ -54,7 +54,7 @@ object WorkflowStep {
 
     val SetupJavaAction = UseRef.Public("actions", "setup-java", "v3")
     val SetupGraalVMAction = UseRef.Public("graalvm", "setup-graalvm", "v1")
-    val sbtCacheParams = if (includeSbt) Map("cache" -> "sbt") else Map.empty
+    val sbtCacheParams = if (enableCaching) Map("cache" -> "sbt") else Map.empty
 
     versions flatMap {
       case jv @ JavaSpec(JavaSpec.Distribution.GraalVM(graalVersion), javaVersion) =>
