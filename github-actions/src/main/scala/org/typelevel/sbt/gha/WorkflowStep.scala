@@ -41,7 +41,7 @@ object WorkflowStep {
     UseRef.Public("actions", "checkout", "v3"),
     name = Some("Checkout current branch (fast)"))
 
-  def SetupJava(versions: List[JavaSpec], includeSbt: Boolean = true): List[WorkflowStep] = {
+  def SetupJava(versions: List[JavaSpec], enableCaching: Boolean = true): List[WorkflowStep] = {
     def sbtUpdateStep(cond: String, setupId: String) =
       if (includeSbt)
         List(
