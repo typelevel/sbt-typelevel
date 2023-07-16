@@ -492,6 +492,7 @@ jobs:
       - uses: coursier/setup-action@v1
         with:
           apps: scala-steward
+          jvm: 8
 
       - run: scala-steward validate-repo-config .scala-steward.conf
 
