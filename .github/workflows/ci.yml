@@ -15,17 +15,17 @@ on:
     tags: [v*]
 
 permissions:
+  actions: write
   checks: write
+  contents: write
   deployments: write
+  id-token: none
+  issues: write
   packages: write
   pages: write
-  security-events: write
-  id-token: none
-  repository-projects: write
-  contents: write
-  issues: write
-  actions: write
   pull-requests: write
+  repository-projects: write
+  security-events: write
   statuses: write
 
 env:

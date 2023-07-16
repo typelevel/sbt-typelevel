@@ -16,6 +16,8 @@
 
 package org.typelevel.sbt.gha
 
+import scala.collection.immutable.SortedMap
+
 sealed abstract class Permissions extends Product with Serializable
 
 /**
@@ -40,7 +42,7 @@ object Permissions {
       securityEvents: PermissionValue,
       statuses: PermissionValue
   ) extends Permissions {
-    private[gha] lazy val asMap: Map[PermissionScope, PermissionValue] = Map(
+    private[gha] lazy val asMap: SortedMap[PermissionScope, PermissionValue] = SortedMap(
       PermissionScope.Actions -> actions,
       PermissionScope.Checks -> checks,
       PermissionScope.Contents -> contents,
@@ -120,6 +122,9 @@ object PermissionScope {
   case object RepositoryProjects extends PermissionScope
   case object SecurityEvents extends PermissionScope
   case object Statuses extends PermissionScope
+
+  implicit val permissionScopeOrdering: Ordering[PermissionScope] = (x, y) =>
+    Ordering[String].compare(x.toString, y.toString)
 }
 
 sealed abstract class PermissionValue extends Product with Serializable
