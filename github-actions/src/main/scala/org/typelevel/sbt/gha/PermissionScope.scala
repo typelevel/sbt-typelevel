@@ -19,8 +19,8 @@ package org.typelevel.sbt.gha
 import scala.collection.immutable.SortedMap
 
 sealed abstract class Permissions extends Product with Serializable {
-  private[gha] def rendered: String
-  private[gha] def value: String = s"permissions:$rendered"
+  def rendered: String
+  def value: String = s"permissions:$rendered"
 }
 
 /**
@@ -29,13 +29,13 @@ sealed abstract class Permissions extends Product with Serializable {
  */
 object Permissions {
   case object ReadAll extends Permissions {
-    override private[gha] val rendered: String = " read-all"
+    override val rendered: String = " read-all"
   }
   case object WriteAll extends Permissions {
-    override private[gha] val rendered: String = " write-all"
+    override val rendered: String = " write-all"
   }
   case object None extends Permissions {
-    override private[gha] val rendered: String = " {}"
+    override val rendered: String = " {}"
   }
   final case class Specify private (
       actions: PermissionValue,
@@ -66,7 +66,7 @@ object Permissions {
       PermissionScope.Statuses -> statuses
     )
 
-    override private[gha] val rendered: String = {
+    override val rendered: String = {
       val map = asMap.map {
         case (key, value) =>
           s"${key.value}: ${value.value}"
@@ -123,9 +123,7 @@ object Permissions {
   }
 }
 
-sealed abstract class PermissionScope(private[gha] val value: String)
-    extends Product
-    with Serializable
+sealed abstract class PermissionScope(val value: String) extends Product with Serializable
 
 object PermissionScope {
   case object Actions extends PermissionScope("actions")
@@ -146,9 +144,7 @@ object PermissionScope {
     Ordering[String].compare(x.toString, y.toString)
 }
 
-sealed abstract class PermissionValue(private[gha] val value: String)
-    extends Product
-    with Serializable
+sealed abstract class PermissionValue(val value: String) extends Product with Serializable
 
 object PermissionValue {
   case object Read extends PermissionValue("read")
