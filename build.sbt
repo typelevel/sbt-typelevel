@@ -1,5 +1,7 @@
 name := "sbt-typelevel"
 
+import org.typelevel.sbt.gha.{PermissionScope, PermissionValue, Permissions}
+
 ThisBuild / tlBaseVersion := "0.5"
 ThisBuild / crossScalaVersions := Seq("2.12.18")
 ThisBuild / developers ++= List(
@@ -44,6 +46,8 @@ ThisBuild / mergifyPrRules += MergifyPrRule(
   )
 )
 ThisBuild / mergifyRequiredJobs ++= Seq("validate-steward", "site")
+
+ThisBuild / githubWorkflowPermissions := Some(Permissions.Specify.defaultPermissive)
 
 val MunitVersion = "0.7.29"
 

@@ -22,6 +22,7 @@ final case class WorkflowJob(
     steps: List[WorkflowStep],
     sbtStepPreamble: List[String] = List(s"++ $${{ matrix.scala }}"),
     cond: Option[String] = None,
+    permissions: Option[Permissions] = None,
     env: Map[String, String] = Map(),
     oses: List[String] = List("ubuntu-latest"),
     scalas: List[String] = List("2.13"),
