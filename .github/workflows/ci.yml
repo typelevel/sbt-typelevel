@@ -511,7 +511,6 @@ jobs:
         with:
           distribution: temurin
           java-version: 11
-          cache: sbt
 
       - uses: coursier/setup-action@v1
         with:

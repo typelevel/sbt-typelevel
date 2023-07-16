@@ -41,16 +41,20 @@ object WorkflowStep {
     UseRef.Public("actions", "checkout", "v3"),
     name = Some("Checkout current branch (fast)"))
 
-  def SetupJava(versions: List[JavaSpec]): List[WorkflowStep] = {
+  def SetupJava(versions: List[JavaSpec], includeSbt: Boolean = true): List[WorkflowStep] = {
     def sbtUpdateStep(cond: String, setupId: String) =
-      WorkflowStep.Sbt(
-        List("reload", "+update"),
-        name = Some(s"sbt update"),
-        cond = Some(s"$cond && steps.${setupId}.outputs.cache-hit == 'false'")
-      )
+      if (includeSbt)
+        List(
+          WorkflowStep.Sbt(
+            List("reload", "+update"),
+            name = Some(s"sbt update"),
+            cond = Some(s"$cond && steps.${setupId}.outputs.cache-hit == 'false'")
+          ))
+      else Nil
 
     val SetupJavaAction = UseRef.Public("actions", "setup-java", "v3")
     val SetupGraalVMAction = UseRef.Public("graalvm", "setup-graalvm", "v1")
+    val sbtCacheParams = if (includeSbt) Map("cache" -> "sbt") else Map.empty
 
     versions flatMap {
       case jv @ JavaSpec(JavaSpec.Distribution.GraalVM(graalVersion), javaVersion) =>
@@ -62,8 +66,8 @@ object WorkflowStep {
           id = Some(setupId),
           cond = Some(cond),
           params =
-            Map("version" -> graalVersion, "java-version" -> javaVersion, "cache" -> "sbt")
-        ) :: sbtUpdateStep(cond, setupId) :: Nil
+            Map("version" -> graalVersion, "java-version" -> javaVersion) ++ sbtCacheParams
+        ) +: sbtUpdateStep(cond, setupId)
 
       case jv @ JavaSpec(dist, version) =>
         val setupId = s"setup-java-${dist.rendering}-$version".replace('.', '_')
@@ -75,8 +79,8 @@ object WorkflowStep {
           id = Some(setupId),
           cond = Some(cond),
           params =
-            Map("distribution" -> dist.rendering, "java-version" -> version, "cache" -> "sbt")
-        ) :: sbtUpdateStep(cond, setupId) :: Nil
+            Map("distribution" -> dist.rendering, "java-version" -> version) ++ sbtCacheParams
+        ) +: sbtUpdateStep(cond, setupId)
     }
 
   }
