@@ -78,7 +78,7 @@ object GenerativePlugin extends AutoPlugin {
         .mkString("-")
   }
 
-  private[gha] def indent(output: String, level: Int): String = {
+  private def indent(output: String, level: Int): String = {
     val space = (0 until level * 2).map(_ => ' ').mkString
     (space + output.replace("\n", s"\n$space")).replaceAll("""\n[ ]+\n""", "\n\n")
   }
@@ -210,9 +210,45 @@ object GenerativePlugin extends AutoPlugin {
 ${indent(rendered.mkString("\n"), 1)}"""
     }
 
+  def compilePermissionScope(permissionScope: PermissionScope): String = permissionScope match {
+    case PermissionScope.Actions => "actions"
+    case PermissionScope.Checks => "checks"
+    case PermissionScope.Contents => "contents"
+    case PermissionScope.Deployments => "deployments"
+    case PermissionScope.IdToken => "id-token"
+    case PermissionScope.Issues => "issues"
+    case PermissionScope.Discussions => "discussions"
+    case PermissionScope.Packages => "packages"
+    case PermissionScope.Pages => "pages"
+    case PermissionScope.PullRequests => "pull-requests"
+    case PermissionScope.RepositoryProjects => "repository-projects"
+    case PermissionScope.SecurityEvents => "security-events"
+    case PermissionScope.Statuses => "statuses"
+  }
+
+  def compilePermissionsValue(permissionValue: PermissionValue): String =
+    permissionValue match {
+      case PermissionValue.Read => "read"
+      case PermissionValue.Write => "write"
+      case PermissionValue.None => "none"
+    }
+
   def compilePermissions(permissions: Option[Permissions]): String = {
     permissions match {
-      case Some(perms) => perms.value
+      case Some(perms) =>
+        val rendered = perms match {
+          case Permissions.ReadAll => " read-all"
+          case Permissions.WriteAll => " write-all"
+          case Permissions.None => " {}"
+          case x: Permissions.Specify =>
+            val map = x.asMap.map {
+              case (key, value) =>
+                s"${compilePermissionScope(key)}: ${compilePermissionsValue(value)}"
+            }
+            "\n" + indent(map.mkString("\n"), 1)
+        }
+        s"permissions:$rendered"
+
       case None => ""
     }
   }

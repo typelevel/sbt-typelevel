@@ -18,25 +18,16 @@ package org.typelevel.sbt.gha
 
 import scala.collection.immutable.SortedMap
 
-sealed abstract class Permissions extends Product with Serializable {
-  def rendered: String
-  def value: String = s"permissions:$rendered"
-}
+sealed abstract class Permissions extends Product with Serializable
 
 /**
  * @see
  *   https://docs.github.com/en/actions/using-jobs/assigning-permissions-to-jobs#overview
  */
 object Permissions {
-  case object ReadAll extends Permissions {
-    override val rendered: String = " read-all"
-  }
-  case object WriteAll extends Permissions {
-    override val rendered: String = " write-all"
-  }
-  case object None extends Permissions {
-    override val rendered: String = " {}"
-  }
+  case object ReadAll extends Permissions
+  case object WriteAll extends Permissions
+  case object None extends Permissions
   final case class Specify private (
       actions: PermissionValue,
       checks: PermissionValue,
@@ -65,14 +56,6 @@ object Permissions {
       PermissionScope.SecurityEvents -> securityEvents,
       PermissionScope.Statuses -> statuses
     )
-
-    override val rendered: String = {
-      val map = asMap.map {
-        case (key, value) =>
-          s"${key.value}: ${value.value}"
-      }
-      "\n" + GenerativePlugin.indent(map.mkString("\n"), 1)
-    }
   }
   object Specify {
     // See https://docs.github.com/en/actions/security-guides/automatic-token-authentication#permissions-for-the-github_token
@@ -123,31 +106,31 @@ object Permissions {
   }
 }
 
-sealed abstract class PermissionScope(val value: String) extends Product with Serializable
+sealed abstract class PermissionScope extends Product with Serializable
 
 object PermissionScope {
-  case object Actions extends PermissionScope("actions")
-  case object Checks extends PermissionScope("checks")
-  case object Contents extends PermissionScope("contents")
-  case object Deployments extends PermissionScope("deployments")
-  case object IdToken extends PermissionScope("id-token")
-  case object Issues extends PermissionScope("issues")
-  case object Discussions extends PermissionScope("discussions")
-  case object Packages extends PermissionScope("packages")
-  case object Pages extends PermissionScope("pages")
-  case object PullRequests extends PermissionScope("pull-requests")
-  case object RepositoryProjects extends PermissionScope("repository-projects")
-  case object SecurityEvents extends PermissionScope("security-events")
-  case object Statuses extends PermissionScope("statuses")
+  case object Actions extends PermissionScope
+  case object Checks extends PermissionScope
+  case object Contents extends PermissionScope
+  case object Deployments extends PermissionScope
+  case object IdToken extends PermissionScope
+  case object Issues extends PermissionScope
+  case object Discussions extends PermissionScope
+  case object Packages extends PermissionScope
+  case object Pages extends PermissionScope
+  case object PullRequests extends PermissionScope
+  case object RepositoryProjects extends PermissionScope
+  case object SecurityEvents extends PermissionScope
+  case object Statuses extends PermissionScope
 
   implicit val permissionScopeOrdering: Ordering[PermissionScope] = (x, y) =>
     Ordering[String].compare(x.toString, y.toString)
 }
 
-sealed abstract class PermissionValue(val value: String) extends Product with Serializable
+sealed abstract class PermissionValue extends Product with Serializable
 
 object PermissionValue {
-  case object Read extends PermissionValue("read")
-  case object Write extends PermissionValue("write")
-  case object None extends PermissionValue("none")
+  case object Read extends PermissionValue
+  case object Write extends PermissionValue
+  case object None extends PermissionValue
 }
