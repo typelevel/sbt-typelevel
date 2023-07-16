@@ -513,10 +513,6 @@ jobs:
           java-version: 11
           cache: sbt
 
-      - name: sbt update
-        if: matrix.java == 'temurin@11' && steps.setup-java-temurin-11.outputs.cache-hit == 'false'
-        run: sbt '++ ${{ matrix.scala }}' reload +update
-
       - uses: coursier/setup-action@v1
         with:
           apps: scala-steward

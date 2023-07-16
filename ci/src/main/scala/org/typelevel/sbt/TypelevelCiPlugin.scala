@@ -169,7 +169,9 @@ object TypelevelCiPlugin extends AutoPlugin {
             "validate-steward",
             "Validate Steward Config",
             WorkflowStep.Checkout ::
-              WorkflowStep.SetupJava(List(JavaSpec.temurin("11"))) :::
+              WorkflowStep
+                .SetupJava(List(JavaSpec.temurin("11")))
+                .filterNot(_.name == Some("sbt update")) :::
               WorkflowStep.Use(
                 UseRef.Public("coursier", "setup-action", "v1"),
                 Map("apps" -> "scala-steward")
