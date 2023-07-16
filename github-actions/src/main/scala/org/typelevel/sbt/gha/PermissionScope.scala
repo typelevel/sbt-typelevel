@@ -40,7 +40,7 @@ object Permissions {
       securityEvents: PermissionValue,
       statuses: PermissionValue
   ) extends Permissions {
-    val asMap: Map[PermissionScope, PermissionValue] = Map(
+    private[gha] lazy val asMap: Map[PermissionScope, PermissionValue] = Map(
       PermissionScope.Actions -> actions,
       PermissionScope.Checks -> checks,
       PermissionScope.Contents -> contents,
