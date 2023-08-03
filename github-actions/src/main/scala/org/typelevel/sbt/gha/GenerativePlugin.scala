@@ -441,7 +441,7 @@ ${indent(rendered.mkString("\n"), 1)}"""
       }
     }
 
-    val renderedMatricesPre = job.matrixAdds map {
+    val renderedMatricesPre = job.matrixAdds.toList.sortBy(_._1) map {
       case (key, values) => s"$key: ${values.map(wrap).mkString("[", ", ", "]")}"
     } mkString "\n"
 
