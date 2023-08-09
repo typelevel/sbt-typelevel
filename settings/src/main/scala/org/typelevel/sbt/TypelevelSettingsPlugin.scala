@@ -65,7 +65,11 @@ object TypelevelSettingsPlugin extends AutoPlugin {
           )
 
       val scalacCompat =
-        Seq(CompileTime, Test).map("org.typelevel" %% "scalac-compat-annotation" % "0.1.2" % _)
+        if (Set("2.12", "2.13", "3").contains(scalaBinaryVersion.value))
+          Seq(CompileTime, Test).map(
+            "org.typelevel" %% "scalac-compat-annotation" % "0.1.2" % _)
+        else
+          Nil
 
       scalacCompat ++ plugins
     },
