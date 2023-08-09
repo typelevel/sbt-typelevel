@@ -46,9 +46,10 @@ object WorkflowStep {
       if (enableCaching)
         List(
           WorkflowStep.Sbt(
-            List("reload", "+update"),
+            List("+update"),
             name = Some(s"sbt update"),
-            cond = Some(s"$cond && steps.${setupId}.outputs.cache-hit == 'false'")
+            cond = Some(s"$cond && steps.${setupId}.outputs.cache-hit == 'false'"),
+            preamble = false
           ))
       else Nil
 
@@ -136,7 +137,8 @@ object WorkflowStep {
       cond: Option[String] = None,
       env: Map[String, String] = Map(),
       params: Map[String, String] = Map(),
-      timeoutMinutes: Option[Int] = None)
+      timeoutMinutes: Option[Int] = None,
+      preamble: Boolean = true)
       extends WorkflowStep {
     def withId(id: Option[String]) = copy(id = id)
     def withName(name: Option[String]) = copy(name = name)
