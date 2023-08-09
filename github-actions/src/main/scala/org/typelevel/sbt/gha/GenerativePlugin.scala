@@ -291,12 +291,13 @@ ${indent(rendered.mkString("\n"), 1)}"""
       case sbtStep: Sbt =>
         import sbtStep.commands
 
+        val preamble = if (sbtStep.preamble) sbtStepPreamble else Nil
         val sbtClientMode = sbt.matches("""sbt.* --client($| .*)""")
         val safeCommands =
           if (sbtClientMode)
-            s"'${(sbtStepPreamble ::: commands).mkString("; ")}'"
+            s"'${(preamble ::: commands).mkString("; ")}'"
           else
-            (sbtStepPreamble ::: commands)
+            (preamble ::: commands)
               .map { c =>
                 if (c.indexOf(' ') >= 0)
                   s"'$c'"
