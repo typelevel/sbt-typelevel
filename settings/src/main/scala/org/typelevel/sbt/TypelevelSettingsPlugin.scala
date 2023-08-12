@@ -124,7 +124,8 @@ object TypelevelSettingsPlugin extends AutoPlugin {
         // - remove 'implicit-recursion' due to backward incompatibility with 2.12
         // - remove 'recurse-with-default' due to backward incompatibility with 2.12
         // - remove 'unused' because it is configured by '-Wunused'
-        "-Xlint:_,-implicit-recursion,-recurse-with-default,-unused"
+        // - remove '-byname-implicit' because scala/bug#12072
+        "-Xlint:_,-implicit-recursion,-recurse-with-default,-unused,-byname-implicit"
       )
 
       val warningsDotty = Seq.empty
