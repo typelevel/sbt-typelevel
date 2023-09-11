@@ -120,6 +120,8 @@ object TypelevelSettingsPlugin extends AutoPlugin {
         "-Wnumeric-widen",
         "-Wunused", // all choices are enabled by default
         "-Wvalue-discard",
+        // we want to opt-in to the -Xsource:3 semantics changes, and opt-out from fatal warnings about the changes
+        "-Wconf:cat=scala3-migration:s",
         // Tune '-Xlint':
         // - remove 'implicit-recursion' due to backward incompatibility with 2.12
         // - remove 'recurse-with-default' due to backward incompatibility with 2.12
