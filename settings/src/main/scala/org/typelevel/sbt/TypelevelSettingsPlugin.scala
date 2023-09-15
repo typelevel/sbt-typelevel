@@ -114,21 +114,25 @@ object TypelevelSettingsPlugin extends AutoPlugin {
         "-Ywarn-dead-code", // superseded by "-Wdead-code"
         "-Ywarn-numeric-widen" // superseded by "-Wnumeric-widen"
       )
-      val warnings213 = Seq(
+      def warnings213(patch: Int) = Seq(
         "-Wdead-code",
         "-Wextra-implicit",
         "-Wnumeric-widen",
         "-Wunused", // all choices are enabled by default
         "-Wvalue-discard",
-        // we want to opt-in to the -Xsource:3 semantics changes, and opt-out from fatal warnings about the changes
-        "-Wconf:cat=scala3-migration:s",
         // Tune '-Xlint':
         // - remove 'implicit-recursion' due to backward incompatibility with 2.12
         // - remove 'recurse-with-default' due to backward incompatibility with 2.12
         // - remove 'unused' because it is configured by '-Wunused'
         // - remove '-byname-implicit' because scala/bug#12072
         "-Xlint:_,-implicit-recursion,-recurse-with-default,-unused,-byname-implicit"
-      )
+      ) ++
+        (if (patch >= 12)
+           Seq(
+             // we want to opt-in to the -Xsource:3 semantics changes, and opt-out from fatal warnings about the changes
+             "-Wconf:cat=scala3-migration:s"
+           )
+         else Nil)
 
       val warningsDotty = Seq.empty
 
@@ -149,8 +153,8 @@ object TypelevelSettingsPlugin extends AutoPlugin {
         case V(V(3, _, _, _)) =>
           warningsDotty
 
-        case V(V(2, minor, _, _)) if minor >= 13 =>
-          (warnings211 ++ warnings212 ++ warnings213 ++ warningsNsc)
+        case V(V(2, minor, patch, _)) if minor >= 13 =>
+          (warnings211 ++ warnings212 ++ warnings213(patch.getOrElse(0)) ++ warningsNsc)
             .filterNot(removed212 ++ removed213)
 
         case V(V(2, minor, _, _)) if minor >= 12 =>
