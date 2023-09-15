@@ -93,7 +93,7 @@ object TypelevelGitHubPlugin extends AutoPlugin {
             infoOpt.toSeq flatMap { info =>
               val path =
                 // see https://github.com/scala/bug/issues/12867#issuecomment-1718481858
-                if (minor > 13 || minor == 13 && patch.exists(_ >= 12))
+                if (minor > 13 || minor == 13 && patch.forall(_ >= 12))
                   s"${info.browseUrl}/blob/${vh}/€{FILE_PATH}.scala"
                 else s"${info.browseUrl}/blob/${vh}€{FILE_PATH}.scala"
               Seq("-doc-source-url", path)
