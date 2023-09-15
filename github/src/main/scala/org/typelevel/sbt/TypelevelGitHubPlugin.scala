@@ -18,12 +18,12 @@ package org.typelevel.sbt
 
 import com.github.sbt.git.SbtGit.git
 import org.typelevel.sbt.kernel.GitHelper
+import org.typelevel.sbt.kernel.V
 import sbt._
 
 import scala.util.Try
 
 import Keys._
-import TypelevelKernelPlugin.autoImport._
 
 object TypelevelGitHubPlugin extends AutoPlugin {
 
@@ -82,19 +82,24 @@ object TypelevelGitHubPlugin extends AutoPlugin {
       val userRepo = gitHubUserRepo.value
       val infoOpt = scmInfo.value
 
-      if (tlIsScala3.value)
-        tagOrHash.toSeq flatMap { vh =>
-          userRepo.toSeq flatMap {
-            case (user, repo) => Seq(s"-source-links:github://${user}/${repo}", "-revision", vh)
-          }
+      tagOrHash.toSeq flatMap { vh =>
+        scalaVersion.value match {
+          case V(V(3, _, _, _)) =>
+            userRepo.toSeq flatMap {
+              case (user, repo) =>
+                Seq(s"-source-links:github://${user}/${repo}", "-revision", vh)
+            }
+          case (V(V(2, minor, patch, _))) =>
+            infoOpt.toSeq flatMap { info =>
+              val path =
+                // see https://github.com/scala/bug/issues/12867#issuecomment-1718481858
+                if (minor > 13 || minor == 13 && patch.forall(_ >= 12))
+                  s"${info.browseUrl}/blob/${vh}/€{FILE_PATH}.scala"
+                else s"${info.browseUrl}/blob/${vh}€{FILE_PATH}.scala"
+              Seq("-doc-source-url", path)
+            }
         }
-      else
-        tagOrHash.toSeq flatMap { vh =>
-          infoOpt.toSeq flatMap { info =>
-            val path = s"${info.browseUrl}/blob/${vh}€{FILE_PATH}.scala"
-            Seq("-doc-source-url", path)
-          }
-        }
+      }
     }
   )
 
