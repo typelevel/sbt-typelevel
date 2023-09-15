@@ -235,7 +235,7 @@ jobs:
 
   publish:
     name: Publish Artifacts
-    needs: [build]
+    needs: [build, validate-steward]
     if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main')
     strategy:
       matrix:
