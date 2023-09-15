@@ -31,6 +31,7 @@ ThisBuild / githubWorkflowBuildMatrixExclusions ++= {
 }
 
 ThisBuild / githubWorkflowPublishTimeoutMinutes := Some(45)
+ThisBuild / githubWorkflowPublishNeeds += "validate-steward"
 
 ThisBuild / mergifyStewardConfig ~= {
   _.map(_.copy(mergeMinors = true, author = "typelevel-steward[bot]"))

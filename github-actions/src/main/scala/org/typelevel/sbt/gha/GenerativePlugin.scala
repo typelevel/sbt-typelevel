@@ -636,6 +636,7 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
     githubWorkflowPublishTargetBranches := Seq(RefPredicate.Equals(Ref.Branch("main"))),
     githubWorkflowPublishCond := None,
     githubWorkflowPublishTimeoutMinutes := None,
+    githubWorkflowPublishNeeds := Seq("build"),
     githubWorkflowJavaVersions := Seq(JavaSpec.temurin("11")),
     githubWorkflowScalaVersions := {
       val scalas = crossScalaVersions.value
@@ -812,7 +813,7 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
           scalas = List.empty,
           sbtStepPreamble = List.empty,
           javas = List(githubWorkflowJavaVersions.value.head),
-          needs = List("build"),
+          needs = githubWorkflowPublishNeeds.value.toList,
           timeoutMinutes = githubWorkflowPublishTimeoutMinutes.value
         )).filter(_ => githubWorkflowPublishTargetBranches.value.nonEmpty)
 
