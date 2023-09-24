@@ -20,9 +20,9 @@ import cats.effect.Async
 import cats.effect.kernel.Resource
 import laika.ast.Path
 import laika.io.model.InputTree
-import laika.markdown.github.GitHubFlavor
-import laika.parse.code.SyntaxHighlighting
-import laika.parse.code.languages.DottySyntax
+import laika.format.Markdown.GitHubFlavor
+import laika.config.SyntaxHighlighting
+import laika.parse.code.languages.ScalaSyntax
 import laika.theme.Theme
 import laika.theme.ThemeBuilder
 import laika.theme.ThemeProvider
@@ -70,7 +70,7 @@ object TypelevelHeliumExtensions {
         )
         .addExtensions(
           GitHubFlavor,
-          if (scala3) SyntaxHighlighting.withSyntaxBinding("scala", DottySyntax)
+          if (scala3) SyntaxHighlighting.withSyntaxBinding("scala", ScalaSyntax.Scala3)
           else SyntaxHighlighting
         )
         .build
