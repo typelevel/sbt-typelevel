@@ -19,9 +19,9 @@ package org.typelevel.sbt.site
 import cats.effect.Async
 import cats.effect.kernel.Resource
 import laika.ast.Path
-import laika.io.model.InputTree
-import laika.format.Markdown.GitHubFlavor
 import laika.config.SyntaxHighlighting
+import laika.format.Markdown.GitHubFlavor
+import laika.io.model.InputTree
 import laika.parse.code.languages.ScalaSyntax
 import laika.theme.Theme
 import laika.theme.ThemeBuilder
