@@ -32,15 +32,19 @@ object TypelevelCiSigningPlugin extends AutoPlugin {
 
   override def buildSettings = Seq(
     githubWorkflowPublishPreamble := Seq(
+      // The command below is supported but interpreted differently on Linux and macOS runners.
+      //   Linux: base64 --decode --ignore-garbage -
+      //   macOS: base64 --decode --input -
+      // On Linux, the `-` is a positional argument, on macOS it is the parameter to `--input`.
       WorkflowStep.Run( // if your key is not passphrase-protected
-        List("echo $PGP_SECRET | base64 -di | gpg --import"),
+        List("echo $PGP_SECRET | base64 -d -i - | gpg --import"),
         name = Some("Import signing key"),
         cond = Some("env.PGP_SECRET != '' && env.PGP_PASSPHRASE == ''"),
         env = env
       ),
       WorkflowStep.Run( // if your key is passphrase-protected
         List(
-          "echo \"$PGP_SECRET\" | base64 -di > /tmp/signing-key.gpg",
+          "echo \"$PGP_SECRET\" | base64 -d -i - > /tmp/signing-key.gpg",
           "echo \"$PGP_PASSPHRASE\" | gpg --pinentry-mode loopback --passphrase-fd 0 --import /tmp/signing-key.gpg",
           "(echo \"$PGP_PASSPHRASE\"; echo; echo) | gpg --command-fd 0 --pinentry-mode loopback --change-passphrase $(gpg --list-secret-keys --with-colons 2> /dev/null | grep '^sec:' | cut --delimiter ':' --fields 5 | tail -n 1)"
         ),
