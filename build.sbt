@@ -2,7 +2,7 @@ name := "sbt-typelevel"
 
 import org.typelevel.sbt.gha.{PermissionScope, PermissionValue, Permissions}
 
-ThisBuild / tlBaseVersion := "0.5"
+ThisBuild / tlBaseVersion := "0.6"
 ThisBuild / crossScalaVersions := Seq("2.12.18")
 ThisBuild / developers ++= List(
   tlGitHubDev("armanbilge", "Arman Bilge"),
