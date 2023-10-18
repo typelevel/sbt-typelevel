@@ -57,9 +57,12 @@ object GenericSiteSettings {
   @nowarn("cat=deprecation")
   private val legacyRelatedProjects: Initialize[Option[ThemeNavigationSection]] = setting {
     NonEmptyList.fromList(tlSiteRelatedProjects.value.toList).map { projects =>
+      val links = projects.map { case (name, url) => TextLink.external(url.toString, name) }
       ThemeNavigationSection(
         "Related Projects",
-        projects.map { case (name, url) => TextLink.external(url.toString, name) })
+        links.head,
+        links.tail*
+      )
     }
   }
 
