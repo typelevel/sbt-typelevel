@@ -13,7 +13,7 @@ Instead of using the super-plugins, for finer-grained control you can always add
 `TypelevelKernelPlugin`
 
 - `tlIsScala3` (setting): `true`, if `scalaVersion` is 3.x.
-- `tlReplaceCommandAlias` (method): Replace a `addCommandAlias` definition.
+- `tlCommandAliases` (setting): Command aliases defined for this build.
 - `tlReleaseLocal` (command): Alias for `+publishLocal`.
 
 ### sbt-typelevel-versioning

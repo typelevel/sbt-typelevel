@@ -22,7 +22,7 @@ import xerial.sbt.Sonatype
 
 import Keys._
 import Sonatype.autoImport._
-import TypelevelKernelPlugin.mkCommand
+import TypelevelKernelPlugin.autoImport._
 
 object TypelevelSonatypePlugin extends AutoPlugin {
 
@@ -37,19 +37,21 @@ object TypelevelSonatypePlugin extends AutoPlugin {
 
   import autoImport._
 
+  override def globalSettings = Seq(
+    tlCommandAliases += {
+      "tlRelease" -> List(
+        "reload",
+        "project /",
+        "+mimaReportBinaryIssues",
+        "+publish",
+        "tlSonatypeBundleReleaseIfRelevant")
+    }
+  )
+
   override def buildSettings =
     Seq(
       tlSonatypeUseLegacyHost := false,
       autoAPIMappings := true
-    ) ++ addCommandAlias(
-      "tlRelease",
-      mkCommand(
-        List(
-          "reload",
-          "project /",
-          "+mimaReportBinaryIssues",
-          "+publish",
-          "tlSonatypeBundleReleaseIfRelevant"))
     )
 
   override def projectSettings = Seq(
