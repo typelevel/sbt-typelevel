@@ -39,6 +39,13 @@ object TypelevelKernelPlugin extends AutoPlugin {
     lazy val tlSkipIrrelevantScalas = settingKey[Boolean](
       "Sets skip := true for compile/test/publish/etc. tasks on a project if the current scalaVersion is not in that project's crossScalaVersions (default: false)")
 
+    lazy val tlCommandAliases = settingKey[Map[String, List[String]]](
+      "Command aliases defined for this build"
+    )
+
+    @deprecated(
+      "Use `tlCommandAliases` for a more composable command definition experience",
+      "0.6.1")
     def tlReplaceCommandAlias(name: String, contents: String): Seq[Setting[State => State]] =
       Seq(GlobalScope / onLoad ~= { (f: State => State) =>
         f andThen { s: State =>
@@ -51,7 +58,23 @@ object TypelevelKernelPlugin extends AutoPlugin {
   import autoImport._
 
   override def globalSettings = Seq(
-    Def.derive(tlIsScala3 := scalaVersion.value.startsWith("3."))
+    Def.derive(tlIsScala3 := scalaVersion.value.startsWith("3.")),
+    tlCommandAliases := Map.empty,
+    onLoad := {
+      val aliases = tlCommandAliases.value
+      onLoad.value.compose { (state: State) =>
+        aliases.foldLeft(state) {
+          case (state, (alias, command)) =>
+            BasicCommands.addAlias(state, alias, mkCommand(command))
+        }
+      }
+    },
+    onUnload := {
+      val aliases = tlCommandAliases.value.keys
+      onUnload.value.compose { (state: State) =>
+        aliases.foldLeft(state) { (state, alias) => BasicCommands.removeAlias(state, alias) }
+      }
+    }
   )
 
   override def buildSettings =

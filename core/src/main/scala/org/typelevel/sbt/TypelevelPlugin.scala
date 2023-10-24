@@ -22,6 +22,7 @@ import org.typelevel.sbt.gha.GitHubActionsPlugin
 import sbt._
 
 import Keys._
+import TypelevelKernelPlugin.autoImport._
 
 /**
  * The [[TypelevelPlugin]] brings together the [[TypelevelCiReleasePlugin]] and the
@@ -44,7 +45,6 @@ object TypelevelPlugin extends AutoPlugin {
       "Convert compiler warnings into errors under CI builds (default: true)")
   }
 
-  import TypelevelKernelPlugin.mkCommand
   import TypelevelCiPlugin.autoImport._
   import TypelevelSettingsPlugin.autoImport._
   import TypelevelSonatypeCiReleasePlugin.autoImport._
@@ -76,52 +76,25 @@ object TypelevelPlugin extends AutoPlugin {
         scala <- githubWorkflowScalaVersions.value.filterNot(defaultScala.startsWith(_))
         java <- githubWorkflowJavaVersions.value.tail // default java is head
       } yield MatrixExclude(Map("scala" -> scala, "java" -> java.render))
-    }
-  ) ++ addPrePRCommandAlias ++ addTlPrePRBotHookCommandAlias
-
-  // partially re-implemnents addCommandAlias
-  // this is so we can use the value of other settings to generate command
-  private def addPrePRCommandAlias: Seq[Setting[_]] = Seq(
-    GlobalScope / onLoad := {
+    },
+    GlobalScope / tlCommandAliases ++= {
       val header = tlCiHeaderCheck.value
       val scalafmt = tlCiScalafmtCheck.value
       val scalafix = tlCiScalafixCheck.value
 
-      (GlobalScope / Keys.onLoad).value.compose { (state: State) =>
-        val command = mkCommand(
-          List("project /", "githubWorkflowGenerate") ++
-            List("+headerCreateAll").filter(_ => header) ++
-            List("+scalafmtAll", "scalafmtSbt").filter(_ => scalafmt) ++
-            List("+scalafixAll").filter(_ => scalafix)
-        )
-        BasicCommands.addAlias(state, "prePR", command)
-      }
-    },
-    GlobalScope / Keys.onUnload := {
-      (GlobalScope / Keys.onUnload)
-        .value
-        .compose((state: State) => BasicCommands.removeAlias(state, "prePR"))
-    }
-  )
+      val prePR = List("project /", "githubWorkflowGenerate") ++
+        List("+headerCreateAll").filter(_ => header) ++
+        List("+scalafmtAll", "scalafmtSbt").filter(_ => scalafmt) ++
+        List("+scalafixAll").filter(_ => scalafix)
 
-  private def addTlPrePRBotHookCommandAlias: Seq[Setting[_]] = Seq(
-    GlobalScope / onLoad := {
-      val header = tlCiHeaderCheck.value
-      val scalafmt = tlCiScalafmtCheck.value
+      val botHook = List("githubWorkflowGenerate") ++
+        List("+headerCreateAll").filter(_ => header) ++
+        List("+scalafmtAll", "scalafmtSbt").filter(_ => scalafmt)
 
-      (GlobalScope / Keys.onLoad).value.compose { (state: State) =>
-        val command = mkCommand(
-          List("githubWorkflowGenerate") ++
-            List("+headerCreateAll").filter(_ => header) ++
-            List("+scalafmtAll", "scalafmtSbt").filter(_ => scalafmt)
-        )
-        BasicCommands.addAlias(state, "tlPrePrBotHook", command)
-      }
-    },
-    GlobalScope / Keys.onUnload := {
-      (GlobalScope / Keys.onUnload)
-        .value
-        .compose((state: State) => BasicCommands.removeAlias(state, "tlPrePrBotHook"))
+      Map(
+        "prePR" -> prePR,
+        "tlPrePrBotHook" -> botHook
+      )
     }
   )
 
