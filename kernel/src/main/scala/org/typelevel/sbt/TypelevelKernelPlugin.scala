@@ -59,7 +59,9 @@ object TypelevelKernelPlugin extends AutoPlugin {
 
   override def globalSettings = Seq(
     Def.derive(tlIsScala3 := scalaVersion.value.startsWith("3.")),
-    tlCommandAliases := Map.empty,
+    tlCommandAliases := Map(
+      "tlReleaseLocal" -> List("reload", "project /", "+publishLocal")
+    ),
     onLoad := {
       val aliases = tlCommandAliases.value
       onLoad.value.compose { (state: State) =>
@@ -76,9 +78,6 @@ object TypelevelKernelPlugin extends AutoPlugin {
       }
     }
   )
-
-  override def buildSettings =
-    addCommandAlias("tlReleaseLocal", mkCommand(List("reload", "project /", "+publishLocal")))
 
   override def projectSettings = Seq(
     ivyConfigurations += CompileTime,
