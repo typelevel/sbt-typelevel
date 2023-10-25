@@ -29,7 +29,8 @@ object TypelevelKernelPlugin extends AutoPlugin {
   override def trigger = allRequirements
 
   object autoImport {
-    lazy val CompileTime: Configuration = config("compile-time").hide
+    @deprecated("use `Provided` instead", "0.6.1")
+    lazy val CompileTime: Configuration = Provided
 
     lazy val tlIsScala3 = settingKey[Boolean]("True if building with Scala 3")
 
@@ -77,11 +78,6 @@ object TypelevelKernelPlugin extends AutoPlugin {
         aliases.foldLeft(state) { (state, alias) => BasicCommands.removeAlias(state, alias) }
       }
     }
-  )
-
-  override def projectSettings = Seq(
-    ivyConfigurations += CompileTime,
-    Compile / unmanagedClasspath ++= update.value.select(configurationFilter(CompileTime.name))
   )
 
   private[sbt] def mkCommand(commands: List[String]): String = commands.mkString("; ", "; ", "")
