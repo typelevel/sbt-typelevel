@@ -18,10 +18,11 @@ package org.typelevel.sbt
 
 import org.typelevel.sbt.kernel.GitHelper
 import org.typelevel.sbt.kernel.V
+import sbt.Keys._
 import sbt._
 import sbt.plugins.JvmPlugin
 
-import Keys._
+import scala.annotation.nowarn
 
 object TypelevelKernelPlugin extends AutoPlugin {
 
@@ -30,7 +31,7 @@ object TypelevelKernelPlugin extends AutoPlugin {
 
   object autoImport {
     @deprecated("use `Provided` instead", "0.6.1")
-    lazy val CompileTime: Configuration = Provided
+    lazy val CompileTime: Configuration = config("compile-time").hide
 
     lazy val tlIsScala3 = settingKey[Boolean]("True if building with Scala 3")
 
@@ -78,6 +79,12 @@ object TypelevelKernelPlugin extends AutoPlugin {
         aliases.foldLeft(state) { (state, alias) => BasicCommands.removeAlias(state, alias) }
       }
     }
+  )
+
+  @nowarn("cat=deprecation")
+  override def projectSettings = Seq(
+    ivyConfigurations += CompileTime,
+    Compile / unmanagedClasspath ++= update.value.select(configurationFilter(CompileTime.name))
   )
 
   private[sbt] def mkCommand(commands: List[String]): String = commands.mkString("; ", "; ", "")
