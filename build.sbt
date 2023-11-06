@@ -88,13 +88,14 @@ lazy val noPublish = project
     name := "sbt-typelevel-no-publish"
   )
 
-lazy val settings = project
+lazy val settings = crossProject(JVMPlatform)
+  .withoutSuffixFor(JVMPlatform)
   .in(file("settings"))
   .enablePlugins(SbtPlugin)
   .settings(
     name := "sbt-typelevel-settings"
   )
-  .dependsOn(kernel)
+  .jvmConfigure(_.dependsOn(kernel))
 
 lazy val github = project
   .in(file("github"))
@@ -200,7 +201,7 @@ lazy val core = project
   )
   .dependsOn(
     ciRelease,
-    settings
+    settings.jvm
   )
 
 lazy val site = project

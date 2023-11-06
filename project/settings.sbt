@@ -1,1 +1,1 @@
-../settings/build.sbt
+../settings/jvm/build.sbt

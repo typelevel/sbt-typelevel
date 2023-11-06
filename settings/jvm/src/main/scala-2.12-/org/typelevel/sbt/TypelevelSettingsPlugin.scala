@@ -19,7 +19,6 @@ package org.typelevel.sbt
 import com.github.sbt.git.GitPlugin
 import org.typelevel.sbt.kernel.V
 import sbt._
-import sbtcrossproject.CrossPlugin.autoImport._
 
 import java.io.File
 import java.lang.management.ManagementFactory
@@ -317,17 +316,10 @@ object TypelevelSettingsPlugin extends AutoPlugin {
     },
     unmanagedSourceDirectories ++= {
       def extraDirs(suffix: String) =
-        crossProjectCrossType.?.value match {
-          case Some(crossType) =>
-            crossType
-              .sharedSrcDir(baseDirectory.value, Defaults.nameForSrc(configuration.value.name))
-              .toList
-              .map(f => file(f.getPath + suffix))
-          case None =>
-            List(
-              baseDirectory.value / "src" /
-                Defaults.nameForSrc(configuration.value.name) / s"scala$suffix"
-            )
+        unmanagedSourceDirectories.value.flatMap {
+          case f if f.getName == "scala" =>
+            List(f, f.getParentFile / s"scala$suffix")
+          case f => List(f)
         }
 
       CrossVersion.partialVersion(scalaVersion.value) match {

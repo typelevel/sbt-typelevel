@@ -10,7 +10,6 @@ val modules = List(
   "mima",
   "no-publish",
   "scalafix",
-  "settings",
   "site",
   "sonatype",
   "sonatype-ci-release",
@@ -19,7 +18,7 @@ val modules = List(
 
 Compile / unmanagedSourceDirectories ++= modules.map { module =>
   baseDirectory.value.getParentFile / module / "src" / "main" / "scala"
-}
+} :+ baseDirectory.value.getParentFile / "settings" / "jvm" / "src" / "main" / "scala-2.12-"
 
 Compile / unmanagedResourceDirectories ++= modules.map { module =>
   baseDirectory.value.getParentFile / module / "src" / "main" / "resources"
