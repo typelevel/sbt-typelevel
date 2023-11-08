@@ -102,7 +102,7 @@ object TypelevelSitePlugin extends AutoPlugin {
           case spec @ JavaSpec(_, version)
               if version
                 .split('.')
-                .lift(0)
+                .headOption
                 .flatMap(v => Try(v.toInt).toOption)
                 .exists(_ >= 11) =>
             spec
