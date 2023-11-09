@@ -31,6 +31,7 @@ import sbt.Keys._
 import sbt._
 
 import scala.annotation.nowarn
+import scala.util.Try
 
 object TypelevelSitePlugin extends AutoPlugin {
 
@@ -58,6 +59,8 @@ object TypelevelSitePlugin extends AutoPlugin {
 
     lazy val tlSiteKeepFiles =
       settingKey[Boolean]("Whether to keep existing files when deploying site (default: true)")
+    lazy val tlSiteJavaVersion = settingKey[JavaSpec](
+      "The Java version to use for the site job, must be >= 11 (default: first compatible choice from `githubWorkflowJavaVersions`, otherwise Temurin 11)")
     lazy val tlSiteGenerate = settingKey[Seq[WorkflowStep]](
       "A sequence of workflow steps which generates the site (default: [Sbt(List(\"tlSite\"))])")
     lazy val tlSitePublish = settingKey[Seq[WorkflowStep]](
@@ -92,6 +95,20 @@ object TypelevelSitePlugin extends AutoPlugin {
     tlSiteApiPackage := None,
     tlSiteRelatedProjects := Nil,
     tlSiteKeepFiles := true,
+    tlSiteJavaVersion := {
+      githubWorkflowJavaVersions
+        .value
+        .collectFirst {
+          case spec @ JavaSpec(_, version)
+              if version
+                .split('.')
+                .headOption
+                .flatMap(v => Try(v.toInt).toOption)
+                .exists(_ >= 11) =>
+            spec
+        }
+        .getOrElse(JavaSpec.temurin("11"))
+    },
     homepage := {
       gitHubUserRepo.value.map {
         case ("typelevel", repo) => url(s"https://typelevel.org/$repo")
@@ -209,16 +226,25 @@ object TypelevelSitePlugin extends AutoPlugin {
           List.empty
       }
     },
-    ThisBuild / githubWorkflowAddedJobs +=
+    ThisBuild / githubWorkflowAddedJobs += {
+
+      val extraJava =
+        if (!githubWorkflowJavaVersions.value.contains(tlSiteJavaVersion.value))
+          WorkflowStep.SetupJava(List(tlSiteJavaVersion.value))
+        else Nil
+
       WorkflowJob(
         "site",
         "Generate Site",
         scalas = List.empty,
         sbtStepPreamble = List.empty,
-        javas = List(githubWorkflowJavaVersions.value.head),
-        steps =
-          githubWorkflowJobSetup.value.toList ++ tlSiteGenerate.value ++ tlSitePublish.value
+        javas = List(tlSiteJavaVersion.value),
+        steps = githubWorkflowJobSetup.value.toList ++
+          extraJava ++
+          tlSiteGenerate.value ++
+          tlSitePublish.value
       )
+    }
   )
 
   private def previewTask = Def

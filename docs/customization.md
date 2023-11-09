@@ -113,6 +113,7 @@ Using this plugin the following 2 settings have new default values:
 - `tlSiteApiModule` (setting): The module that publishes API docs (default: `None`).
 - `tlSiteApiPackage` (setting): The top-level package for your API docs (e.g. org.typlevel.sbt).
 - `tlSiteKeepFiles` (setting): Whether to keep existing files when deploying site (default: `true`).
+- `tlSiteJavaVersion` (setting): The Java version to use for the site job, must be >= 11 (default: first compatible choice from `githubWorkflowJavaVersions`, otherwise Temurin 11).
 - `tlSiteGenerate` (setting): A sequence of workflow steps which generates the site (default: `[Sbt(List("tlSite"))]`).
 - `tlSitePublish` (setting): A sequence of workflow steps which publishes the site (default: `peaceiris/actions-gh-pages`).
 - `tlSitePublishBranch` (setting): The branch to publish the site from on every push. Set this to `None` if you only want to update the site on tag releases. (default: `main`)
