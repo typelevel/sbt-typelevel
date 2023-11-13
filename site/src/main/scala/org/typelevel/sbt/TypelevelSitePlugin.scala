@@ -254,9 +254,9 @@ object TypelevelSitePlugin extends AutoPlugin {
       val logger = streams.value.log
       logger.info("Initializing server...")
 
-      val (_, cancel) = Tasks.buildPreviewServer.value.allocated.unsafeRunSync()
+      val (server, cancel) = Tasks.buildPreviewServer.value.allocated.unsafeRunSync()
 
-      logger.info(s"Preview server started on port http://localhost:${laikaPreviewConfig.value.port}.")
+      logger.info(s"Preview server started at ${server.baseUri}")
 
       // watch but no-livereload b/c we don't need an mdoc server
       mdoc.toTask(" --watch --no-livereload").andFinally {
