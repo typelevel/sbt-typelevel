@@ -27,10 +27,10 @@ final class ScalafixProject private (
     val rules: Project,
     val input: Project,
     val output: Project,
-    val tests: Project
+    val tests: Project,
 ) extends CompositeProject {
 
-  lazy val componentProjects = Seq(all, rules, input, output, tests)
+  lazy val componentProjects = Seq(rules, input, output, tests)
 
   def in(dir: File): ScalafixProject =
     new ScalafixProject(
@@ -40,10 +40,6 @@ final class ScalafixProject private (
       output.in(dir / "output"),
       tests.in(dir / "tests")
     )
-
-  lazy val all = Project(name, file(s"$name-aggregate"))
-    .aggregate(rules, input, output, tests)
-    .enablePlugins(NoPublishPlugin)
 
   def rulesSettings(ss: Def.SettingsDefinition*): ScalafixProject =
     rulesConfigure(_.settings(ss: _*))
