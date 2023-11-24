@@ -32,7 +32,16 @@ final class ScalafixProject private (
 
   lazy val componentProjects = Seq(all, rules, input, output, tests)
 
-  lazy val all = Project(name, file(s"target/$name-aggregate"))
+  def in(dir: File): ScalafixProject =
+    new ScalafixProject(
+      name,
+      rules.in(dir / "rules"),
+      input.in(dir / "input"),
+      output.in(dir / "output"),
+      tests.in(dir / "tests")
+    )
+
+  lazy val all = Project(name, file(s"$name-aggregate"))
     .aggregate(rules, input, output, tests)
     .enablePlugins(NoPublishPlugin)
 
@@ -89,7 +98,7 @@ final class ScalafixProject private (
 object ScalafixProject {
   def apply(name: String): ScalafixProject = {
 
-    lazy val rules = Project(s"$name-rules", file(s"modules/$name/rules")).settings(
+    lazy val rules = Project(s"$name-rules", file(s"$name/rules")).settings(
       libraryDependencies += "ch.epfl.scala" %% "scalafix-core" % _root_
         .scalafix
         .sbt
@@ -98,12 +107,12 @@ object ScalafixProject {
     )
 
     lazy val input =
-      Project(s"$name-input", file(s"modules/$name/input")).enablePlugins(NoPublishPlugin)
+      Project(s"$name-input", file(s"$name/input")).enablePlugins(NoPublishPlugin)
 
     lazy val output =
-      Project(s"$name-output", file(s"modules/$name/output")).enablePlugins(NoPublishPlugin)
+      Project(s"$name-output", file(s"$name/output")).enablePlugins(NoPublishPlugin)
 
-    lazy val tests = Project(s"$name-tests", file(s"modules/$name/tests"))
+    lazy val tests = Project(s"$name-tests", file(s"$name/tests"))
       .settings(
         scalafixTestkitOutputSourceDirectories := (output / Compile / unmanagedSourceDirectories).value,
         scalafixTestkitInputSourceDirectories := (input / Compile / unmanagedSourceDirectories).value,
