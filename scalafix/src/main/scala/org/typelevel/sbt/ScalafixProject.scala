@@ -27,7 +27,7 @@ final class ScalafixProject private (
     val rules: Project,
     val input: Project,
     val output: Project,
-    val tests: Project,
+    val tests: Project
 ) extends CompositeProject {
 
   lazy val componentProjects = Seq(rules, input, output, tests)
