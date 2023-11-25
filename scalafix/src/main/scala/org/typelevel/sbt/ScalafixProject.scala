@@ -32,6 +32,8 @@ final class ScalafixProject private (
 
   lazy val componentProjects = Seq(rules, input, output, tests)
 
+  def componentProjectReferences = componentProjects.map(x => (x: ProjectReference))
+
   def in(dir: File): ScalafixProject =
     new ScalafixProject(
       name,
