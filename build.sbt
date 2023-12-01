@@ -151,6 +151,7 @@ lazy val scalafix = project
     name := "sbt-typelevel-scalafix",
     tlVersionIntroduced := Map("2.12" -> "0.4.10")
   )
+  .dependsOn(noPublish)
 
 lazy val ciSigning = project
   .in(file("ci-signing"))
