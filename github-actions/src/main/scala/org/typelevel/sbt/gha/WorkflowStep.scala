@@ -53,7 +53,7 @@ object WorkflowStep {
           ))
       else Nil
 
-    val SetupJavaAction = UseRef.Public("actions", "setup-java", "v3")
+    val SetupJavaAction = UseRef.Public("actions", "setup-java", "v4")
     val SetupGraalVMAction = UseRef.Public("graalvm", "setup-graalvm", "v1")
     val sbtCacheParams = if (enableCaching) Map("cache" -> "sbt") else Map.empty
 
