@@ -338,19 +338,20 @@ object TypelevelSettingsPlugin extends AutoPlugin {
       }
     },
     packageSrc / mappings ++= {
-      val base = sourceManaged.value
+      val bases = managedSourceDirectories.value
       managedSources.value.map { file =>
-        file.relativeTo(base) match {
-          case Some(relative) => file -> relative.getPath
-          case None =>
+        bases
+          .map(b => file.relativeTo(b))
+          .collectFirst { case Some(relative) => file -> relative.getPath }
+          .getOrElse {
             throw new RuntimeException(
               s"""|Expected managed sources in:
-                  |$base
+                  |${bases.mkString("\n")}
                   |But found them here:
                   |$file
                   |""".stripMargin
             )
-        }
+          }
       }
     }
   )
