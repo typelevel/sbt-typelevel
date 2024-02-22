@@ -32,7 +32,7 @@ ThisBuild / githubWorkflowBuildMatrixExclusions ++= {
   val exclusions = for {
     java <- githubWorkflowJavaVersions.value.tail
     os <- githubWorkflowOSes.value.tail
-    if java != temurin17 && os != macos14 // keep this one
+    if !(java == temurin17 && os == macos14) // keep this one
   } yield MatrixExclude(Map("java" -> java.render, "os" -> os))
 
   exclusions :+ MatrixExclude(Map("java" -> temurin8.render, "os" -> macos14))

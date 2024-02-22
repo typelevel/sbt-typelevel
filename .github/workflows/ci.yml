@@ -60,21 +60,35 @@ jobs:
           - java: temurin@11
             os: macos-latest
           - java: temurin@11
+            os: macos-14
+          - java: temurin@11
+            os: windows-latest
+          - java: temurin@17
+            os: macos-latest
+          - java: temurin@17
             os: windows-latest
           - java: graal_22.3.2@11
             os: macos-latest
+          - java: graal_22.3.2@11
+            os: macos-14
           - java: graal_22.3.2@11
             os: windows-latest
           - java: graalvm@17
             os: macos-latest
+          - java: graalvm@17
+            os: macos-14
           - java: graalvm@17
             os: windows-latest
           - java: corretto@17
             os: macos-latest
+          - java: corretto@17
+            os: macos-14
           - java: corretto@17
             os: windows-latest
           - java: semeru@17
             os: macos-latest
+          - java: semeru@17
+            os: macos-14
           - java: semeru@17
             os: windows-latest
           - java: temurin@8
