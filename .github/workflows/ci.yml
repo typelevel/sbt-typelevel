@@ -92,11 +92,6 @@ jobs:
         shell: bash
         run: git config --global core.autocrlf false
 
-      - name: Install sbt
-        if: contains(runner.os, 'macos')
-        shell: bash
-        run: brew install sbt
-
       - name: Checkout current branch (full)
         uses: actions/checkout@v4
         with:
@@ -264,10 +259,6 @@ jobs:
         if: contains(runner.os, 'windows')
         run: git config --global core.autocrlf false
 
-      - name: Install sbt
-        if: contains(runner.os, 'macos')
-        run: brew install sbt
-
       - name: Checkout current branch (full)
         uses: actions/checkout@v4
         with:
@@ -415,10 +406,6 @@ jobs:
         if: contains(runner.os, 'windows')
         run: git config --global core.autocrlf false
 
-      - name: Install sbt
-        if: contains(runner.os, 'macos')
-        run: brew install sbt
-
       - name: Checkout current branch (full)
         uses: actions/checkout@v4
         with:
@@ -561,10 +548,6 @@ jobs:
       - name: Ignore line ending differences in git
         if: contains(runner.os, 'windows')
         run: git config --global core.autocrlf false
-
-      - name: Install sbt
-        if: contains(runner.os, 'macos')
-        run: brew install sbt
 
       - name: Checkout current branch (full)
         uses: actions/checkout@v4
