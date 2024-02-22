@@ -41,7 +41,11 @@ jobs:
     name: Build and Test
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os:
+          - ubuntu-latest
+          - macos-latest
+          - macos-14
+          - windows-latest
         scala: [2.12]
         java:
           - temurin@8
@@ -56,6 +60,8 @@ jobs:
           - java: temurin@11
             os: macos-latest
           - java: temurin@11
+            os: macos-14
+          - java: temurin@11
             os: windows-latest
           - java: temurin@17
             os: macos-latest
@@ -64,22 +70,37 @@ jobs:
           - java: graal_22.3.2@11
             os: macos-latest
           - java: graal_22.3.2@11
+            os: macos-14
+          - java: graal_22.3.2@11
             os: windows-latest
           - java: graalvm@17
             os: macos-latest
+          - java: graalvm@17
+            os: macos-14
           - java: graalvm@17
             os: windows-latest
           - java: corretto@17
             os: macos-latest
           - java: corretto@17
+            os: macos-14
+          - java: corretto@17
             os: windows-latest
           - java: semeru@17
             os: macos-latest
           - java: semeru@17
+            os: macos-14
+          - java: semeru@17
             os: windows-latest
+          - java: temurin@8
+            os: macos-14
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
     steps:
+      - name: Install sbt
+        if: contains(runner.os, 'macos')
+        shell: bash
+        run: brew install sbt
+
       - name: Ignore line ending differences in git
         if: contains(runner.os, 'windows')
         shell: bash
@@ -244,6 +265,10 @@ jobs:
     runs-on: ${{ matrix.os }}
     timeout-minutes: 45
     steps:
+      - name: Install sbt
+        if: contains(runner.os, 'macos')
+        run: brew install sbt
+
       - name: Ignore line ending differences in git
         if: contains(runner.os, 'windows')
         run: git config --global core.autocrlf false
@@ -387,6 +412,10 @@ jobs:
         java: [temurin@8]
     runs-on: ${{ matrix.os }}
     steps:
+      - name: Install sbt
+        if: contains(runner.os, 'macos')
+        run: brew install sbt
+
       - name: Ignore line ending differences in git
         if: contains(runner.os, 'windows')
         run: git config --global core.autocrlf false
@@ -526,6 +555,10 @@ jobs:
         java: [temurin@11]
     runs-on: ${{ matrix.os }}
     steps:
+      - name: Install sbt
+        if: contains(runner.os, 'macos')
+        run: brew install sbt
+
       - name: Ignore line ending differences in git
         if: contains(runner.os, 'windows')
         run: git config --global core.autocrlf false

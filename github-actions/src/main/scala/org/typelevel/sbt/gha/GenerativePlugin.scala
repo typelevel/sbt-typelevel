@@ -659,6 +659,7 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
   private lazy val internalTargetAggregation =
     settingKey[Seq[File]]("Aggregates target directories from all subprojects")
 
+  private val macosGuard = Some("contains(runner.os, 'macos')")
   private val windowsGuard = Some("contains(runner.os, 'windows')")
 
   private val PlatformSep = FileSystems.getDefault.getSeparator
@@ -775,6 +776,14 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
     },
     githubWorkflowGeneratedCacheSteps := Seq(),
     githubWorkflowJobSetup := {
+      val brewInstallSbtOpt = if (githubWorkflowOSes.value.exists(_.contains("macos"))) {
+        List(
+          WorkflowStep
+            .Run(List("brew install sbt"), name = Some("Install sbt"), cond = macosGuard))
+      } else {
+        Nil
+      }
+
       val autoCrlfOpt = if (githubWorkflowOSes.value.exists(_.contains("windows"))) {
         List(
           WorkflowStep.Run(
@@ -785,7 +794,8 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
         Nil
       }
 
-      autoCrlfOpt :::
+      brewInstallSbtOpt :::
+        autoCrlfOpt :::
         List(WorkflowStep.CheckoutFull) :::
         WorkflowStep.SetupJava(githubWorkflowJavaVersions.value.toList) :::
         githubWorkflowGeneratedCacheSteps.value.toList
