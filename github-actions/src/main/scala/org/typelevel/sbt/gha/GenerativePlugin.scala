@@ -776,6 +776,14 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
     },
     githubWorkflowGeneratedCacheSteps := Seq(),
     githubWorkflowJobSetup := {
+      val brewInstallSbtOpt = if (githubWorkflowOSes.value.exists(_.contains("macos"))) {
+        List(
+          WorkflowStep
+            .Run(List("brew install sbt"), name = Some("Install sbt"), cond = macosGuard))
+      } else {
+        Nil
+      }
+
       val autoCrlfOpt = if (githubWorkflowOSes.value.exists(_.contains("windows"))) {
         List(
           WorkflowStep.Run(
@@ -786,16 +794,8 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
         Nil
       }
 
-      val brewInstallSbtOpt = if (githubWorkflowOSes.value.exists(_.contains("macos"))) {
-        List(
-          WorkflowStep
-            .Run(List("brew install sbt"), name = Some("Install sbt"), cond = macosGuard))
-      } else {
-        Nil
-      }
-
-      autoCrlfOpt :::
-        brewInstallSbtOpt :::
+      brewInstallSbtOpt :::
+        autoCrlfOpt :::
         List(WorkflowStep.CheckoutFull) :::
         WorkflowStep.SetupJava(githubWorkflowJavaVersions.value.toList) :::
         githubWorkflowGeneratedCacheSteps.value.toList

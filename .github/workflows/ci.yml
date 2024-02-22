@@ -96,6 +96,11 @@ jobs:
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
     steps:
+      - name: Install sbt
+        if: contains(runner.os, 'macos')
+        shell: bash
+        run: brew install sbt
+
       - name: Ignore line ending differences in git
         if: contains(runner.os, 'windows')
         shell: bash
@@ -265,6 +270,10 @@ jobs:
     runs-on: ${{ matrix.os }}
     timeout-minutes: 45
     steps:
+      - name: Install sbt
+        if: contains(runner.os, 'macos')
+        run: brew install sbt
+
       - name: Ignore line ending differences in git
         if: contains(runner.os, 'windows')
         run: git config --global core.autocrlf false
@@ -412,6 +421,10 @@ jobs:
         java: [temurin@8]
     runs-on: ${{ matrix.os }}
     steps:
+      - name: Install sbt
+        if: contains(runner.os, 'macos')
+        run: brew install sbt
+
       - name: Ignore line ending differences in git
         if: contains(runner.os, 'windows')
         run: git config --global core.autocrlf false
@@ -555,6 +568,10 @@ jobs:
         java: [temurin@11]
     runs-on: ${{ matrix.os }}
     steps:
+      - name: Install sbt
+        if: contains(runner.os, 'macos')
+        run: brew install sbt
+
       - name: Ignore line ending differences in git
         if: contains(runner.os, 'windows')
         run: git config --global core.autocrlf false
