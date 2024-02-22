@@ -21,7 +21,7 @@ ThisBuild / githubWorkflowJavaVersions ++= Seq(
   JavaSpec.semeru("17")
 )
 
-ThisBuild / githubWorkflowOSes ++= Seq("macos-latest", "windows-latest")
+ThisBuild / githubWorkflowOSes ++= Seq("macos-latest", "macos-14", "windows-latest")
 
 ThisBuild / githubWorkflowBuildMatrixExclusions ++= {
   for {
