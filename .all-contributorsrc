@@ -282,6 +282,16 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "satabin",
+      "name": "Lucas Satabin",
+      "avatar_url": "https://avatars.githubusercontent.com/u/2537737?v=4",
+      "profile": "https://blog.gnieh.org/",
+      "contributions": [
+        "bug",
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
