@@ -84,8 +84,8 @@ object TypelevelPlugin extends AutoPlugin {
 
       val prePR = List("project /", "githubWorkflowGenerate") ++
         List("+headerCreateAll").filter(_ => header) ++
-        List("+scalafmtAll", "scalafmtSbt").filter(_ => scalafmt) ++
-        List("+scalafixAll").filter(_ => scalafix)
+        List("+scalafixAll").filter(_ => scalafix) ++
+        List("+scalafmtAll", "scalafmtSbt").filter(_ => scalafmt)
 
       val botHook = List("githubWorkflowGenerate") ++
         List("+headerCreateAll").filter(_ => header) ++
