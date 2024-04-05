@@ -20,7 +20,6 @@ import laika.helium.Helium
 import laika.sbt.LaikaPlugin
 import laika.sbt.LaikaPlugin.autoImport._
 import laika.sbt.Tasks
-import laika.theme.ThemeProvider
 import mdoc.MdocPlugin
 import mdoc.MdocPlugin.autoImport._
 import org.typelevel.sbt.TypelevelKernelPlugin._
@@ -36,15 +35,6 @@ import scala.util.Try
 object TypelevelSitePlugin extends AutoPlugin {
 
   object autoImport {
-
-    @deprecated("Use tlSiteHelium", "0.5.0")
-    lazy val tlSiteHeliumConfig = settingKey[Helium]("The Typelevel Helium configuration")
-    @deprecated("Use tlSiteHelium", "0.5.0")
-    lazy val tlSiteHeliumExtensions =
-      settingKey[ThemeProvider]("The Typelevel Helium extensions")
-    @deprecated("Use .site.mainNavigation(appendLinks = ...) in tlSiteHelium", "0.5.0")
-    lazy val tlSiteRelatedProjects =
-      settingKey[Seq[(String, URL)]]("A list of related projects (default: empty)")
 
     lazy val tlSiteHelium = settingKey[Helium]("The Helium theme configuration and extensions")
     lazy val tlSiteIsTypelevelProject =
@@ -87,13 +77,11 @@ object TypelevelSitePlugin extends AutoPlugin {
     tlSiteApiModule := None
   )
 
-  @nowarn("cat=deprecation")
   override def buildSettings = Seq(
     tlSitePublishBranch := Some("main"),
     tlSitePublishTags := tlSitePublishBranch.value.isEmpty,
     tlSiteApiUrl := None,
     tlSiteApiPackage := None,
-    tlSiteRelatedProjects := Nil,
     tlSiteKeepFiles := true,
     tlSiteJavaVersion := {
       githubWorkflowJavaVersions
@@ -117,7 +105,6 @@ object TypelevelSitePlugin extends AutoPlugin {
     }
   )
 
-  @nowarn("cat=deprecation")
   override def projectSettings = Seq(
     tlSite := Def
       .sequential(
@@ -143,10 +130,8 @@ object TypelevelSitePlugin extends AutoPlugin {
       else
         None
     },
-    tlSiteHeliumConfig := TypelevelSiteSettings.defaults.value,
-    tlSiteHeliumExtensions := GenericSiteSettings.themeExtensions.value,
     tlSiteHelium := {
-      if (tlSiteIsTypelevelProject.value.isDefined) tlSiteHeliumConfig.value
+      if (tlSiteIsTypelevelProject.value.isDefined) TypelevelSiteSettings.defaults.value
       else GenericSiteSettings.defaults.value
     },
     tlSiteApiUrl := {

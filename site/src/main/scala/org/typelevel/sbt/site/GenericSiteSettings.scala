@@ -16,24 +16,28 @@
 
 package org.typelevel.sbt.site
 
-import cats.data.NonEmptyList
+import cats.effect.Async
+import cats.effect.Resource
+import laika.ast.Path
+import laika.config.SyntaxHighlighting
+import laika.format.Markdown.GitHubFlavor
 import laika.helium.Helium
 import laika.helium.config.HeliumIcon
 import laika.helium.config.IconLink
-import laika.helium.config.TextLink
-import laika.helium.config.ThemeNavigationSection
+import laika.io.model.InputTree
+import laika.parse.code.languages.ScalaSyntax
+import laika.theme.Theme
+import laika.theme.ThemeBuilder
 import laika.theme.ThemeProvider
 import org.typelevel.sbt.TypelevelGitHubPlugin.gitHubUserRepo
 import org.typelevel.sbt.TypelevelKernelPlugin.autoImport.tlIsScala3
 import org.typelevel.sbt.TypelevelSitePlugin.autoImport.tlSiteApiUrl
-import org.typelevel.sbt.TypelevelSitePlugin.autoImport.tlSiteHeliumExtensions
-import org.typelevel.sbt.TypelevelSitePlugin.autoImport.tlSiteRelatedProjects
 import sbt.Def._
 import sbt.Keys.developers
 import sbt.Keys.scmInfo
 import sbt.Keys.version
 
-import scala.annotation.nowarn
+import java.net.URL
 
 object GenericSiteSettings {
 
@@ -45,32 +49,29 @@ object GenericSiteSettings {
     scmInfo.value.map { info => IconLink.external(info.browseUrl.toString, HeliumIcon.github) }
   }
 
-  @nowarn("cat=deprecation")
   val themeExtensions: Initialize[ThemeProvider] = setting {
-    // TODO - inline when deprecated class gets removed
-    TypelevelHeliumExtensions(
-      tlIsScala3.value,
-      tlSiteApiUrl.value
-    )
-  }
-
-  @nowarn("cat=deprecation")
-  private val legacyRelatedProjects: Initialize[Option[ThemeNavigationSection]] = setting {
-    NonEmptyList.fromList(tlSiteRelatedProjects.value.toList).map { projects =>
-      val links = projects.map { case (name, url) => TextLink.external(url.toString, name) }
-      ThemeNavigationSection(
-        "Related Projects",
-        links.head,
-        links.tail*
-      )
+    new ThemeProvider {
+      def build[F[_]](implicit F: Async[F]): Resource[F, Theme[F]] =
+        ThemeBuilder[F]("sbt-typelevel-site Helium Extensions")
+          .addInputs(
+            tlSiteApiUrl.value.fold(InputTree[F]) { url =>
+              InputTree[F].addString(htmlForwarder(url), Path.Root / "api" / "index.html")
+            }
+          )
+          .addExtensions(
+            GitHubFlavor,
+            if (tlIsScala3.value)
+              SyntaxHighlighting.withSyntaxBinding("scala", ScalaSyntax.Scala3)
+            else SyntaxHighlighting
+          )
+          .build
     }
   }
 
-  @nowarn("cat=deprecation")
   val defaults: Initialize[Helium] = setting {
     Helium
       .defaults
-      .extendWith(tlSiteHeliumExtensions.value)
+      .extendWith(themeExtensions.value)
       .site
       .metadata(
         title = gitHubUserRepo.value.map(_._2),
@@ -79,11 +80,16 @@ object GenericSiteSettings {
         version = Some(version.value)
       )
       .site
-      .mainNavigation(appendLinks = legacyRelatedProjects.value.toList)
-      .site
       .topNavigationBar(
         navLinks = apiLink.value.toList ++ githubLink.value.toList
       )
   }
+
+  private def htmlForwarder(to: URL) =
+    s"""|<!DOCTYPE html>
+        |<meta charset="utf-8">
+        |<meta http-equiv="refresh" content="0; URL=$to">
+        |<link rel="canonical" href="$to">
+        |""".stripMargin
 
 }
