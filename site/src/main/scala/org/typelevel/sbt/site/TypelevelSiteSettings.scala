@@ -56,23 +56,33 @@ object TypelevelSiteSettings {
     Favicon.external("https://typelevel.org/img/favicon.png", "32x32", "image/png")
   )
 
-  // light theme colours
-  // Tl suffix indicates these are lifted directly from somewhere within the Typelevel site
-  // val redTl = Color.hex("f8293a")
-  val brightRedTl = Color.hex("fe4559")
-  val coralTl = Color.hex("f86971")
-  val pinkTl = Color.hex("ffb4b5")
-  val whiteTl = Color.hex("ffffff")
-  val gunmetalTl = Color.hex("21303f")
-  val platinumTl = Color.hex("e6e8ea")
-  // Extra colours to supplement
-  val lightPink = Color.hex("ffe7e7")
-  val slateBlue = Color.hex("385a70") // 406881 (original slateCyan)
-  val mediumSlateCyanButDarker = Color.hex("8ebac7")
-  val mediumSlateCyan = Color.hex("b0cfd8")
-  val lightSlateCyan = Color.hex("ddeaed")
-  val lighterSlateCyan = Color.hex("f4f8fa")
-  val softYellow = Color.hex("f9f5d9")
+  object colors {
+    val primary = Color.hex("385a70")
+    val primaryMedium = Color.hex("8ebac7")
+    val primaryLight = Color.hex("f4f8fa")
+    val secondary = Color.hex("fe4559")
+    val text = Color.hex("21303f")
+    val background = Color.hex("ffffff")
+    val landingPageGradient = Color.hex("b0cfd8")
+    val info = Color.hex("ddeaed")
+    val warning = Color.hex("f9f5d9")
+    val error = Color.hex("ffe7e7")
+
+    val syntaxBase: ColorQuintet = ColorQuintet(
+      colors.text, // background
+      Color.hex("73ad9b"), // comments
+      Color.hex("b2adb4"), // punctuation
+      Color.hex("ffb4b5"), // identifier
+      Color.hex("e6e8ea") // unclassified
+    )
+    val syntaxWheel: ColorQuintet = ColorQuintet(
+      Color.hex("8fa1c9"), // substitution, annotation
+      Color.hex("81e67b"), // keyword, escape-sequence
+      Color.hex("ffde6d"), // declaration name
+      Color.hex("86aac1"), // literals
+      Color.hex("f86971") // type/class name
+    )
+  }
 
   val defaults: Initialize[Helium] = setting {
     GenericSiteSettings
@@ -96,39 +106,45 @@ object TypelevelSiteSettings {
       )
       .site
       .themeColors(
-        primary = slateBlue,
-        secondary = brightRedTl,
-        primaryMedium = mediumSlateCyanButDarker,
-        primaryLight = lighterSlateCyan,
-        text = gunmetalTl,
-        background = whiteTl,
-        bgGradient = (mediumSlateCyan, lighterSlateCyan)
+        primary = colors.primary,
+        secondary = colors.secondary,
+        primaryMedium = colors.primaryMedium,
+        primaryLight = colors.primaryLight,
+        text = colors.text,
+        background = colors.background,
+        bgGradient = (colors.landingPageGradient, colors.primaryLight)
       )
       .site
       .messageColors(
-        info = slateBlue,
-        infoLight = lightSlateCyan,
-        warning = slateBlue,
-        warningLight = softYellow,
-        error = slateBlue,
-        errorLight = lightPink
+        info = colors.primary,
+        infoLight = colors.info,
+        warning = colors.primary,
+        warningLight = colors.warning,
+        error = colors.primary,
+        errorLight = colors.error
       )
       .site
       .syntaxHighlightingColors(
-        base = ColorQuintet(
-          gunmetalTl,
-          Color.hex("73ad9b"), // comments
-          Color.hex("b2adb4"), // ?
-          pinkTl, // identifier
-          platinumTl // base colour
-        ),
-        wheel = ColorQuintet(
-          Color.hex("8fa1c9"), // substitution, annotation
-          Color.hex("81e67b"), // keyword, escape-sequence
-          Color.hex("ffde6d"), // declaration name
-          Color.hex("86aac1"), // literals
-          coralTl // type/class name
-        )
+        base = colors.syntaxBase,
+        wheel = colors.syntaxWheel
       )
   }
+
+  @deprecated("use colors.primary", "0.7.0") val slateBlue = colors.primary
+  @deprecated("use colors.primaryMedium", "0.7.0") val mediumSlateCyanButDarker =
+    colors.primaryMedium
+  @deprecated("use colors.primaryLight", "0.7.0") val lighterSlateCyan = colors.primaryLight
+  @deprecated("use colors.secondary", "0.7.0") val brightRedTl = colors.secondary
+  @deprecated("use colors.text", "0.7.0") val gunmetalTl = colors.text
+  @deprecated("use colors.background", "0.7.0") val whiteTl = colors.background
+  @deprecated("use colors.landingPageGradient", "0.7.0") val mediumSlateCyan =
+    colors.landingPageGradient
+  @deprecated("use colors.info", "0.7.0") val lightSlateCyan = colors.info
+  @deprecated("use colors.warning", "0.7.0") val softYellow = colors.warning
+  @deprecated("use colors.error", "0.7.0") val lightPink = colors.error
+
+  @deprecated("use colors.syntaxBase.c4", "0.7.0") val pinkTl = colors.syntaxBase.c4
+  @deprecated("use colors.syntaxBase.c5", "0.7.0") val platinumTl = colors.syntaxBase.c5
+  @deprecated("use colors.syntaxWheel.c5", "0.7.0") val coralTl = colors.syntaxWheel.c5
+
 }
