@@ -56,7 +56,7 @@ object TypelevelSiteSettings {
     Favicon.external("https://typelevel.org/img/favicon.png", "32x32", "image/png")
   )
 
-  object colors {
+  private object colors {
     val primary = Color.hex("385a70")
     val primaryMedium = Color.hex("8ebac7")
     val primaryLight = Color.hex("f4f8fa")
@@ -130,21 +130,34 @@ object TypelevelSiteSettings {
       )
   }
 
-  @deprecated("use colors.primary", "0.7.0") val slateBlue = colors.primary
-  @deprecated("use colors.primaryMedium", "0.7.0") val mediumSlateCyanButDarker =
+  @deprecated("color properties will be removed from public API", "0.7.0") val slateBlue =
+    colors.primary
+  @deprecated(
+    "color properties will be removed from public API",
+    "0.7.0") val mediumSlateCyanButDarker =
     colors.primaryMedium
-  @deprecated("use colors.primaryLight", "0.7.0") val lighterSlateCyan = colors.primaryLight
-  @deprecated("use colors.secondary", "0.7.0") val brightRedTl = colors.secondary
-  @deprecated("use colors.text", "0.7.0") val gunmetalTl = colors.text
-  @deprecated("use colors.background", "0.7.0") val whiteTl = colors.background
-  @deprecated("use colors.landingPageGradient", "0.7.0") val mediumSlateCyan =
+  @deprecated(
+    "color properties will be removed from public API",
+    "0.7.0") val lighterSlateCyan = colors.primaryLight
+  @deprecated("color properties will be removed from public API", "0.7.0") val brightRedTl =
+    colors.secondary
+  @deprecated("color properties will be removed from public API", "0.7.0") val gunmetalTl =
+    colors.text
+  @deprecated("color properties will be removed from public API", "0.7.0") val whiteTl =
+    colors.background
+  @deprecated("color properties will be removed from public API", "0.7.0") val mediumSlateCyan =
     colors.landingPageGradient
-  @deprecated("use colors.info", "0.7.0") val lightSlateCyan = colors.info
-  @deprecated("use colors.warning", "0.7.0") val softYellow = colors.warning
-  @deprecated("use colors.error", "0.7.0") val lightPink = colors.error
-
-  @deprecated("use colors.syntaxBase.c4", "0.7.0") val pinkTl = colors.syntaxBase.c4
-  @deprecated("use colors.syntaxBase.c5", "0.7.0") val platinumTl = colors.syntaxBase.c5
-  @deprecated("use colors.syntaxWheel.c5", "0.7.0") val coralTl = colors.syntaxWheel.c5
+  @deprecated("color properties will be removed from public API", "0.7.0") val lightSlateCyan =
+    colors.info
+  @deprecated("color properties will be removed from public API", "0.7.0") val softYellow =
+    colors.warning
+  @deprecated("color properties will be removed from public API", "0.7.0") val lightPink =
+    colors.error
+  @deprecated("color properties will be removed from public API", "0.7.0") val pinkTl =
+    colors.syntaxBase.c4
+  @deprecated("color properties will be removed from public API", "0.7.0") val platinumTl =
+    colors.syntaxBase.c5
+  @deprecated("color properties will be removed from public API", "0.7.0") val coralTl =
+    colors.syntaxWheel.c5
 
 }
