@@ -28,20 +28,20 @@ object Permissions {
   case object ReadAll extends Permissions
   case object WriteAll extends Permissions
   case object None extends Permissions
-  final case class Specify private (
-      actions: PermissionValue,
-      checks: PermissionValue,
-      contents: PermissionValue,
-      deployments: PermissionValue,
-      idToken: PermissionValue,
-      issues: PermissionValue,
-      packages: PermissionValue,
-      pages: PermissionValue,
-      pullRequests: PermissionValue,
-      repositoryProjects: PermissionValue,
-      securityEvents: PermissionValue,
-      statuses: PermissionValue
-  ) extends Permissions {
+  sealed abstract class Specify extends Permissions {
+    def actions: PermissionValue
+    def checks: PermissionValue
+    def contents: PermissionValue
+    def deployments: PermissionValue
+    def idToken: PermissionValue
+    def issues: PermissionValue
+    def packages: PermissionValue
+    def pages: PermissionValue
+    def pullRequests: PermissionValue
+    def repositoryProjects: PermissionValue
+    def securityEvents: PermissionValue
+    def statuses: PermissionValue
+
     private[gha] lazy val asMap: SortedMap[PermissionScope, PermissionValue] = SortedMap(
       PermissionScope.Actions -> actions,
       PermissionScope.Checks -> checks,
@@ -58,6 +58,34 @@ object Permissions {
     )
   }
   object Specify {
+    def apply(
+        actions: PermissionValue,
+        checks: PermissionValue,
+        contents: PermissionValue,
+        deployments: PermissionValue,
+        idToken: PermissionValue,
+        issues: PermissionValue,
+        packages: PermissionValue,
+        pages: PermissionValue,
+        pullRequests: PermissionValue,
+        repositoryProjects: PermissionValue,
+        securityEvents: PermissionValue,
+        statuses: PermissionValue
+    ): Specify =
+      Impl(
+        actions,
+        checks,
+        contents,
+        deployments,
+        idToken,
+        issues,
+        packages,
+        pages,
+        pullRequests,
+        repositoryProjects,
+        securityEvents,
+        statuses)
+
     // See https://docs.github.com/en/actions/security-guides/automatic-token-authentication#permissions-for-the-github_token
     val defaultPermissive = Specify(
       actions = PermissionValue.Write,
@@ -103,6 +131,23 @@ object Permissions {
       securityEvents = PermissionValue.Read,
       statuses = PermissionValue.Read
     )
+
+    private final case class Impl(
+        actions: PermissionValue,
+        checks: PermissionValue,
+        contents: PermissionValue,
+        deployments: PermissionValue,
+        idToken: PermissionValue,
+        issues: PermissionValue,
+        packages: PermissionValue,
+        pages: PermissionValue,
+        pullRequests: PermissionValue,
+        repositoryProjects: PermissionValue,
+        securityEvents: PermissionValue,
+        statuses: PermissionValue
+    ) extends Specify {
+      override def productPrefix = "Specify"
+    }
   }
 }
 
