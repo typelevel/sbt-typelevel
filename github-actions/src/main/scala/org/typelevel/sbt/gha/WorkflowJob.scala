@@ -104,7 +104,8 @@ object WorkflowJob {
       container: Option[JobContainer],
       environment: Option[JobEnvironment],
       concurrency: Option[Concurrency],
-      timeoutMinutes: Option[Int]) extends WorkflowJob {
+      timeoutMinutes: Option[Int])
+      extends WorkflowJob {
     override def productPrefix = "Impl"
   }
 }
