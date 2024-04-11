@@ -16,10 +16,39 @@
 
 package org.typelevel.sbt.gha
 
-final case class JobContainer(
-    image: String,
-    credentials: Option[(String, String)] = None,
-    env: Map[String, String] = Map(),
-    volumes: Map[String, String] = Map(),
-    ports: List[Int] = Nil,
-    options: List[String] = Nil)
+sealed abstract class JobContainer {
+  def image: String
+  def credentials: Option[(String, String)]
+  def env: Map[String, String]
+  def volumes: Map[String, String]
+  def ports: List[Int]
+  def options: List[String]
+}
+
+object JobContainer {
+
+  def apply(
+      image: String,
+      credentials: Option[(String, String)] = None,
+      env: Map[String, String] = Map(),
+      volumes: Map[String, String] = Map(),
+      ports: List[Int] = Nil,
+      options: List[String] = Nil): JobContainer =
+    Impl(image, credentials, env, volumes, ports, options)
+
+  private[gha] def unapply(jc: JobContainer) = {
+    import jc._
+    Some((image, credentials, env, volumes, ports, options))
+  }
+
+  private final case class Impl(
+      image: String,
+      credentials: Option[(String, String)],
+      env: Map[String, String],
+      volumes: Map[String, String],
+      ports: List[Int],
+      options: List[String])
+      extends JobContainer {
+    override def productPrefix: String = "JobContainer"
+  }
+}
