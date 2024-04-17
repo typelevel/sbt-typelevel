@@ -9,7 +9,6 @@ digraph {
   laika[label="laika-sbt"]
   mdoc[label="sbt-mdoc"]
   mima[label="sbt-mima-plugin"]
-  sn[label="sbt-scala-native"]
   sncp[label="sbt-scala-native-crossproject"]
   sonatype[label="sbt-sonatype"]
   sjs[label="sbt-scalajs"]
@@ -31,7 +30,6 @@ digraph {
   tlgithub -> tlkernel;
   tlgithub -> git;
   tlgithub -> sjs;
-  tlgithub -> sn;
 
   tlversioning[label="sbt-typelevel-versioning"];
   tlversioning -> tlkernel;
