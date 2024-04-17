@@ -50,8 +50,6 @@ Instead of using the super-plugins, for finer-grained control you can always add
 
 `TypelevelScalaJSGitHubPlugin`: Points your sourcemaps to GitHub permalinks. Only activated for Scala.js projects.
 
-`TypelevelScalaNativeGitHubPlugin`: Points your sourcemaps to GitHub permalinks. Only activated for Scala Native projects.
-
 ### sbt-typelevel-github-actions
 `GitHubActionsPlugin`: Provides general functionality, giving builds the ability to introspect on their host workflow and whether or not they are running in GitHub Actions.
 
