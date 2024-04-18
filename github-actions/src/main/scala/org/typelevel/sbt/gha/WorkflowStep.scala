@@ -114,52 +114,108 @@ object WorkflowStep {
       List("echo \"$(" + cmd + ")\" >> $GITHUB_PATH"),
       name = Some(s"Prepend $$PATH using $cmd"))
 
-  final case class Run(
-      commands: List[String],
-      id: Option[String] = None,
-      name: Option[String] = None,
-      cond: Option[String] = None,
-      env: Map[String, String] = Map(),
-      params: Map[String, String] = Map(),
-      timeoutMinutes: Option[Int] = None)
-      extends WorkflowStep {
-    def withId(id: Option[String]) = copy(id = id)
-    def withName(name: Option[String]) = copy(name = name)
-    def withCond(cond: Option[String]) = copy(cond = cond)
-    def withEnv(env: Map[String, String]) = copy(env = env)
-    def withTimeoutMinutes(minutes: Option[Int]) = copy(timeoutMinutes = minutes)
+  sealed abstract class Run extends WorkflowStep {
+    def commands: List[String]
+    def params: Map[String, String]
   }
 
-  final case class Sbt(
-      commands: List[String],
-      id: Option[String] = None,
-      name: Option[String] = None,
-      cond: Option[String] = None,
-      env: Map[String, String] = Map(),
-      params: Map[String, String] = Map(),
-      timeoutMinutes: Option[Int] = None,
-      preamble: Boolean = true)
-      extends WorkflowStep {
-    def withId(id: Option[String]) = copy(id = id)
-    def withName(name: Option[String]) = copy(name = name)
-    def withCond(cond: Option[String]) = copy(cond = cond)
-    def withEnv(env: Map[String, String]) = copy(env = env)
-    def withTimeoutMinutes(minutes: Option[Int]) = copy(timeoutMinutes = minutes)
+  object Run {
+    def apply(
+        commands: List[String],
+        id: Option[String] = None,
+        name: Option[String] = None,
+        cond: Option[String] = None,
+        env: Map[String, String] = Map(),
+        params: Map[String, String] = Map(),
+        timeoutMinutes: Option[Int] = None): Run =
+      Impl(commands, id, name, cond, env, params, timeoutMinutes)
+
+    private final case class Impl(
+        commands: List[String],
+        id: Option[String],
+        name: Option[String],
+        cond: Option[String],
+        env: Map[String, String],
+        params: Map[String, String],
+        timeoutMinutes: Option[Int])
+        extends Run {
+      def withId(id: Option[String]) = copy(id = id)
+      def withName(name: Option[String]) = copy(name = name)
+      def withCond(cond: Option[String]) = copy(cond = cond)
+      def withEnv(env: Map[String, String]) = copy(env = env)
+      def withTimeoutMinutes(minutes: Option[Int]) = copy(timeoutMinutes = minutes)
+    }
   }
 
-  final case class Use(
-      ref: UseRef,
-      params: Map[String, String] = Map(),
-      id: Option[String] = None,
-      name: Option[String] = None,
-      cond: Option[String] = None,
-      env: Map[String, String] = Map(),
-      timeoutMinutes: Option[Int] = None)
-      extends WorkflowStep {
-    def withId(id: Option[String]) = copy(id = id)
-    def withName(name: Option[String]) = copy(name = name)
-    def withCond(cond: Option[String]) = copy(cond = cond)
-    def withEnv(env: Map[String, String]) = copy(env = env)
-    def withTimeoutMinutes(minutes: Option[Int]) = copy(timeoutMinutes = minutes)
+  sealed abstract class Sbt extends WorkflowStep {
+    def commands: List[String]
+    def params: Map[String, String]
+    def preamble: Boolean
+  }
+
+  object Sbt {
+    def apply(
+        commands: List[String],
+        id: Option[String] = None,
+        name: Option[String] = None,
+        cond: Option[String] = None,
+        env: Map[String, String] = Map(),
+        params: Map[String, String] = Map(),
+        timeoutMinutes: Option[Int] = None,
+        preamble: Boolean = true): Sbt =
+      Impl(commands, id, name, cond, env, params, timeoutMinutes, preamble)
+
+    private final case class Impl(
+        commands: List[String],
+        id: Option[String],
+        name: Option[String],
+        cond: Option[String],
+        env: Map[String, String],
+        params: Map[String, String],
+        timeoutMinutes: Option[Int],
+        preamble: Boolean)
+        extends Sbt {
+      override def productPrefix = "Sbt"
+      def withId(id: Option[String]) = copy(id = id)
+      def withName(name: Option[String]) = copy(name = name)
+      def withCond(cond: Option[String]) = copy(cond = cond)
+      def withEnv(env: Map[String, String]) = copy(env = env)
+      def withTimeoutMinutes(minutes: Option[Int]) = copy(timeoutMinutes = minutes)
+    }
+  }
+
+  sealed abstract class Use extends WorkflowStep {
+    def ref: UseRef
+    def params: Map[String, String]
+  }
+
+  object Use {
+
+    def apply(
+        ref: UseRef,
+        params: Map[String, String] = Map(),
+        id: Option[String] = None,
+        name: Option[String] = None,
+        cond: Option[String] = None,
+        env: Map[String, String] = Map(),
+        timeoutMinutes: Option[Int] = None): Use =
+      Impl(ref, params, id, name, cond, env, timeoutMinutes)
+
+    private final case class Impl(
+        ref: UseRef,
+        params: Map[String, String],
+        id: Option[String],
+        name: Option[String],
+        cond: Option[String],
+        env: Map[String, String],
+        timeoutMinutes: Option[Int])
+        extends Use {
+      override def productPrefix = "Use"
+      def withId(id: Option[String]) = copy(id = id)
+      def withName(name: Option[String]) = copy(name = name)
+      def withCond(cond: Option[String]) = copy(cond = cond)
+      def withEnv(env: Map[String, String]) = copy(env = env)
+      def withTimeoutMinutes(minutes: Option[Int]) = copy(timeoutMinutes = minutes)
+    }
   }
 }
