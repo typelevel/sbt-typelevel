@@ -16,7 +16,7 @@
 
 package org.typelevel.sbt.gha
 
-sealed trait RefPredicate extends Product with Serializable
+sealed abstract class RefPredicate extends Product with Serializable
 
 object RefPredicate {
   final case class Equals(ref: Ref) extends RefPredicate

@@ -16,7 +16,7 @@
 
 package org.typelevel.sbt.gha
 
-sealed trait PREventType extends Product with Serializable
+sealed abstract class PREventType extends Product with Serializable
 
 object PREventType {
   val Defaults = List(Opened, Reopened, Synchronize)

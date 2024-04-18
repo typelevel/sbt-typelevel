@@ -16,7 +16,7 @@
 
 package org.typelevel.sbt.gha
 
-sealed trait WorkflowStep extends Product with Serializable {
+sealed abstract class WorkflowStep extends Product with Serializable {
   def id: Option[String]
   def name: Option[String]
   def cond: Option[String]

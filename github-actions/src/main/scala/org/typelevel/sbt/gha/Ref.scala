@@ -16,7 +16,7 @@
 
 package org.typelevel.sbt.gha
 
-sealed trait Ref extends Product with Serializable
+sealed abstract class Ref extends Product with Serializable
 
 object Ref {
   final case class Branch(name: String) extends Ref
