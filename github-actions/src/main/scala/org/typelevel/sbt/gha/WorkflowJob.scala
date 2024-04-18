@@ -106,6 +106,6 @@ object WorkflowJob {
       concurrency: Option[Concurrency],
       timeoutMinutes: Option[Int])
       extends WorkflowJob {
-    override def productPrefix = "Impl"
+    override def productPrefix = "WorkflowJob"
   }
 }
