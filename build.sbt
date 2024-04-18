@@ -10,7 +10,7 @@ ThisBuild / developers ++= List(
   tlGitHubDev("ChristopherDavenport", "Christopher Davenport"),
   tlGitHubDev("djspiewak", "Daniel Spiewak")
 )
-ThisBuild / startYear := Some(2022)
+ThisBuild / startYear ~= { _.map(_ => 2022) } // dog food
 
 val temurin8 = JavaSpec.temurin("8")
 val temurin17 = JavaSpec.temurin("17")

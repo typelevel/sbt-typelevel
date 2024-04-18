@@ -21,6 +21,10 @@ import org.typelevel.sbt.gha.GenerativePlugin
 import org.typelevel.sbt.gha.GitHubActionsPlugin
 import sbt._
 
+import java.time.Instant
+import java.time.ZoneOffset
+import java.time.ZonedDateTime
+
 import Keys._
 import TypelevelKernelPlugin.autoImport._
 
@@ -61,7 +65,11 @@ object TypelevelPlugin extends AutoPlugin {
         else None
       }
     },
-    startYear := Some(java.time.YearMonth.now().getYear()),
+    startYear := {
+      val instant = Instant.ofEpochMilli(BuildInfo.builtAtMillis)
+      val zdt = ZonedDateTime.ofInstant(instant, ZoneOffset.UTC)
+      Some(zdt.getYear)
+    },
     licenses += License.Apache2,
     tlCiHeaderCheck := true,
     tlCiScalafmtCheck := true,
