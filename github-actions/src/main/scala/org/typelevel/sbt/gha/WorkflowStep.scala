@@ -139,6 +139,7 @@ object WorkflowStep {
         params: Map[String, String],
         timeoutMinutes: Option[Int])
         extends Run {
+      override def productPrefix = "Run"
       def withId(id: Option[String]) = copy(id = id)
       def withName(name: Option[String]) = copy(name = name)
       def withCond(cond: Option[String]) = copy(cond = cond)
