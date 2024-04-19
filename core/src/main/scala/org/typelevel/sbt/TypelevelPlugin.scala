@@ -61,7 +61,6 @@ object TypelevelPlugin extends AutoPlugin {
         else None
       }
     },
-    startYear := Some(java.time.YearMonth.now().getYear()),
     licenses += License.Apache2,
     tlCiHeaderCheck := true,
     tlCiScalafmtCheck := true,
