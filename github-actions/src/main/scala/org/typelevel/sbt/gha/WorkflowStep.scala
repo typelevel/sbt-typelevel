@@ -117,6 +117,7 @@ object WorkflowStep {
   sealed abstract class Run extends WorkflowStep {
     def commands: List[String]
     def params: Map[String, String]
+    def workingDirectory: Option[String]
   }
 
   object Run {
@@ -127,8 +128,9 @@ object WorkflowStep {
         cond: Option[String] = None,
         env: Map[String, String] = Map(),
         params: Map[String, String] = Map(),
-        timeoutMinutes: Option[Int] = None): Run =
-      Impl(commands, id, name, cond, env, params, timeoutMinutes)
+        timeoutMinutes: Option[Int] = None,
+        workingDirectory: Option[String] = None): Run =
+      Impl(commands, id, name, cond, env, params, timeoutMinutes, workingDirectory)
 
     private final case class Impl(
         commands: List[String],
@@ -137,7 +139,8 @@ object WorkflowStep {
         cond: Option[String],
         env: Map[String, String],
         params: Map[String, String],
-        timeoutMinutes: Option[Int])
+        timeoutMinutes: Option[Int],
+        workingDirectory: Option[String])
         extends Run {
       override def productPrefix = "Run"
       def withId(id: Option[String]) = copy(id = id)

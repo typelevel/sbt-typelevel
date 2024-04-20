@@ -41,6 +41,11 @@ ThisBuild / githubWorkflowBuildMatrixExclusions ++= {
 ThisBuild / githubWorkflowPublishTimeoutMinutes := Some(45)
 ThisBuild / githubWorkflowPublishNeeds += "validate-steward"
 
+ThisBuild / githubWorkflowBuild += WorkflowStep.Run(
+  List("pwd"),
+  workingDirectory = Some("project")
+)
+
 ThisBuild / mergifyStewardConfig ~= {
   _.map(_.withMergeMinors(true).withAuthor("typelevel-steward[bot]"))
 }
