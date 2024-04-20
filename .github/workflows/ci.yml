@@ -237,6 +237,10 @@ jobs:
         shell: bash
         run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' doc
 
+      - shell: bash
+        working-directory: project
+        run: pwd
+
       - name: Make target directories
         if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main')
         shell: bash

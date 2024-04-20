@@ -286,7 +286,9 @@ ${indent(rendered.mkString("\n"), 1)}"""
 
     val body = step match {
       case run: Run =>
-        renderRunBody(run.commands, run.params, renderedShell)
+        val renderedWorkingDirectory =
+          run.workingDirectory.map(wrap).map("working-directory: " + _ + "\n").getOrElse("")
+        renderRunBody(run.commands, run.params, renderedShell, renderedWorkingDirectory)
 
       case sbtStep: Sbt =>
         import sbtStep.commands
@@ -309,7 +311,8 @@ ${indent(rendered.mkString("\n"), 1)}"""
         renderRunBody(
           commands = List(s"$sbt $safeCommands"),
           params = sbtStep.params,
-          renderedShell = renderedShell
+          renderedShell = renderedShell,
+          renderedWorkingDirectory = ""
         )
 
       case use: Use =>
@@ -344,8 +347,10 @@ ${indent(rendered.mkString("\n"), 1)}"""
   def renderRunBody(
       commands: List[String],
       params: Map[String, String],
-      renderedShell: String) =
-    renderedShell + "run: " + wrap(commands.mkString("\n")) + renderParams(params)
+      renderedShell: String,
+      renderedWorkingDirectory: String) =
+    renderedShell + renderedWorkingDirectory + "run: " + wrap(
+      commands.mkString("\n")) + renderParams(params)
 
   def renderParams(params: Map[String, String]): String = {
     val renderedParamsPre = compileEnv(params, prefix = "with")
