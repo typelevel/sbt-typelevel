@@ -16,7 +16,7 @@
 
 package org.typelevel.sbt.gha
 
-sealed trait Paths extends Product with Serializable
+sealed abstract class Paths extends Product with Serializable
 
 object Paths {
   final case class Include(paths: List[String]) extends Paths

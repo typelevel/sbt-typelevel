@@ -18,4 +18,16 @@ package org.typelevel.sbt.gha
 
 import java.net.URL
 
-final case class JobEnvironment(name: String, url: Option[URL] = None)
+sealed abstract class JobEnvironment {
+  def name: String
+  def url: Option[URL]
+}
+
+object JobEnvironment {
+  def apply(name: String, url: Option[URL] = None): JobEnvironment =
+    Impl(name, url)
+
+  private final case class Impl(name: String, url: Option[URL]) extends JobEnvironment {
+    override def productPrefix = "JobEnvironment"
+  }
+}

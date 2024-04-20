@@ -16,7 +16,7 @@
 
 package org.typelevel.sbt.gha
 
-sealed trait UseRef extends Product with Serializable
+sealed abstract class UseRef extends Product with Serializable
 
 object UseRef {
   final case class Public(owner: String, repo: String, ref: String) extends UseRef

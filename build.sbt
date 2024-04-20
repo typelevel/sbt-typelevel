@@ -42,7 +42,7 @@ ThisBuild / githubWorkflowPublishTimeoutMinutes := Some(45)
 ThisBuild / githubWorkflowPublishNeeds += "validate-steward"
 
 ThisBuild / mergifyStewardConfig ~= {
-  _.map(_.copy(mergeMinors = true, author = "typelevel-steward[bot]"))
+  _.map(_.withMergeMinors(true).withAuthor("typelevel-steward[bot]"))
 }
 ThisBuild / mergifySuccessConditions += MergifyCondition.Custom("#approved-reviews-by>=1")
 ThisBuild / mergifyLabelPaths += { "docs" -> file("docs") }

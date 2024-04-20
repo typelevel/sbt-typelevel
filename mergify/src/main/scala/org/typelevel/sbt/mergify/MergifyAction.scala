@@ -142,7 +142,7 @@ object MergifyAction {
           )
       }
 
-    private sealed trait OptionallyWeighted
+    private sealed abstract class OptionallyWeighted
     private case class Weighted(value: NonEmptyList[(String, Int)]) extends OptionallyWeighted
     private case class Unweighted(value: NonEmptyList[String]) extends OptionallyWeighted
 

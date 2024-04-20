@@ -16,4 +16,18 @@
 
 package org.typelevel.sbt.gha
 
-final case class Concurrency(group: String, cancelInProgress: Option[Boolean] = None)
+sealed abstract class Concurrency {
+  def group: String
+  def cancelInProgress: Option[Boolean]
+}
+
+object Concurrency {
+
+  def apply(group: String, cancelInProgress: Option[Boolean] = None): Concurrency =
+    Impl(group, cancelInProgress)
+
+  private final case class Impl(group: String, cancelInProgress: Option[Boolean])
+      extends Concurrency {
+    override def productPrefix = "Concurrency"
+  }
+}
