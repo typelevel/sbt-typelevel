@@ -24,18 +24,18 @@ ThisBuild / githubWorkflowJavaVersions ++= Seq(
   JavaSpec.semeru("17")
 )
 
-val macos14 = "macos-14"
+val macOS = "macos-latest"
 
-ThisBuild / githubWorkflowOSes ++= Seq("macos-latest", macos14, "windows-latest")
+ThisBuild / githubWorkflowOSes ++= Seq(macOS, "windows-latest")
 
 ThisBuild / githubWorkflowBuildMatrixExclusions ++= {
   val exclusions = for {
     java <- githubWorkflowJavaVersions.value.tail
     os <- githubWorkflowOSes.value.tail
-    if !(java == temurin17 && os == macos14) // keep this one
+    if !(java == temurin17 && os == macOS) // keep this one
   } yield MatrixExclude(Map("java" -> java.render, "os" -> os))
 
-  exclusions :+ MatrixExclude(Map("java" -> temurin8.render, "os" -> macos14))
+  exclusions :+ MatrixExclude(Map("java" -> temurin8.render, "os" -> macOS))
 }
 
 ThisBuild / githubWorkflowPublishTimeoutMinutes := Some(45)
