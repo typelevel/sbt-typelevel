@@ -79,12 +79,14 @@ object TypelevelPlugin extends AutoPlugin {
     GlobalScope / tlCommandAliases ++= {
       val header = tlCiHeaderCheck.value
       val scalafmt = tlCiScalafmtCheck.value
+      val javafmt = tlCiJavafmtCheck.value
       val scalafix = tlCiScalafixCheck.value
 
       val prePR = List("project /", "githubWorkflowGenerate") ++
         List("+headerCreateAll").filter(_ => header) ++
         List("+scalafixAll").filter(_ => scalafix) ++
-        List("+scalafmtAll", "scalafmtSbt").filter(_ => scalafmt)
+        List("+scalafmtAll", "scalafmtSbt").filter(_ => scalafmt) ++
+        List("javafmtAll").filter(_ => javafmt)
 
       val botHook = List("githubWorkflowGenerate") ++
         List("+headerCreateAll").filter(_ => header) ++

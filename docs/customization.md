@@ -62,6 +62,7 @@ Both plugins are documented in [**sbt-typelevel-github-actions**](gha.md).
 
 - `tlCiHeaderCheck` (setting): Whether to do header check in CI (default: `false`).
 - `tlCiScalafmtCheck` (setting): Whether to do scalafmt check in CI (default: `false`).
+- `tlCiJavafmtCheck` (setting): Whether to do javafmt check in CI (default: `false`).
 - `tlCiScalafixCheck` (setting): Whether to do scalafix check in CI (default: `false`).
 - `tlCiMimaBinaryIssueCheck` (setting): Whether to do MiMa binary issues check in CI (default: `false`).
 - `tlCiDocCheck` (setting): Whether to build API docs in CI (default: `false`).
