@@ -37,6 +37,8 @@ object TypelevelCiPlugin extends AutoPlugin {
       settingKey[Boolean]("Whether to do header check in CI (default: false)")
     lazy val tlCiScalafmtCheck =
       settingKey[Boolean]("Whether to do scalafmt check in CI (default: false)")
+    lazy val tlCiJavafmtCheck =
+      settingKey[Boolean]("Whether to do javafmt check in CI (default: false)")
     lazy val tlCiScalafixCheck =
       settingKey[Boolean]("Whether to do scalafix check in CI (default: false)")
     lazy val tlCiMimaBinaryIssueCheck =
@@ -57,6 +59,7 @@ object TypelevelCiPlugin extends AutoPlugin {
   override def buildSettings = Seq(
     tlCiHeaderCheck := false,
     tlCiScalafmtCheck := false,
+    tlCiJavafmtCheck := false,
     tlCiScalafixCheck := false,
     tlCiMimaBinaryIssueCheck := false,
     tlCiDocCheck := false,
@@ -68,32 +71,32 @@ object TypelevelCiPlugin extends AutoPlugin {
     githubWorkflowPublishTargetBranches := Seq(),
     githubWorkflowBuild := {
 
-      val style = (tlCiHeaderCheck.value, tlCiScalafmtCheck.value) match {
-        case (true, true) => // headers + formatting
-          List(
-            WorkflowStep.Sbt(
-              List("headerCheckAll", "scalafmtCheckAll", "project /", "scalafmtSbtCheck"),
-              name = Some("Check headers and formatting"),
-              cond = Some(primaryAxisCond.value)
-            )
+      val style = {
+        val headers = List("headerCheckAll").filter(_ => tlCiHeaderCheck.value)
+
+        val scalafmt = List(
+          "scalafmtCheckAll",
+          "project /",
+          "scalafmtSbtCheck"
+        ).filter(_ => tlCiScalafmtCheck.value)
+
+        val javafmt = List("javafmtCheckAll").filter(_ => tlCiJavafmtCheck.value)
+
+        val formatting = javafmt ++ scalafmt
+
+        val headersFormatting = headers ++ formatting
+
+        val names =
+          List("headers").filter(_ => headers.nonEmpty) ++ List("formatting").filter(_ =>
+            formatting.nonEmpty)
+
+        List(
+          WorkflowStep.Sbt(
+            headers ++ formatting,
+            name = Some(s"Check ${names.mkString(" and ")}"),
+            cond = Some(primaryAxisCond.value)
           )
-        case (true, false) => // headers
-          List(
-            WorkflowStep.Sbt(
-              List("headerCheckAll"),
-              name = Some("Check headers"),
-              cond = Some(primaryAxisCond.value)
-            )
-          )
-        case (false, true) => // formatting
-          List(
-            WorkflowStep.Sbt(
-              List("scalafmtCheckAll", "project /", "scalafmtSbtCheck"),
-              name = Some("Check formatting"),
-              cond = Some(primaryAxisCond.value)
-            )
-          )
-        case (false, false) => Nil // nada
+        ).filter(_ => headersFormatting.nonEmpty)
       }
 
       val test = List(
