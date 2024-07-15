@@ -194,11 +194,12 @@ object TypelevelSettingsPlugin extends AutoPlugin {
     },
     scalacOptions ++= {
       scalaVersion.value match {
-        case V(V(3, _, _, _)) if onlyScala3.value =>
-          Seq("-Ykind-projector:underscores")
-
-        case V(V(3, _, _, _)) =>
-          Seq("-language:implicitConversions", "-Ykind-projector")
+        case V(V(3, minor, _, _)) =>
+          val kpFlag = if (minor >= 5) "-Xkind-projector" else "-Ykind-projector"
+          if (onlyScala3.value)
+            Seq(s"$kpFlag:underscores")
+          else
+            Seq("-language:implicitConversions", kpFlag)
 
         case V(V(2, minor, _, _)) if minor >= 12 =>
           Seq("-language:_", "-Xsource:3")
