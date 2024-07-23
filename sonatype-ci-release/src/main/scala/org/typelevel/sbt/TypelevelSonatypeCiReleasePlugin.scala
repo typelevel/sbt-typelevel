@@ -78,9 +78,11 @@ object TypelevelSonatypeCiReleasePlugin extends AutoPlugin {
                 |resolvers += "${repo.name}" at "${repo.root}"
                 |```
                 |""".stripMargin
+
+          case _ => ""
         }
 
-        GitHubActionsPlugin.appendtoStepSummary(
+        GitHubActionsPlugin.appendToStepSummary(
           s"""|## Published `$v`
               |${resolver}""".stripMargin
         )
