@@ -79,7 +79,13 @@ object TypelevelSonatypeCiReleasePlugin extends AutoPlugin {
                 |```
                 |""".stripMargin
 
-          case _ => ""
+          case repo: URLRepository =>
+            s"""|```scala
+                |resolvers += Resolver.url("${repo.name}", ${repo.patterns}, ${repo.allowInsecureProtocol})
+                |```
+                |""".stripMargin
+          // fallback to print at least _something_
+          case other => other.toString
         }
 
         GitHubActionsPlugin.appendToStepSummary(
