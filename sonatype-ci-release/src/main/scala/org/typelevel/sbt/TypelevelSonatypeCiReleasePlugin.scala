@@ -81,7 +81,7 @@ object TypelevelSonatypeCiReleasePlugin extends AutoPlugin {
 
           case repo: URLRepository =>
             s"""|```scala
-                |resolvers += Resolver.url("${repo.name}", ${repo.patterns}, ${repo.allowInsecureProtocol})
+                |resolvers += URLRepository("${repo.name}", ${repo.patterns}, ${repo.allowInsecureProtocol})
                 |```
                 |""".stripMargin
           // fallback to print at least _something_
