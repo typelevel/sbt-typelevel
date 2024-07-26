@@ -187,7 +187,7 @@ object TypelevelCiPlugin extends AutoPlugin {
   override def projectSettings: Seq[Setting[_]] = Seq(
     Test / Keys.executeTests := {
       val results: Tests.Output = (Test / Keys.executeTests).value
-      GitHubActionsPlugin.appendtoStepSummary(
+      GitHubActionsPlugin.appendToStepSummary(
         renderTestResults(Keys.thisProject.value.id, Keys.scalaVersion.value, results)
       )
       results

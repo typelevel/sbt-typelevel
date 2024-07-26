@@ -78,9 +78,17 @@ object TypelevelSonatypeCiReleasePlugin extends AutoPlugin {
                 |resolvers += "${repo.name}" at "${repo.root}"
                 |```
                 |""".stripMargin
+
+          case repo: URLRepository =>
+            s"""|```scala
+                |resolvers += URLRepository("${repo.name}", ${repo.patterns}, ${repo.allowInsecureProtocol})
+                |```
+                |""".stripMargin
+          // fallback to print at least _something_
+          case other => other.toString
         }
 
-        GitHubActionsPlugin.appendtoStepSummary(
+        GitHubActionsPlugin.appendToStepSummary(
           s"""|## Published `$v`
               |${resolver}""".stripMargin
         )
