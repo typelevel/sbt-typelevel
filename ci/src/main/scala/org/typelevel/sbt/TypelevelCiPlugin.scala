@@ -52,6 +52,9 @@ object TypelevelCiPlugin extends AutoPlugin {
     lazy val tlCiStewardValidateConfig = settingKey[Option[File]](
       "The location of the Scala Steward config to validate (default: `.scala-steward.conf`, if exists)")
 
+    lazy val tlCiIsFork =
+      settingKey[Boolean]("Whether this project is a fork of any else (default: false)")
+
   }
 
   import autoImport._
@@ -64,6 +67,7 @@ object TypelevelCiPlugin extends AutoPlugin {
     tlCiMimaBinaryIssueCheck := false,
     tlCiDocCheck := false,
     tlCiDependencyGraphJob := true,
+    tlCiIsFork := false,
     githubWorkflowTargetBranches ++= Seq(
       "!update/**", // ignore steward branches
       "!pr/**" // escape-hatch to disable ci on a branch
