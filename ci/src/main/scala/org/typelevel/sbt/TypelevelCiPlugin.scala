@@ -143,6 +143,10 @@ object TypelevelCiPlugin extends AutoPlugin {
     },
     githubWorkflowJavaVersions := Seq(JavaSpec.temurin("8")),
     githubWorkflowAddedJobs ++= {
+      val ghEventCond = "github.event_name != 'pull_request'"
+      val ghForkCond = s"github.event.repository.fork == ${tlCiIsFork.value}"
+      val jobCond = s"$ghForkCond && $ghEventCond"
+
       val dependencySubmission =
         if (tlCiDependencyGraphJob.value)
           List(
@@ -159,7 +163,7 @@ object TypelevelCiPlugin extends AutoPlugin {
                   Some(List("test", "scala-tool", "scala-doc-tool", "test-internal")),
                   None
                 ),
-              cond = Some("github.event_name != 'pull_request'")
+              cond = Some(jobCond)
             ))
         else Nil
 
