@@ -20,6 +20,8 @@ import com.typesafe.tools.mima.plugin.MimaPlugin
 import sbt._
 import xerial.sbt.Sonatype
 
+import scala.annotation.nowarn
+
 import Keys._
 import Sonatype.autoImport._
 import TypelevelKernelPlugin.autoImport._
@@ -31,6 +33,10 @@ object TypelevelSonatypePlugin extends AutoPlugin {
   override def trigger = allRequirements
 
   object autoImport {
+    @deprecated(
+      "Use ThisBuild / sonatypeCredentialHost := xerial.sbt.Sonatype.sonatypeLegacy",
+      "0.7.3"
+    )
     lazy val tlSonatypeUseLegacyHost =
       settingKey[Boolean]("Publish to oss.sonatype.org instead of s01 (default: false)")
   }
@@ -48,10 +54,19 @@ object TypelevelSonatypePlugin extends AutoPlugin {
     }
   )
 
+  @nowarn("cat=deprecation")
   override def buildSettings =
     Seq(
       tlSonatypeUseLegacyHost := false,
-      autoAPIMappings := true
+      autoAPIMappings := true,
+      sonatypeCredentialHost := {
+        Option(System.getenv("SONATYPE_CREDENTIAL_HOST")).filter(_.nonEmpty).getOrElse {
+          if (tlSonatypeUseLegacyHost.value)
+            Sonatype.sonatypeLegacy
+          else
+            Sonatype.sonatype01
+        }
+      }
     )
 
   override def projectSettings = Seq(
@@ -59,14 +74,6 @@ object TypelevelSonatypePlugin extends AutoPlugin {
     sonatypeProfileName := organization.value,
     publishTo := sonatypePublishToBundle.value,
     commands += sonatypeBundleReleaseIfRelevant,
-    sonatypeCredentialHost := {
-      Option(System.getenv("SONATYPE_CREDENTIAL_HOST")).filter(_.nonEmpty).getOrElse {
-        if (tlSonatypeUseLegacyHost.value)
-          "oss.sonatype.org"
-        else
-          "s01.oss.sonatype.org"
-      }
-    },
     apiURL := apiURL.value.orElse(hostedApiUrl.value)
   )
 
