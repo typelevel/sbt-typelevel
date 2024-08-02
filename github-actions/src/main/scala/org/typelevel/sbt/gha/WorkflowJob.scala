@@ -37,6 +37,27 @@ sealed abstract class WorkflowJob {
   def environment: Option[JobEnvironment]
   def concurrency: Option[Concurrency]
   def timeoutMinutes: Option[Int]
+
+  def withId(id: String): WorkflowJob
+  def withName(name: String): WorkflowJob
+  def withSteps(steps: List[WorkflowStep]): WorkflowJob
+  def withSbtStepPreamble(sbtStepPreamble: List[String]): WorkflowJob
+  def withCond(cond: Option[String]): WorkflowJob
+  def withPermissions(permissions: Option[Permissions]): WorkflowJob
+  def withEnv(env: Map[String, String]): WorkflowJob
+  def withOses(oses: List[String]): WorkflowJob
+  def withScalas(scalas: List[String]): WorkflowJob
+  def withJavas(javas: List[JavaSpec]): WorkflowJob
+  def withNeeds(needs: List[String]): WorkflowJob
+  def withMatrixFailFast(matrixFailFast: Option[Boolean]): WorkflowJob
+  def withMatrixAdds(matrixAdds: Map[String, List[String]]): WorkflowJob
+  def withMatrixIncs(matrixIncs: List[MatrixInclude]): WorkflowJob
+  def withMatrixExcs(matrixExcs: List[MatrixExclude]): WorkflowJob
+  def withRunsOnExtraLabels(runsOnExtraLabels: List[String]): WorkflowJob
+  def withContainer(container: Option[JobContainer]): WorkflowJob
+  def withEnvironment(environment: Option[JobEnvironment]): WorkflowJob
+  def withConcurrency(concurrency: Option[Concurrency]): WorkflowJob
+  def withTimeoutMinutes(timeoutMinutes: Option[Int]): WorkflowJob
 }
 
 object WorkflowJob {
@@ -106,6 +127,30 @@ object WorkflowJob {
       concurrency: Option[Concurrency],
       timeoutMinutes: Option[Int])
       extends WorkflowJob {
+
+    // scalafmt: { maxColumn = 200 }
+    override def withId(id: String): WorkflowJob = copy(id = id)
+    override def withName(name: String): WorkflowJob = copy(name = name)
+    override def withSteps(steps: List[WorkflowStep]): WorkflowJob = copy(steps = steps)
+    override def withSbtStepPreamble(sbtStepPreamble: List[String]): WorkflowJob = copy(sbtStepPreamble = sbtStepPreamble)
+    override def withCond(cond: Option[String]): WorkflowJob = copy(cond = cond)
+    override def withPermissions(permissions: Option[Permissions]): WorkflowJob = copy(permissions = permissions)
+    override def withEnv(env: Map[String, String]): WorkflowJob = copy(env = env)
+    override def withOses(oses: List[String]): WorkflowJob = copy(oses = oses)
+    override def withScalas(scalas: List[String]): WorkflowJob = copy(scalas = scalas)
+    override def withJavas(javas: List[JavaSpec]): WorkflowJob = copy(javas = javas)
+    override def withNeeds(needs: List[String]): WorkflowJob = copy(needs = needs)
+    override def withMatrixFailFast(matrixFailFast: Option[Boolean]): WorkflowJob = copy(matrixFailFast = matrixFailFast)
+    override def withMatrixAdds(matrixAdds: Map[String, List[String]]): WorkflowJob = copy(matrixAdds = matrixAdds)
+    override def withMatrixIncs(matrixIncs: List[MatrixInclude]): WorkflowJob = copy(matrixIncs = matrixIncs)
+    override def withMatrixExcs(matrixExcs: List[MatrixExclude]): WorkflowJob = copy(matrixExcs = matrixExcs)
+    override def withRunsOnExtraLabels(runsOnExtraLabels: List[String]): WorkflowJob = copy(runsOnExtraLabels = runsOnExtraLabels)
+    override def withContainer(container: Option[JobContainer]): WorkflowJob = copy(container = container)
+    override def withEnvironment(environment: Option[JobEnvironment]): WorkflowJob = copy(environment = environment)
+    override def withConcurrency(concurrency: Option[Concurrency]): WorkflowJob = copy(concurrency = concurrency)
+    override def withTimeoutMinutes(timeoutMinutes: Option[Int]): WorkflowJob = copy(timeoutMinutes = timeoutMinutes)
+    // scalafmt: { maxColumn = 96 }
+
     override def productPrefix = "WorkflowJob"
   }
 }
