@@ -76,24 +76,30 @@ object TypelevelPlugin extends AutoPlugin {
         java <- githubWorkflowJavaVersions.value.tail // default java is head
       } yield MatrixExclude(Map("scala" -> scala, "java" -> java.render))
     },
-    GlobalScope / tlCommandAliases ++= {
+    GlobalScope / tlPrePRSteps ++= {
       val header = tlCiHeaderCheck.value
       val scalafmt = tlCiScalafmtCheck.value
       val javafmt = tlCiJavafmtCheck.value
       val scalafix = tlCiScalafixCheck.value
 
-      val prePR = List("project /", "githubWorkflowGenerate") ++
+      List("project /", "githubWorkflowGenerate") ++
         List("+headerCreateAll").filter(_ => header) ++
         List("+scalafixAll").filter(_ => scalafix) ++
         List("+scalafmtAll", "scalafmtSbt").filter(_ => scalafmt) ++
-        List("javafmtAll").filter(_ => javafmt)
+        List("javafmtAll").filter(_ => javafmt) ++
+        List("compile", "test")
+    },
+    GlobalScope / tlCommandAliases ++= {
+      val header = tlCiHeaderCheck.value
+      val scalafmt = tlCiScalafmtCheck.value
+      val javafmt = tlCiJavafmtCheck.value
 
       val botHook = List("githubWorkflowGenerate") ++
         List("+headerCreateAll").filter(_ => header) ++
+        List("javafmtAll").filter(_ => javafmt) ++
         List("+scalafmtAll", "scalafmtSbt").filter(_ => scalafmt)
 
       Map(
-        "prePR" -> prePR,
         "tlPrePrBotHook" -> botHook
       )
     }

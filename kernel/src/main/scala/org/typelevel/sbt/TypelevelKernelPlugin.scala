@@ -45,6 +45,9 @@ object TypelevelKernelPlugin extends AutoPlugin {
       "Command aliases defined for this build"
     )
 
+    lazy val tlPrePRSteps =
+      settingKey[List[String]]("Steps to be performed before a user submits a PR")
+
     @deprecated(
       "Use `tlCommandAliases` for a more composable command definition experience",
       "0.6.1")
@@ -62,7 +65,8 @@ object TypelevelKernelPlugin extends AutoPlugin {
   override def globalSettings = Seq(
     Def.derive(tlIsScala3 := scalaVersion.value.startsWith("3.")),
     tlCommandAliases := Map(
-      "tlReleaseLocal" -> List("reload", "project /", "+publishLocal")
+      "tlReleaseLocal" -> List("reload", "project /", "+publishLocal"),
+      "prePR" -> ("reload" :: "project /" :: tlPrePRSteps.value)
     ),
     onLoad := {
       val aliases = tlCommandAliases.value
@@ -78,7 +82,8 @@ object TypelevelKernelPlugin extends AutoPlugin {
       onUnload.value.compose { (state: State) =>
         aliases.foldLeft(state) { (state, alias) => BasicCommands.removeAlias(state, alias) }
       }
-    }
+    },
+    tlPrePRSteps := List.empty
   )
 
   @nowarn("cat=deprecation")
