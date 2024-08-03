@@ -81,13 +81,15 @@ object TypelevelPlugin extends AutoPlugin {
       val scalafmt = tlCiScalafmtCheck.value
       val javafmt = tlCiJavafmtCheck.value
       val scalafix = tlCiScalafixCheck.value
+      val mima = tlCiMimaBinaryIssueCheck.value
 
-      List("project /", "githubWorkflowGenerate") ++
+      List("githubWorkflowGenerate") ++
         List("+headerCreateAll").filter(_ => header) ++
         List("+scalafixAll").filter(_ => scalafix) ++
         List("+scalafmtAll", "scalafmtSbt").filter(_ => scalafmt) ++
         List("javafmtAll").filter(_ => javafmt) ++
-        List("compile", "test")
+        List("compile", "test") ++
+        List("mimaReportBinaryIssues").filter(_ => mima)
     },
     GlobalScope / tlCommandAliases ++= {
       val header = tlCiHeaderCheck.value
