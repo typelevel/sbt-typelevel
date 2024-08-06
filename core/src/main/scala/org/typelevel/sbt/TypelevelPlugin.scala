@@ -87,9 +87,7 @@ object TypelevelPlugin extends AutoPlugin {
         List("+headerCreateAll").filter(_ => header) ++
         List("+scalafixAll").filter(_ => scalafix) ++
         List("+scalafmtAll", "scalafmtSbt").filter(_ => scalafmt) ++
-        List("javafmtAll").filter(_ => javafmt) ++
-        List("compile", "test") ++
-        List("mimaReportBinaryIssues").filter(_ => mima)
+        List("javafmtAll").filter(_ => javafmt)
     },
     GlobalScope / tlCommandAliases ++= {
       val header = tlCiHeaderCheck.value
