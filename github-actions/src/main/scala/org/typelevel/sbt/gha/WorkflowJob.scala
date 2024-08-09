@@ -58,6 +58,9 @@ sealed abstract class WorkflowJob {
   def withEnvironment(environment: Option[JobEnvironment]): WorkflowJob
   def withConcurrency(concurrency: Option[Concurrency]): WorkflowJob
   def withTimeoutMinutes(timeoutMinutes: Option[Int]): WorkflowJob
+
+  def updateEnv(name: String, value: String): WorkflowJob
+  def appendSteps(steps: List[WorkflowStep]): WorkflowJob
 }
 
 object WorkflowJob {
@@ -149,6 +152,9 @@ object WorkflowJob {
     override def withEnvironment(environment: Option[JobEnvironment]): WorkflowJob = copy(environment = environment)
     override def withConcurrency(concurrency: Option[Concurrency]): WorkflowJob = copy(concurrency = concurrency)
     override def withTimeoutMinutes(timeoutMinutes: Option[Int]): WorkflowJob = copy(timeoutMinutes = timeoutMinutes)
+
+    def updateEnv(name: String, value: String): WorkflowJob = withEnv(env.updated(name, value))
+    def appendSteps(steps: List[WorkflowStep]): WorkflowJob = withSteps(this.steps ++ steps)
     // scalafmt: { maxColumn = 96 }
 
     override def productPrefix = "WorkflowJob"
