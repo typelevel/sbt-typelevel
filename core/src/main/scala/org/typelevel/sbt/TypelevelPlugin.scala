@@ -81,7 +81,6 @@ object TypelevelPlugin extends AutoPlugin {
       val scalafmt = tlCiScalafmtCheck.value
       val javafmt = tlCiJavafmtCheck.value
       val scalafix = tlCiScalafixCheck.value
-      val mima = tlCiMimaBinaryIssueCheck.value
 
       List("githubWorkflowGenerate") ++
         List("+headerCreateAll").filter(_ => header) ++
