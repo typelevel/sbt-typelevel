@@ -29,8 +29,8 @@ sealed abstract class WorkflowStep extends Product with Serializable {
   def withEnv(env: Map[String, String]): WorkflowStep
   def withTimeoutMinutes(minutes: Option[Int]): WorkflowStep
 
-  def updateEnv(name: String, value: String): WorkflowStep
-  def addEnv(env: Map[String, String]): WorkflowStep
+  def updatedEnv(name: String, value: String): WorkflowStep
+  def appendEnv(env: Map[String, String]): WorkflowStep
 }
 
 object WorkflowStep {
@@ -126,10 +126,10 @@ object WorkflowStep {
     def withParams(params: Map[String, String]): Run
     def withWorkingDirectory(workingDirectory: Option[String]): Run
 
-    def updateEnv(name: String, value: String): Run
-    def addEnv(env: Map[String, String]): Run
-    def updateParams(name: String, value: String): Run
-    def addParams(params: Map[String, String]): Run
+    def updatedEnv(name: String, value: String): Run
+    def appendEnv(env: Map[String, String]): Run
+    def updatedParams(name: String, value: String): Run
+    def appendParams(params: Map[String, String]): Run
   }
 
   object Run {
@@ -166,10 +166,10 @@ object WorkflowStep {
       def withParams(params: Map[String, String]) = copy(params = params)
       def withWorkingDirectory(workingDirectory: Option[String]) = copy(workingDirectory = workingDirectory)
 
-      def updateEnv(name: String, value: String) = copy(env = this.env.updated(name, value))
-      def addEnv(env: Map[String, String]) = copy(env = this.env ++ env)
-      def updateParams(name: String, value: String) = copy(params = this.params.updated(name, value))
-      def addParams(params: Map[String, String]) = copy(params = this.params ++ params)
+      def updatedEnv(name: String, value: String) = copy(env = this.env.updated(name, value))
+      def appendEnv(env: Map[String, String]) = copy(env = this.env ++ env)
+      def updatedParams(name: String, value: String) = copy(params = this.params.updated(name, value))
+      def appendParams(params: Map[String, String]) = copy(params = this.params ++ params)
       // scalafmt: { maxColumn = 96 }
     }
   }
@@ -183,10 +183,10 @@ object WorkflowStep {
     def withParams(params: Map[String, String]): Sbt
     def withPreamble(preamble: Boolean): Sbt
 
-    def updateEnv(name: String, value: String): Sbt
-    def addEnv(env: Map[String, String]): Sbt
-    def updateParams(name: String, value: String): Sbt
-    def addParams(params: Map[String, String]): Sbt
+    def updatedEnv(name: String, value: String): Sbt
+    def appendEnv(env: Map[String, String]): Sbt
+    def updatedParams(name: String, value: String): Sbt
+    def appendParams(params: Map[String, String]): Sbt
   }
 
   object Sbt {
@@ -223,10 +223,10 @@ object WorkflowStep {
       def withParams(params: Map[String, String]) = copy(params = params)
       def withPreamble(preamble: Boolean) = copy(preamble = preamble)
 
-      def updateEnv(name: String, value: String) = copy(env = this.env.updated(name, value))
-      def addEnv(env: Map[String, String]) = copy(env = this.env ++ env)
-      def updateParams(name: String, value: String) = copy(params = params.updated(name, value))
-      def addParams(params: Map[String, String]) = copy(params = this.params ++ params)
+      def updatedEnv(name: String, value: String) = copy(env = this.env.updated(name, value))
+      def appendEnv(env: Map[String, String]) = copy(env = this.env ++ env)
+      def updatedParams(name: String, value: String) = copy(params = params.updated(name, value))
+      def appendParams(params: Map[String, String]) = copy(params = this.params ++ params)
       // scalafmt: { maxColumn = 96 }
     }
   }
@@ -238,10 +238,10 @@ object WorkflowStep {
     def withRef(ref: UseRef): Use
     def withParams(params: Map[String, String]): Use
 
-    def updateEnv(name: String, value: String): Use
-    def addEnv(env: Map[String, String]): Use
-    def updateParams(name: String, value: String): Use
-    def addParams(params: Map[String, String]): Use
+    def updatedEnv(name: String, value: String): Use
+    def appendEnv(env: Map[String, String]): Use
+    def updatedParams(name: String, value: String): Use
+    def appendParams(params: Map[String, String]): Use
   }
 
   object Use {
@@ -276,10 +276,10 @@ object WorkflowStep {
       def withRef(ref: UseRef) = copy(ref = ref)
       def withParams(params: Map[String, String]) = copy(params = params)
 
-      def updateEnv(name: String, value: String) = copy(env = this.env.updated(name, value))
-      def addEnv(env: Map[String, String]) = copy(env = this.env ++ env)
-      def updateParams(name: String, value: String) = copy(params = params.updated(name, value))
-      def addParams(params: Map[String, String]) = copy(params = this.params ++ params)
+      def updatedEnv(name: String, value: String) = copy(env = this.env.updated(name, value))
+      def appendEnv(env: Map[String, String]) = copy(env = this.env ++ env)
+      def updatedParams(name: String, value: String) = copy(params = params.updated(name, value))
+      def appendParams(params: Map[String, String]) = copy(params = this.params ++ params)
       // scalafmt: { maxColumn = 96 }
     }
   }

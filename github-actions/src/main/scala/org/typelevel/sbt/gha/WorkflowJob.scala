@@ -59,7 +59,7 @@ sealed abstract class WorkflowJob {
   def withConcurrency(concurrency: Option[Concurrency]): WorkflowJob
   def withTimeoutMinutes(timeoutMinutes: Option[Int]): WorkflowJob
 
-  def updateEnv(name: String, value: String): WorkflowJob
+  def updatedEnv(name: String, value: String): WorkflowJob
   def appendSteps(steps: List[WorkflowStep]): WorkflowJob
 }
 
@@ -153,7 +153,7 @@ object WorkflowJob {
     override def withConcurrency(concurrency: Option[Concurrency]): WorkflowJob = copy(concurrency = concurrency)
     override def withTimeoutMinutes(timeoutMinutes: Option[Int]): WorkflowJob = copy(timeoutMinutes = timeoutMinutes)
 
-    def updateEnv(name: String, value: String): WorkflowJob = withEnv(env.updated(name, value))
+    def updatedEnv(name: String, value: String): WorkflowJob = withEnv(env.updated(name, value))
     def appendSteps(steps: List[WorkflowStep]): WorkflowJob = withSteps(this.steps ++ steps)
     // scalafmt: { maxColumn = 96 }
 
