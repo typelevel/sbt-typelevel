@@ -28,6 +28,9 @@ sealed abstract class WorkflowStep extends Product with Serializable {
   def withCond(cond: Option[String]): WorkflowStep
   def withEnv(env: Map[String, String]): WorkflowStep
   def withTimeoutMinutes(minutes: Option[Int]): WorkflowStep
+
+  def updatedEnv(name: String, value: String): WorkflowStep
+  def concatEnv(env: TraversableOnce[(String, String)]): WorkflowStep
 }
 
 object WorkflowStep {
@@ -118,6 +121,15 @@ object WorkflowStep {
     def commands: List[String]
     def params: Map[String, String]
     def workingDirectory: Option[String]
+
+    def withCommands(commands: List[String]): Run
+    def withParams(params: Map[String, String]): Run
+    def withWorkingDirectory(workingDirectory: Option[String]): Run
+
+    def updatedEnv(name: String, value: String): Run
+    def concatEnv(env: TraversableOnce[(String, String)]): Run
+    def updatedParams(name: String, value: String): Run
+    def concatParams(params: TraversableOnce[(String, String)]): Run
   }
 
   object Run {
@@ -143,11 +155,22 @@ object WorkflowStep {
         workingDirectory: Option[String])
         extends Run {
       override def productPrefix = "Run"
+      // scalafmt: { maxColumn = 200 }
       def withId(id: Option[String]) = copy(id = id)
       def withName(name: Option[String]) = copy(name = name)
       def withCond(cond: Option[String]) = copy(cond = cond)
       def withEnv(env: Map[String, String]) = copy(env = env)
       def withTimeoutMinutes(minutes: Option[Int]) = copy(timeoutMinutes = minutes)
+
+      def withCommands(commands: List[String]) = copy(commands = commands)
+      def withParams(params: Map[String, String]) = copy(params = params)
+      def withWorkingDirectory(workingDirectory: Option[String]) = copy(workingDirectory = workingDirectory)
+
+      def updatedEnv(name: String, value: String) = copy(env = this.env.updated(name, value))
+      def concatEnv(env: TraversableOnce[(String, String)]) = copy(env = this.env ++ env)
+      def updatedParams(name: String, value: String) = copy(params = this.params.updated(name, value))
+      def concatParams(params: TraversableOnce[(String, String)]) = copy(params = this.params ++ params)
+      // scalafmt: { maxColumn = 96 }
     }
   }
 
@@ -155,6 +178,15 @@ object WorkflowStep {
     def commands: List[String]
     def params: Map[String, String]
     def preamble: Boolean
+
+    def withCommands(commands: List[String]): Sbt
+    def withParams(params: Map[String, String]): Sbt
+    def withPreamble(preamble: Boolean): Sbt
+
+    def updatedEnv(name: String, value: String): Sbt
+    def concatEnv(env: TraversableOnce[(String, String)]): Sbt
+    def updatedParams(name: String, value: String): Sbt
+    def concatParams(params: TraversableOnce[(String, String)]): Sbt
   }
 
   object Sbt {
@@ -180,17 +212,36 @@ object WorkflowStep {
         preamble: Boolean)
         extends Sbt {
       override def productPrefix = "Sbt"
+      // scalafmt: { maxColumn = 200 }
       def withId(id: Option[String]) = copy(id = id)
       def withName(name: Option[String]) = copy(name = name)
       def withCond(cond: Option[String]) = copy(cond = cond)
       def withEnv(env: Map[String, String]) = copy(env = env)
       def withTimeoutMinutes(minutes: Option[Int]) = copy(timeoutMinutes = minutes)
+
+      def withCommands(commands: List[String]) = copy(commands = commands)
+      def withParams(params: Map[String, String]) = copy(params = params)
+      def withPreamble(preamble: Boolean) = copy(preamble = preamble)
+
+      def updatedEnv(name: String, value: String) = copy(env = this.env.updated(name, value))
+      def concatEnv(env: TraversableOnce[(String, String)]) = copy(env = this.env ++ env)
+      def updatedParams(name: String, value: String) = copy(params = params.updated(name, value))
+      def concatParams(params: TraversableOnce[(String, String)]) = copy(params = this.params ++ params)
+      // scalafmt: { maxColumn = 96 }
     }
   }
 
   sealed abstract class Use extends WorkflowStep {
     def ref: UseRef
     def params: Map[String, String]
+
+    def withRef(ref: UseRef): Use
+    def withParams(params: Map[String, String]): Use
+
+    def updatedEnv(name: String, value: String): Use
+    def concatEnv(env: TraversableOnce[(String, String)]): Use
+    def updatedParams(name: String, value: String): Use
+    def concatParams(params: TraversableOnce[(String, String)]): Use
   }
 
   object Use {
@@ -215,11 +266,21 @@ object WorkflowStep {
         timeoutMinutes: Option[Int])
         extends Use {
       override def productPrefix = "Use"
+      // scalafmt: { maxColumn = 200 }
       def withId(id: Option[String]) = copy(id = id)
       def withName(name: Option[String]) = copy(name = name)
       def withCond(cond: Option[String]) = copy(cond = cond)
       def withEnv(env: Map[String, String]) = copy(env = env)
       def withTimeoutMinutes(minutes: Option[Int]) = copy(timeoutMinutes = minutes)
+
+      def withRef(ref: UseRef) = copy(ref = ref)
+      def withParams(params: Map[String, String]) = copy(params = params)
+
+      def updatedEnv(name: String, value: String) = copy(env = this.env.updated(name, value))
+      def concatEnv(env: TraversableOnce[(String, String)]) = copy(env = this.env ++ env)
+      def updatedParams(name: String, value: String) = copy(params = params.updated(name, value))
+      def concatParams(params: TraversableOnce[(String, String)]) = copy(params = this.params ++ params)
+      // scalafmt: { maxColumn = 96 }
     }
   }
 }
