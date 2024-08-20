@@ -25,6 +25,8 @@ import sbt._
 import sbt._
 
 import scala.util.Try
+import xerial.sbt.Sonatype
+import xerial.sbt.Sonatype.autoImport._
 
 import Keys._
 import Keys._
@@ -129,7 +131,10 @@ object TypelevelVersioningPlugin extends AutoPlugin {
         version += s"-$formatted"
       }
 
-      if (isSnapshot.value) version += "-SNAPSHOT"
+      val isPublishingToCentalPortal =
+        sonatypeCredentialHost.value == Sonatype.sonatypeCentralHost
+
+      if (isSnapshot.value && !isPublishingToCentalPortal) version += "-SNAPSHOT"
 
       version
     },
