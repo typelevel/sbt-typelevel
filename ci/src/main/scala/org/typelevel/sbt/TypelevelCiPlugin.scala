@@ -52,6 +52,10 @@ object TypelevelCiPlugin extends AutoPlugin {
     lazy val tlCiStewardValidateConfig = settingKey[Option[File]](
       "The location of the Scala Steward config to validate (default: `.scala-steward.conf`, if exists)")
 
+    lazy val tlCiForkCondition =
+      settingKey[String](
+        "Condition for checking on CI whether this project is a fork of another (default: `github.event.repository.fork == false`)")
+
   }
 
   import autoImport._
@@ -64,6 +68,7 @@ object TypelevelCiPlugin extends AutoPlugin {
     tlCiMimaBinaryIssueCheck := false,
     tlCiDocCheck := false,
     tlCiDependencyGraphJob := true,
+    tlCiForkCondition := "github.event.repository.fork == false",
     githubWorkflowTargetBranches ++= Seq(
       "!update/**", // ignore steward branches
       "!pr/**" // escape-hatch to disable ci on a branch
@@ -139,6 +144,9 @@ object TypelevelCiPlugin extends AutoPlugin {
     },
     githubWorkflowJavaVersions := Seq(JavaSpec.temurin("8")),
     githubWorkflowAddedJobs ++= {
+      val ghEventCond = "github.event_name != 'pull_request'"
+      val jobCond = s"${tlCiForkCondition.value} && $ghEventCond"
+
       val dependencySubmission =
         if (tlCiDependencyGraphJob.value)
           List(
@@ -155,7 +163,7 @@ object TypelevelCiPlugin extends AutoPlugin {
                   Some(List("test", "scala-tool", "scala-doc-tool", "test-internal")),
                   None
                 ),
-              cond = Some("github.event_name != 'pull_request'")
+              cond = Some(jobCond)
             ))
         else Nil
 
