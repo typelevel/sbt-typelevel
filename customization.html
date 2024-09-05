@@ -226,7 +226,8 @@
           <li><code>tlCiScalafixCheck</code> (setting): Whether to do scalafix check in CI (default: <code>false</code>).</li>
           <li><code>tlCiMimaBinaryIssueCheck</code> (setting): Whether to do MiMa binary issues check in CI (default: <code>false</code>).</li>
           <li><code>tlCiDocCheck</code> (setting): Whether to build API docs in CI (default: <code>false</code>).</li>
-          <li><code>tlCiDependencyGraphJob</code> (setting): Whether to add a job to submit dependencies to GH (default: <code>true</code>)</li>
+          <li><code>tlCiDependencyGraphJob</code> (setting): Whether to add a job to submit dependencies to GH (default: <code>true</code>).</li>
+          <li><code>tlCiForkCondition</code> (setting): Condition for checking on CI whether this project is a fork of another (default: <code>github.event.repository.fork == false</code>).</li>
           <li><code>tlCiStewardValidateConfig</code> (setting): The location of the Scala Steward config to validate (default: <code>.scala-steward.conf</code>, if exists).</li>
           <li><code>tlCrossRootProject</code> (method): helper to create a <code>root</code> project that can aggregate both <code>Project</code>s and <code>CrossProject</code>s. Automatically creates separate jobs in the CI matrix for each platform (JVM, JS, etc.).</li>
         </ul>
