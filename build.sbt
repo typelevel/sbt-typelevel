@@ -63,7 +63,7 @@ ThisBuild / mergifyRequiredJobs ++= Seq("validate-steward", "site")
 
 ThisBuild / githubWorkflowPermissions := Some(Permissions.Specify.defaultPermissive)
 
-val MunitVersion = "1.0.1"
+val MunitVersion = "1.0.2"
 
 lazy val `sbt-typelevel` = tlCrossRootProject.aggregate(
   kernel,
