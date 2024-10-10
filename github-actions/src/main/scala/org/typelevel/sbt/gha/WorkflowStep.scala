@@ -56,8 +56,6 @@ object WorkflowStep {
           ))
       else Nil
 
-    val SetupJavaAction = UseRef.Public("actions", "setup-java", "v4")
-    val SetupGraalVMAction = UseRef.Public("graalvm", "setup-graalvm", "v1")
     val sbtCacheParams = if (enableCaching) Map("cache" -> "sbt") else Map.empty
 
     versions flatMap {
@@ -65,7 +63,7 @@ object WorkflowStep {
         val setupId = s"setup-graalvm-${graalVersion}-$javaVersion".replace('.', '_')
         val cond = s"matrix.java == '${jv.render}'"
         WorkflowStep.Use(
-          SetupGraalVMAction,
+          UseRef.Public("graalvm", "setup-graalvm", "v1"),
           name = Some(s"Setup GraalVM (${jv.render})"),
           id = Some(setupId),
           cond = Some(cond),
@@ -78,7 +76,7 @@ object WorkflowStep {
         val cond = s"matrix.java == '${jv.render}'"
 
         WorkflowStep.Use(
-          if (dist == JavaSpec.Distribution.GraalVM) SetupGraalVMAction else SetupJavaAction,
+          UseRef.Public("actions", "setup-java", "v4"),
           name = Some(s"Setup Java (${jv.render})"),
           id = Some(setupId),
           cond = Some(cond),
