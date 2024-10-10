@@ -33,6 +33,8 @@ object JavaSpec {
   def oracle(version: String): JavaSpec = JavaSpec(Distribution.Oracle, version)
   def semeru(version: String): JavaSpec = JavaSpec(Distribution.Semeru, version)
   def microsoft(version: String): JavaSpec = JavaSpec(Distribution.Microsoft, version)
+  def dragonwell(version: String): JavaSpec = JavaSpec(Distribution.Dragonwell, version)
+  def sapmachine(version: String): JavaSpec = JavaSpec(Distribution.SapMachine, version)
 
   sealed abstract class Distribution(val rendering: String) extends Product with Serializable
 
@@ -48,5 +50,7 @@ object JavaSpec {
     case object GraalVM extends Distribution("graalvm")
     case object Semeru extends Distribution("semeru")
     case object Microsoft extends Distribution("microsoft")
+    case object Dragonwell extends Distribution("dragonwell")
+    case object SapMachine extends Distribution("sapmachine")
   }
 }
