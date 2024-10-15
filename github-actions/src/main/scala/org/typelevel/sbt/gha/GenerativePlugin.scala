@@ -781,12 +781,6 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
     },
     githubWorkflowGeneratedCacheSteps := Seq(),
     githubWorkflowJobSetup := {
-      val installSbt = List(
-        WorkflowStep.Use(
-          UseRef.Public("sbt", "setup-sbt", "v1"),
-          name = Some("Install sbt")
-        )
-      )
 
       val autoCrlfOpt = if (githubWorkflowOSes.value.exists(_.contains("windows"))) {
         List(
@@ -798,9 +792,9 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
         Nil
       }
 
-      installSbt :::
-        autoCrlfOpt :::
+      autoCrlfOpt :::
         List(WorkflowStep.CheckoutFull) :::
+        WorkflowStep.SetupSbt ::
         WorkflowStep.SetupJava(githubWorkflowJavaVersions.value.toList) :::
         githubWorkflowGeneratedCacheSteps.value.toList
     },

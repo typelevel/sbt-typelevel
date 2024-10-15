@@ -44,6 +44,11 @@ object WorkflowStep {
     UseRef.Public("actions", "checkout", "v4"),
     name = Some("Checkout current branch (fast)"))
 
+  val SetupSbt: WorkflowStep = WorkflowStep.Use(
+    UseRef.Public("sbt", "setup-sbt", "v1"),
+    name = Some("Setup sbt")
+  )
+
   def SetupJava(versions: List[JavaSpec], enableCaching: Boolean = true): List[WorkflowStep] = {
     def sbtUpdateStep(cond: String, setupId: String) =
       if (enableCaching)
