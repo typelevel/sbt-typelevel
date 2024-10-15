@@ -38,7 +38,7 @@ concurrency:
 
 jobs:
   build:
-    name: Build and Test
+    name: CI
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
