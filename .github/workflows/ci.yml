@@ -48,7 +48,7 @@ jobs:
           - temurin@11
           - temurin@17
           - graal_22.3.2@11
-          - graalvm@17
+          - graalvm@21
           - corretto@17
           - semeru@17
         project: [sbt-typelevelJVM]
@@ -63,9 +63,9 @@ jobs:
             os: macos-latest
           - java: graal_22.3.2@11
             os: windows-latest
-          - java: graalvm@17
+          - java: graalvm@21
             os: macos-latest
-          - java: graalvm@17
+          - java: graalvm@21
             os: windows-latest
           - java: corretto@17
             os: macos-latest
@@ -149,17 +149,17 @@ jobs:
         shell: bash
         run: sbt +update
 
-      - name: Setup Java (graalvm@17)
-        id: setup-java-graalvm-17
-        if: matrix.java == 'graalvm@17'
+      - name: Setup Java (graalvm@21)
+        id: setup-java-graalvm-21
+        if: matrix.java == 'graalvm@21'
         uses: actions/setup-java@v4
         with:
           distribution: graalvm
-          java-version: 17
+          java-version: 21
           cache: sbt
 
       - name: sbt update
-        if: matrix.java == 'graalvm@17' && steps.setup-java-graalvm-17.outputs.cache-hit == 'false'
+        if: matrix.java == 'graalvm@21' && steps.setup-java-graalvm-21.outputs.cache-hit == 'false'
         shell: bash
         run: sbt +update
 
@@ -315,17 +315,17 @@ jobs:
         if: matrix.java == 'graal_22.3.2@11' && steps.setup-graalvm-22_3_2-11.outputs.cache-hit == 'false'
         run: sbt +update
 
-      - name: Setup Java (graalvm@17)
-        id: setup-java-graalvm-17
-        if: matrix.java == 'graalvm@17'
+      - name: Setup Java (graalvm@21)
+        id: setup-java-graalvm-21
+        if: matrix.java == 'graalvm@21'
         uses: actions/setup-java@v4
         with:
           distribution: graalvm
-          java-version: 17
+          java-version: 21
           cache: sbt
 
       - name: sbt update
-        if: matrix.java == 'graalvm@17' && steps.setup-java-graalvm-17.outputs.cache-hit == 'false'
+        if: matrix.java == 'graalvm@21' && steps.setup-java-graalvm-21.outputs.cache-hit == 'false'
         run: sbt +update
 
       - name: Setup Java (corretto@17)
@@ -461,17 +461,17 @@ jobs:
         if: matrix.java == 'graal_22.3.2@11' && steps.setup-graalvm-22_3_2-11.outputs.cache-hit == 'false'
         run: sbt +update
 
-      - name: Setup Java (graalvm@17)
-        id: setup-java-graalvm-17
-        if: matrix.java == 'graalvm@17'
+      - name: Setup Java (graalvm@21)
+        id: setup-java-graalvm-21
+        if: matrix.java == 'graalvm@21'
         uses: actions/setup-java@v4
         with:
           distribution: graalvm
-          java-version: 17
+          java-version: 21
           cache: sbt
 
       - name: sbt update
-        if: matrix.java == 'graalvm@17' && steps.setup-java-graalvm-17.outputs.cache-hit == 'false'
+        if: matrix.java == 'graalvm@21' && steps.setup-java-graalvm-21.outputs.cache-hit == 'false'
         run: sbt +update
 
       - name: Setup Java (corretto@17)
@@ -603,17 +603,17 @@ jobs:
         if: matrix.java == 'graal_22.3.2@11' && steps.setup-graalvm-22_3_2-11.outputs.cache-hit == 'false'
         run: sbt +update
 
-      - name: Setup Java (graalvm@17)
-        id: setup-java-graalvm-17
-        if: matrix.java == 'graalvm@17'
+      - name: Setup Java (graalvm@21)
+        id: setup-java-graalvm-21
+        if: matrix.java == 'graalvm@21'
         uses: actions/setup-java@v4
         with:
           distribution: graalvm
-          java-version: 17
+          java-version: 21
           cache: sbt
 
       - name: sbt update
-        if: matrix.java == 'graalvm@17' && steps.setup-java-graalvm-17.outputs.cache-hit == 'false'
+        if: matrix.java == 'graalvm@21' && steps.setup-java-graalvm-21.outputs.cache-hit == 'false'
         run: sbt +update
 
       - name: Setup Java (corretto@17)
