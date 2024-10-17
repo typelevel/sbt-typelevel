@@ -87,7 +87,7 @@ trait GenerativeKeys {
   lazy val githubWorkflowScalaVersions = settingKey[Seq[String]](
     "A list of Scala versions on which to build the project (default: crossScalaVersions.value)")
   lazy val githubWorkflowOSes =
-    settingKey[Seq[String]]("A list of OS names (default: [ubuntu-latest])")
+    settingKey[Seq[String]]("A list of OS names (default: [ubuntu-22.04])")
 
   lazy val githubWorkflowDependencyPatterns = settingKey[Seq[String]](
     "A list of file globes within the project which affect dependency information (default: [**/*.sbt, project/build.properties])")
