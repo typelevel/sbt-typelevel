@@ -19,7 +19,7 @@ ThisBuild / githubWorkflowJavaVersions ++= Seq(
   JavaSpec.temurin("11"),
   temurin17,
   JavaSpec(JavaSpec.Distribution.GraalVM("22.3.2"), "11"),
-  JavaSpec.graalvm("17"),
+  JavaSpec.graalvm("21"),
   JavaSpec.corretto("17"),
   JavaSpec.semeru("17")
 )
