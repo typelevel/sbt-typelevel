@@ -38,7 +38,7 @@ concurrency:
 
 jobs:
   build:
-    name: CI
+    name: Test
     strategy:
       matrix:
         os: [ubuntu-22.04, macos-latest, windows-latest]

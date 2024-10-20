@@ -828,7 +828,7 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
       Seq(
         WorkflowJob(
           "build",
-          "CI",
+          "Test",
           githubWorkflowJobSetup.value.toList :::
             githubWorkflowBuildPreamble.value.toList :::
             WorkflowStep.Run(
