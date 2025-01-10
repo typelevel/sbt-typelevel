@@ -26,5 +26,5 @@ Compile / unmanagedResourceDirectories ++= modules.map { module =>
 }
 
 libraryDependencies ++= Seq(
-  "io.get-coursier" %% "coursier" % "2.1.23"
+  "io.get-coursier" %% "coursier" % "2.1.24"
 )
