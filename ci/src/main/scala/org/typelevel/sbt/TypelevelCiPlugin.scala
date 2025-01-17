@@ -172,23 +172,20 @@ object TypelevelCiPlugin extends AutoPlugin {
     tlCiStewardValidateConfig :=
       Some(file(".scala-steward.conf")).filter(_.exists()),
     githubWorkflowAddedJobs ++= {
-      tlCiStewardValidateConfig
-        .value
-        .toList
-        .map { config =>
-          WorkflowJob(
-            "validate-steward",
-            "Validate Steward Config",
-            WorkflowStep.Checkout ::
-              WorkflowStep.SetupJava(List(JavaSpec.temurin("11")), false) :::
-              WorkflowStep.Use(
-                UseRef.Public("coursier", "setup-action", "v1"),
-                Map("apps" -> "scala-steward")
-              ) ::
-              WorkflowStep.Run(List(s"scala-steward validate-repo-config $config")) :: Nil,
-            scalas = List.empty
-          )
-        }
+      tlCiStewardValidateConfig.value.toList.map { config =>
+        WorkflowJob(
+          "validate-steward",
+          "Validate Steward Config",
+          WorkflowStep.Checkout ::
+            WorkflowStep.SetupJava(List(JavaSpec.temurin("11")), false) :::
+            WorkflowStep.Use(
+              UseRef.Public("coursier", "setup-action", "v1"),
+              Map("apps" -> "scala-steward")
+            ) ::
+            WorkflowStep.Run(List(s"scala-steward validate-repo-config $config")) :: Nil,
+          scalas = List.empty
+        )
+      }
     }
   )
 

@@ -60,18 +60,15 @@ object TypelevelGitHubPlugin extends AutoPlugin {
       }
     },
     developers := {
-      gitHubUserRepo
-        .value
-        .toList
-        .map {
-          case (user, repo) =>
-            Developer(
-              user,
-              s"$repo contributors",
-              s"@$user",
-              url(s"https://github.com/$user/$repo/contributors")
-            )
-        }
+      gitHubUserRepo.value.toList.map {
+        case (user, repo) =>
+          Developer(
+            user,
+            s"$repo contributors",
+            s"@$user",
+            url(s"https://github.com/$user/$repo/contributors")
+          )
+      }
     }
   )
 
