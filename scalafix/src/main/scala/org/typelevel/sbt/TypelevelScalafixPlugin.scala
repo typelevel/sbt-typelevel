@@ -44,7 +44,7 @@ object TypelevelScalafixPlugin extends AutoPlugin {
     semanticdbEnabled := true,
     semanticdbVersion := scalafixSemanticdb.revision,
     SettingKey[Boolean]("tlCiScalafixCheck") := true,
-    tlTypelevelScalafixVersion := Some("0.3.1"),
+    tlTypelevelScalafixVersion := Some("0.4.0"),
     scalafixDependencies ++= tlTypelevelScalafixVersion
       .value
       .map { v => "org.typelevel" %% "typelevel-scalafix" % v }
