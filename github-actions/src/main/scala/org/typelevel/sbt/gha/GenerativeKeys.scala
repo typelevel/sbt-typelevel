@@ -25,6 +25,10 @@ trait GenerativeKeys {
   lazy val githubWorkflowCheck = taskKey[Unit](
     "Checks to see if the ci.yml and clean.yml files are equivalent to what would be generated and errors if otherwise")
 
+  lazy val githubWorkflows = settingKey[Map[String, Workflow]](
+    "The map of jobs which will make up the generated workflows, with the keys being the workflow file path.")
+  lazy val githubWorkflowCI =
+    settingKey[Workflow]("The Workflow which will make up the generated ci workflow (ci.yml)")
   lazy val githubWorkflowGeneratedCI = settingKey[Seq[WorkflowJob]](
     "The sequence of jobs which will make up the generated ci workflow (ci.yml)")
   lazy val githubWorkflowGeneratedUploadSteps = settingKey[Seq[WorkflowStep]](
@@ -65,6 +69,8 @@ trait GenerativeKeys {
       s"Commands automatically prepended to a WorkflowStep.Sbt (default: ['++ $${{ matrix.scala }}'])")
   lazy val githubWorkflowBuild = settingKey[Seq[WorkflowStep]](
     "A sequence of workflow steps which compile and test the project (default: [Sbt(List(\"test\"))])")
+  lazy val githubWorkflowBuildJob =
+    settingKey[WorkflowJob]("A workflow job for compiling and testing the project")
 
   lazy val githubWorkflowPublishPreamble = settingKey[Seq[WorkflowStep]](
     "A list of steps to insert after base setup but before publishing (default: [])")
@@ -72,6 +78,8 @@ trait GenerativeKeys {
     "A list of steps to insert after publication but before the end of the publish job (default: [])")
   lazy val githubWorkflowPublish = settingKey[Seq[WorkflowStep]](
     "A sequence workflow steps which publishes the project (default: [Sbt(List(\"+publish\"))])")
+  lazy val githubWorkflowPublishJob =
+    settingKey[WorkflowJob]("A workflow job which publishes the project.")
   lazy val githubWorkflowPublishTargetBranches = settingKey[Seq[RefPredicate]](
     "A set of branch predicates which will be applied to determine whether the current branch gets a publication stage; if empty, publish will be skipped entirely (default: [== main])")
   lazy val githubWorkflowPublishCond = settingKey[Option[String]](
