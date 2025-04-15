@@ -854,7 +854,7 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
 
   private val publicationCond = Def setting {
     val notPRCond = "github.event_name != 'pull_request'"
-    val notForkCond = "github.event.repository.fork == false"
+    val forkCond = githubWorkflowForkCondition.value
 
     val publicationCondPre =
       githubWorkflowPublishTargetBranches
@@ -867,7 +867,7 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
       case None => publicationCondPre
     }
 
-    s"$notForkCond && $notPRCond && $publicationCond"
+    s"$forkCond && $notPRCond && $publicationCond"
   }
 
   private val sbt = Def.setting {
