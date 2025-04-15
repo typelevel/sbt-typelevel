@@ -658,7 +658,8 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
     githubWorkflowTargetPaths := Paths.None,
     githubWorkflowEnv := Map("GITHUB_TOKEN" -> s"$${{ secrets.GITHUB_TOKEN }}"),
     githubWorkflowPermissions := None,
-    githubWorkflowAddedJobs := Seq()
+    githubWorkflowAddedJobs := Seq(),
+    githubWorkflowForkCondition := "github.event.repository.fork == false"
   )
 
   private lazy val internalTargetAggregation =
