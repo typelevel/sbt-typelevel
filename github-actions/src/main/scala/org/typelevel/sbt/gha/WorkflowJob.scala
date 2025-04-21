@@ -19,11 +19,13 @@ package org.typelevel.sbt.gha
 sealed abstract class WorkflowJob extends Product with Serializable {
   def id: String
   def name: String
+  def needs: List[String]
   def outputs: Map[String, String]
   // TODO: Check for other common properites, like `cond` and `need`
 
   def withId(id: String): WorkflowJob
   def withName(name: String): WorkflowJob
+  def withNeeds(needs: List[String]): WorkflowJob
   def withOutputs(outputs: Map[String, String]): WorkflowJob
 
   def updatedOutputs(name: String, value: String): WorkflowJob
@@ -31,6 +33,52 @@ sealed abstract class WorkflowJob extends Product with Serializable {
 }
 
 object WorkflowJob {
+  def apply(
+      id: String,
+      name: String,
+      steps: List[WorkflowStep],
+      sbtStepPreamble: List[String] = List(s"++ $${{ matrix.scala }}"),
+      cond: Option[String] = None,
+      permissions: Option[Permissions] = None,
+      env: Map[String, String] = Map(),
+      outputs: Map[String, String] = Map.empty,
+      oses: List[String] = List("ubuntu-22.04"),
+      scalas: List[String] = List("2.13"),
+      javas: List[JavaSpec] = List(JavaSpec.temurin("11")),
+      needs: List[String] = List(),
+      matrixFailFast: Option[Boolean] = None,
+      matrixAdds: Map[String, List[String]] = Map(),
+      matrixIncs: List[MatrixInclude] = List(),
+      matrixExcs: List[MatrixExclude] = List(),
+      runsOnExtraLabels: List[String] = List(),
+      container: Option[JobContainer] = None,
+      environment: Option[JobEnvironment] = None,
+      concurrency: Option[Concurrency] = None,
+      timeoutMinutes: Option[Int] = None
+  ): Run =
+    Run(
+      id = id,
+      name = name,
+      steps = steps,
+      sbtStepPreamble = sbtStepPreamble,
+      cond = cond,
+      permissions = permissions,
+      env = env,
+      outputs = outputs,
+      oses = oses,
+      scalas = scalas,
+      javas = javas,
+      needs = needs,
+      matrixFailFast = matrixFailFast,
+      matrixAdds = matrixAdds,
+      matrixIncs = matrixIncs,
+      matrixExcs = matrixExcs,
+      runsOnExtraLabels = runsOnExtraLabels,
+      container = container,
+      environment = environment,
+      concurrency = concurrency,
+      timeoutMinutes = timeoutMinutes
+    )
   sealed abstract class Run extends WorkflowJob {
     def id: String
     def name: String
@@ -92,6 +140,7 @@ object WorkflowJob {
         cond: Option[String] = None,
         permissions: Option[Permissions] = None,
         env: Map[String, String] = Map(),
+        outputs: Map[String, String] = Map.empty,
         oses: List[String] = List("ubuntu-22.04"),
         scalas: List[String] = List("2.13"),
         javas: List[JavaSpec] = List(JavaSpec.temurin("11")),
@@ -114,7 +163,7 @@ object WorkflowJob {
         cond = cond,
         permissions = permissions,
         env = env,
-        outputs = Map.empty,
+        outputs = outputs,
         oses = oses,
         scalas = scalas,
         javas = javas,
@@ -192,12 +241,14 @@ object WorkflowJob {
     def id: String
     def name: String
     def uses: String
+    def needs: List[String]
     def secrets: Option[Secrets]
     def params: Map[String, String]
     def outputs: Map[String, String]
 
     def withId(id: String): Use
     def withName(name: String): Use
+    def withNeeds(needs: List[String]): Use
     def withUses(uses: String): Use
     def withSecrets(secrets: Option[Secrets]): Use
     def withParams(params: Map[String, String]): Use
@@ -213,6 +264,7 @@ object WorkflowJob {
         id: String,
         name: String,
         uses: String,
+        needs: List[String] = List.empty,
         secrets: Option[Secrets] = None,
         params: Map[String, String] = Map.empty,
         outputs: Map[String, String] = Map.empty
@@ -220,6 +272,7 @@ object WorkflowJob {
       id = id,
       name = name,
       uses = uses,
+      needs = needs,
       secrets = secrets,
       params = params,
       outputs = outputs
@@ -228,12 +281,14 @@ object WorkflowJob {
         id: String,
         name: String,
         uses: String,
+        needs: List[String],
         secrets: Option[Secrets],
         params: Map[String, String],
         outputs: Map[String, String]
     ) extends Use {
       override def withId(id: String): Use = copy(id = id)
       override def withName(name: String): Use = copy(name = name)
+      override def withNeeds(needs: List[String]): Use = copy(needs = needs)
       override def withUses(uses: String): Use = copy(uses = uses)
       override def withSecrets(secrets: Option[Secrets]): Use = copy(secrets = secrets)
       override def withParams(params: Map[String, String]): Use = copy(params = params)

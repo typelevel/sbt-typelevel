@@ -196,7 +196,7 @@ object GenerativePlugin extends AutoPlugin {
 
   def compileSecrets(secrets: Secrets): String = secrets match {
     case Secrets.Inherit => s"\nsecrets: inherit"
-    case Secrets.Values(values) => compileEnv(values, prefix = "\nsecrets")
+    case Secrets.Values(values) => compileMap(values, prefix = "\nsecrets")
   }
 
   def compileRef(ref: Ref): String = ref match {
@@ -247,11 +247,12 @@ object GenerativePlugin extends AutoPlugin {
         s"environment: ${wrap(environment.name)}"
     }
 
-  def compileEnv(env: Map[String, String], prefix: String = "env"): String =
-    if (env.isEmpty) {
+  def compileEnv(env: Map[String, String]): String = compileMap(env, prefix = "env")
+  def compileMap(data: Map[String, String], prefix: String): String =
+    if (data.isEmpty) {
       ""
     } else {
-      val rendered = env map {
+      val rendered = data.map {
         case (key, value) =>
           if (!isSafeString(key) || key.indexOf(' ') >= 0)
             sys.error(s"'$key' is not a valid environment variable name")
@@ -404,7 +405,7 @@ object GenerativePlugin extends AutoPlugin {
       commands.mkString("\n")) + renderParams(params)
 
   def renderParams(params: Map[String, String]): String = {
-    val renderedParamsPre = compileEnv(params, prefix = "with")
+    val renderedParamsPre = compileMap(params, prefix = "with")
     val renderedParams =
       if (renderedParamsPre.isEmpty)
         ""
@@ -419,12 +420,16 @@ object GenerativePlugin extends AutoPlugin {
     case job: WorkflowJob.Use => compileUseJob(job)
   }
   def compileUseJob(job: WorkflowJob.Use): String = {
-    val renderedUses = s"uses: ${job.uses}\n"
+    val renderedNeeds =
+      if (job.needs.isEmpty)
+        ""
+      else
+        s"\nneeds: [${job.needs.mkString(", ")}]"
 
     val renderedSecrets = job.secrets.fold("")(compileSecrets)
 
     val renderedOutputs = {
-      val renderedOutputsPre = compileEnv(job.outputs, prefix = "outputs")
+      val renderedOutputsPre = compileMap(job.outputs, prefix = "outputs")
       if (renderedOutputsPre.isEmpty)
         ""
       else
@@ -432,7 +437,7 @@ object GenerativePlugin extends AutoPlugin {
     }
 
     val renderedInputs = {
-      val renderedInputsPre = compileEnv(job.params, prefix = "with")
+      val renderedInputsPre = compileMap(job.params, prefix = "with")
       if (renderedInputsPre.isEmpty)
         ""
       else
@@ -440,8 +445,8 @@ object GenerativePlugin extends AutoPlugin {
     }
 
     // format: off
-    val body = s"""name: ${wrap(job.name)}
-      ${renderedUses}${renderedInputs}${renderedOutputs}${renderedSecrets}
+    val body = s"""name: ${wrap(job.name)}${renderedNeeds}
+      |uses: ${job.uses}${renderedInputs}${renderedOutputs}${renderedSecrets}
       |""".stripMargin
     // format: on
 
@@ -516,7 +521,7 @@ object GenerativePlugin extends AutoPlugin {
       else
         "\n" + renderedEnvPre
 
-    val renderedOutputsPre = compileEnv(job.outputs, prefix = "outputs")
+    val renderedOutputsPre = compileMap(job.outputs, prefix = "outputs")
     val renderedOutputs =
       if (renderedOutputsPre.isEmpty)
         ""
