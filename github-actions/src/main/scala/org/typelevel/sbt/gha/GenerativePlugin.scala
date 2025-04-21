@@ -414,7 +414,41 @@ object GenerativePlugin extends AutoPlugin {
     renderedParams
   }
 
-  def compileJob(job: WorkflowJob, sbt: String): String = {
+  def compileJob(job: WorkflowJob, sbt: String): String = job match {
+    case job: WorkflowJob.Run => compileRunJob(job, sbt)
+    case job: WorkflowJob.Use => compileUseJob(job)
+  }
+  def compileUseJob(job: WorkflowJob.Use): String = {
+    val renderedUses = s"uses: ${job.uses}\n"
+
+    val renderedSecrets = job.secrets.fold("")(compileSecrets)
+
+    val renderedOutputs = {
+      val renderedOutputsPre = compileEnv(job.outputs, prefix = "outputs")
+      if (renderedOutputsPre.isEmpty)
+        ""
+      else
+        "\n" + renderedOutputsPre
+    }
+
+    val renderedInputs = {
+      val renderedInputsPre = compileEnv(job.params, prefix = "with")
+      if (renderedInputsPre.isEmpty)
+        ""
+      else
+        "\n" + renderedInputsPre
+    }
+
+    // format: off
+    val body = s"""name: ${wrap(job.name)}
+      ${renderedUses}${renderedInputs}${renderedOutputs}${renderedSecrets}
+      |""".stripMargin
+    // format: on
+
+    s"${job.id}:\n${indent(body, 1)}"
+  }
+
+  def compileRunJob(job: WorkflowJob.Run, sbt: String): String = {
     val renderedNeeds =
       if (job.needs.isEmpty)
         ""
@@ -578,17 +612,12 @@ object GenerativePlugin extends AutoPlugin {
 
     val renderedFailFast = job.matrixFailFast.fold("")("\n  fail-fast: " + _)
 
-    val renderedUses =
-      job.uses.fold("") { uses => s"\nuses: ${uses}" }
-
-    val renderedSecrets = compileSecrets(job.secrets)
-
     // format: off
     val body = s"""name: ${wrap(job.name)}${renderedNeeds}${renderedCond}
       |strategy:${renderedFailFast}
       |  matrix:
       |${buildMatrix(2, "os" -> job.oses, "scala" -> job.scalas, "java" -> job.javas.map(_.render))}${renderedMatrices}
-      |runs-on: ${runsOn}${renderedEnvironment}${renderedContainer}${renderedPerm}${renderedEnv}${renderedOutputs}${renderedConcurrency}${renderedTimeoutMinutes}${renderedUses}${renderedSecrets}
+      |runs-on: ${runsOn}${renderedEnvironment}${renderedContainer}${renderedPerm}${renderedEnv}${renderedOutputs}${renderedConcurrency}${renderedTimeoutMinutes}
       |steps:
       |${indent(job.steps.map(compileStep(_, sbt, job.sbtStepPreamble, declareShell = declareShell)).mkString("\n\n"), 1)}""".stripMargin
     // format: on
@@ -869,7 +898,7 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
         else
           githubWorkflowGeneratedUploadSteps.value.toList
 
-      WorkflowJob(
+      WorkflowJob.Run(
         "build",
         "Test",
         githubWorkflowJobSetup.value.toList :::
@@ -893,7 +922,7 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
       )
     },
     githubWorkflowPublishJob := {
-      WorkflowJob(
+      WorkflowJob.Run(
         "publish",
         "Publish Artifacts",
         githubWorkflowJobSetup.value.toList :::
@@ -1096,7 +1125,7 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
     Workflow(on = List(WorkflowTrigger.Push()))
       .withName("Clean".some)
       .withJobs(
-        WorkflowJob(
+        WorkflowJob.Run(
           id = "delete-artifacts",
           name = "Delete Artifacts",
           env = Map("GITHUB_TOKEN" -> s"$${{ secrets.GITHUB_TOKEN }}"),
