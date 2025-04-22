@@ -152,6 +152,8 @@ object GenerativePlugin extends AutoPlugin {
             indent("push", 1)
           else
             indent("push:\n" + indent(renderedBranches + renderedTags + renderedPaths, 1), 1)
+        case _: WorkflowTrigger.WorkflowCall => indent("workflow_call", 1)
+        case raw: WorkflowTrigger.Raw => indent(raw.toYaml, 1)
       }
       .mkString("\n", "\n", "")
 
@@ -944,21 +946,20 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
         timeoutMinutes = githubWorkflowPublishTimeoutMinutes.value
       )
     },
-    githubWorkflows := Map(
-      "ci" -> toWorkflow(
-        name = "Continuous Integration",
-        branches = githubWorkflowTargetBranches.value.toList,
-        tags = githubWorkflowTargetTags.value.toList,
-        paths = githubWorkflowTargetPaths.value,
-        prEventTypes = githubWorkflowPREventTypes.value.toList,
-        permissions = githubWorkflowPermissions.value,
-        env = githubWorkflowEnv.value,
-        concurrency = githubWorkflowConcurrency.value,
-        jobs = githubWorkflowGeneratedCI.value.toList
-      )
-    ) ++ (if (githubWorkflowIncludeClean.value)
-            Map("clean" -> cleanFlow)
-          else Map.empty),
+    githubWorkflowCI := toWorkflow(
+      name = "Continuous Integration",
+      branches = githubWorkflowTargetBranches.value.toList,
+      tags = githubWorkflowTargetTags.value.toList,
+      paths = githubWorkflowTargetPaths.value,
+      prEventTypes = githubWorkflowPREventTypes.value.toList,
+      permissions = githubWorkflowPermissions.value,
+      env = githubWorkflowEnv.value,
+      concurrency = githubWorkflowConcurrency.value,
+      jobs = githubWorkflowGeneratedCI.value.toList
+    ),
+    githubWorkflows := Map("ci" -> githubWorkflowCI.value) ++
+      (if (githubWorkflowIncludeClean.value) Map("clean" -> cleanFlow)
+       else Map.empty),
     githubWorkflowGeneratedCI := {
       val publishJobOpt: Seq[WorkflowJob] =
         Seq(githubWorkflowPublishJob.value).filter(_ =>

@@ -27,6 +27,8 @@ trait GenerativeKeys {
 
   lazy val githubWorkflows = settingKey[Map[String, Workflow]](
     "The map of jobs which will make up the generated workflows, with the keys being the workflow file path.")
+  lazy val githubWorkflowCI =
+    settingKey[Workflow]("The Workflow which will make up the generated ci workflow (ci.yml)")
   lazy val githubWorkflowGeneratedCI = settingKey[Seq[WorkflowJob]](
     "The sequence of jobs which will make up the generated ci workflow (ci.yml)")
   lazy val githubWorkflowGeneratedUploadSteps = settingKey[Seq[WorkflowStep]](
