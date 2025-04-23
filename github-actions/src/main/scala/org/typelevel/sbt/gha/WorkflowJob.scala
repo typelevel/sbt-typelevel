@@ -21,12 +21,16 @@ sealed abstract class WorkflowJob extends Product with Serializable {
   def name: String
   def needs: List[String]
   def outputs: Map[String, String]
+  def permissions: Option[Permissions]
+  def concurrency: Option[Concurrency]
   // TODO: Check for other common properites, like `cond` and `need`
 
   def withId(id: String): WorkflowJob
   def withName(name: String): WorkflowJob
   def withNeeds(needs: List[String]): WorkflowJob
   def withOutputs(outputs: Map[String, String]): WorkflowJob
+  def withPermissions(permissions: Option[Permissions]): WorkflowJob
+  def withConcurrency(concurrency: Option[Concurrency]): WorkflowJob
 
   def updatedOutputs(name: String, value: String): WorkflowJob
   def concatOutputs(outputs: TraversableOnce[(String, String)]): WorkflowJob
@@ -245,6 +249,8 @@ object WorkflowJob {
     def secrets: Option[Secrets]
     def params: Map[String, String]
     def outputs: Map[String, String]
+    def permissions: Option[Permissions]
+    def concurrency: Option[Concurrency]
 
     def withId(id: String): Use
     def withName(name: String): Use
@@ -253,6 +259,8 @@ object WorkflowJob {
     def withSecrets(secrets: Option[Secrets]): Use
     def withParams(params: Map[String, String]): Use
     def withOutputs(outputs: Map[String, String]): Use
+    def withPermissions(permissions: Option[Permissions]): Use
+    def withConcurrency(concurrency: Option[Concurrency]): Use
 
     def updatedParams(name: String, value: String): Use
     def concatParams(params: TraversableOnce[(String, String)]): Use
@@ -267,7 +275,9 @@ object WorkflowJob {
         needs: List[String] = List.empty,
         secrets: Option[Secrets] = None,
         params: Map[String, String] = Map.empty,
-        outputs: Map[String, String] = Map.empty
+        outputs: Map[String, String] = Map.empty,
+        permissions: Option[Permissions] = None,
+        concurrency: Option[Concurrency] = None
     ): Use = new Impl(
       id = id,
       name = name,
@@ -275,7 +285,9 @@ object WorkflowJob {
       needs = needs,
       secrets = secrets,
       params = params,
-      outputs = outputs
+      outputs = outputs,
+      permissions = permissions,
+      concurrency = concurrency
     )
     private final case class Impl(
         id: String,
@@ -284,8 +296,13 @@ object WorkflowJob {
         needs: List[String],
         secrets: Option[Secrets],
         params: Map[String, String],
-        outputs: Map[String, String]
+        outputs: Map[String, String],
+        permissions: Option[Permissions],
+        concurrency: Option[Concurrency]
     ) extends Use {
+      override def productPrefix = "Use"
+
+      // scalafmt: { maxColumn = 200 }
       override def withId(id: String): Use = copy(id = id)
       override def withName(name: String): Use = copy(name = name)
       override def withNeeds(needs: List[String]): Use = copy(needs = needs)
@@ -293,6 +310,9 @@ object WorkflowJob {
       override def withSecrets(secrets: Option[Secrets]): Use = copy(secrets = secrets)
       override def withParams(params: Map[String, String]): Use = copy(params = params)
       override def withOutputs(outputs: Map[String, String]): Use = copy(outputs = outputs)
+      override def withPermissions(permissions: Option[Permissions]): Use = copy(permissions = permissions)
+      override def withConcurrency(concurrency: Option[Concurrency]): Use = copy(concurrency = concurrency)
+      // scalafmt: { maxColumn = 96 }
 
       override def updatedParams(name: String, value: String) =
         copy(params = params.updated(name, value))

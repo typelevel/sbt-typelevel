@@ -426,7 +426,7 @@ object GenerativePlugin extends AutoPlugin {
       if (job.needs.isEmpty)
         ""
       else
-        s"\nneeds: [${job.needs.mkString(", ")}]"
+        job.needs.mkString("\nneeds: [", ", ", "]")
 
     val renderedSecrets = job.secrets.fold("")(compileSecrets)
 
@@ -460,7 +460,7 @@ object GenerativePlugin extends AutoPlugin {
       if (job.needs.isEmpty)
         ""
       else
-        s"\nneeds: [${job.needs.mkString(", ")}]"
+        job.needs.mkString("\nneeds: [", ", ", "]")
 
     val renderedEnvironment =
       job.environment.map(compileEnvironment).map("\n" + _).getOrElse("")
