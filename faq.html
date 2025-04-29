@@ -227,7 +227,7 @@
         
         <h2 id="how-do-i-manage-my-scala-js-and-scala-native-versions" class="section"><a class="anchor-link left" href="#how-do-i-manage-my-scala-js-and-scala-native-versions"><i class="icofont-laika link">&#xef71;</i></a>How do I manage my Scala.js and Scala Native versions?</h2>
         <p>We recommend explicitly setting your Scala.js and Scala Native versions in <code>project/plugins.sbt</code>.</p>
-        <pre class="keep-together pdf epub"><code class="nohighlight"><span class="identifier">addSbtPlugin</span><span>(</span><span class="string-literal">&quot;org.scala-js&quot;</span><span> % </span><span class="string-literal">&quot;sbt-scalajs&quot;</span><span> % </span><span class="string-literal">&quot;1.18.2&quot;</span><span>)
+        <pre class="keep-together pdf epub"><code class="nohighlight"><span class="identifier">addSbtPlugin</span><span>(</span><span class="string-literal">&quot;org.scala-js&quot;</span><span> % </span><span class="string-literal">&quot;sbt-scalajs&quot;</span><span> % </span><span class="string-literal">&quot;1.19.0&quot;</span><span>)
 </span><span class="identifier">addSbtPlugin</span><span>(</span><span class="string-literal">&quot;org.scala-native&quot;</span><span> % </span><span class="string-literal">&quot;sbt-scala-native&quot;</span><span> % </span><span class="string-literal">&quot;0.4.17&quot;</span><span>)</span></code></pre>
         <p><strong>sbt-typelevel</strong> ships with a conservative Scala.js and Scala Native version to enable certain settings.
         If one of your dependencies requires a newer version you may experience failures in the <code>scalaJSLink</code> or <code>nativeLink</code> CI steps.</p>
