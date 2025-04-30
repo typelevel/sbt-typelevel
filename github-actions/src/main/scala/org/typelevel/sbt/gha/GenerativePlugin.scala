@@ -20,7 +20,6 @@ import sbt.Keys._
 import sbt._
 
 import java.nio.file.FileSystems
-import scala.io.Source
 
 object GenerativePlugin extends AutoPlugin {
 
@@ -111,6 +110,54 @@ object GenerativePlugin extends AutoPlugin {
     else
       s"'${str.replace("'", "''")}'"
 
+  def compileOn(on: List[WorkflowTrigger]): String = {
+
+    def renderBranches(branches: List[String]) =
+      if (branches.size == 0) ""
+      else s"branches: [${branches.map(wrap).mkString(", ")}]"
+    def renderTypesPre(prEventTypes: List[PREventType]) =
+      prEventTypes.map(compilePREventType).mkString("[", ", ", "]")
+    def renderTypes(prEventTypes: List[PREventType]) =
+      if (prEventTypes.sortBy(_.toString) == PREventType.Defaults) ""
+      else "\n" + indent("types: " + renderTypesPre(prEventTypes), 2)
+
+    def renderTags(tags: List[String]) = {
+      if (tags.isEmpty) ""
+      else s"""\ntags: [${tags.map(wrap).mkString(", ")}]"""
+    }
+
+    def renderPaths(paths: Paths) = paths match {
+      case Paths.None =>
+        ""
+      case Paths.Include(paths) =>
+        "\n" + indent(s"""paths: [${paths.map(wrap).mkString(", ")}]""", 2)
+      case Paths.Ignore(paths) =>
+        "\n" + indent(s"""paths-ignore: [${paths.map(wrap).mkString(", ")}]""", 2)
+    }
+
+    val renderedTriggers = on
+      .map {
+        case pr: WorkflowTrigger.PullRequest =>
+          val renderedBranches = renderBranches(pr.branches)
+          val renderedTypes = renderTypes(pr.types)
+          val renderedPaths = renderPaths(pr.paths)
+          indent(
+            "pull_request:\n" + indent(renderedBranches + renderedTypes + renderedPaths, 1),
+            1)
+        case push: WorkflowTrigger.Push =>
+          val renderedBranches = renderBranches(push.branches)
+          val renderedTags = renderTags(push.tags)
+          val renderedPaths = renderPaths(push.paths)
+          if ((renderedBranches.size + renderedTags.size + renderedPaths.size) == 0)
+            indent("push", 1)
+          else
+            indent("push:\n" + indent(renderedBranches + renderedTags + renderedPaths, 1), 1)
+      }
+      .mkString("\n", "\n", "")
+
+    "on:" + renderedTriggers
+  }
+
   def compileList(items: List[String], level: Int): String = {
     val rendered = items.map(wrap)
     if (rendered.map(_.length).sum < 40) // just arbitrarily...
@@ -145,6 +192,11 @@ object GenerativePlugin extends AutoPlugin {
       case ReviewRequested => "review_requested"
       case ReviewRequestRemoved => "review_request_removed"
     }
+  }
+
+  def compileSecrets(secrets: Secrets): String = secrets match {
+    case Secrets.Inherit => s"\nsecrets: inherit"
+    case Secrets.Values(values) => compileEnv(values, prefix = "\nsecrets")
   }
 
   def compileRef(ref: Ref): String = ref match {
@@ -206,8 +258,7 @@ object GenerativePlugin extends AutoPlugin {
 
           s"""$key: ${wrap(value)}"""
       }
-      s"""$prefix:
-${indent(rendered.mkString("\n"), 1)}"""
+      s"""$prefix:\n${indent(rendered.mkString("\n"), 1)}"""
     }
 
   def compilePermissionScope(permissionScope: PermissionScope): String = permissionScope match {
@@ -363,7 +414,41 @@ ${indent(rendered.mkString("\n"), 1)}"""
     renderedParams
   }
 
-  def compileJob(job: WorkflowJob, sbt: String): String = {
+  def compileJob(job: WorkflowJob, sbt: String): String = job match {
+    case job: WorkflowJob.Run => compileRunJob(job, sbt)
+    case job: WorkflowJob.Use => compileUseJob(job)
+  }
+  def compileUseJob(job: WorkflowJob.Use): String = {
+    val renderedUses = s"uses: ${job.uses}\n"
+
+    val renderedSecrets = job.secrets.fold("")(compileSecrets)
+
+    val renderedOutputs = {
+      val renderedOutputsPre = compileEnv(job.outputs, prefix = "outputs")
+      if (renderedOutputsPre.isEmpty)
+        ""
+      else
+        "\n" + renderedOutputsPre
+    }
+
+    val renderedInputs = {
+      val renderedInputsPre = compileEnv(job.params, prefix = "with")
+      if (renderedInputsPre.isEmpty)
+        ""
+      else
+        "\n" + renderedInputsPre
+    }
+
+    // format: off
+    val body = s"""name: ${wrap(job.name)}
+      ${renderedUses}${renderedInputs}${renderedOutputs}${renderedSecrets}
+      |""".stripMargin
+    // format: on
+
+    s"${job.id}:\n${indent(body, 1)}"
+  }
+
+  def compileRunJob(job: WorkflowJob.Run, sbt: String): String = {
     val renderedNeeds =
       if (job.needs.isEmpty)
         ""
@@ -430,6 +515,13 @@ ${indent(rendered.mkString("\n"), 1)}"""
         ""
       else
         "\n" + renderedEnvPre
+
+    val renderedOutputsPre = compileEnv(job.outputs, prefix = "outputs")
+    val renderedOutputs =
+      if (renderedOutputsPre.isEmpty)
+        ""
+      else
+        "\n" + renderedOutputsPre
 
     val renderedPermPre = compilePermissions(job.permissions)
     val renderedPerm =
@@ -522,12 +614,12 @@ ${indent(rendered.mkString("\n"), 1)}"""
 
     // format: off
     val body = s"""name: ${wrap(job.name)}${renderedNeeds}${renderedCond}
-strategy:${renderedFailFast}
-  matrix:
-${buildMatrix(2, "os" -> job.oses, "scala" -> job.scalas, "java" -> job.javas.map(_.render))}${renderedMatrices}
-runs-on: ${runsOn}${renderedEnvironment}${renderedContainer}${renderedPerm}${renderedEnv}${renderedConcurrency}${renderedTimeoutMinutes}
-steps:
-${indent(job.steps.map(compileStep(_, sbt, job.sbtStepPreamble, declareShell = declareShell)).mkString("\n\n"), 1)}"""
+      |strategy:${renderedFailFast}
+      |  matrix:
+      |${buildMatrix(2, "os" -> job.oses, "scala" -> job.scalas, "java" -> job.javas.map(_.render))}${renderedMatrices}
+      |runs-on: ${runsOn}${renderedEnvironment}${renderedContainer}${renderedPerm}${renderedEnv}${renderedOutputs}${renderedConcurrency}${renderedTimeoutMinutes}
+      |steps:
+      |${indent(job.steps.map(compileStep(_, sbt, job.sbtStepPreamble, declareShell = declareShell)).mkString("\n\n"), 1)}""".stripMargin
     // format: on
 
     s"${job.id}:\n${indent(body, 1)}"
@@ -542,7 +634,7 @@ ${indent(job.steps.map(compileStep(_, sbt, job.sbtStepPreamble, declareShell = d
       .map(indent(_, level))
       .mkString("\n")
 
-  def compileWorkflow(
+  private def toWorkflow(
       name: String,
       branches: List[String],
       tags: List[String],
@@ -551,8 +643,32 @@ ${indent(job.steps.map(compileStep(_, sbt, job.sbtStepPreamble, declareShell = d
       permissions: Option[Permissions],
       env: Map[String, String],
       concurrency: Option[Concurrency],
-      jobs: List[WorkflowJob],
-      sbt: String): String = {
+      jobs: List[WorkflowJob]
+  ): Workflow = {
+    Workflow(
+      on = List(
+        WorkflowTrigger.PullRequest(
+          branches = branches,
+          tags = tags,
+          paths = paths,
+          types = prEventTypes),
+        WorkflowTrigger.Push(
+          branches = branches,
+          tags = tags,
+          paths = paths
+        )
+      )
+    ).withName(Option(name))
+      .withPermissions(permissions)
+      .withEnv(env)
+      .withConcurrency(concurrency)
+      .withJobs(jobs)
+  }
+
+  def render(workflow: Workflow, sbt: String): String = {
+    import workflow._
+
+    val renderedName = name.fold("") { name => s"name: ${wrap(name)}" }
 
     val renderedPermissionsPre = compilePermissions(permissions)
     val renderedEnvPre = compileEnv(env)
@@ -570,28 +686,7 @@ ${indent(job.steps.map(compileStep(_, sbt, job.sbtStepPreamble, declareShell = d
     val renderedConcurrency =
       concurrency.map(compileConcurrency).map("\n" + _ + "\n\n").getOrElse("")
 
-    val renderedTypesPre = prEventTypes.map(compilePREventType).mkString("[", ", ", "]")
-    val renderedTypes =
-      if (prEventTypes.sortBy(_.toString) == PREventType.Defaults)
-        ""
-      else
-        "\n" + indent("types: " + renderedTypesPre, 2)
-
-    val renderedTags =
-      if (tags.isEmpty)
-        ""
-      else
-        s"""
-    tags: [${tags.map(wrap).mkString(", ")}]"""
-
-    val renderedPaths = paths match {
-      case Paths.None =>
-        ""
-      case Paths.Include(paths) =>
-        "\n" + indent(s"""paths: [${paths.map(wrap).mkString(", ")}]""", 2)
-      case Paths.Ignore(paths) =>
-        "\n" + indent(s"""paths-ignore: [${paths.map(wrap).mkString(", ")}]""", 2)
-    }
+    val renderedOn = compileOn(on)
 
     s"""# This file was automatically generated by sbt-github-actions using the
 # githubWorkflowGenerate task. You should add and commit this file to
@@ -600,17 +695,14 @@ ${indent(job.steps.map(compileStep(_, sbt, job.sbtStepPreamble, declareShell = d
 # change your sbt build configuration to revise the workflow description
 # to meet your needs, then regenerate this file.
 
-name: ${wrap(name)}
+${renderedName}
 
-on:
-  pull_request:
-    branches: [${branches.map(wrap).mkString(", ")}]$renderedTypes$renderedPaths
-  push:
-    branches: [${branches.map(wrap).mkString(", ")}]$renderedTags$renderedPaths
+${renderedOn}
 
 ${renderedPerm}${renderedEnv}${renderedConcurrency}jobs:
 ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
 """
+
   }
 
   val settingDefaults = Seq(
@@ -672,7 +764,7 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
     pathStr.replace(PlatformSep, "/") // *force* unix separators
   }
 
-  private val pathStrs = Def setting {
+  private val pathStrs = Def.setting {
     val base = (ThisBuild / baseDirectory).value.toPath
 
     internalTargetAggregation.value map { file =>
@@ -798,60 +890,80 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
         WorkflowStep.SetupJava(githubWorkflowJavaVersions.value.toList) :::
         githubWorkflowGeneratedCacheSteps.value.toList
     },
-    githubWorkflowGeneratedCI := {
+    githubWorkflowBuildJob := {
       val uploadStepsOpt =
-        if (githubWorkflowPublishTargetBranches
-            .value
-            .isEmpty && githubWorkflowAddedJobs.value.isEmpty)
+        if (githubWorkflowPublishTargetBranches.value.isEmpty &&
+          githubWorkflowAddedJobs.value.isEmpty)
           Nil
         else
           githubWorkflowGeneratedUploadSteps.value.toList
 
-      val publishJobOpt = Seq(
-        WorkflowJob(
-          "publish",
-          "Publish Artifacts",
-          githubWorkflowJobSetup.value.toList :::
-            githubWorkflowGeneratedDownloadSteps.value.toList :::
-            githubWorkflowPublishPreamble.value.toList :::
-            githubWorkflowPublish.value.toList :::
-            githubWorkflowPublishPostamble.value.toList,
-          cond = Some(publicationCond.value),
-          oses = githubWorkflowOSes.value.toList.take(1),
-          scalas = List.empty,
-          sbtStepPreamble = List.empty,
-          javas = List(githubWorkflowJavaVersions.value.head),
-          needs = githubWorkflowPublishNeeds.value.toList,
-          timeoutMinutes = githubWorkflowPublishTimeoutMinutes.value
-        )).filter(_ => githubWorkflowPublishTargetBranches.value.nonEmpty)
+      WorkflowJob.Run(
+        "build",
+        "Test",
+        githubWorkflowJobSetup.value.toList :::
+          githubWorkflowBuildPreamble.value.toList :::
+          WorkflowStep.Run(
+            List(s"${sbt.value} githubWorkflowCheck"),
+            name = Some("Check that workflows are up to date")) ::
+          githubWorkflowBuild.value.toList :::
+          githubWorkflowBuildPostamble.value.toList :::
+          uploadStepsOpt,
+        sbtStepPreamble = githubWorkflowBuildSbtStepPreamble.value.toList,
+        oses = githubWorkflowOSes.value.toList,
+        scalas = githubWorkflowScalaVersions.value.toList,
+        javas = githubWorkflowJavaVersions.value.toList,
+        matrixFailFast = githubWorkflowBuildMatrixFailFast.value,
+        matrixAdds = githubWorkflowBuildMatrixAdditions.value,
+        matrixIncs = githubWorkflowBuildMatrixInclusions.value.toList,
+        matrixExcs = githubWorkflowBuildMatrixExclusions.value.toList,
+        runsOnExtraLabels = githubWorkflowBuildRunsOnExtraLabels.value.toList,
+        timeoutMinutes = githubWorkflowBuildTimeoutMinutes.value
+      )
+    },
+    githubWorkflowPublishJob := {
+      WorkflowJob.Run(
+        "publish",
+        "Publish Artifacts",
+        githubWorkflowJobSetup.value.toList :::
+          githubWorkflowGeneratedDownloadSteps.value.toList :::
+          githubWorkflowPublishPreamble.value.toList :::
+          githubWorkflowPublish.value.toList :::
+          githubWorkflowPublishPostamble.value.toList,
+        cond = Some(publicationCond.value),
+        oses = githubWorkflowOSes.value.toList.take(1),
+        scalas = List.empty,
+        sbtStepPreamble = List.empty,
+        javas = List(githubWorkflowJavaVersions.value.head),
+        needs = githubWorkflowPublishNeeds.value.toList,
+        timeoutMinutes = githubWorkflowPublishTimeoutMinutes.value
+      )
+    },
+    githubWorkflows := Map(
+      "ci" -> toWorkflow(
+        name = "Continuous Integration",
+        branches = githubWorkflowTargetBranches.value.toList,
+        tags = githubWorkflowTargetTags.value.toList,
+        paths = githubWorkflowTargetPaths.value,
+        prEventTypes = githubWorkflowPREventTypes.value.toList,
+        permissions = githubWorkflowPermissions.value,
+        env = githubWorkflowEnv.value,
+        concurrency = githubWorkflowConcurrency.value,
+        jobs = githubWorkflowGeneratedCI.value.toList
+      )
+    ) ++ (if (githubWorkflowIncludeClean.value)
+            Map("clean" -> cleanFlow)
+          else Map.empty),
+    githubWorkflowGeneratedCI := {
+      val publishJobOpt: Seq[WorkflowJob] =
+        Seq(githubWorkflowPublishJob.value).filter(_ =>
+          githubWorkflowPublishTargetBranches.value.nonEmpty)
 
-      Seq(
-        WorkflowJob(
-          "build",
-          "Test",
-          githubWorkflowJobSetup.value.toList :::
-            githubWorkflowBuildPreamble.value.toList :::
-            WorkflowStep.Run(
-              List(s"${sbt.value} githubWorkflowCheck"),
-              name = Some("Check that workflows are up to date")) ::
-            githubWorkflowBuild.value.toList :::
-            githubWorkflowBuildPostamble.value.toList :::
-            uploadStepsOpt,
-          sbtStepPreamble = githubWorkflowBuildSbtStepPreamble.value.toList,
-          oses = githubWorkflowOSes.value.toList,
-          scalas = githubWorkflowScalaVersions.value.toList,
-          javas = githubWorkflowJavaVersions.value.toList,
-          matrixFailFast = githubWorkflowBuildMatrixFailFast.value,
-          matrixAdds = githubWorkflowBuildMatrixAdditions.value,
-          matrixIncs = githubWorkflowBuildMatrixInclusions.value.toList,
-          matrixExcs = githubWorkflowBuildMatrixExclusions.value.toList,
-          runsOnExtraLabels = githubWorkflowBuildRunsOnExtraLabels.value.toList,
-          timeoutMinutes = githubWorkflowBuildTimeoutMinutes.value
-        )) ++ publishJobOpt ++ githubWorkflowAddedJobs.value
+      Seq(githubWorkflowBuildJob.value) ++ publishJobOpt ++ githubWorkflowAddedJobs.value
     }
   )
 
-  private val publicationCond = Def setting {
+  private val publicationCond = Def.setting {
     val publicationCondPre =
       githubWorkflowPublishTargetBranches
         .value
@@ -873,31 +985,7 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
     }
   }
 
-  private val generateCiContents = Def task {
-    compileWorkflow(
-      "Continuous Integration",
-      githubWorkflowTargetBranches.value.toList,
-      githubWorkflowTargetTags.value.toList,
-      githubWorkflowTargetPaths.value,
-      githubWorkflowPREventTypes.value.toList,
-      githubWorkflowPermissions.value,
-      githubWorkflowEnv.value,
-      githubWorkflowConcurrency.value,
-      githubWorkflowGeneratedCI.value.toList,
-      sbt.value
-    )
-  }
-
-  private val readCleanContents = Def task {
-    val src = Source.fromURL(getClass.getResource("/clean.yml"))
-    try {
-      src.mkString
-    } finally {
-      src.close()
-    }
-  }
-
-  private val workflowsDirTask = Def task {
+  private val workflowsDirTask = Def.task {
     val githubDir = baseDirectory.value / ".github"
     val workflowsDir = githubDir / "workflows"
 
@@ -912,14 +1000,6 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
     workflowsDir
   }
 
-  private val ciYmlFile = Def task {
-    workflowsDirTask.value / "ci.yml"
-  }
-
-  private val cleanYmlFile = Def task {
-    workflowsDirTask.value / "clean.yml"
-  }
-
   override def projectSettings = Seq(
     githubWorkflowArtifactUpload := publishArtifact.value,
     Global / internalTargetAggregation ++= {
@@ -931,25 +1011,27 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
     githubWorkflowGenerate / aggregate := false,
     githubWorkflowCheck / aggregate := false,
     githubWorkflowGenerate := {
-      val ciContents = generateCiContents.value
-      val includeClean = githubWorkflowIncludeClean.value
-      val cleanContents = readCleanContents.value
-
-      val ciYml = ciYmlFile.value
-      val cleanYml = cleanYmlFile.value
-
-      IO.write(ciYml, ciContents)
-
-      if (includeClean)
-        IO.write(cleanYml, cleanContents)
+      val sbtV = sbt.value
+      val workflowsDir = workflowsDirTask.value
+      githubWorkflows
+        .value
+        .map {
+          case (key, value) =>
+            (workflowsDir / s"$key.yml") -> render(value, sbtV)
+        }
+        .foreach {
+          case (file, contents) =>
+            IO.write(file, contents)
+        }
     },
     githubWorkflowCheck := {
-      val expectedCiContents = generateCiContents.value
-      val includeClean = githubWorkflowIncludeClean.value
-      val expectedCleanContents = readCleanContents.value
-
-      val ciYml = ciYmlFile.value
-      val cleanYml = cleanYmlFile.value
+      val sbtV = sbt.value
+      val workflowsDir = workflowsDirTask.value
+      val expectedFlows: Map[File, String] =
+        githubWorkflows.value.map {
+          case (key, value) =>
+            (workflowsDir / s"$key.yml") -> render(value, sbtV)
+        }
 
       val log = state.value.log
 
@@ -967,10 +1049,7 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
         }
       }
 
-      compare(ciYml, expectedCiContents)
-
-      if (includeClean)
-        compare(cleanYml, expectedCleanContents)
+      expectedFlows.foreach(compare _ tupled)
     }
   )
 
@@ -1041,4 +1120,60 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
       }
     lines.mkString("\n")
   }
+
+  private val cleanFlow: Workflow =
+    Workflow(on = List(WorkflowTrigger.Push()))
+      .withName("Clean".some)
+      .withJobs(
+        WorkflowJob.Run(
+          id = "delete-artifacts",
+          name = "Delete Artifacts",
+          env = Map("GITHUB_TOKEN" -> s"$${{ secrets.GITHUB_TOKEN }}"),
+          scalas = List.empty,
+          javas = List.empty,
+          steps = WorkflowStep.Run(
+            name = "Delete artifacts".some,
+            commands =
+              raw"""# Customize those three lines with your repository and credentials:
+                   |REPO=$${GITHUB_API_URL}/repos/$${{ github.repository }}
+                   |
+                   |# A shortcut to call GitHub API.
+                   |ghapi() { curl --silent --location --user _:$$GITHUB_TOKEN "$$@"; }
+                   |
+                   |# A temporary file which receives HTTP response headers.
+                   |TMPFILE=/tmp/tmp.$$$$
+                   |
+                   |# An associative array, key: artifact name, value: number of artifacts of that name.
+                   |declare -A ARTCOUNT
+                   |
+                   |# Process all artifacts on this repository, loop on returned "pages".
+                   |URL=$$REPO/actions/artifacts
+                   |while [[ -n "$$URL" ]]; do
+                   |
+                   |  # Get current page, get response headers in a temporary file.
+                   |  JSON=$$(ghapi --dump-header $$TMPFILE "$$URL")
+                   |
+                   |  # Get URL of next page. Will be empty if we are at the last page.
+                   |  URL=$$(grep '^Link:' "$$TMPFILE" | tr ',' '\n' | grep 'rel="next"' | head -1 | sed -e 's/.*<//' -e 's/>.*//')
+                   |  rm -f $$TMPFILE
+                   |
+                   |  # Number of artifacts on this page:
+                   |  COUNT=$$(( $$(jq <<<$$JSON -r '.artifacts | length') ))
+                   |
+                   |  # Loop on all artifacts on this page.
+                   |  for ((i=0; $$i < $$COUNT; i++)); do
+                   |
+                   |    # Get name of artifact and count instances of this name.
+                   |    name=$$(jq <<<$$JSON -r ".artifacts[$$i].name?")
+                   |    ARTCOUNT[$$name]=$$(( $$(( $${ARTCOUNT[$$name]} )) + 1))
+                   |
+                   |    id=$$(jq <<<$$JSON -r ".artifacts[$$i].id?")
+                   |    size=$$(( $$(jq <<<$$JSON -r ".artifacts[$$i].size_in_bytes?") ))
+                   |    printf "Deleting '%s' #%d, %'d bytes\n" $$name $${ARTCOUNT[$$name]} $$size
+                   |    ghapi -X DELETE $$REPO/actions/artifacts/$$id
+                   |  done
+                   |done""".stripMargin :: Nil
+          ) :: Nil
+        ) :: Nil
+      )
 }

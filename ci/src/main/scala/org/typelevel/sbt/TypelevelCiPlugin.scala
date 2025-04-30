@@ -150,7 +150,7 @@ object TypelevelCiPlugin extends AutoPlugin {
       val dependencySubmission =
         if (tlCiDependencyGraphJob.value)
           List(
-            WorkflowJob(
+            WorkflowJob.Run(
               "dependency-submission",
               "Submit Dependencies",
               scalas = Nil,
@@ -173,7 +173,7 @@ object TypelevelCiPlugin extends AutoPlugin {
       Some(file(".scala-steward.conf")).filter(_.exists()),
     githubWorkflowAddedJobs ++= {
       tlCiStewardValidateConfig.value.toList.map { config =>
-        WorkflowJob(
+        WorkflowJob.Run(
           "validate-steward",
           "Validate Steward Config",
           WorkflowStep.Checkout ::
