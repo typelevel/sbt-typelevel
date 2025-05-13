@@ -183,7 +183,7 @@ class VSuite extends FunSuite {
     val rc1 = V(0, 1, Some(1), Some("RC1"))
     val rc2 = V(0, 1, Some(1), Some("RC2"))
     val expected = List(rc1, rc2, release)
-    assertEquals(List(rc2, release, rc1), expected)
-    assertEquals(List(release, rc1, rc2), expected)
+    assertEquals(List(rc2, release, rc1).sorted, expected)
+    assertEquals(List(release, rc1, rc2).sorted, expected)
   }
 }
