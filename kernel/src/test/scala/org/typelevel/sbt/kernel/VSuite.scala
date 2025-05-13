@@ -178,4 +178,12 @@ class VSuite extends FunSuite {
     assertEquals(pre1 < nopre1, true)
   }
 
+  test("pre-release is before release") {
+    val release = V(0, 1, Some(1), None)
+    val rc1 = V(0, 1, Some(1), Some("RC1"))
+    val rc2 = V(0, 1, Some(1), Some("RC2"))
+    val expected = List(rc1, rc2, release)
+    assertEquals(List(rc2, release, rc1), expected)
+    assertEquals(List(release, rc1, rc2), expected)
+  }
 }
