@@ -17,6 +17,7 @@
 package org.typelevel.sbt.kernel
 
 import munit.FunSuite
+import scala.util.Random
 
 class VSuite extends FunSuite {
 
@@ -169,21 +170,24 @@ class VSuite extends FunSuite {
     assertEquals(patch1 < p1patch1, true)
   }
 
-  test("x.y.1-M1 < x.y.1") {
+  test("x.y.1-M1 < x.y.1-RC1 < x.y.1") {
     val pre0 = V(0, 5, Some(1), Some("M1"))
-    val nopre0 = V(0, 5, Some(2), None)
+    val nopre0 = V(0, 5, Some(1), None)
     assertEquals(pre0 < nopre0, true)
     val pre1 = V(1, 5, Some(1), Some("M1"))
-    val nopre1 = V(1, 5, Some(2), None)
+    val nopre1 = V(1, 5, Some(1), None)
     assertEquals(pre1 < nopre1, true)
-  }
 
-  test("pre-release is before release") {
     val release = V(0, 1, Some(1), None)
     val rc1 = V(0, 1, Some(1), Some("RC1"))
     val rc2 = V(0, 1, Some(1), Some("RC2"))
-    val expected = List(rc1, rc2, release)
-    assertEquals(List(rc2, release, rc1).sorted, expected)
-    assertEquals(List(release, rc1, rc2).sorted, expected)
+    val m1 = V(0, 1, Some(1), Some("M1"))
+    val m2 = V(0, 1, Some(1), Some("M2"))
+    val expected = List(m1, m2, rc1, rc2, release)
+    assertEquals(List(rc2, m1, release, m2, rc1).sorted, expected)
+    assertEquals(List(release, rc1, rc2, m2, m1).sorted, expected)
+
+    val random = Random.shuffle(List(release, rc1, rc2, m2, m1))
+    assertEquals(clue(random).sorted, expected)
   }
 }
