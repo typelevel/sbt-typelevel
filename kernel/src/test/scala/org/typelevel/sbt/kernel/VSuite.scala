@@ -17,6 +17,7 @@
 package org.typelevel.sbt.kernel
 
 import munit.FunSuite
+
 import scala.util.Random
 
 class VSuite extends FunSuite {
