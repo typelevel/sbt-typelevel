@@ -42,6 +42,19 @@ object Permissions {
     def securityEvents: PermissionValue
     def statuses: PermissionValue
 
+    def withActions(actions: PermissionValue): Specify
+    def withChecks(checks: PermissionValue): Specify
+    def withContents(contents: PermissionValue): Specify
+    def withDeployments(deployments: PermissionValue): Specify
+    def withIdToken(idToken: PermissionValue): Specify
+    def withIssues(issues: PermissionValue): Specify
+    def withPackages(packages: PermissionValue): Specify
+    def withPages(pages: PermissionValue): Specify
+    def withPullRequests(pullRequests: PermissionValue): Specify
+    def withRepositoryProjects(repositoryProjects: PermissionValue): Specify
+    def withSecurityEvents(securityEvents: PermissionValue): Specify
+    def withStatuses(statuses: PermissionValue): Specify
+
     private[gha] lazy val asMap: SortedMap[PermissionScope, PermissionValue] = SortedMap(
       PermissionScope.Actions -> actions,
       PermissionScope.Checks -> checks,
@@ -147,6 +160,21 @@ object Permissions {
         statuses: PermissionValue
     ) extends Specify {
       override def productPrefix = "Specify"
+
+      // scalafmt: { maxColumn = 200 }
+      def withActions(actions: PermissionValue): Specify = copy(actions = actions)
+      def withChecks(checks: PermissionValue): Specify = copy(checks = checks)
+      def withContents(contents: PermissionValue): Specify = copy(contents = contents)
+      def withDeployments(deployments: PermissionValue): Specify = copy(deployments = deployments)
+      def withIdToken(idToken: PermissionValue): Specify = copy(idToken = idToken)
+      def withIssues(issues: PermissionValue): Specify = copy(issues = issues)
+      def withPackages(packages: PermissionValue): Specify = copy(packages = packages)
+      def withPages(pages: PermissionValue): Specify = copy(pages = pages)
+      def withPullRequests(pullRequests: PermissionValue): Specify = copy(pullRequests = pullRequests)
+      def withRepositoryProjects(repositoryProjects: PermissionValue): Specify = copy(repositoryProjects = repositoryProjects)
+      def withSecurityEvents(securityEvents: PermissionValue): Specify = copy(securityEvents = securityEvents)
+      def withStatuses(statuses: PermissionValue): Specify = copy(statuses = statuses)
+      // scalafmt: { maxColumn = 96 }
     }
   }
 }
