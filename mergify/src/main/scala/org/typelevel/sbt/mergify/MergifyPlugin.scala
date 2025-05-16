@@ -135,7 +135,7 @@ object MergifyPlugin extends AutoPlugin {
 
   private lazy val jobSuccessConditions = Def.setting {
     githubWorkflowGeneratedCI.value.flatMap {
-      case job if mergifyRequiredJobs.value.contains(job.id) =>
+      case job: WorkflowJob.Run if mergifyRequiredJobs.value.contains(job.id) =>
         GenerativePlugin
           .expandMatrix(
             job.oses,
@@ -148,6 +148,8 @@ object MergifyPlugin extends AutoPlugin {
           .map { cell =>
             MergifyCondition.Custom(s"status-success=${job.name} (${cell.mkString(", ")})")
           }
+      case job: WorkflowJob.Use if mergifyRequiredJobs.value.contains(job.id) =>
+        MergifyCondition.Custom(s"status-success=${job.name}") :: Nil
       case _ => Nil
     }
   }
