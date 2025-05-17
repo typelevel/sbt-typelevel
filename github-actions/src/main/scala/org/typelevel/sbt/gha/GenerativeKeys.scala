@@ -113,6 +113,9 @@ trait GenerativeKeys {
     s"Permissions to use for the global workflow (default: None)")
   lazy val githubWorkflowAddedJobs = settingKey[Seq[WorkflowJob]](
     "A list of additional jobs to add to the CI workflow (default: [])")
+  lazy val githubWorkflowForkCondition =
+    settingKey[String](
+      "A condition in the workflow to determine if this project is a fork of another (default: `github.event.repository.fork == false`)")
 }
 
 object GenerativeKeys extends GenerativeKeys
