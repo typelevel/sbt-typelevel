@@ -80,7 +80,7 @@ Any and all settings which affect the behavior of the generative plugin should b
 - `githubWorkflowEnv` : `Map[String, String]` – An environment which is global to the entire **ci.yml** workflow. Defaults to `Map("GITHUB_TOKEN" -> "${{ secrets.GITHUB_TOKEN }}")` since it's so commonly needed.
 - `githubWorkflowAddedJobs` : `Seq[WorkflowJob]` – A convenience mechanism for adding extra custom jobs to the **ci.yml** workflow (though you can also do this by modifying `githubWorkflowGeneratedCI`). Defaults to empty.
 - `githubWorkflowConcurrency` : `Option[Concurrency]` - Use concurrency to ensure that only a single workflow within the same concurrency group will run at a time. Defaults to `${{ github.workflow }} @ ${{ github.ref }}`.
-- `githubWorkflowForkCondition` : `String` — A condition in the workflow to determine if this project is a fork of another (default: `github.event.repository.fork == false`)
+- `githubWorkflowForkCondition` : `String` — A condition to determine if this workflow is running on a fork (default: `github.event.repository.fork == false`).
 
 #### `build` Job
 
