@@ -23,6 +23,8 @@ import sbt.Keys._
 import sbt._
 import xerial.sbt.Sonatype.autoImport._
 
+import scala.annotation.nowarn
+
 object TypelevelSonatypeCiReleasePlugin extends AutoPlugin {
 
   object autoImport {
@@ -68,6 +70,7 @@ object TypelevelSonatypeCiReleasePlugin extends AutoPlugin {
     .map(k => k -> s"$${{ secrets.$k }}")
     .toMap
 
+  @nowarn("cat=deprecation")
   private def tlCiReleaseCommand: Command =
     Command.command("tlCiRelease") { state =>
       val newState = Command.process("tlRelease", state)

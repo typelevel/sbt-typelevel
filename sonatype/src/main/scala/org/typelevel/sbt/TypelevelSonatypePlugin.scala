@@ -112,6 +112,7 @@ object TypelevelSonatypePlugin extends AutoPlugin {
     else None
   }
 
+  @nowarn("cat=deprecation")
   private def sonatypeBundleReleaseIfRelevant: Command =
     Command.command("tlSonatypeBundleReleaseIfRelevant") { state =>
       if (state.getSetting(isSnapshot).getOrElse(false))
