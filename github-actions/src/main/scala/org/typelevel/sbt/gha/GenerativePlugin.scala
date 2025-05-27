@@ -351,12 +351,20 @@ ${indent(rendered.mkString("\n"), 1)}"""
     indent(preamble + body, 1).updated(0, '-')
   }
 
+  @deprecated("Use the apply method with renderedContinueOnError", since = "0.7.8")
+  def renderRunBody(
+      commands: List[String],
+      params: Map[String, String],
+      renderedShell: String,
+      renderedWorkingDirectory: String): String =
+    renderRunBody(commands, params, renderedShell, renderedWorkingDirectory, "")
+
   def renderRunBody(
       commands: List[String],
       params: Map[String, String],
       renderedShell: String,
       renderedWorkingDirectory: String,
-      renderedContinueOnError: String) =
+      renderedContinueOnError: String): String =
     renderedShell + renderedWorkingDirectory + renderedContinueOnError + "run: " + wrap(
       commands.mkString("\n")) + renderParams(params)
 

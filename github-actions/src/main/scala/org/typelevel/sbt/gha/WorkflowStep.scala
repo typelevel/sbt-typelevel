@@ -138,6 +138,28 @@ object WorkflowStep {
   }
 
   object Run {
+    @deprecated("Use the apply method with continueOnError", since = "0.7.8")
+    def apply(
+        commands: List[String],
+        id: Option[String],
+        name: Option[String],
+        cond: Option[String],
+        env: Map[String, String],
+        params: Map[String, String],
+        timeoutMinutes: Option[Int],
+        workingDirectory: Option[String]
+    ): Run = apply(
+      commands,
+      id,
+      name,
+      cond,
+      env,
+      params,
+      timeoutMinutes,
+      workingDirectory,
+      continueOnError = false
+    )
+
     def apply(
         commands: List[String],
         id: Option[String] = None,
@@ -207,6 +229,19 @@ object WorkflowStep {
   }
 
   object Sbt {
+
+    @deprecated("Use the apply method with continueOnError", since = "0.7.8")
+    def apply(
+        commands: List[String],
+        id: Option[String],
+        name: Option[String],
+        cond: Option[String],
+        env: Map[String, String],
+        params: Map[String, String],
+        timeoutMinutes: Option[Int],
+        preamble: Boolean): Sbt =
+      apply(commands, id, name, cond, env, params, timeoutMinutes, preamble, false)
+
     def apply(
         commands: List[String],
         id: Option[String] = None,
@@ -265,6 +300,27 @@ object WorkflowStep {
   }
 
   object Use {
+
+    @deprecated("Use the apply method with continueOnError", since = "0.7.8")
+    def apply(
+        ref: UseRef,
+        params: Map[String, String],
+        id: Option[String],
+        name: Option[String],
+        cond: Option[String],
+        env: Map[String, String],
+        timeoutMinutes: Option[Int]
+    ): Use =
+      apply(
+        ref,
+        params,
+        id,
+        name,
+        cond,
+        env,
+        timeoutMinutes,
+        continueOnError = false
+      )
 
     def apply(
         ref: UseRef,
