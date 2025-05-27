@@ -18,28 +18,19 @@ package org.typelevel.sbt
 
 import com.typesafe.tools.mima.plugin.MimaPlugin
 import sbt._
-import xerial.sbt.Sonatype
 
 import scala.annotation.nowarn
 
 import Keys._
-import Sonatype.autoImport._
 import TypelevelKernelPlugin.autoImport._
 
 object TypelevelSonatypePlugin extends AutoPlugin {
 
-  override def requires = MimaPlugin && Sonatype
+  override def requires = MimaPlugin
 
   override def trigger = allRequirements
 
-  object autoImport {
-    @deprecated(
-      "Use ThisBuild / sonatypeCredentialHost := xerial.sbt.Sonatype.sonatypeLegacy",
-      "0.7.3"
-    )
-    lazy val tlSonatypeUseLegacyHost =
-      settingKey[Boolean]("Publish to oss.sonatype.org instead of s01 (default: false)")
-  }
+  object autoImport {}
 
   import autoImport._
 
@@ -50,30 +41,22 @@ object TypelevelSonatypePlugin extends AutoPlugin {
         "project /",
         "+mimaReportBinaryIssues",
         "+publish",
-        "tlSonatypeBundleReleaseIfRelevant")
+        "sonaRelease")
     }
   )
 
-  @nowarn("cat=deprecation")
   override def buildSettings =
     Seq(
-      tlSonatypeUseLegacyHost := false,
-      autoAPIMappings := true,
-      sonatypeCredentialHost := {
-        Option(System.getenv("SONATYPE_CREDENTIAL_HOST")).filter(_.nonEmpty).getOrElse {
-          if (tlSonatypeUseLegacyHost.value)
-            Sonatype.sonatypeLegacy
-          else
-            Sonatype.sonatype01
-        }
-      }
+      autoAPIMappings := true
     )
 
   override def projectSettings = Seq(
     publishMavenStyle := true, // we want to do this unconditionally, even if publishing a plugin
-    sonatypeProfileName := organization.value,
-    publishTo := sonatypePublishToBundle.value,
-    commands += sonatypeBundleReleaseIfRelevant,
+    publishTo := {
+      val centralSnapshots = "https://central.sonatype.com/repository/maven-snapshots/"
+      if (isSnapshot.value) Some("central-snapshots" at centralSnapshots)
+      else localStaging.value
+    },
     apiURL := apiURL.value.orElse(hostedApiUrl.value)
   )
 
@@ -101,7 +84,7 @@ object TypelevelSonatypePlugin extends AutoPlugin {
         scalaVersion.value,
         scalaBinaryVersion.value
       ).map { cross =>
-        val host = sonatypeCredentialHost.value
+        val host = "central.sonatype.com"
         val repo = if (isSnapshot.value) "snapshots" else "releases"
         val org = organization.value.replace('.', '/')
         val mod = cross(moduleName.value)
@@ -111,12 +94,4 @@ object TypelevelSonatypePlugin extends AutoPlugin {
       }
     else None
   }
-
-  private def sonatypeBundleReleaseIfRelevant: Command =
-    Command.command("tlSonatypeBundleReleaseIfRelevant") { state =>
-      if (state.getSetting(isSnapshot).getOrElse(false))
-        state // a snapshot is good-to-go
-      else // a non-snapshot releases as a bundle
-        Command.process("sonatypeBundleRelease", state)
-    }
 }

@@ -14,16 +14,13 @@ The instructions provided here are adapted from [sbt/sbt-ci-release](https://git
 
 If this is your first time publishing, first follow the [Initial Setup](https://central.sonatype.org/publish/publish-guide/#initial-setup) directions in Sonatype's [Publishing Guide](https://central.sonatype.org/publish/publish-guide/) to create an account and request publishing rights for your domain name. If you do not have a domain, you may use `io.github.your_gh_handle` as your **Group Id**.
 
-After you've been granted publishing rights for your domain, log in to either:
-
-- https://s01.oss.sonatype.org (all newly-registered domains)
-- https://oss.sonatype.org (domains registered before February 2021)
+After you've been granted publishing rights for your domain, log in [Sonatype Central Portal](https://central.sonatype.org/).
 
 Then:
 
-1. Click your username in the top right, then click **Profile**
-2. In the drop-down menu in the top left, select **User Token**
-3. Click the **Access User Token** button to obtain your Sonatype credentials
+1. Click your username in the top right, then click **View Account**
+2. Select **Generate User Token**
+3. Press **Ok** to (re)generate your user token.
 4. Set these as the `SONATYPE_USERNAME` and `SONATYPE_PASSWORD` secrets on your repository
 
 ## PGP Key
