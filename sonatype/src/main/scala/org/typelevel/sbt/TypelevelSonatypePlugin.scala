@@ -19,8 +19,6 @@ package org.typelevel.sbt
 import com.typesafe.tools.mima.plugin.MimaPlugin
 import sbt._
 
-import scala.annotation.nowarn
-
 import Keys._
 import TypelevelKernelPlugin.autoImport._
 
@@ -31,8 +29,6 @@ object TypelevelSonatypePlugin extends AutoPlugin {
   override def trigger = allRequirements
 
   object autoImport {}
-
-  import autoImport._
 
   override def globalSettings = Seq(
     tlCommandAliases += {

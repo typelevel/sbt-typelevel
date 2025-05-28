@@ -48,7 +48,6 @@ object TypelevelPlugin extends AutoPlugin {
   import TypelevelCiPlugin.autoImport._
   import TypelevelSettingsPlugin.autoImport._
   import TypelevelSonatypeCiReleasePlugin.autoImport._
-  import TypelevelVersioningPlugin.autoImport._
   import GenerativePlugin.autoImport._
   import GitHubActionsPlugin.autoImport._
 
