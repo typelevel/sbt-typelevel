@@ -72,7 +72,7 @@ object TypelevelSonatypeCiReleasePlugin extends AutoPlugin {
   @nowarn("cat=deprecation")
   private def tlCiReleaseCommand: Command =
     Command.command("tlCiRelease") { state =>
-      val newState = Command.process("tlRelease", state)
+      val newState = Command.process("tlRelease", state,  _ => ())
       newState.getSetting(version).foreach { v =>
         val resolver = newState.getSetting(isSnapshot).fold("") {
           case true =>
