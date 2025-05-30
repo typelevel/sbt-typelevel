@@ -58,7 +58,7 @@ object TypelevelSonatypePlugin extends AutoPlugin {
   )
 
   private[sbt] lazy val hostedApiUrl =
-    Def.setting(javadocioUrl.value.orElse(sonatypeApiUrl.value))
+    Def.setting(javadocioUrl.value)
 
   private lazy val javadocioUrl = Def.setting {
     if (isSnapshot.value || !publishArtifact.value)
@@ -72,23 +72,5 @@ object TypelevelSonatypePlugin extends AutoPlugin {
         url(
           s"https://www.javadoc.io/doc/${organization.value}/${cross(moduleName.value)}/${version.value}/")
       }
-  }
-
-  private lazy val sonatypeApiUrl = Def.setting {
-    if (publishArtifact.value)
-      CrossVersion(
-        crossVersion.value,
-        scalaVersion.value,
-        scalaBinaryVersion.value
-      ).map { cross =>
-        val host = "central.sonatype.com"
-        val repo = if (isSnapshot.value) "snapshots" else "releases"
-        val org = organization.value.replace('.', '/')
-        val mod = cross(moduleName.value)
-        val ver = version.value
-        url(
-          s"https://$host/service/local/repositories/$repo/archive/$org/$mod/$ver/$mod-$ver-javadoc.jar/!/index.html")
-      }
-    else None
   }
 }
