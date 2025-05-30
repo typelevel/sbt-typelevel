@@ -53,7 +53,8 @@ object TypelevelSonatypePlugin extends AutoPlugin {
       if (isSnapshot.value) Some("central-snapshots" at centralSnapshots)
       else localStaging.value
     },
-    apiURL := apiURL.value.orElse(hostedApiUrl.value)
+    apiURL := apiURL.value.orElse(hostedApiUrl.value),
+    sbtPluginPublishLegacyMavenStyle := false
   )
 
   private[sbt] lazy val hostedApiUrl =
