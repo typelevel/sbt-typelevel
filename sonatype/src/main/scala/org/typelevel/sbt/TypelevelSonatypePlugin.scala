@@ -37,7 +37,7 @@ object TypelevelSonatypePlugin extends AutoPlugin {
         "project /",
         "+mimaReportBinaryIssues",
         "+publish",
-        "sonaRelease")
+        "tlSonatypeBundleReleaseIfRelevant")
     }
   )
 
@@ -53,6 +53,7 @@ object TypelevelSonatypePlugin extends AutoPlugin {
       if (isSnapshot.value) Some("central-snapshots" at centralSnapshots)
       else localStaging.value
     },
+    commands += sonatypeBundleReleaseIfRelevant,
     apiURL := apiURL.value.orElse(hostedApiUrl.value),
     sbtPluginPublishLegacyMavenStyle := false
   )
@@ -73,4 +74,12 @@ object TypelevelSonatypePlugin extends AutoPlugin {
           s"https://www.javadoc.io/doc/${organization.value}/${cross(moduleName.value)}/${version.value}/")
       }
   }
+
+  private def sonatypeBundleReleaseIfRelevant: Command =
+    Command.command("tlSonatypeBundleReleaseIfRelevant") { state =>
+      if (state.getSetting(isSnapshot).getOrElse(false))
+        state // a snapshot is good-to-go
+      else // a non-snapshot releases as a bundle
+        Command.process("sonaRelease", state, _ => ())
+    }
 }
