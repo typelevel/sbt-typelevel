@@ -58,21 +58,24 @@ object TypelevelSonatypePlugin extends AutoPlugin {
     sbtPluginPublishLegacyMavenStyle := false
   )
 
-  private[sbt] lazy val hostedApiUrl =
-    Def.setting(javadocioUrl.value)
-
-  private lazy val javadocioUrl = Def.setting {
-    if (isSnapshot.value || !publishArtifact.value)
-      None // javadoc.io doesn't support snapshots, or unpublished modules ;)
-    else
+  private[sbt] lazy val hostedApiUrl = Def.setting {
+    if (publishArtifact.value) {
+      // javadoc.io does not support snapshots, but if we don't have
+      // _some_ value, intermodule links that will work in a proper
+      // release generate (fatal by default) warnings in snapshot
+      // releases.  We have to pick our poison: broken links in
+      // snapshot docs, or less links in all docs.  We pick the
+      // former.
+      val hostname = if (isSnapshot.value) "javadoc.invalid" else "javadoc.io"
       CrossVersion(
         crossVersion.value,
         scalaVersion.value,
         scalaBinaryVersion.value
       ).map { cross =>
         url(
-          s"https://www.javadoc.io/doc/${organization.value}/${cross(moduleName.value)}/${version.value}/")
+          s"https://${hostname}/doc/${organization.value}/${cross(moduleName.value)}/${version.value}/")
       }
+    } else None
   }
 
   private def sonatypeBundleReleaseIfRelevant: Command =
