@@ -18,30 +18,17 @@ package org.typelevel.sbt
 
 import com.typesafe.tools.mima.plugin.MimaPlugin
 import sbt._
-import xerial.sbt.Sonatype
-
-import scala.annotation.nowarn
 
 import Keys._
-import Sonatype.autoImport._
 import TypelevelKernelPlugin.autoImport._
 
 object TypelevelSonatypePlugin extends AutoPlugin {
 
-  override def requires = MimaPlugin && Sonatype
+  override def requires = MimaPlugin
 
   override def trigger = allRequirements
 
-  object autoImport {
-    @deprecated(
-      "Use ThisBuild / sonatypeCredentialHost := xerial.sbt.Sonatype.sonatypeLegacy",
-      "0.7.3"
-    )
-    lazy val tlSonatypeUseLegacyHost =
-      settingKey[Boolean]("Publish to oss.sonatype.org instead of s01 (default: false)")
-  }
-
-  import autoImport._
+  object autoImport {}
 
   override def globalSettings = Seq(
     tlCommandAliases += {
@@ -54,62 +41,41 @@ object TypelevelSonatypePlugin extends AutoPlugin {
     }
   )
 
-  @nowarn("cat=deprecation")
   override def buildSettings =
     Seq(
-      tlSonatypeUseLegacyHost := false,
-      autoAPIMappings := true,
-      sonatypeCredentialHost := {
-        Option(System.getenv("SONATYPE_CREDENTIAL_HOST")).filter(_.nonEmpty).getOrElse {
-          if (tlSonatypeUseLegacyHost.value)
-            Sonatype.sonatypeLegacy
-          else
-            Sonatype.sonatype01
-        }
-      }
+      autoAPIMappings := true
     )
 
   override def projectSettings = Seq(
     publishMavenStyle := true, // we want to do this unconditionally, even if publishing a plugin
-    sonatypeProfileName := organization.value,
-    publishTo := sonatypePublishToBundle.value,
+    publishTo := {
+      val centralSnapshots = "https://central.sonatype.com/repository/maven-snapshots/"
+      if (isSnapshot.value) Some("central-snapshots" at centralSnapshots)
+      else localStaging.value
+    },
     commands += sonatypeBundleReleaseIfRelevant,
-    apiURL := apiURL.value.orElse(hostedApiUrl.value)
+    apiURL := apiURL.value.orElse(hostedApiUrl.value),
+    sbtPluginPublishLegacyMavenStyle := false
   )
 
-  private[sbt] lazy val hostedApiUrl =
-    Def.setting(javadocioUrl.value.orElse(sonatypeApiUrl.value))
-
-  private lazy val javadocioUrl = Def.setting {
-    if (isSnapshot.value || !publishArtifact.value)
-      None // javadoc.io doesn't support snapshots, or unpublished modules ;)
-    else
+  private[sbt] lazy val hostedApiUrl = Def.setting {
+    if (publishArtifact.value) {
+      // javadoc.io does not support snapshots, but if we don't have
+      // _some_ value, intermodule links that will work in a proper
+      // release generate (fatal by default) warnings in snapshot
+      // releases.  We have to pick our poison: broken links in
+      // snapshot docs, or less links in all docs.  We pick the
+      // former.
+      val hostname = if (isSnapshot.value) "javadoc.invalid" else "javadoc.io"
       CrossVersion(
         crossVersion.value,
         scalaVersion.value,
         scalaBinaryVersion.value
       ).map { cross =>
         url(
-          s"https://www.javadoc.io/doc/${organization.value}/${cross(moduleName.value)}/${version.value}/")
+          s"https://${hostname}/doc/${organization.value}/${cross(moduleName.value)}/${version.value}/")
       }
-  }
-
-  private lazy val sonatypeApiUrl = Def.setting {
-    if (publishArtifact.value)
-      CrossVersion(
-        crossVersion.value,
-        scalaVersion.value,
-        scalaBinaryVersion.value
-      ).map { cross =>
-        val host = sonatypeCredentialHost.value
-        val repo = if (isSnapshot.value) "snapshots" else "releases"
-        val org = organization.value.replace('.', '/')
-        val mod = cross(moduleName.value)
-        val ver = version.value
-        url(
-          s"https://$host/service/local/repositories/$repo/archive/$org/$mod/$ver/$mod-$ver-javadoc.jar/!/index.html")
-      }
-    else None
+    } else None
   }
 
   private def sonatypeBundleReleaseIfRelevant: Command =
@@ -117,6 +83,6 @@ object TypelevelSonatypePlugin extends AutoPlugin {
       if (state.getSetting(isSnapshot).getOrElse(false))
         state // a snapshot is good-to-go
       else // a non-snapshot releases as a bundle
-        Command.process("sonatypeBundleRelease", state)
+        Command.process("sonaRelease", state, _ => ())
     }
 }

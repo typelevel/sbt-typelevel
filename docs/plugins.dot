@@ -10,7 +10,6 @@ digraph {
   mdoc[label="sbt-mdoc"]
   mima[label="sbt-mima-plugin"]
   sncp[label="sbt-scala-native-crossproject"]
-  sonatype[label="sbt-sonatype"]
   sjs[label="sbt-scalajs"]
   sjscp[label="sbt-scalajs-crossproject"]
   unidoc[label="sbt-unidoc"]
@@ -41,7 +40,6 @@ digraph {
 
   tlsonatype[label="sbt-typelevel-sonatype"];
   tlsonatype -> tlkernel;
-  tlsonatype -> sonatype;
   tlsonatype -> mima;
   tlsonatype -> unidoc;
 

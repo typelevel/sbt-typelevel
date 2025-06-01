@@ -31,7 +31,6 @@ Instead of using the super-plugins, for finer-grained control you can always add
 ### sbt-typelevel-sonatype
 `TypelevelSonatypePlugin`: Sets up publishing to Sonatype/Maven.
 
-- `tlSonatypeUseLegacyHost` (setting): Publish to `oss.sonatype.org` instead of `s01.oss.sonatype.org` (default: false).
 - `tlRelease` (command): Check binary-compatibility and `+publish` to Sonatype.
 
 `TypelevelUnidocPlugin`: Sets up publishing a Scaladoc-only artifact to Sonatype/Maven.

@@ -20,7 +20,6 @@ import de.heikoseeberger.sbtheader.HeaderPlugin
 import org.typelevel.sbt.gha.GenerativePlugin
 import org.typelevel.sbt.gha.GitHubActionsPlugin
 import sbt._
-import xerial.sbt.Sonatype
 
 import Keys._
 import TypelevelKernelPlugin.autoImport._
@@ -49,10 +48,8 @@ object TypelevelPlugin extends AutoPlugin {
   import TypelevelCiPlugin.autoImport._
   import TypelevelSettingsPlugin.autoImport._
   import TypelevelSonatypeCiReleasePlugin.autoImport._
-  import TypelevelVersioningPlugin.autoImport._
   import GenerativePlugin.autoImport._
   import GitHubActionsPlugin.autoImport._
-  import Sonatype.autoImport._
 
   override def buildSettings = Seq(
     organization := "org.typelevel",
@@ -67,14 +64,7 @@ object TypelevelPlugin extends AutoPlugin {
     licenses += License.Apache2,
     tlCiHeaderCheck := true,
     tlCiScalafmtCheck := true,
-    tlCiReleaseBranches := {
-      val central =
-        sonatypeCredentialHost.value.equalsIgnoreCase(Sonatype.sonatypeCentralHost)
-      if (central && tlUntaggedAreSnapshots.value)
-        Seq() // Sonatype Central does not support snapshots
-      else
-        Seq("main")
-    },
+    tlCiReleaseBranches := Seq("main"),
     Def.derive(tlFatalWarnings := githubIsWorkflowBuild.value),
     githubWorkflowJavaVersions := {
       Seq(JavaSpec.temurin(tlJdkRelease.value.getOrElse(8).toString))
