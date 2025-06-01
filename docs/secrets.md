@@ -14,7 +14,7 @@ The instructions provided here are adapted from [sbt/sbt-ci-release](https://git
 
 If this is your first time publishing, first follow the [Initial Setup](https://central.sonatype.org/publish/publish-guide/#initial-setup) directions in Sonatype's [Publishing Guide](https://central.sonatype.org/publish/publish-guide/) to create an account and request publishing rights for your domain name. If you do not have a domain, you may use `io.github.your_gh_handle` as your **Group Id**.
 
-After you've been granted publishing rights for your domain, log in [Sonatype Central Portal](https://central.sonatype.org/).
+After you've been granted publishing rights for your domain, log in to [Sonatype Central Portal](https://central.sonatype.org/).
 
 Then:
 
