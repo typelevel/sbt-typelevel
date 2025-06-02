@@ -1,1 +1,1 @@
-libraryDependencies += "org.yaml" % "snakeyaml" % "1.33"
+libraryDependencies += "org.yaml" % "snakeyaml" % "2.4"
