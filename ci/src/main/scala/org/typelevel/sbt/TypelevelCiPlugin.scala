@@ -23,6 +23,7 @@ import org.typelevel.sbt.gha.GitHubActionsPlugin
 import org.typelevel.sbt.gha.WorkflowStep
 import sbt._
 
+import scala.annotation.nowarn
 import scala.language.experimental.macros
 
 object TypelevelCiPlugin extends AutoPlugin {
@@ -52,6 +53,7 @@ object TypelevelCiPlugin extends AutoPlugin {
     lazy val tlCiStewardValidateConfig = settingKey[Option[File]](
       "The location of the Scala Steward config to validate (default: `.scala-steward.conf`, if exists)")
 
+    @deprecated("Use `githubWorkflowForkCondition` instead", "0.7.8")
     lazy val tlCiForkCondition =
       settingKey[String](
         "Condition for checking on CI whether this project is a fork of another (default: `github.event.repository.fork == false`)")
@@ -60,6 +62,7 @@ object TypelevelCiPlugin extends AutoPlugin {
 
   import autoImport._
 
+  @nowarn("cat=deprecation")
   override def buildSettings = Seq(
     tlCiHeaderCheck := false,
     tlCiScalafmtCheck := false,
@@ -68,7 +71,7 @@ object TypelevelCiPlugin extends AutoPlugin {
     tlCiMimaBinaryIssueCheck := false,
     tlCiDocCheck := false,
     tlCiDependencyGraphJob := true,
-    tlCiForkCondition := "github.event.repository.fork == false",
+    tlCiForkCondition := githubWorkflowForkCondition.value,
     githubWorkflowTargetBranches ++= Seq(
       "!update/**", // ignore steward branches
       "!pr/**" // escape-hatch to disable ci on a branch
