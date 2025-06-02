@@ -21,7 +21,6 @@ import org.typelevel.sbt.gha.GenerativePlugin.autoImport._
 import org.typelevel.sbt.gha.GitHubActionsPlugin
 import sbt.Keys._
 import sbt._
-import xerial.sbt.Sonatype.autoImport._
 
 object TypelevelSonatypeCiReleasePlugin extends AutoPlugin {
 
@@ -70,22 +69,17 @@ object TypelevelSonatypeCiReleasePlugin extends AutoPlugin {
 
   private def tlCiReleaseCommand: Command =
     Command.command("tlCiRelease") { state =>
-      val newState = Command.process("tlRelease", state)
+      val newState = Command.process("tlRelease", state, _ => ())
       newState.getSetting(version).foreach { v =>
-        val resolver = newState.getSetting(sonatypeDefaultResolver).fold("") {
-          case repo: MavenRepository =>
+        val resolver = newState.getSetting(isSnapshot).fold("") {
+          case true =>
             s"""|```scala
-                |resolvers += "${repo.name}" at "${repo.root}"
+                |resolvers += "central-snapshots" at "https://central.sonatype.com/repository/maven-snapshots/"
                 |```
                 |""".stripMargin
 
-          case repo: URLRepository =>
-            s"""|```scala
-                |resolvers += URLRepository("${repo.name}", ${repo.patterns}, ${repo.allowInsecureProtocol})
-                |```
-                |""".stripMargin
-          // fallback to print at least _something_
-          case other => other.toString
+          case false =>
+            ""
         }
 
         GitHubActionsPlugin.appendToStepSummary(
