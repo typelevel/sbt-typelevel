@@ -141,7 +141,6 @@
     <li class="level1 nav-leaf"><a href="#how-do-i-publish-snapshots-in-ci">How do I publish snapshots in CI?</a></li>
     <li class="level1 nav-leaf"><a href="#what-happens-if-i-push-a-tag-and-commit-at-the-same-time">What happens if I push a tag and commit at the same time?</a></li>
     <li class="level1 nav-leaf"><a href="#how-do-i-split-my-ci-matrix-into-separate-jobs-for-jvm-js-etc">How do I split my CI matrix into separate jobs for JVM, JS, etc?</a></li>
-    <li class="level1 nav-leaf"><a href="#how-do-i-publish-to-oss-sonatype-org-instead-of-s01-oss-sonatype-org">How do I publish to <code>oss.sonatype.org</code> instead of <code>s01.oss.sonatype.org</code>?</a></li>
     <li class="level1 nav-leaf"><a href="#how-do-i-publish-a-website-like-this-one">How do I publish a website like this one?</a></li>
     <li class="level1 nav-leaf"><a href="#how-do-i-manage-my-scala-js-and-scala-native-versions">How do I manage my Scala.js and Scala Native versions?</a></li>
   </ul>
@@ -217,10 +216,6 @@
 </span><span class="comment">// After
 </span><span class="keyword">val</span><span> </span><span class="identifier">root</span><span> = </span><span class="identifier">tlCrossRootProject</span><span>
   .</span><span class="identifier">aggregate</span><span>(</span><span class="identifier">core</span><span>, </span><span class="identifier">io</span><span>, </span><span class="identifier">node</span><span>, </span><span class="identifier">scodec</span><span>, </span><span class="identifier">protocols</span><span>, </span><span class="identifier">reactiveStreams</span><span>, </span><span class="identifier">benchmark</span><span>)</span></code></pre>
-        
-        <h2 id="how-do-i-publish-to-oss-sonatype-org-instead-of-s01-oss-sonatype-org" class="section"><a class="anchor-link left" href="#how-do-i-publish-to-oss-sonatype-org-instead-of-s01-oss-sonatype-org"><i class="icofont-laika link">&#xef71;</i></a>How do I publish to <code>oss.sonatype.org</code> instead of <code>s01.oss.sonatype.org</code>?</h2>
-        <p>Note that <code>oss.sonatype.org</code> is the legacy host and there is an <a href="https://central.sonatype.org/news/20210223_new-users-on-s01/#why-are-we-doing-this">open invitation to migrate to the new host</a>.</p>
-        <pre class="keep-together pdf epub"><code class="nohighlight"><span class="type-name">ThisBuild</span><span> / </span><span class="identifier">tlSonatypeUseLegacyHost</span><span> := </span><span class="boolean-literal">true</span></code></pre>
         
         <h2 id="how-do-i-publish-a-website-like-this-one" class="section"><a class="anchor-link left" href="#how-do-i-publish-a-website-like-this-one"><i class="icofont-laika link">&#xef71;</i></a>How do I publish a website like this one?</h2>
         <p>Check out the <a href="site.html"><strong>sbt-typelevel-site</strong></a> plugin.</p>
