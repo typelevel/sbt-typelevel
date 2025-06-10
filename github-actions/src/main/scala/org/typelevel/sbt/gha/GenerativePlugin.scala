@@ -228,7 +228,7 @@ object GenerativePlugin extends AutoPlugin {
     concurrency.cancelInProgress match {
       case Some(value) =>
         val fields = s"""group: ${wrap(concurrency.group)}
-                        |cancel-in-progress: ${wrap(value.toString)}""".stripMargin
+                        |cancel-in-progress: ${wrap(value)}""".stripMargin
         s"""concurrency:
            |${indent(fields, 1)}""".stripMargin
 
@@ -247,19 +247,22 @@ object GenerativePlugin extends AutoPlugin {
         s"environment: ${wrap(environment.name)}"
     }
 
-  def compileEnv(env: Map[String, String]): String = compileMap(env, prefix = "env")
-  def compileMap(data: Map[String, String], prefix: String): String =
+  def compileEnv(env: Map[String, String], prefix: String = "", suffix: String = ""): String =
+    compileMap(env, prefix = s"${prefix}env", suffix = suffix)
+  def compileMap(data: Map[String, String], prefix: String = "", suffix: String = ""): String =
     if (data.isEmpty) {
       ""
     } else {
-      val rendered = data.map {
-        case (key, value) =>
-          if (!isSafeString(key) || key.indexOf(' ') >= 0)
-            sys.error(s"'$key' is not a valid environment variable name")
+      val rendered = data
+        .map {
+          case (key, value) =>
+            if (!isSafeString(key) || key.indexOf(' ') >= 0)
+              sys.error(s"'$key' is not a valid environment variable name")
 
-          s"""$key: ${wrap(value)}"""
-      }
-      s"""$prefix:\n${indent(rendered.mkString("\n"), 1)}"""
+            s"""$key: ${wrap(value)}"""
+        }
+        .mkString("\n")
+      s"""$prefix:\n${indent(rendered, 1)}$suffix"""
     }
 
   def compilePermissionScope(permissionScope: PermissionScope): String = permissionScope match {
@@ -285,7 +288,10 @@ object GenerativePlugin extends AutoPlugin {
       case PermissionValue.None => "none"
     }
 
-  def compilePermissions(permissions: Option[Permissions]): String = {
+  def compilePermissions(
+      permissions: Option[Permissions],
+      prefix: String = "",
+      suffix: String = ""): String = {
     permissions match {
       case Some(perms) =>
         val rendered = perms match {
@@ -299,7 +305,7 @@ object GenerativePlugin extends AutoPlugin {
             }
             "\n" + indent(map.mkString("\n"), 1)
         }
-        s"permissions:$rendered"
+        s"${prefix}permissions:$rendered$suffix"
 
       case None => ""
     }
@@ -317,24 +323,13 @@ object GenerativePlugin extends AutoPlugin {
     val renderedCond = step.cond.map(wrap).map("if: " + _ + "\n").getOrElse("")
     val renderedShell = if (declareShell) "shell: bash\n" else ""
 
-    val renderedEnvPre = compileEnv(step.env)
-    val renderedEnv =
-      if (renderedEnvPre.isEmpty)
-        ""
-      else
-        renderedEnvPre + "\n"
+    val renderedEnv = compileEnv(step.env, suffix = "\n")
 
     val renderedTimeoutMinutes =
       step.timeoutMinutes.map("timeout-minutes: " + _ + "\n").getOrElse("")
 
-    val preamblePre =
+    val preamble: String =
       renderedName + renderedId + renderedCond + renderedEnv + renderedTimeoutMinutes
-
-    val preamble =
-      if (preamblePre.isEmpty)
-        ""
-      else
-        preamblePre
 
     val body = step match {
       case run: Run =>
@@ -404,16 +399,8 @@ object GenerativePlugin extends AutoPlugin {
     renderedShell + renderedWorkingDirectory + "run: " + wrap(
       commands.mkString("\n")) + renderParams(params)
 
-  def renderParams(params: Map[String, String]): String = {
-    val renderedParamsPre = compileMap(params, prefix = "with")
-    val renderedParams =
-      if (renderedParamsPre.isEmpty)
-        ""
-      else
-        "\n" + renderedParamsPre
-
-    renderedParams
-  }
+  def renderParams(params: Map[String, String]): String =
+    compileMap(params, prefix = "\nwith")
 
   def compileJob(job: WorkflowJob, sbt: String): String = job match {
     case job: WorkflowJob.Run => compileRunJob(job, sbt)
@@ -428,21 +415,9 @@ object GenerativePlugin extends AutoPlugin {
 
     val renderedSecrets = job.secrets.fold("")(compileSecrets)
 
-    val renderedOutputs = {
-      val renderedOutputsPre = compileMap(job.outputs, prefix = "outputs")
-      if (renderedOutputsPre.isEmpty)
-        ""
-      else
-        "\n" + renderedOutputsPre
-    }
+    val renderedOutputs = compileMap(job.outputs, prefix = "\noutputs")
 
-    val renderedInputs = {
-      val renderedInputsPre = compileMap(job.params, prefix = "with")
-      if (renderedInputsPre.isEmpty)
-        ""
-      else
-        "\n" + renderedInputsPre
-    }
+    val renderedInputs = compileMap(job.params, prefix = "\nwith")
 
     // format: off
     val body = s"""name: ${wrap(job.name)}${renderedNeeds}
@@ -471,7 +446,7 @@ object GenerativePlugin extends AutoPlugin {
     val renderedContainer = job.container match {
       case Some(JobContainer(image, credentials, env, volumes, ports, options)) =>
         if (credentials.isEmpty && env.isEmpty && volumes.isEmpty && ports.isEmpty && options.isEmpty) {
-          "\n" + s"container: ${wrap(image)}"
+          s"\ncontainer: ${wrap(image)}"
         } else {
           val renderedImage = s"image: ${wrap(image)}"
 
@@ -483,11 +458,7 @@ object GenerativePlugin extends AutoPlugin {
               ""
           }
 
-          val renderedEnv =
-            if (env.nonEmpty)
-              "\n" + compileEnv(env)
-            else
-              ""
+          val renderedEnv = compileEnv(env, prefix = "\n")
 
           val renderedVolumes =
             if (volumes.nonEmpty)
@@ -514,31 +485,16 @@ object GenerativePlugin extends AutoPlugin {
         ""
     }
 
-    val renderedEnvPre = compileEnv(job.env)
-    val renderedEnv =
-      if (renderedEnvPre.isEmpty)
-        ""
-      else
-        "\n" + renderedEnvPre
+    val renderedEnv = compileMap(job.env, "\nenv")
 
-    val renderedOutputsPre = compileMap(job.outputs, prefix = "outputs")
-    val renderedOutputs =
-      if (renderedOutputsPre.isEmpty)
-        ""
-      else
-        "\n" + renderedOutputsPre
+    val renderedOutputs = compileMap(job.outputs, prefix = "\noutputs")
 
-    val renderedPermPre = compilePermissions(job.permissions)
-    val renderedPerm =
-      if (renderedPermPre.isEmpty)
-        ""
-      else
-        "\n" + renderedPermPre
+    val renderedPerm = compilePermissions(job.permissions, prefix = "\n")
 
     val renderedTimeoutMinutes =
       job.timeoutMinutes.map(timeout => s"\ntimeout-minutes: $timeout").getOrElse("")
 
-    List("include", "exclude") foreach { key =>
+    List("include", "exclude").foreach { key =>
       if (job.matrixAdds.contains(key)) {
         sys.error(s"key `$key` is reserved and cannot be used in an Actions matrix definition")
       }
@@ -681,18 +637,8 @@ object GenerativePlugin extends AutoPlugin {
 
     val renderedName = name.fold("") { name => s"name: ${wrap(name)}" }
 
-    val renderedPermissionsPre = compilePermissions(permissions)
-    val renderedEnvPre = compileEnv(env)
-    val renderedEnv =
-      if (renderedEnvPre.isEmpty)
-        ""
-      else
-        renderedEnvPre + "\n\n"
-    val renderedPerm =
-      if (renderedPermissionsPre.isEmpty)
-        ""
-      else
-        renderedPermissionsPre + "\n\n"
+    val renderedEnv = compileEnv(env, suffix = "\n\n")
+    val renderedPerm = compilePermissions(permissions, suffix = "\n\n")
 
     val renderedConcurrency =
       concurrency.map(compileConcurrency).map("\n" + _ + "\n\n").getOrElse("")
@@ -725,7 +671,7 @@ object GenerativePlugin extends AutoPlugin {
     githubWorkflowConcurrency := Some(
       Concurrency(
         group = s"$${{ github.workflow }} @ $${{ github.ref }}",
-        cancelInProgress = Some(true))
+        cancelInProgress = true)
     ),
     githubWorkflowBuildMatrixFailFast := None,
     githubWorkflowBuildMatrixAdditions := Map(),
