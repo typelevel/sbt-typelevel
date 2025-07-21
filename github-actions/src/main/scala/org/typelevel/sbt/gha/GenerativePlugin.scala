@@ -500,9 +500,15 @@ object GenerativePlugin extends AutoPlugin {
       }
     }
 
-    val renderedMatricesPre = job.matrixAdds.toList.sortBy(_._1) map {
-      case (key, values) => s"$key: ${values.map(wrap).mkString("[", ", ", "]")}"
-    } mkString "\n"
+    val renderedMatricesAdds =
+      if (job.matrixAdds.isEmpty) ""
+      else
+        job
+          .matrixAdds
+          .toList
+          .sortBy(_._1)
+          .map { case (key, values) => s"$key: ${values.map(wrap).mkString("[", ", ", "]")}" }
+          .mkString("\n", "\n", "")
 
     // TODO refactor all of this stuff to use whitelist instead
     val whitelist = Map(
@@ -524,44 +530,35 @@ object GenerativePlugin extends AutoPlugin {
       }
     }
 
-    val renderedIncludesPre = if (job.matrixIncs.isEmpty) {
-      renderedMatricesPre
-    } else {
-      job.matrixIncs.foreach(inc => checkMatching(inc.matching))
+    val renderedIncludes =
+      if (job.matrixIncs.isEmpty) ""
+      else {
+        job.matrixIncs.foreach(inc => checkMatching(inc.matching))
 
-      val rendered = compileListOfSimpleDicts(
-        job.matrixIncs.map(i => i.matching ++ i.additions))
+        val rendered = compileListOfSimpleDicts(
+          job.matrixIncs.map(i => i.matching ++ i.additions))
 
-      val renderedMatrices =
-        if (renderedMatricesPre.isEmpty)
-          ""
-        else
-          renderedMatricesPre + "\n"
+        s"\ninclude:\n${indent(rendered, 1)}"
+      }
 
-      s"${renderedMatrices}include:\n${indent(rendered, 1)}"
-    }
+    val renderedExcludes =
+      if (job.matrixExcs.isEmpty) ""
+      else {
+        job.matrixExcs.foreach(exc => checkMatching(exc.matching))
 
-    val renderedExcludesPre = if (job.matrixExcs.isEmpty) {
-      renderedIncludesPre
-    } else {
-      job.matrixExcs.foreach(exc => checkMatching(exc.matching))
+        val rendered = compileListOfSimpleDicts(job.matrixExcs.map(_.matching))
 
-      val rendered = compileListOfSimpleDicts(job.matrixExcs.map(_.matching))
+        s"\nexclude:\n${indent(rendered, 1)}"
+      }
 
-      val renderedIncludes =
-        if (renderedIncludesPre.isEmpty)
-          ""
-        else
-          renderedIncludesPre + "\n"
-
-      s"${renderedIncludes}exclude:\n${indent(rendered, 1)}"
-    }
-
-    val renderedMatrices =
-      if (renderedExcludesPre.isEmpty)
-        ""
-      else
-        "\n" + indent(renderedExcludesPre, 2)
+    val renderedMatrices = indent(
+      buildMatrix(
+        0,
+        "os" -> job.oses,
+        "scala" -> job.scalas,
+        "java" -> job.javas.map(_.render)) +
+        renderedMatricesAdds + renderedIncludes + renderedExcludes,
+      2)
 
     val declareShell = job.oses.exists(_.contains("windows"))
 
@@ -583,7 +580,7 @@ object GenerativePlugin extends AutoPlugin {
     val body = s"""name: ${wrap(job.name)}${renderedNeeds}${renderedCond}
       |strategy:${renderedFailFast}
       |  matrix:
-      |${buildMatrix(2, "os" -> job.oses, "scala" -> job.scalas, "java" -> job.javas.map(_.render))}${renderedMatrices}
+      |${renderedMatrices}
       |runs-on: ${runsOn}${renderedEnvironment}${renderedContainer}${renderedPerm}${renderedEnv}${renderedOutputs}${renderedConcurrency}${renderedTimeoutMinutes}
       |steps:
       |${renderedSteps}""".stripMargin
