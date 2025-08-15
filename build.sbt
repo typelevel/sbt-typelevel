@@ -26,7 +26,7 @@ ThisBuild / githubWorkflowJavaVersions ++= Seq(
 
 val macOS = "macos-latest"
 
-ThisBuild / githubWorkflowOSes ++= Seq(macOS, "windows-latest")
+ThisBuild / githubWorkflowOSes ++= Seq(macOS, "windows-2022")
 
 ThisBuild / githubWorkflowBuildMatrixExclusions ++= {
   val exclusions = for {

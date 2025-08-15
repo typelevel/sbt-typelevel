@@ -20,7 +20,7 @@ pull_request_rules:
   - status-success=Test (ubuntu-22.04, 2.12, corretto@17, sbt-typelevelJVM)
   - status-success=Test (ubuntu-22.04, 2.12, semeru@17, sbt-typelevelJVM)
   - status-success=Test (macos-latest, 2.12, temurin@17, sbt-typelevelJVM)
-  - status-success=Test (windows-latest, 2.12, temurin@8, sbt-typelevelJVM)
+  - status-success=Test (windows-2022, 2.12, temurin@8, sbt-typelevelJVM)
   - status-success=Validate Steward Config (ubuntu-22.04, temurin@11)
   - status-success=Generate Site (ubuntu-22.04, temurin@11)
   - '#approved-reviews-by>=1'
