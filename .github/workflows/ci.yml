@@ -41,7 +41,7 @@ jobs:
     name: Test
     strategy:
       matrix:
-        os: [ubuntu-22.04, macos-latest, windows-latest]
+        os: [ubuntu-22.04, macos-latest, windows-2022]
         scala: [2.12]
         java:
           - temurin@8
@@ -56,25 +56,25 @@ jobs:
           - java: temurin@11
             os: macos-latest
           - java: temurin@11
-            os: windows-latest
+            os: windows-2022
           - java: temurin@17
-            os: windows-latest
+            os: windows-2022
           - java: graal_22.3.2@11
             os: macos-latest
           - java: graal_22.3.2@11
-            os: windows-latest
+            os: windows-2022
           - java: graalvm@21
             os: macos-latest
           - java: graalvm@21
-            os: windows-latest
+            os: windows-2022
           - java: corretto@17
             os: macos-latest
           - java: corretto@17
-            os: windows-latest
+            os: windows-2022
           - java: semeru@17
             os: macos-latest
           - java: semeru@17
-            os: windows-latest
+            os: windows-2022
           - java: temurin@8
             os: macos-latest
     runs-on: ${{ matrix.os }}
