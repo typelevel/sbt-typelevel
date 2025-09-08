@@ -36,12 +36,12 @@ sealed abstract class WorkflowStep extends Product with Serializable {
 object WorkflowStep {
 
   val CheckoutFull: WorkflowStep = Use(
-    UseRef.Public("actions", "checkout", "v4"),
+    UseRef.Public("actions", "checkout", "v5"),
     name = Some("Checkout current branch (full)"),
     params = Map("fetch-depth" -> "0"))
 
   val Checkout: WorkflowStep = Use(
-    UseRef.Public("actions", "checkout", "v4"),
+    UseRef.Public("actions", "checkout", "v5"),
     name = Some("Checkout current branch (fast)"))
 
   val SetupSbt: WorkflowStep = WorkflowStep.Use(
@@ -81,7 +81,7 @@ object WorkflowStep {
         val cond = s"matrix.java == '${jv.render}'"
 
         WorkflowStep.Use(
-          UseRef.Public("actions", "setup-java", "v4"),
+          UseRef.Public("actions", "setup-java", "v5"),
           name = Some(s"Setup Java (${jv.render})"),
           id = Some(setupId),
           cond = Some(cond),
