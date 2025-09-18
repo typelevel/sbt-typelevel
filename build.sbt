@@ -1,6 +1,7 @@
 name := "sbt-typelevel"
 
 import org.typelevel.sbt.gha.{PermissionScope, PermissionValue, Permissions}
+import com.typesafe.tools.mima.core._
 
 ThisBuild / tlBaseVersion := "0.8"
 ThisBuild / crossScalaVersions := Seq("2.12.20")
@@ -41,9 +42,15 @@ ThisBuild / githubWorkflowBuildMatrixExclusions ++= {
 ThisBuild / githubWorkflowPublishTimeoutMinutes := Some(45)
 ThisBuild / githubWorkflowPublishNeeds += "validate-steward"
 
-ThisBuild / githubWorkflowBuild += WorkflowStep.Run(
-  List("pwd"),
-  workingDirectory = Some("project")
+ThisBuild / githubWorkflowBuild ++= Seq(
+  WorkflowStep.Run(
+    List("pwd"),
+    workingDirectory = Some("project")
+  ),
+  WorkflowStep.Run(
+    List("exit 1"),
+    continueOnError = true
+  )
 )
 
 ThisBuild / mergifyStewardConfig ~= {
@@ -121,7 +128,11 @@ lazy val githubActions = project
   .in(file("github-actions"))
   .enablePlugins(SbtPlugin)
   .settings(
-    name := "sbt-typelevel-github-actions"
+    name := "sbt-typelevel-github-actions",
+    mimaBinaryIssueFilters ++= Seq(
+      ProblemFilters.exclude[DirectMissingMethodProblem]("org.typelevel.sbt.gha.*#*#Impl.*"),
+      ProblemFilters.exclude[MissingTypesProblem]("org.typelevel.sbt.gha.*$*$Impl$")
+    )
   )
 
 lazy val mergify = project

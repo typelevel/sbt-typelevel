@@ -223,6 +223,10 @@ jobs:
         working-directory: project
         run: pwd
 
+      - shell: bash
+        continue-on-error: true
+        run: exit 1
+
       - name: Make target directories
         if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main')
         shell: bash
