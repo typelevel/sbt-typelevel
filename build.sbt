@@ -42,9 +42,15 @@ ThisBuild / githubWorkflowBuildMatrixExclusions ++= {
 ThisBuild / githubWorkflowPublishTimeoutMinutes := Some(45)
 ThisBuild / githubWorkflowPublishNeeds += "validate-steward"
 
-ThisBuild / githubWorkflowBuild += WorkflowStep.Run(
-  List("pwd"),
-  workingDirectory = Some("project")
+ThisBuild / githubWorkflowBuild ++= Seq(
+  WorkflowStep.Run(
+    List("pwd"),
+    workingDirectory = Some("project")
+  ),
+  WorkflowStep.Run(
+    List("exit 1"),
+    continueOnError = true
+  )
 )
 
 ThisBuild / mergifyStewardConfig ~= {
