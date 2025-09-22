@@ -674,7 +674,8 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
     githubWorkflowTargetPaths := Paths.None,
     githubWorkflowEnv := Map("GITHUB_TOKEN" -> s"$${{ secrets.GITHUB_TOKEN }}"),
     githubWorkflowPermissions := None,
-    githubWorkflowAddedJobs := Seq()
+    githubWorkflowAddedJobs := Seq(),
+    githubWorkflowForkCondition := "github.event.repository.fork == false"
   )
 
   private lazy val internalTargetAggregation =
@@ -868,6 +869,9 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
   )
 
   private val publicationCond = Def setting {
+    val notPRCond = "github.event_name != 'pull_request'"
+    val forkCond = githubWorkflowForkCondition.value
+
     val publicationCondPre =
       githubWorkflowPublishTargetBranches
         .value
@@ -878,7 +882,8 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
       case Some(cond) => publicationCondPre + " && (" + cond + ")"
       case None => publicationCondPre
     }
-    s"github.event_name != 'pull_request' && $publicationCond"
+
+    s"$forkCond && $notPRCond && $publicationCond"
   }
 
   private val sbt = Def.setting {
