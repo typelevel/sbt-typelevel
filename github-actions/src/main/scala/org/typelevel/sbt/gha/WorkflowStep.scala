@@ -138,7 +138,7 @@ object WorkflowStep {
   }
 
   object Run {
-    @deprecated("Use the apply method with continueOnError", since = "0.7.8")
+    @deprecated("Use the apply method with continueOnError", since = "0.8.1")
     def apply(
         commands: List[String],
         id: Option[String],
@@ -230,7 +230,7 @@ object WorkflowStep {
 
   object Sbt {
 
-    @deprecated("Use the apply method with continueOnError", since = "0.7.8")
+    @deprecated("Use the apply method with continueOnError", since = "0.8.1")
     def apply(
         commands: List[String],
         id: Option[String],
@@ -301,7 +301,7 @@ object WorkflowStep {
 
   object Use {
 
-    @deprecated("Use the apply method with continueOnError", since = "0.7.8")
+    @deprecated("Use the apply method with continueOnError", since = "0.8.1")
     def apply(
         ref: UseRef,
         params: Map[String, String],

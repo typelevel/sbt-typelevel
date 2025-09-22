@@ -351,7 +351,7 @@ ${indent(rendered.mkString("\n"), 1)}"""
     indent(preamble + body, 1).updated(0, '-')
   }
 
-  @deprecated("Use the overload with renderedContinueOnError", since = "0.7.8")
+  @deprecated("Use the overload with renderedContinueOnError", since = "0.8.1")
   def renderRunBody(
       commands: List[String],
       params: Map[String, String],
