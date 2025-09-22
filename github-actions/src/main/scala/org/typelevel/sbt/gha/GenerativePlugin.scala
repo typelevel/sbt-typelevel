@@ -264,6 +264,7 @@ ${indent(rendered.mkString("\n"), 1)}"""
     val renderedId = step.id.map(wrap).map("id: " + _ + "\n").getOrElse("")
     val renderedCond = step.cond.map(wrap).map("if: " + _ + "\n").getOrElse("")
     val renderedShell = if (declareShell) "shell: bash\n" else ""
+    val renderedContinueOnError = if (step.continueOnError) "continue-on-error: true\n" else ""
 
     val renderedEnvPre = compileEnv(step.env)
     val renderedEnv =
@@ -288,7 +289,12 @@ ${indent(rendered.mkString("\n"), 1)}"""
       case run: Run =>
         val renderedWorkingDirectory =
           run.workingDirectory.map(wrap).map("working-directory: " + _ + "\n").getOrElse("")
-        renderRunBody(run.commands, run.params, renderedShell, renderedWorkingDirectory)
+        renderRunBody(
+          run.commands,
+          run.params,
+          renderedShell,
+          renderedWorkingDirectory,
+          renderedContinueOnError)
 
       case sbtStep: Sbt =>
         import sbtStep.commands
@@ -312,7 +318,8 @@ ${indent(rendered.mkString("\n"), 1)}"""
           commands = List(s"$sbt $safeCommands"),
           params = sbtStep.params,
           renderedShell = renderedShell,
-          renderedWorkingDirectory = ""
+          renderedWorkingDirectory = "",
+          renderedContinueOnError = renderedContinueOnError
         )
 
       case use: Use =>
@@ -338,18 +345,27 @@ ${indent(rendered.mkString("\n"), 1)}"""
             s"uses: docker://$image:$tag"
         }
 
-        decl + renderParams(params)
+        decl + renderedContinueOnError + renderParams(params)
     }
 
     indent(preamble + body, 1).updated(0, '-')
   }
 
+  @deprecated("Use the overload with renderedContinueOnError", since = "0.8.1")
   def renderRunBody(
       commands: List[String],
       params: Map[String, String],
       renderedShell: String,
-      renderedWorkingDirectory: String) =
-    renderedShell + renderedWorkingDirectory + "run: " + wrap(
+      renderedWorkingDirectory: String): String =
+    renderRunBody(commands, params, renderedShell, renderedWorkingDirectory, "")
+
+  def renderRunBody(
+      commands: List[String],
+      params: Map[String, String],
+      renderedShell: String,
+      renderedWorkingDirectory: String,
+      renderedContinueOnError: String): String =
+    renderedShell + renderedWorkingDirectory + renderedContinueOnError + "run: " + wrap(
       commands.mkString("\n")) + renderParams(params)
 
   def renderParams(params: Map[String, String]): String = {

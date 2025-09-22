@@ -22,12 +22,14 @@ sealed abstract class WorkflowStep extends Product with Serializable {
   def cond: Option[String]
   def env: Map[String, String]
   def timeoutMinutes: Option[Int]
+  def continueOnError: Boolean
 
   def withId(id: Option[String]): WorkflowStep
   def withName(name: Option[String]): WorkflowStep
   def withCond(cond: Option[String]): WorkflowStep
   def withEnv(env: Map[String, String]): WorkflowStep
   def withTimeoutMinutes(minutes: Option[Int]): WorkflowStep
+  def withContinueOnError(continueOnError: Boolean): WorkflowStep
 
   def updatedEnv(name: String, value: String): WorkflowStep
   def concatEnv(env: TraversableOnce[(String, String)]): WorkflowStep
@@ -136,6 +138,28 @@ object WorkflowStep {
   }
 
   object Run {
+    @deprecated("Use the apply method with continueOnError", since = "0.8.1")
+    def apply(
+        commands: List[String],
+        id: Option[String],
+        name: Option[String],
+        cond: Option[String],
+        env: Map[String, String],
+        params: Map[String, String],
+        timeoutMinutes: Option[Int],
+        workingDirectory: Option[String]
+    ): Run = apply(
+      commands,
+      id,
+      name,
+      cond,
+      env,
+      params,
+      timeoutMinutes,
+      workingDirectory,
+      continueOnError = false
+    )
+
     def apply(
         commands: List[String],
         id: Option[String] = None,
@@ -144,8 +168,18 @@ object WorkflowStep {
         env: Map[String, String] = Map(),
         params: Map[String, String] = Map(),
         timeoutMinutes: Option[Int] = None,
-        workingDirectory: Option[String] = None): Run =
-      Impl(commands, id, name, cond, env, params, timeoutMinutes, workingDirectory)
+        workingDirectory: Option[String] = None,
+        continueOnError: Boolean = false): Run =
+      Impl(
+        commands,
+        id,
+        name,
+        cond,
+        env,
+        params,
+        timeoutMinutes,
+        workingDirectory,
+        continueOnError)
 
     private final case class Impl(
         commands: List[String],
@@ -155,7 +189,8 @@ object WorkflowStep {
         env: Map[String, String],
         params: Map[String, String],
         timeoutMinutes: Option[Int],
-        workingDirectory: Option[String])
+        workingDirectory: Option[String],
+        continueOnError: Boolean)
         extends Run {
       override def productPrefix = "Run"
       // scalafmt: { maxColumn = 200 }
@@ -164,6 +199,7 @@ object WorkflowStep {
       def withCond(cond: Option[String]) = copy(cond = cond)
       def withEnv(env: Map[String, String]) = copy(env = env)
       def withTimeoutMinutes(minutes: Option[Int]) = copy(timeoutMinutes = minutes)
+      def withContinueOnError(continueOnError: Boolean) = copy(continueOnError = continueOnError)
 
       def withCommands(commands: List[String]) = copy(commands = commands)
       def withParams(params: Map[String, String]) = copy(params = params)
@@ -193,6 +229,19 @@ object WorkflowStep {
   }
 
   object Sbt {
+
+    @deprecated("Use the apply method with continueOnError", since = "0.8.1")
+    def apply(
+        commands: List[String],
+        id: Option[String],
+        name: Option[String],
+        cond: Option[String],
+        env: Map[String, String],
+        params: Map[String, String],
+        timeoutMinutes: Option[Int],
+        preamble: Boolean): Sbt =
+      apply(commands, id, name, cond, env, params, timeoutMinutes, preamble, false)
+
     def apply(
         commands: List[String],
         id: Option[String] = None,
@@ -201,8 +250,9 @@ object WorkflowStep {
         env: Map[String, String] = Map(),
         params: Map[String, String] = Map(),
         timeoutMinutes: Option[Int] = None,
-        preamble: Boolean = true): Sbt =
-      Impl(commands, id, name, cond, env, params, timeoutMinutes, preamble)
+        preamble: Boolean = true,
+        continueOnError: Boolean = false): Sbt =
+      Impl(commands, id, name, cond, env, params, timeoutMinutes, preamble, continueOnError)
 
     private final case class Impl(
         commands: List[String],
@@ -212,7 +262,8 @@ object WorkflowStep {
         env: Map[String, String],
         params: Map[String, String],
         timeoutMinutes: Option[Int],
-        preamble: Boolean)
+        preamble: Boolean,
+        continueOnError: Boolean)
         extends Sbt {
       override def productPrefix = "Sbt"
       // scalafmt: { maxColumn = 200 }
@@ -221,6 +272,7 @@ object WorkflowStep {
       def withCond(cond: Option[String]) = copy(cond = cond)
       def withEnv(env: Map[String, String]) = copy(env = env)
       def withTimeoutMinutes(minutes: Option[Int]) = copy(timeoutMinutes = minutes)
+      def withContinueOnError(continueOnError: Boolean): WorkflowStep = copy(continueOnError = continueOnError)
 
       def withCommands(commands: List[String]) = copy(commands = commands)
       def withParams(params: Map[String, String]) = copy(params = params)
@@ -249,6 +301,27 @@ object WorkflowStep {
 
   object Use {
 
+    @deprecated("Use the apply method with continueOnError", since = "0.8.1")
+    def apply(
+        ref: UseRef,
+        params: Map[String, String],
+        id: Option[String],
+        name: Option[String],
+        cond: Option[String],
+        env: Map[String, String],
+        timeoutMinutes: Option[Int]
+    ): Use =
+      apply(
+        ref,
+        params,
+        id,
+        name,
+        cond,
+        env,
+        timeoutMinutes,
+        continueOnError = false
+      )
+
     def apply(
         ref: UseRef,
         params: Map[String, String] = Map(),
@@ -256,8 +329,9 @@ object WorkflowStep {
         name: Option[String] = None,
         cond: Option[String] = None,
         env: Map[String, String] = Map(),
-        timeoutMinutes: Option[Int] = None): Use =
-      Impl(ref, params, id, name, cond, env, timeoutMinutes)
+        timeoutMinutes: Option[Int] = None,
+        continueOnError: Boolean = false): Use =
+      Impl(ref, params, id, name, cond, env, timeoutMinutes, continueOnError)
 
     private final case class Impl(
         ref: UseRef,
@@ -266,7 +340,8 @@ object WorkflowStep {
         name: Option[String],
         cond: Option[String],
         env: Map[String, String],
-        timeoutMinutes: Option[Int])
+        timeoutMinutes: Option[Int],
+        continueOnError: Boolean)
         extends Use {
       override def productPrefix = "Use"
       // scalafmt: { maxColumn = 200 }
@@ -275,6 +350,7 @@ object WorkflowStep {
       def withCond(cond: Option[String]) = copy(cond = cond)
       def withEnv(env: Map[String, String]) = copy(env = env)
       def withTimeoutMinutes(minutes: Option[Int]) = copy(timeoutMinutes = minutes)
+      def withContinueOnError(continueOnError: Boolean) = copy(continueOnError = continueOnError)
 
       def withRef(ref: UseRef) = copy(ref = ref)
       def withParams(params: Map[String, String]) = copy(params = params)
