@@ -209,7 +209,7 @@ object TypelevelSettingsPlugin extends AutoPlugin {
     },
     scalacOptions ++= {
       scalaVersion.value match {
-        case V(V(2, 13, Some(17), _)) =>
+        case V(V(2, 13, Some(patch), _)) if patch >= 17 =>
           // https://github.com/scala/bug/issues/13128#issuecomment-3375870295
           Seq("-Wconf:cat=lint-infer-any&msg=kind-polymorphic:s")
         case _ =>
