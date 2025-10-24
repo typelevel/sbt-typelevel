@@ -36,6 +36,7 @@ sealed abstract class WorkflowJob {
   def container: Option[JobContainer]
   def environment: Option[JobEnvironment]
   def concurrency: Option[Concurrency]
+  def outputs: Map[String, String]
   def timeoutMinutes: Option[Int]
 
   def withId(id: String): WorkflowJob
@@ -57,6 +58,7 @@ sealed abstract class WorkflowJob {
   def withContainer(container: Option[JobContainer]): WorkflowJob
   def withEnvironment(environment: Option[JobEnvironment]): WorkflowJob
   def withConcurrency(concurrency: Option[Concurrency]): WorkflowJob
+  def withOutputs(outputs: Map[String, String]): WorkflowJob
   def withTimeoutMinutes(timeoutMinutes: Option[Int]): WorkflowJob
 
   def updatedEnv(name: String, value: String): WorkflowJob
@@ -86,6 +88,7 @@ object WorkflowJob {
       container: Option[JobContainer] = None,
       environment: Option[JobEnvironment] = None,
       concurrency: Option[Concurrency] = None,
+      outputs: Map[String, String] = Map(),
       timeoutMinutes: Option[Int] = None): WorkflowJob =
     Impl(
       id,
@@ -107,6 +110,7 @@ object WorkflowJob {
       container,
       environment,
       concurrency,
+      outputs,
       timeoutMinutes
     )
 
@@ -130,6 +134,7 @@ object WorkflowJob {
       container: Option[JobContainer],
       environment: Option[JobEnvironment],
       concurrency: Option[Concurrency],
+      outputs: Map[String, String],
       timeoutMinutes: Option[Int])
       extends WorkflowJob {
 
@@ -153,6 +158,7 @@ object WorkflowJob {
     override def withContainer(container: Option[JobContainer]): WorkflowJob = copy(container = container)
     override def withEnvironment(environment: Option[JobEnvironment]): WorkflowJob = copy(environment = environment)
     override def withConcurrency(concurrency: Option[Concurrency]): WorkflowJob = copy(concurrency = concurrency)
+    override def withOutputs(outputs: Map[String, String]): WorkflowJob = copy(outputs = outputs)
     override def withTimeoutMinutes(timeoutMinutes: Option[Int]): WorkflowJob = copy(timeoutMinutes = timeoutMinutes)
 
     def updatedEnv(name: String, value: String): WorkflowJob = copy(env = env.updated(name, value))
