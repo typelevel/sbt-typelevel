@@ -16,6 +16,8 @@
 
 package org.typelevel.sbt.gha
 
+import scala.runtime.AbstractFunction20
+
 sealed abstract class WorkflowJob {
   def id: String
   def name: String
@@ -36,8 +38,8 @@ sealed abstract class WorkflowJob {
   def container: Option[JobContainer]
   def environment: Option[JobEnvironment]
   def concurrency: Option[Concurrency]
-  def outputs: Map[String, String]
   def timeoutMinutes: Option[Int]
+  def outputs: Map[String, String]
 
   def withId(id: String): WorkflowJob
   def withName(name: String): WorkflowJob
@@ -58,8 +60,8 @@ sealed abstract class WorkflowJob {
   def withContainer(container: Option[JobContainer]): WorkflowJob
   def withEnvironment(environment: Option[JobEnvironment]): WorkflowJob
   def withConcurrency(concurrency: Option[Concurrency]): WorkflowJob
-  def withOutputs(outputs: Map[String, String]): WorkflowJob
   def withTimeoutMinutes(timeoutMinutes: Option[Int]): WorkflowJob
+  def withOutputs(outputs: Map[String, String]): WorkflowJob
 
   def updatedEnv(name: String, value: String): WorkflowJob
   def concatEnv(envs: TraversableOnce[(String, String)]): WorkflowJob
@@ -88,8 +90,8 @@ object WorkflowJob {
       container: Option[JobContainer] = None,
       environment: Option[JobEnvironment] = None,
       concurrency: Option[Concurrency] = None,
-      outputs: Map[String, String] = Map(),
-      timeoutMinutes: Option[Int] = None): WorkflowJob =
+      timeoutMinutes: Option[Int] = None,
+      outputs: Map[String, String] = Map()): WorkflowJob =
     Impl(
       id,
       name,
@@ -110,8 +112,54 @@ object WorkflowJob {
       container,
       environment,
       concurrency,
-      outputs,
-      timeoutMinutes
+      timeoutMinutes,
+      outputs
+    )
+
+  // Kept for binary compatibility. It can be removed in a future major release.
+  def apply(
+      id: String,
+      name: String,
+      steps: List[WorkflowStep],
+      sbtStepPreamble: List[String],
+      cond: Option[String],
+      permissions: Option[Permissions],
+      env: Map[String, String],
+      oses: List[String],
+      scalas: List[String],
+      javas: List[JavaSpec],
+      needs: List[String],
+      matrixFailFast: Option[Boolean],
+      matrixAdds: Map[String, List[String]],
+      matrixIncs: List[MatrixInclude],
+      matrixExcs: List[MatrixExclude],
+      runsOnExtraLabels: List[String],
+      container: Option[JobContainer],
+      environment: Option[JobEnvironment],
+      concurrency: Option[Concurrency],
+      timeoutMinutes: Option[Int]): WorkflowJob =
+    apply(
+      id,
+      name,
+      steps,
+      sbtStepPreamble,
+      cond,
+      permissions,
+      env,
+      oses,
+      scalas,
+      javas,
+      needs,
+      matrixFailFast,
+      matrixAdds,
+      matrixIncs,
+      matrixExcs,
+      runsOnExtraLabels,
+      container,
+      environment,
+      concurrency,
+      timeoutMinutes,
+      Map()
     )
 
   private final case class Impl(
@@ -134,8 +182,8 @@ object WorkflowJob {
       container: Option[JobContainer],
       environment: Option[JobEnvironment],
       concurrency: Option[Concurrency],
-      outputs: Map[String, String],
-      timeoutMinutes: Option[Int])
+      timeoutMinutes: Option[Int],
+      outputs: Map[String, String])
       extends WorkflowJob {
 
     // scalafmt: { maxColumn = 200 }
@@ -158,8 +206,8 @@ object WorkflowJob {
     override def withContainer(container: Option[JobContainer]): WorkflowJob = copy(container = container)
     override def withEnvironment(environment: Option[JobEnvironment]): WorkflowJob = copy(environment = environment)
     override def withConcurrency(concurrency: Option[Concurrency]): WorkflowJob = copy(concurrency = concurrency)
-    override def withOutputs(outputs: Map[String, String]): WorkflowJob = copy(outputs = outputs)
     override def withTimeoutMinutes(timeoutMinutes: Option[Int]): WorkflowJob = copy(timeoutMinutes = timeoutMinutes)
+    override def withOutputs(outputs: Map[String, String]): WorkflowJob = copy(outputs = outputs)
 
     def updatedEnv(name: String, value: String): WorkflowJob = copy(env = env.updated(name, value))
     def concatEnv(envs: TraversableOnce[(String, String)]): WorkflowJob = copy(env = this.env ++ envs)
@@ -168,5 +216,215 @@ object WorkflowJob {
     // scalafmt: { maxColumn = 96 }
 
     override def productPrefix = "WorkflowJob"
+
+    // Must be manually defined because of the overload below. It can be removed in a future major release.
+    def copy(
+        id: String = id,
+        name: String = name,
+        steps: List[WorkflowStep] = steps,
+        sbtStepPreamble: List[String] = sbtStepPreamble,
+        cond: Option[String] = cond,
+        permissions: Option[Permissions] = permissions,
+        env: Map[String, String] = env,
+        oses: List[String] = oses,
+        scalas: List[String] = scalas,
+        javas: List[JavaSpec] = javas,
+        needs: List[String] = needs,
+        matrixFailFast: Option[Boolean] = matrixFailFast,
+        matrixAdds: Map[String, List[String]] = matrixAdds,
+        matrixIncs: List[MatrixInclude] = matrixIncs,
+        matrixExcs: List[MatrixExclude] = matrixExcs,
+        runsOnExtraLabels: List[String] = runsOnExtraLabels,
+        container: Option[JobContainer] = container,
+        environment: Option[JobEnvironment] = environment,
+        concurrency: Option[Concurrency] = concurrency,
+        timeoutMinutes: Option[Int] = timeoutMinutes,
+        outputs: Map[String, String] = outputs
+    ): Impl = Impl(
+      id,
+      name,
+      steps,
+      sbtStepPreamble,
+      cond,
+      permissions,
+      env,
+      oses,
+      scalas,
+      javas,
+      needs,
+      matrixFailFast,
+      matrixAdds,
+      matrixIncs,
+      matrixExcs,
+      runsOnExtraLabels,
+      container,
+      environment,
+      concurrency,
+      timeoutMinutes,
+      outputs
+    )
+
+    // Kept for binary compatibility. It can be removed in a future major release.
+    def copy(
+        id: String,
+        name: String,
+        steps: List[WorkflowStep],
+        sbtStepPreamble: List[String],
+        cond: Option[String],
+        permissions: Option[Permissions],
+        env: Map[String, String],
+        oses: List[String],
+        scalas: List[String],
+        javas: List[JavaSpec],
+        needs: List[String],
+        matrixFailFast: Option[Boolean],
+        matrixAdds: Map[String, List[String]],
+        matrixIncs: List[MatrixInclude],
+        matrixExcs: List[MatrixExclude],
+        runsOnExtraLabels: List[String],
+        container: Option[JobContainer],
+        environment: Option[JobEnvironment],
+        concurrency: Option[Concurrency],
+        timeoutMinutes: Option[Int]
+    ): Impl = Impl(
+      id,
+      name,
+      steps,
+      sbtStepPreamble,
+      cond,
+      permissions,
+      env,
+      oses,
+      scalas,
+      javas,
+      needs,
+      matrixFailFast,
+      matrixAdds,
+      matrixIncs,
+      matrixExcs,
+      runsOnExtraLabels,
+      container,
+      environment,
+      concurrency,
+      timeoutMinutes,
+      outputs
+    )
+
+    // Kept for binary compatibility. It can be removed in a future major release.
+    def this(
+        id: String,
+        name: String,
+        steps: List[WorkflowStep],
+        sbtStepPreamble: List[String],
+        cond: Option[String],
+        permissions: Option[Permissions],
+        env: Map[String, String],
+        oses: List[String],
+        scalas: List[String],
+        javas: List[JavaSpec],
+        needs: List[String],
+        matrixFailFast: Option[Boolean],
+        matrixAdds: Map[String, List[String]],
+        matrixIncs: List[MatrixInclude],
+        matrixExcs: List[MatrixExclude],
+        runsOnExtraLabels: List[String],
+        container: Option[JobContainer],
+        environment: Option[JobEnvironment],
+        concurrency: Option[Concurrency],
+        timeoutMinutes: Option[Int]
+    ) = this(
+      id,
+      name,
+      steps,
+      sbtStepPreamble,
+      cond,
+      permissions,
+      env,
+      oses,
+      scalas,
+      javas,
+      needs,
+      matrixFailFast,
+      matrixAdds,
+      matrixIncs,
+      matrixExcs,
+      runsOnExtraLabels,
+      container,
+      environment,
+      concurrency,
+      timeoutMinutes,
+      Map()
+    )
+  }
+
+  // Kept for binary compatibility. It can be removed in a future major release.
+  private object Impl
+      extends AbstractFunction20[
+        String,
+        String,
+        List[WorkflowStep],
+        List[String],
+        Option[String],
+        Option[Permissions],
+        Map[String, String],
+        List[String],
+        List[String],
+        List[JavaSpec],
+        List[String],
+        Option[Boolean],
+        Map[String, List[String]],
+        List[MatrixInclude],
+        List[MatrixExclude],
+        List[String],
+        Option[JobContainer],
+        Option[JobEnvironment],
+        Option[Concurrency],
+        Option[Int],
+        Impl
+      ] {
+    def apply(
+        id: String,
+        name: String,
+        steps: List[WorkflowStep],
+        sbtStepPreamble: List[String],
+        cond: Option[String],
+        permissions: Option[Permissions],
+        env: Map[String, String],
+        oses: List[String],
+        scalas: List[String],
+        javas: List[JavaSpec],
+        needs: List[String],
+        matrixFailFast: Option[Boolean],
+        matrixAdds: Map[String, List[String]],
+        matrixIncs: List[MatrixInclude],
+        matrixExcs: List[MatrixExclude],
+        runsOnExtraLabels: List[String],
+        container: Option[JobContainer],
+        environment: Option[JobEnvironment],
+        concurrency: Option[Concurrency],
+        timeoutMinutes: Option[Int]
+    ): Impl = apply(
+      id,
+      name,
+      steps,
+      sbtStepPreamble,
+      cond,
+      permissions,
+      env,
+      oses,
+      scalas,
+      javas,
+      needs,
+      matrixFailFast,
+      matrixAdds,
+      matrixIncs,
+      matrixExcs,
+      runsOnExtraLabels,
+      container,
+      environment,
+      concurrency,
+      timeoutMinutes,
+      Map()
+    )
   }
 }
