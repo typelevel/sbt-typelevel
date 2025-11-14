@@ -210,6 +210,21 @@ object GenerativePlugin extends AutoPlugin {
 ${indent(rendered.mkString("\n"), 1)}"""
     }
 
+  def compileOutputs(outputs: Map[String, String]): String =
+    if (outputs.isEmpty) {
+      ""
+    } else {
+      val rendered = outputs map {
+        case (key, value) =>
+          if (!isSafeString(key) || key.indexOf(' ') >= 0 || key.indexOf('\n') >= 0)
+            sys.error(s"'$key' is not a valid output name")
+
+          s"""$key: $${{ $value }}"""
+      }
+      s"""outputs:
+${indent(rendered.mkString("\n"), 1)}"""
+    }
+
   def compilePermissionScope(permissionScope: PermissionScope): String = permissionScope match {
     case PermissionScope.Actions => "actions"
     case PermissionScope.Checks => "checks"
@@ -454,6 +469,13 @@ ${indent(rendered.mkString("\n"), 1)}"""
       else
         "\n" + renderedPermPre
 
+    val renderedOutputsPre = compileOutputs(job.outputs)
+    val renderedOutputs =
+      if (renderedOutputsPre.isEmpty)
+        ""
+      else
+        "\n" + renderedOutputsPre
+
     val renderedTimeoutMinutes =
       job.timeoutMinutes.map(timeout => s"\ntimeout-minutes: $timeout").getOrElse("")
 
@@ -541,7 +563,7 @@ ${indent(rendered.mkString("\n"), 1)}"""
 strategy:${renderedFailFast}
   matrix:
 ${buildMatrix(2, "os" -> job.oses, "scala" -> job.scalas, "java" -> job.javas.map(_.render))}${renderedMatrices}
-runs-on: ${runsOn}${renderedEnvironment}${renderedContainer}${renderedPerm}${renderedEnv}${renderedConcurrency}${renderedTimeoutMinutes}
+runs-on: ${runsOn}${renderedEnvironment}${renderedContainer}${renderedPerm}${renderedEnv}${renderedConcurrency}${renderedOutputs}${renderedTimeoutMinutes}
 steps:
 ${indent(job.steps.map(compileStep(_, sbt, job.sbtStepPreamble, declareShell = declareShell)).mkString("\n\n"), 1)}"""
     // format: on
