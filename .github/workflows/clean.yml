@@ -7,12 +7,16 @@
 
 name: Clean
 
-on: push
+on:  
+  push:
 
 jobs:
   delete-artifacts:
     name: Delete Artifacts
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-22.04]
+    runs-on: ${{ matrix.os }}
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
