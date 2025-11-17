@@ -130,7 +130,9 @@ lazy val githubActions = project
   .settings(
     name := "sbt-typelevel-github-actions",
     mimaBinaryIssueFilters ++= Seq(
+      ProblemFilters.exclude[DirectMissingMethodProblem]("org.typelevel.sbt.gha.*#Impl.*"),
       ProblemFilters.exclude[DirectMissingMethodProblem]("org.typelevel.sbt.gha.*#*#Impl.*"),
+      ProblemFilters.exclude[MissingTypesProblem]("org.typelevel.sbt.gha.*$Impl$"),
       ProblemFilters.exclude[MissingTypesProblem]("org.typelevel.sbt.gha.*$*$Impl$")
     )
   )
