@@ -7,7 +7,7 @@
 
 name: Continuous Integration
 
-on:
+on:  
   pull_request:
     branches: ['**', '!update/**', '!pr/**']
   push:
@@ -30,7 +30,6 @@ permissions:
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
 
 concurrency:
   group: ${{ github.workflow }} @ ${{ github.ref }}
