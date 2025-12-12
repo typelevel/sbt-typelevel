@@ -656,3 +656,26 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: mdocs/target/docs/site
           keep_files: true
+
+  greeter:
+    name: Generate some output
+    strategy:
+      matrix:
+        os: [ubuntu-22.04]
+    runs-on: ${{ matrix.os }}
+    outputs:
+      greeting: ${{ steps.greet.outputs.msg }}
+    steps:
+      - id: greet
+        run: echo "msg=Hello" >> "$GITHUB_OUTPUT"
+
+  consume-output:
+    name: Consume output from greeter job
+    needs: [greeter]
+    if: ${{ needs.greeter.outputs.greeting != 'Hello' }}
+    strategy:
+      matrix:
+        os: [ubuntu-22.04]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - run: exit 1
