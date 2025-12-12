@@ -4,7 +4,7 @@ import org.typelevel.sbt.gha.{PermissionScope, PermissionValue, Permissions}
 import com.typesafe.tools.mima.core._
 
 ThisBuild / tlBaseVersion := "0.8"
-ThisBuild / crossScalaVersions := Seq("2.12.20")
+ThisBuild / crossScalaVersions := Seq("2.12.21")
 ThisBuild / developers ++= List(
   tlGitHubDev("armanbilge", "Arman Bilge"),
   tlGitHubDev("rossabaker", "Ross A. Baker"),
