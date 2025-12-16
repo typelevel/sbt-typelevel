@@ -218,7 +218,7 @@ object TypelevelSitePlugin extends AutoPlugin {
           WorkflowStep.SetupJava(List(tlSiteJavaVersion.value))
         else Nil
 
-      WorkflowJob(
+      WorkflowJob.Run(
         "site",
         "Generate Site",
         scalas = List.empty,
