@@ -1,6 +1,7 @@
 import com.typesafe.tools.mima.core._
 mimaBinaryIssueFilters ++= Seq(
   "org.typelevel.sbt.gha.WorkflowJob.*",
+  "org.typelevel.sbt.gha.WorkflowJob#Impl.*",
   "org.typelevel.sbt.gha.WorkflowStep.**",
   "org.typelevel.sbt.gha.WorkflowStep#Sbt.*",
   "org.typelevel.sbt.gha.WorkflowStep#Run.*",

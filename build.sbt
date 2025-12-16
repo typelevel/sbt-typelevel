@@ -53,6 +53,35 @@ ThisBuild / githubWorkflowBuild ++= Seq(
   )
 )
 
+ThisBuild / githubWorkflowAddedJobs ++= Seq(
+  WorkflowJob(
+    "greeter",
+    "Generate some output",
+    scalas = Nil,
+    javas = Nil,
+    steps = List(
+      WorkflowStep.Run(
+        List("""echo "msg=Hello" >> "$GITHUB_OUTPUT""""),
+        id = Some("greet")
+      )
+    ),
+    outputs = Map("greeting" -> "steps.greet.outputs.msg")
+  ),
+  WorkflowJob(
+    "consume-output",
+    "Consume output from greeter job",
+    scalas = Nil,
+    javas = Nil,
+    needs = List("greeter"),
+    cond = Some("${{ needs.greeter.outputs.greeting != 'Hello' }}"),
+    steps = List(
+      WorkflowStep.Run(
+        List("exit 1")
+      )
+    )
+  )
+)
+
 ThisBuild / mergifyStewardConfig ~= {
   _.map(_.withMergeMinors(true).withAuthor("typelevel-steward[bot]"))
 }
@@ -130,7 +159,9 @@ lazy val githubActions = project
   .settings(
     name := "sbt-typelevel-github-actions",
     mimaBinaryIssueFilters ++= Seq(
+      ProblemFilters.exclude[DirectMissingMethodProblem]("org.typelevel.sbt.gha.*#Impl.*"),
       ProblemFilters.exclude[DirectMissingMethodProblem]("org.typelevel.sbt.gha.*#*#Impl.*"),
+      ProblemFilters.exclude[MissingTypesProblem]("org.typelevel.sbt.gha.*$Impl$"),
       ProblemFilters.exclude[MissingTypesProblem]("org.typelevel.sbt.gha.*$*$Impl$")
     )
   )
