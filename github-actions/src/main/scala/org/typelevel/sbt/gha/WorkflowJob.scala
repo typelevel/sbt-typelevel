@@ -114,7 +114,7 @@ object WorkflowJob {
       outputs
     )
 
-  // Kept for binary compatibility. It can be removed in a future major release.
+  @deprecated("Kept for binary-compatibility", "0.8.4")
   def apply(
       id: String,
       name: String,
