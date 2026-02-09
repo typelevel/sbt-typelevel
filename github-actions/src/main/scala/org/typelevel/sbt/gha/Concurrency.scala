@@ -42,7 +42,7 @@ object Concurrency {
       implicit dummy: DummyImplicit): Concurrency =
     Impl(group, cancelInProgress)
 
-  private final case class Impl(group: String, cancelInProgress: Option[String])
+  private final case class Impl(group: String, cancelInProgressExpr: Option[String])
       extends Concurrency {
     override def productPrefix = "Concurrency"
   }
