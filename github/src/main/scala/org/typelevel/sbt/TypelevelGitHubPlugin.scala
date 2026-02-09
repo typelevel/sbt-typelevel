@@ -86,7 +86,7 @@ object TypelevelGitHubPlugin extends AutoPlugin {
               case (user, repo) =>
                 Seq(s"-source-links:github://${user}/${repo}", "-revision", vh)
             }
-          case (V(V(2, minor, patch, _))) =>
+          case V(V(2, minor, patch, _)) =>
             infoOpt.toSeq flatMap { info =>
               val path =
                 // see https://github.com/scala/bug/issues/12867#issuecomment-1718481858
