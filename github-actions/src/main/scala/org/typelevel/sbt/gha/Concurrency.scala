@@ -18,7 +18,14 @@ package org.typelevel.sbt.gha
 
 sealed abstract class Concurrency {
   def group: String
-  def cancelInProgress: Option[String]
+  def cancelInProgressExpr: Option[String]
+
+  @deprecated("Use cancelInProgressExpr", "0.8.5")
+  final def cancelInProgress: Option[Boolean] = cancelInProgressExpr match {
+    case Some("false") => Some(false)
+    case Some("true") => Some(true)
+    case _ => None
+  }
 }
 
 object Concurrency {
