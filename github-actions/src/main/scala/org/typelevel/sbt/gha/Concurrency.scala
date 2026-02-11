@@ -18,15 +18,31 @@ package org.typelevel.sbt.gha
 
 sealed abstract class Concurrency {
   def group: String
-  def cancelInProgress: Option[Boolean]
+  def cancelInProgressExpr: Option[String]
+
+  @deprecated("Use cancelInProgressExpr", "0.8.5")
+  final def cancelInProgress: Option[Boolean] = cancelInProgressExpr match {
+    case Some("false") => Some(false)
+    case Some("true") => Some(true)
+    case _ => None
+  }
 }
 
 object Concurrency {
+  def apply(group: String): Concurrency =
+    Impl(group, None)
 
-  def apply(group: String, cancelInProgress: Option[Boolean] = None): Concurrency =
+  def apply(group: String, cancelInProgress: Boolean): Concurrency =
+    apply(group, Some(cancelInProgress))
+
+  def apply(group: String, cancelInProgress: Option[Boolean]): Concurrency =
+    Impl(group, cancelInProgress.map(_.toString))
+
+  def apply(group: String, cancelInProgress: Option[String])(
+      implicit dummy: DummyImplicit): Concurrency =
     Impl(group, cancelInProgress)
 
-  private final case class Impl(group: String, cancelInProgress: Option[Boolean])
+  private final case class Impl(group: String, cancelInProgressExpr: Option[String])
       extends Concurrency {
     override def productPrefix = "Concurrency"
   }

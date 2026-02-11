@@ -173,7 +173,7 @@ object GenerativePlugin extends AutoPlugin {
   }
 
   def compileConcurrency(concurrency: Concurrency): String =
-    concurrency.cancelInProgress match {
+    concurrency.cancelInProgressExpr match {
       case Some(value) =>
         val fields = s"""group: ${wrap(concurrency.group)}
                         |cancel-in-progress: ${wrap(value.toString)}""".stripMargin
