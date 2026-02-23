@@ -54,9 +54,13 @@ object GenericSiteSettings {
       def build[F[_]](implicit F: Async[F]): Resource[F, Theme[F]] =
         ThemeBuilder[F]("sbt-typelevel-site Helium Extensions")
           .addInputs(
-            tlSiteApiUrl.value.fold(InputTree[F]) { url =>
-              InputTree[F].addString(htmlForwarder(url), Path.Root / "api" / "index.html")
-            }
+            tlSiteApiUrl.value
+              .fold(InputTree[F]) { url =>
+                InputTree[F].addString(htmlForwarder(url), Path.Root / "api" / "index.html")
+              }
+              .merge(
+                InputTree[F].addString(default404Html, Path.Root / "404.html")
+              )
           )
           .addExtensions(
             GitHubFlavor,
@@ -84,6 +88,31 @@ object GenericSiteSettings {
         navLinks = apiLink.value.toList ++ githubLink.value.toList
       )
   }
+
+private val default404Html: String =
+  """|<!DOCTYPE html>
+     |<html lang="en">
+     |<head>
+     |  <meta charset="utf-8">
+     |  <meta name="viewport" content="width=device-width, initial-scale=1">
+     |  <title>Page not found</title>
+     |  <link rel="stylesheet" href="site/styles.css">
+     |</head>
+     |<body>
+     |  <main class="content">
+     |    <div class="container">
+     |      <h1>Page not found</h1>
+     |      <p>
+     |        The page you were looking for does not exist.
+     |      </p>
+     |      <p>
+     |        <a href="/">Return to the home page</a>
+     |      </p>
+     |    </div>
+     |  </main>
+     |</body>
+     |</html>
+     |""".stripMargin
 
   private def htmlForwarder(to: URL) =
     s"""|<!DOCTYPE html>
