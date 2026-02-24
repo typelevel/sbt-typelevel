@@ -33,10 +33,10 @@ import org.typelevel.sbt.TypelevelGitHubPlugin.gitHubUserRepo
 import org.typelevel.sbt.TypelevelKernelPlugin.autoImport.tlIsScala3
 import org.typelevel.sbt.TypelevelSitePlugin.autoImport.tlSiteApiUrl
 import sbt.Def._
+import sbt.Keys.baseDirectory
 import sbt.Keys.developers
 import sbt.Keys.scmInfo
 import sbt.Keys.version
-import sbt.Keys.baseDirectory
 import sbt._
 
 import java.net.URL
