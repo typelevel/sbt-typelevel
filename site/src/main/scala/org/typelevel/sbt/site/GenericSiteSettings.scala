@@ -36,6 +36,8 @@ import sbt.Def._
 import sbt.Keys.developers
 import sbt.Keys.scmInfo
 import sbt.Keys.version
+import sbt.Keys.baseDirectory
+import sbt._
 
 import java.net.URL
 
@@ -50,6 +52,11 @@ object GenericSiteSettings {
   }
 
   val themeExtensions: Initialize[ThemeProvider] = setting {
+
+    val rootDir = (ThisBuild / baseDirectory).value
+    val docsDir = rootDir / "docs"
+    val userProvided404 = (docsDir / "404.md").exists() || (docsDir / "404.html").exists()
+
     new ThemeProvider {
       def build[F[_]](implicit F: Async[F]): Resource[F, Theme[F]] =
         ThemeBuilder[F]("sbt-typelevel-site Helium Extensions")
@@ -59,7 +66,10 @@ object GenericSiteSettings {
                 InputTree[F].addString(htmlForwarder(url), Path.Root / "api" / "index.html")
               }
               .merge(
-                InputTree[F].addString(default404Html, Path.Root / "404.html")
+                if (userProvided404)
+                  InputTree[F]
+                else
+                  InputTree[F].addString(default404Html, Path.Root / "404.html")
               )
           )
           .addExtensions(
