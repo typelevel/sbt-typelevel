@@ -96,19 +96,19 @@ private val default404Html: String =
      |  <meta charset="utf-8">
      |  <meta name="viewport" content="width=device-width, initial-scale=1">
      |  <title>Page not found</title>
-     |  <link rel="stylesheet" href="site/styles.css">
+     |  <link rel="stylesheet" href="helium/site/laika-helium.css">
+     |  <script src="helium/site/laika-helium.js"></script>
      |</head>
      |<body>
      |  <main class="content">
-     |    <div class="container">
-     |      <h1>Page not found</h1>
-     |      <p>
-     |        The page you were looking for does not exist.
-     |      </p>
-     |      <p>
-     |        <a href="/">Return to the home page</a>
-     |      </p>
-     |    </div>
+     |    <h1 style="text-align:center; font-size:9rem; color:#d2d6dc; margin-top:10rem;">404</h1>
+     |    <h2 style="text-align:center; margin-top:4rem;">Page Not Found</h2>
+     |    <p style="text-align:center; margin-top:1.5rem;">
+     |      Sorry, the page you were looking for does not exist
+     |    </p>
+     |    <p style="text-align:center; margin-top:1.5rem;">
+     |      <a href="index.html">Click here to go back to the home page</a>
+     |    </p>
      |  </main>
      |</body>
      |</html>
