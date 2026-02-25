@@ -17,10 +17,10 @@
 package org.typelevel.sbt
 
 import com.typesafe.tools.mima.plugin.MimaPlugin
-import sbttastymima.TastyMiMaPlugin
 import org.typelevel.sbt.kernel.GitHelper
 import org.typelevel.sbt.kernel.V
 import sbt._
+import sbttastymima.TastyMiMaPlugin
 
 import Keys._
 import MimaPlugin.autoImport._
