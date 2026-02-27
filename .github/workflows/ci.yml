@@ -86,7 +86,7 @@ jobs:
         run: git config --global core.autocrlf false
 
       - name: Checkout current branch (full)
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
@@ -223,6 +223,10 @@ jobs:
         working-directory: project
         run: pwd
 
+      - shell: bash
+        continue-on-error: true
+        run: exit 1
+
       - name: Make target directories
         if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main')
         shell: bash
@@ -235,7 +239,7 @@ jobs:
 
       - name: Upload target directories
         if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main')
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: target-${{ matrix.os }}-${{ matrix.java }}-${{ matrix.scala }}-${{ matrix.project }}
           path: targets.tar
@@ -256,7 +260,7 @@ jobs:
         run: git config --global core.autocrlf false
 
       - name: Checkout current branch (full)
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
@@ -355,7 +359,7 @@ jobs:
         run: sbt +update
 
       - name: Download target directories (2.12, sbt-typelevelJVM)
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v6
         with:
           name: target-${{ matrix.os }}-${{ matrix.java }}-2.12-sbt-typelevelJVM
 
@@ -402,7 +406,7 @@ jobs:
         run: git config --global core.autocrlf false
 
       - name: Checkout current branch (full)
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
@@ -515,7 +519,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout current branch (fast)
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Setup Java (temurin@11)
         id: setup-java-temurin-11
@@ -544,7 +548,7 @@ jobs:
         run: git config --global core.autocrlf false
 
       - name: Checkout current branch (full)
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
@@ -652,3 +656,26 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: mdocs/target/docs/site
           keep_files: true
+
+  greeter:
+    name: Generate some output
+    strategy:
+      matrix:
+        os: [ubuntu-22.04]
+    runs-on: ${{ matrix.os }}
+    outputs:
+      greeting: ${{ steps.greet.outputs.msg }}
+    steps:
+      - id: greet
+        run: echo "msg=Hello" >> "$GITHUB_OUTPUT"
+
+  consume-output:
+    name: Consume output from greeter job
+    needs: [greeter]
+    if: ${{ needs.greeter.outputs.greeting != 'Hello' }}
+    strategy:
+      matrix:
+        os: [ubuntu-22.04]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - run: exit 1

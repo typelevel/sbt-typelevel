@@ -61,7 +61,7 @@ object TypelevelSettingsPlugin extends AutoPlugin {
           Seq(
             compilerPlugin("com.olegpy" %% "better-monadic-for" % "0.3.1"),
             compilerPlugin(
-              "org.typelevel" % "kind-projector" % "0.13.3" cross CrossVersion.full)
+              "org.typelevel" % "kind-projector" % "0.13.4" cross CrossVersion.full)
           )
 
       val scalacCompat =
@@ -205,6 +205,15 @@ object TypelevelSettingsPlugin extends AutoPlugin {
           Seq("-language:_", "-Xsource:3")
 
         case _ => Seq("-language:_")
+      }
+    },
+    scalacOptions ++= {
+      scalaVersion.value match {
+        case V(V(2, 13, Some(patch), _)) if patch >= 17 =>
+          // https://github.com/scala/bug/issues/13128#issuecomment-3375870295
+          Seq("-Wconf:cat=lint-infer-any&msg=kind-polymorphic:s")
+        case _ =>
+          Seq.empty
       }
     },
     Test / scalacOptions ++= {

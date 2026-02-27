@@ -37,6 +37,7 @@ sealed abstract class WorkflowJob {
   def environment: Option[JobEnvironment]
   def concurrency: Option[Concurrency]
   def timeoutMinutes: Option[Int]
+  def outputs: Map[String, String]
 
   def withId(id: String): WorkflowJob
   def withName(name: String): WorkflowJob
@@ -58,6 +59,7 @@ sealed abstract class WorkflowJob {
   def withEnvironment(environment: Option[JobEnvironment]): WorkflowJob
   def withConcurrency(concurrency: Option[Concurrency]): WorkflowJob
   def withTimeoutMinutes(timeoutMinutes: Option[Int]): WorkflowJob
+  def withOutputs(outputs: Map[String, String]): WorkflowJob
 
   def updatedEnv(name: String, value: String): WorkflowJob
   def concatEnv(envs: TraversableOnce[(String, String)]): WorkflowJob
@@ -86,7 +88,8 @@ object WorkflowJob {
       container: Option[JobContainer] = None,
       environment: Option[JobEnvironment] = None,
       concurrency: Option[Concurrency] = None,
-      timeoutMinutes: Option[Int] = None): WorkflowJob =
+      timeoutMinutes: Option[Int] = None,
+      outputs: Map[String, String] = Map()): WorkflowJob =
     Impl(
       id,
       name,
@@ -107,7 +110,54 @@ object WorkflowJob {
       container,
       environment,
       concurrency,
-      timeoutMinutes
+      timeoutMinutes,
+      outputs
+    )
+
+  @deprecated("Kept for binary-compatibility", "0.8.4")
+  def apply(
+      id: String,
+      name: String,
+      steps: List[WorkflowStep],
+      sbtStepPreamble: List[String],
+      cond: Option[String],
+      permissions: Option[Permissions],
+      env: Map[String, String],
+      oses: List[String],
+      scalas: List[String],
+      javas: List[JavaSpec],
+      needs: List[String],
+      matrixFailFast: Option[Boolean],
+      matrixAdds: Map[String, List[String]],
+      matrixIncs: List[MatrixInclude],
+      matrixExcs: List[MatrixExclude],
+      runsOnExtraLabels: List[String],
+      container: Option[JobContainer],
+      environment: Option[JobEnvironment],
+      concurrency: Option[Concurrency],
+      timeoutMinutes: Option[Int]): WorkflowJob =
+    apply(
+      id,
+      name,
+      steps,
+      sbtStepPreamble,
+      cond,
+      permissions,
+      env,
+      oses,
+      scalas,
+      javas,
+      needs,
+      matrixFailFast,
+      matrixAdds,
+      matrixIncs,
+      matrixExcs,
+      runsOnExtraLabels,
+      container,
+      environment,
+      concurrency,
+      timeoutMinutes,
+      Map()
     )
 
   private final case class Impl(
@@ -130,7 +180,8 @@ object WorkflowJob {
       container: Option[JobContainer],
       environment: Option[JobEnvironment],
       concurrency: Option[Concurrency],
-      timeoutMinutes: Option[Int])
+      timeoutMinutes: Option[Int],
+      outputs: Map[String, String])
       extends WorkflowJob {
 
     // scalafmt: { maxColumn = 200 }
@@ -154,6 +205,7 @@ object WorkflowJob {
     override def withEnvironment(environment: Option[JobEnvironment]): WorkflowJob = copy(environment = environment)
     override def withConcurrency(concurrency: Option[Concurrency]): WorkflowJob = copy(concurrency = concurrency)
     override def withTimeoutMinutes(timeoutMinutes: Option[Int]): WorkflowJob = copy(timeoutMinutes = timeoutMinutes)
+    override def withOutputs(outputs: Map[String, String]): WorkflowJob = copy(outputs = outputs)
 
     def updatedEnv(name: String, value: String): WorkflowJob = copy(env = env.updated(name, value))
     def concatEnv(envs: TraversableOnce[(String, String)]): WorkflowJob = copy(env = this.env ++ envs)

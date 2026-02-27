@@ -173,7 +173,7 @@ object GenerativePlugin extends AutoPlugin {
   }
 
   def compileConcurrency(concurrency: Concurrency): String =
-    concurrency.cancelInProgress match {
+    concurrency.cancelInProgressExpr match {
       case Some(value) =>
         val fields = s"""group: ${wrap(concurrency.group)}
                         |cancel-in-progress: ${wrap(value.toString)}""".stripMargin
@@ -207,6 +207,21 @@ object GenerativePlugin extends AutoPlugin {
           s"""$key: ${wrap(value)}"""
       }
       s"""$prefix:
+${indent(rendered.mkString("\n"), 1)}"""
+    }
+
+  def compileOutputs(outputs: Map[String, String]): String =
+    if (outputs.isEmpty) {
+      ""
+    } else {
+      val rendered = outputs map {
+        case (key, value) =>
+          if (!isSafeString(key) || key.indexOf(' ') >= 0 || key.indexOf('\n') >= 0)
+            sys.error(s"'$key' is not a valid output name")
+
+          s"""$key: $${{ $value }}"""
+      }
+      s"""outputs:
 ${indent(rendered.mkString("\n"), 1)}"""
     }
 
@@ -264,6 +279,7 @@ ${indent(rendered.mkString("\n"), 1)}"""
     val renderedId = step.id.map(wrap).map("id: " + _ + "\n").getOrElse("")
     val renderedCond = step.cond.map(wrap).map("if: " + _ + "\n").getOrElse("")
     val renderedShell = if (declareShell) "shell: bash\n" else ""
+    val renderedContinueOnError = if (step.continueOnError) "continue-on-error: true\n" else ""
 
     val renderedEnvPre = compileEnv(step.env)
     val renderedEnv =
@@ -288,7 +304,12 @@ ${indent(rendered.mkString("\n"), 1)}"""
       case run: Run =>
         val renderedWorkingDirectory =
           run.workingDirectory.map(wrap).map("working-directory: " + _ + "\n").getOrElse("")
-        renderRunBody(run.commands, run.params, renderedShell, renderedWorkingDirectory)
+        renderRunBody(
+          run.commands,
+          run.params,
+          renderedShell,
+          renderedWorkingDirectory,
+          renderedContinueOnError)
 
       case sbtStep: Sbt =>
         import sbtStep.commands
@@ -312,7 +333,8 @@ ${indent(rendered.mkString("\n"), 1)}"""
           commands = List(s"$sbt $safeCommands"),
           params = sbtStep.params,
           renderedShell = renderedShell,
-          renderedWorkingDirectory = ""
+          renderedWorkingDirectory = "",
+          renderedContinueOnError = renderedContinueOnError
         )
 
       case use: Use =>
@@ -338,18 +360,27 @@ ${indent(rendered.mkString("\n"), 1)}"""
             s"uses: docker://$image:$tag"
         }
 
-        decl + renderParams(params)
+        decl + renderedContinueOnError + renderParams(params)
     }
 
     indent(preamble + body, 1).updated(0, '-')
   }
 
+  @deprecated("Use the overload with renderedContinueOnError", since = "0.8.1")
   def renderRunBody(
       commands: List[String],
       params: Map[String, String],
       renderedShell: String,
-      renderedWorkingDirectory: String) =
-    renderedShell + renderedWorkingDirectory + "run: " + wrap(
+      renderedWorkingDirectory: String): String =
+    renderRunBody(commands, params, renderedShell, renderedWorkingDirectory, "")
+
+  def renderRunBody(
+      commands: List[String],
+      params: Map[String, String],
+      renderedShell: String,
+      renderedWorkingDirectory: String,
+      renderedContinueOnError: String): String =
+    renderedShell + renderedWorkingDirectory + renderedContinueOnError + "run: " + wrap(
       commands.mkString("\n")) + renderParams(params)
 
   def renderParams(params: Map[String, String]): String = {
@@ -438,6 +469,13 @@ ${indent(rendered.mkString("\n"), 1)}"""
       else
         "\n" + renderedPermPre
 
+    val renderedOutputsPre = compileOutputs(job.outputs)
+    val renderedOutputs =
+      if (renderedOutputsPre.isEmpty)
+        ""
+      else
+        "\n" + renderedOutputsPre
+
     val renderedTimeoutMinutes =
       job.timeoutMinutes.map(timeout => s"\ntimeout-minutes: $timeout").getOrElse("")
 
@@ -525,7 +563,7 @@ ${indent(rendered.mkString("\n"), 1)}"""
 strategy:${renderedFailFast}
   matrix:
 ${buildMatrix(2, "os" -> job.oses, "scala" -> job.scalas, "java" -> job.javas.map(_.render))}${renderedMatrices}
-runs-on: ${runsOn}${renderedEnvironment}${renderedContainer}${renderedPerm}${renderedEnv}${renderedConcurrency}${renderedTimeoutMinutes}
+runs-on: ${runsOn}${renderedEnvironment}${renderedContainer}${renderedPerm}${renderedEnv}${renderedConcurrency}${renderedOutputs}${renderedTimeoutMinutes}
 steps:
 ${indent(job.steps.map(compileStep(_, sbt, job.sbtStepPreamble, declareShell = declareShell)).mkString("\n\n"), 1)}"""
     // format: on
@@ -717,7 +755,7 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
         val artifactId = MatrixKeys.groupId(keys)
 
         val upload = WorkflowStep.Use(
-          UseRef.Public("actions", "upload-artifact", "v4"),
+          UseRef.Public("actions", "upload-artifact", "v5"),
           name = Some(s"Upload target directories"),
           params = Map("name" -> s"target-$artifactId", "path" -> "targets.tar"),
           cond = Some(publicationCond.value)
@@ -763,7 +801,7 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
           val pretty = v.mkString(", ")
 
           val download = WorkflowStep.Use(
-            UseRef.Public("actions", "download-artifact", "v4"),
+            UseRef.Public("actions", "download-artifact", "v6"),
             name = Some(s"Download target directories ($pretty)"),
             params =
               Map("name" -> s"target-$${{ matrix.os }}-$${{ matrix.java }}-${v.mkString("-")}")

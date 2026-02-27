@@ -1,9 +1,10 @@
 name := "sbt-typelevel"
 
 import org.typelevel.sbt.gha.{PermissionScope, PermissionValue, Permissions}
+import com.typesafe.tools.mima.core._
 
 ThisBuild / tlBaseVersion := "0.9"
-ThisBuild / crossScalaVersions := Seq("2.12.20")
+ThisBuild / crossScalaVersions := Seq("2.12.21")
 ThisBuild / developers ++= List(
   tlGitHubDev("armanbilge", "Arman Bilge"),
   tlGitHubDev("rossabaker", "Ross A. Baker"),
@@ -41,9 +42,44 @@ ThisBuild / githubWorkflowBuildMatrixExclusions ++= {
 ThisBuild / githubWorkflowPublishTimeoutMinutes := Some(45)
 ThisBuild / githubWorkflowPublishNeeds += "validate-steward"
 
-ThisBuild / githubWorkflowBuild += WorkflowStep.Run(
-  List("pwd"),
-  workingDirectory = Some("project")
+ThisBuild / githubWorkflowBuild ++= Seq(
+  WorkflowStep.Run(
+    List("pwd"),
+    workingDirectory = Some("project")
+  ),
+  WorkflowStep.Run(
+    List("exit 1"),
+    continueOnError = true
+  )
+)
+
+ThisBuild / githubWorkflowAddedJobs ++= Seq(
+  WorkflowJob(
+    "greeter",
+    "Generate some output",
+    scalas = Nil,
+    javas = Nil,
+    steps = List(
+      WorkflowStep.Run(
+        List("""echo "msg=Hello" >> "$GITHUB_OUTPUT""""),
+        id = Some("greet")
+      )
+    ),
+    outputs = Map("greeting" -> "steps.greet.outputs.msg")
+  ),
+  WorkflowJob(
+    "consume-output",
+    "Consume output from greeter job",
+    scalas = Nil,
+    javas = Nil,
+    needs = List("greeter"),
+    cond = Some("${{ needs.greeter.outputs.greeting != 'Hello' }}"),
+    steps = List(
+      WorkflowStep.Run(
+        List("exit 1")
+      )
+    )
+  )
 )
 
 ThisBuild / mergifyStewardConfig ~= {
@@ -63,7 +99,7 @@ ThisBuild / mergifyRequiredJobs ++= Seq("validate-steward", "site")
 
 ThisBuild / githubWorkflowPermissions := Some(Permissions.Specify.defaultPermissive)
 
-val MunitVersion = "1.1.2"
+val MunitVersion = "1.2.3"
 
 lazy val `sbt-typelevel` = tlCrossRootProject.aggregate(
   kernel,
@@ -121,7 +157,13 @@ lazy val githubActions = project
   .in(file("github-actions"))
   .enablePlugins(SbtPlugin)
   .settings(
-    name := "sbt-typelevel-github-actions"
+    name := "sbt-typelevel-github-actions",
+    mimaBinaryIssueFilters ++= Seq(
+      ProblemFilters.exclude[DirectMissingMethodProblem]("org.typelevel.sbt.gha.*#Impl.*"),
+      ProblemFilters.exclude[DirectMissingMethodProblem]("org.typelevel.sbt.gha.*#*#Impl.*"),
+      ProblemFilters.exclude[MissingTypesProblem]("org.typelevel.sbt.gha.*$Impl$"),
+      ProblemFilters.exclude[MissingTypesProblem]("org.typelevel.sbt.gha.*$*$Impl$")
+    )
   )
 
 lazy val mergify = project
@@ -277,7 +319,7 @@ lazy val docs = project
       val latestScalaJSVersion =
         getLatestVersion(s"org.scala-js:scalajs-library_2.13:").getOrElse(scalaJSVersion)
       val latestNativeVersion =
-        getLatestVersion(s"org.scala-native:nativelib_native0.4_3:").getOrElse(nativeVersion)
+        getLatestVersion(s"org.scala-native:nativelib_native0.5_3:").getOrElse(nativeVersion)
 
       Map(
         "START_YEAR" -> startYear,
