@@ -33,9 +33,11 @@ import org.typelevel.sbt.TypelevelGitHubPlugin.gitHubUserRepo
 import org.typelevel.sbt.TypelevelKernelPlugin.autoImport.tlIsScala3
 import org.typelevel.sbt.TypelevelSitePlugin.autoImport.tlSiteApiUrl
 import sbt.Def._
+import sbt.Keys.baseDirectory
 import sbt.Keys.developers
 import sbt.Keys.scmInfo
 import sbt.Keys.version
+import sbt._
 
 import java.net.URL
 
@@ -50,13 +52,26 @@ object GenericSiteSettings {
   }
 
   val themeExtensions: Initialize[ThemeProvider] = setting {
+
+    val rootDir = (ThisBuild / baseDirectory).value
+    val docsDir = rootDir / "docs"
+    val userProvided404 = (docsDir / "404.md").exists() || (docsDir / "404.html").exists()
+
     new ThemeProvider {
       def build[F[_]](implicit F: Async[F]): Resource[F, Theme[F]] =
         ThemeBuilder[F]("sbt-typelevel-site Helium Extensions")
           .addInputs(
-            tlSiteApiUrl.value.fold(InputTree[F]) { url =>
-              InputTree[F].addString(htmlForwarder(url), Path.Root / "api" / "index.html")
-            }
+            tlSiteApiUrl
+              .value
+              .fold(InputTree[F]) { url =>
+                InputTree[F].addString(htmlForwarder(url), Path.Root / "api" / "index.html")
+              }
+              .merge(
+                if (userProvided404)
+                  InputTree[F]
+                else
+                  InputTree[F].addString(default404Html, Path.Root / "404.html")
+              )
           )
           .addExtensions(
             GitHubFlavor,
@@ -84,6 +99,31 @@ object GenericSiteSettings {
         navLinks = apiLink.value.toList ++ githubLink.value.toList
       )
   }
+
+  private val default404Html: String =
+    """|<!DOCTYPE html>
+       |<html lang="en">
+       |<head>
+       |  <meta charset="utf-8">
+       |  <meta name="viewport" content="width=device-width, initial-scale=1">
+       |  <title>Page not found</title>
+       |  <link rel="stylesheet" href="helium/site/laika-helium.css">
+       |  <script src="helium/site/laika-helium.js"></script>
+       |</head>
+       |<body>
+       |  <main class="content">
+       |    <h1 style="text-align:center; font-size:9rem; color:#d2d6dc; margin-top:10rem;">404</h1>
+       |    <h2 style="text-align:center; margin-top:4rem;">Page Not Found</h2>
+       |    <p style="text-align:center; margin-top:1.5rem;">
+       |      Sorry, the page you were looking for does not exist
+       |    </p>
+       |    <p style="text-align:center; margin-top:1.5rem;">
+       |      <a href="index.html">Click here to go back to the home page</a>
+       |    </p>
+       |  </main>
+       |</body>
+       |</html>
+       |""".stripMargin
 
   private def htmlForwarder(to: URL) =
     s"""|<!DOCTYPE html>
