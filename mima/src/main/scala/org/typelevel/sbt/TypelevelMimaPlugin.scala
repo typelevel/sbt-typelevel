@@ -25,10 +25,11 @@ import sbttastymima.TastyMiMaPlugin
 import Keys._
 import MimaPlugin.autoImport._
 import TastyMiMaPlugin.autoImport._
+import TypelevelKernelPlugin.autoImport._
 
 object TypelevelMimaPlugin extends AutoPlugin {
 
-  override def requires = MimaPlugin && TastyMiMaPlugin
+  override def requires = TypelevelKernelPlugin && MimaPlugin && TastyMiMaPlugin
 
   override def trigger = allRequirements
 
@@ -38,7 +39,6 @@ object TypelevelMimaPlugin extends AutoPlugin {
         "A map scalaBinaryVersion -> version e.g. Map('2.13' -> '1.5.2', '3' -> '1.7.1') used to indicate that a particular crossScalaVersions value was introduced in a given version (default: empty).")
     lazy val tlMimaPreviousVersions = settingKey[Set[String]](
       "A set of previous versions to compare binary-compatibility against (default: auto-populated from git tags and the tlVersionIntroduced setting)")
-    lazy val tlTastyMima = settingKey[Boolean]("Enable TASTy-MiMa (default: false)")
   }
 
   import autoImport._
@@ -89,13 +89,12 @@ object TypelevelMimaPlugin extends AutoPlugin {
       else
         Set.empty
     },
-    tlTastyMima := false,
     tastyMiMaReportIssues := {
-      if (tlTastyMima.value && publishArtifact.value) tastyMiMaReportIssues.value
+      if (tlIsScala3.value && publishArtifact.value) tastyMiMaReportIssues.value
       else ()
     },
     tastyMiMaPreviousArtifacts := {
-      if (tlTastyMima.value && publishArtifact.value) {
+      if (tlIsScala3.value && publishArtifact.value) {
         tlMimaPreviousVersions
           .value
           .flatMap(v => V(v))

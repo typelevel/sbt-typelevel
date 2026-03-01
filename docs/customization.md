@@ -27,7 +27,6 @@ Instead of using the super-plugins, for finer-grained control you can always add
 
 - `tlVersionIntroduced` (setting): A map `scalaBinaryVersion -> version` e.g. `Map("2.13" -> "1.5.2", "3" -> "1.7.1")` used to indicate that a particular `crossScalaVersions` value was introduced in a given version (default: empty).
 - `tlMimaPreviousVersions` (setting): A set of previous versions to compare binary-compatibility against.
-- `tlTastyMima` (setting): Enable TASTy-MiMa (default: `false`).
 
 ### sbt-typelevel-sonatype
 `TypelevelSonatypePlugin`: Sets up publishing to Sonatype/Maven.
