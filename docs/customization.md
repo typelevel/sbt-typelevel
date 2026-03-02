@@ -134,4 +134,93 @@ Using this plugin the following 2 settings have new default values:
 
 sbt-typelevel plugins are in red and the super-plugins are boxed.
 
-<a href="plugins.svg"><img src="plugins.svg" style="width: 100%"/></a>
+```mermaid
+graph LR
+  cross[sbt-crossproject]
+  fix[sbt-scalafix]
+  fmt[sbt-scalafmt]
+  git[sbt-git]
+  gpg[sbt-gpg]
+  header[sbt-header]
+  laika[laika-sbt]
+  mdoc[sbt-mdoc]
+  mima[sbt-mima-plugin]
+  sncp[sbt-scala-native-crossproject]
+  sjs[sbt-scalajs]
+  sjscp[sbt-scalajs-crossproject]
+  unidoc[sbt-unidoc]
+
+  tlkernel[sbt-typelevel-kernel]:::tl
+  tlnopub[sbt-typelevel-no-publish]:::tl
+
+  tlsettings[sbt-typelevel-settings]:::tl
+  tlsettings --> tlkernel
+  tlsettings --> git
+  tlsettings --> cross
+
+  tlgithub[sbt-typelevel-github]:::tl
+  tlgithub --> tlkernel
+  tlgithub --> git
+  tlgithub --> sjs
+
+  tlversioning[sbt-typelevel-versioning]:::tl
+  tlversioning --> tlkernel
+  tlversioning --> git
+
+  tlmima[sbt-typelevel-mima]:::tl
+  tlmima --> tlkernel
+  tlmima --> mima
+
+  tlsonatype[sbt-typelevel-sonatype]:::tl
+  tlsonatype --> tlkernel
+  tlsonatype --> mima
+  tlsonatype --> unidoc
+
+  tlgha[sbt-typelevel-github-actions]:::tl
+
+  tlcisigning[sbt-typelevel-ci-signing]:::tl
+  tlcisigning --> tlgha
+  tlcisigning --> gpg
+
+  tlsonatypecirelease[sbt-typelevel-sonatype-ci-release]:::tl
+  tlsonatypecirelease --> tlsonatype
+  tlsonatypecirelease --> tlgha
+
+  tlci[sbt-typelevel-ci]:::tl
+  tlci --> tlkernel
+  tlci --> tlnopub
+  tlci --> tlgha
+
+  tlfix[sbt-typelevel-scalafix]:::tl
+  tlfix --> fix
+
+  tlmergify[sbt-typelevel-mergify]:::tl
+  tlmergify --> tlgha
+
+  tlsite[sbt-typelevel-site]:::tl
+  tlsite --> tlkernel
+  tlsite --> tlgithub
+  tlsite --> tlgha
+  tlsite --> tlnopub
+  tlsite --> mdoc
+  tlsite --> laika
+
+  tlcirelease[[sbt-typelevel-ci-release]]:::tl
+  tlcirelease --> tlci
+  tlcirelease --> tlgithub
+  tlcirelease --> tlversioning
+  tlcirelease --> tlmima
+  tlcirelease --> tlsonatypecirelease
+  tlcirelease --> tlcisigning
+  tlcirelease --> tlnopub
+
+  tl[[sbt-typelevel]]:::tl
+  tl --> tlsettings
+  tl --> tlcirelease
+  tl --> fmt
+  tl --> header
+  tl --> sjscp
+  tl --> sncp
+
+  classDef tl stroke:#FF4C61,color:#FF4C61
+```
