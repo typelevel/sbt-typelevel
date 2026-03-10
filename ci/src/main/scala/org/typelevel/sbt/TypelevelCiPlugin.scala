@@ -20,6 +20,8 @@ import org.typelevel.sbt.NoPublishGlobalPlugin.noPublishModulesIgnore
 import org.typelevel.sbt.gha.GenerativePlugin
 import org.typelevel.sbt.gha.GenerativePlugin.autoImport._
 import org.typelevel.sbt.gha.GitHubActionsPlugin
+import org.typelevel.sbt.gha.PermissionValue
+import org.typelevel.sbt.gha.Permissions
 import org.typelevel.sbt.gha.WorkflowStep
 import sbt._
 
@@ -156,6 +158,9 @@ object TypelevelCiPlugin extends AutoPlugin {
               scalas = Nil,
               sbtStepPreamble = Nil,
               javas = List(githubWorkflowJavaVersions.value.head),
+              permissions = Some(
+                Permissions.Specify.defaultRestrictive
+                  .withContents(PermissionValue.Write)),
               steps = githubWorkflowJobSetup.value.toList :+
                 WorkflowStep.DependencySubmission(
                   None,
