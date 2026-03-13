@@ -159,8 +159,7 @@ object TypelevelCiPlugin extends AutoPlugin {
               sbtStepPreamble = Nil,
               javas = List(githubWorkflowJavaVersions.value.head),
               permissions = Some(
-                Permissions.Specify.defaultRestrictive
-                  .withContents(PermissionValue.Write)),
+                Permissions.Specify.defaultRestrictive.withContents(PermissionValue.Write)),
               steps = githubWorkflowJobSetup.value.toList :+
                 WorkflowStep.DependencySubmission(
                   None,
