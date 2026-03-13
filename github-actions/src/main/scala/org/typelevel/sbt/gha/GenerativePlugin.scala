@@ -656,7 +656,7 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
     githubWorkflowIncludeClean := true,
     // This is currently set to false because of https://github.com/sbt/sbt/issues/6468. When a new SBT version is
     // released that fixes this issue then check for that SBT version (or higher) and set to true.
-    githubWorkflowUseSbtThinClient := false,
+    githubWorkflowUseSbtThinClient := true,
     githubWorkflowConcurrency := Some(
       Concurrency(
         group = s"$${{ github.workflow }} @ $${{ github.ref }}",
@@ -670,7 +670,7 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
     githubWorkflowBuildTimeoutMinutes := Some(60),
     githubWorkflowBuildPreamble := Seq(),
     githubWorkflowBuildPostamble := Seq(),
-    githubWorkflowBuildSbtStepPreamble := Seq(s"++ $${{ matrix.scala }}"),
+    githubWorkflowBuildSbtStepPreamble := Nil,
     githubWorkflowBuild := Seq(WorkflowStep.Sbt(List("test"), name = Some("Build project"))),
     githubWorkflowPublishPreamble := Seq(),
     githubWorkflowPublishPostamble := Seq(),
