@@ -43,6 +43,8 @@ object TypelevelCiPlugin extends AutoPlugin {
       settingKey[Boolean]("Whether to do scalafix check in CI (default: false)")
     lazy val tlCiMimaBinaryIssueCheck =
       settingKey[Boolean]("Whether to do MiMa binary issues check in CI (default: false)")
+    lazy val tlCiTastyMimaCheck =
+      settingKey[Boolean]("Whether to do TASTy-MiMa issues check in CI (default: false)")
     lazy val tlCiDocCheck =
       settingKey[Boolean]("Whether to build API docs in CI (default: false)")
 
@@ -66,6 +68,7 @@ object TypelevelCiPlugin extends AutoPlugin {
     tlCiJavafmtCheck := false,
     tlCiScalafixCheck := false,
     tlCiMimaBinaryIssueCheck := false,
+    tlCiTastyMimaCheck := false,
     tlCiDocCheck := false,
     tlCiDependencyGraphJob := true,
     tlCiForkCondition := "github.event.repository.fork == false",
@@ -129,6 +132,16 @@ object TypelevelCiPlugin extends AutoPlugin {
             ))
         else Nil
 
+      val tastyMima =
+        if (tlCiTastyMimaCheck.value)
+          List(
+            WorkflowStep.Sbt(
+              List("tastyMiMaReportIssues"),
+              name = Some("Check TASTy compatibility"),
+              cond = Some(primaryAxisCond.value)
+            ))
+        else Nil
+
       val doc =
         if (tlCiDocCheck.value)
           List(
@@ -140,7 +153,7 @@ object TypelevelCiPlugin extends AutoPlugin {
           )
         else Nil
 
-      style ++ scalafix ++ test ++ mima ++ doc
+      style ++ scalafix ++ test ++ mima ++ tastyMima ++ doc
     },
     githubWorkflowJavaVersions := Seq(JavaSpec.temurin("8")),
     githubWorkflowAddedJobs ++= {

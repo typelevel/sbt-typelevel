@@ -64,6 +64,7 @@ Both plugins are documented in [**sbt-typelevel-github-actions**](gha.md).
 - `tlCiJavafmtCheck` (setting): Whether to do javafmt check in CI (default: `false`).
 - `tlCiScalafixCheck` (setting): Whether to do scalafix check in CI (default: `false`).
 - `tlCiMimaBinaryIssueCheck` (setting): Whether to do MiMa binary issues check in CI (default: `false`).
+- `tlCiTastyMimaCheck` (setting): Whether to do TASTy-MiMa issues check in CI (default: `false`).
 - `tlCiDocCheck` (setting): Whether to build API docs in CI (default: `false`).
 - `tlCiDependencyGraphJob` (setting): Whether to add a job to submit dependencies to GH (default: `true`).
 - `tlCiForkCondition` (setting): Condition for checking on CI whether this project is a fork of another (default: `github.event.repository.fork == false`).
