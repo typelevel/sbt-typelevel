@@ -66,6 +66,7 @@ Both plugins are documented in [**sbt-typelevel-github-actions**](gha.md).
 - `tlCiMimaBinaryIssueCheck` (setting): Whether to do MiMa binary issues check in CI (default: `false`).
 - `tlCiDocCheck` (setting): Whether to build API docs in CI (default: `false`).
 - `tlCiDependencyGraphJob` (setting): Whether to add a job to submit dependencies to GH (default: `true`).
+- `tlCiDependencyGraphOnPullRequest` (setting): Whether to run the dependency-submission job on same-repo pull requests, enabling Dependabot/Dependency Review feedback before merge (default: `true`). Fork PRs are always excluded.
 - `tlCiForkCondition` (setting): Condition for checking on CI whether this project is a fork of another (default: `github.event.repository.fork == false`).
 - `tlCiStewardValidateConfig` (setting): The location of the Scala Steward config to validate (default: `.scala-steward.conf`, if exists).
 - `tlCrossRootProject` (method): helper to create a `root` project that can aggregate both `Project`s and `CrossProject`s. Automatically creates separate jobs in the CI matrix for each platform (JVM, JS, etc.).
