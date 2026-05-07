@@ -56,6 +56,9 @@ object TypelevelCiPlugin extends AutoPlugin {
       settingKey[String](
         "Condition for checking on CI whether this project is a fork of another (default: `github.event.repository.fork == false`)")
 
+    lazy val tlCiLintCommands = settingKey[Seq[String]](
+      "sbt commands run in the 'Check headers and formatting' CI step (default: derived from `tlCiHeaderCheck`, `tlCiScalafmtCheck`, and `tlCiJavafmtCheck`)")
+
   }
 
   import autoImport._
@@ -69,6 +72,19 @@ object TypelevelCiPlugin extends AutoPlugin {
     tlCiDocCheck := false,
     tlCiDependencyGraphJob := true,
     tlCiForkCondition := "github.event.repository.fork == false",
+    tlCiLintCommands := {
+      val headers = List("headerCheckAll").filter(_ => tlCiHeaderCheck.value)
+
+      val scalafmt = List(
+        "scalafmtCheckAll",
+        "project /",
+        "scalafmtSbtCheck"
+      ).filter(_ => tlCiScalafmtCheck.value)
+
+      val javafmt = List("javafmtCheckAll").filter(_ => tlCiJavafmtCheck.value)
+
+      headers ++ javafmt ++ scalafmt
+    },
     githubWorkflowTargetBranches ++= Seq(
       "!update/**", // ignore steward branches
       "!pr/**" // escape-hatch to disable ci on a branch
@@ -77,31 +93,15 @@ object TypelevelCiPlugin extends AutoPlugin {
     githubWorkflowBuild := {
 
       val style = {
-        val headers = List("headerCheckAll").filter(_ => tlCiHeaderCheck.value)
-
-        val scalafmt = List(
-          "scalafmtCheckAll",
-          "project /",
-          "scalafmtSbtCheck"
-        ).filter(_ => tlCiScalafmtCheck.value)
-
-        val javafmt = List("javafmtCheckAll").filter(_ => tlCiJavafmtCheck.value)
-
-        val formatting = javafmt ++ scalafmt
-
-        val headersFormatting = headers ++ formatting
-
-        val names =
-          List("headers").filter(_ => headers.nonEmpty) ++ List("formatting").filter(_ =>
-            formatting.nonEmpty)
+        val commands = tlCiLintCommands.value.toList
 
         List(
           WorkflowStep.Sbt(
-            headers ++ formatting,
-            name = Some(s"Check ${names.mkString(" and ")}"),
+            commands,
+            name = Some("Check headers and formatting"),
             cond = Some(primaryAxisCond.value)
           )
-        ).filter(_ => headersFormatting.nonEmpty)
+        ).filter(_ => commands.nonEmpty)
       }
 
       val test = List(
