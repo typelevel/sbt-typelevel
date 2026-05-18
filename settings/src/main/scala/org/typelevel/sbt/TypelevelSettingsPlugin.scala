@@ -279,8 +279,6 @@ object TypelevelSettingsPlugin extends AutoPlugin {
           )
         }
 
-      val log = streams.value.log
-
       scalaVersion.value match {
         case V(V(2, 11, _, _)) =>
           oldTargetOption
@@ -305,9 +303,8 @@ object TypelevelSettingsPlugin extends AutoPlugin {
             tlJdkRelease.value match {
               case Some(n) if n >= 17 =>
                 javaOutputVersionOption
-              case Some(n) =>
-                log.warn(s"tlJdkRelease is ${n} but scala ${scalaVersion.value} require JDK 17")
-                Seq.empty
+              case Some(_) =>
+                Seq("-java-output-version", "17")
               case None =>
                 Seq.empty
             }
