@@ -187,7 +187,13 @@ lazy val mima = project
   .in(file("mima"))
   .enablePlugins(SbtPlugin)
   .settings(
-    name := "sbt-typelevel-mima"
+    name := "sbt-typelevel-mima",
+    mimaBinaryIssueFilters ++= Seq(
+      ProblemFilters.exclude[IncompatibleResultTypeProblem](
+        "org.typelevel.sbt.TypelevelMimaPlugin.requires"),
+      ProblemFilters.exclude[DirectMissingMethodProblem](
+        "org.typelevel.sbt.TypelevelMimaPlugin.requires")
+    )
   )
   .dependsOn(kernel)
 

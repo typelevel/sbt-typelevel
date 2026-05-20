@@ -20,13 +20,16 @@ import com.typesafe.tools.mima.plugin.MimaPlugin
 import org.typelevel.sbt.kernel.GitHelper
 import org.typelevel.sbt.kernel.V
 import sbt._
+import sbttastymima.TastyMiMaPlugin
 
 import Keys._
 import MimaPlugin.autoImport._
+import TastyMiMaPlugin.autoImport._
+import TypelevelKernelPlugin.autoImport._
 
 object TypelevelMimaPlugin extends AutoPlugin {
 
-  override def requires = MimaPlugin
+  override def requires = TypelevelKernelPlugin && MimaPlugin && TastyMiMaPlugin
 
   override def trigger = allRequirements
 
@@ -85,6 +88,26 @@ object TypelevelMimaPlugin extends AutoPlugin {
         }
       else
         Set.empty
+    },
+    tastyMiMaReportIssues := {
+      if (tlIsScala3.value && publishArtifact.value) tastyMiMaReportIssues.value
+      else ()
+    },
+    tastyMiMaPreviousArtifacts := {
+      if (tlIsScala3.value && publishArtifact.value) {
+        tlMimaPreviousVersions
+          .value
+          .flatMap(v => V(v))
+          .toList
+          .sorted
+          .lastOption
+          .map { v =>
+            projectID.value.withRevision(v.toString).withExplicitArtifacts(Vector.empty)
+          }
+          .toSet
+      } else {
+        Set.empty
+      }
     }
   )
 
