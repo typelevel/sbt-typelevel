@@ -295,8 +295,19 @@ object TypelevelSettingsPlugin extends AutoPlugin {
         case V(V(3, minor, _, _)) if minor <= 1 =>
           releaseOption
 
-        case V(V(3, minor, _, _)) if minor >= 2 =>
+        case V(V(3, minor, _, _)) if minor >= 2 && minor <= 7 =>
           javaOutputVersionOption
+
+        case V(V(3, minor, _, _)) if minor > 7 =>
+          // https://www.scala-lang.org/news/next-scala-lts-jdk.html
+          tlJdkRelease.value match {
+            case Some(n) if n >= 17 =>
+              javaOutputVersionOption
+            case Some(_) =>
+              Seq("-java-output-version", "17")
+            case None =>
+              Seq.empty
+          }
 
         case _ =>
           Seq.empty
