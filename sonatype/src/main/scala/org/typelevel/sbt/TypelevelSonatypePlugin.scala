@@ -36,7 +36,7 @@ object TypelevelSonatypePlugin extends AutoPlugin {
         "reload",
         "project /",
         "+mimaReportBinaryIssues",
-        "+publish",
+        "+publishSigned",
         "tlSonatypeBundleReleaseIfRelevant")
     }
   )
