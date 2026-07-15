@@ -755,7 +755,7 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
         val artifactId = MatrixKeys.groupId(keys)
 
         val upload = WorkflowStep.Use(
-          UseRef.Public("actions", "upload-artifact", "v5"),
+          UseRef.Public("actions", "upload-artifact", "v7"),
           name = Some(s"Upload target directories"),
           params = Map("name" -> s"target-$artifactId", "path" -> "targets.tar"),
           cond = Some(publicationCond.value)
@@ -801,7 +801,7 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
           val pretty = v.mkString(", ")
 
           val download = WorkflowStep.Use(
-            UseRef.Public("actions", "download-artifact", "v6"),
+            UseRef.Public("actions", "download-artifact", "v8"),
             name = Some(s"Download target directories ($pretty)"),
             params =
               Map("name" -> s"target-$${{ matrix.os }}-$${{ matrix.java }}-${v.mkString("-")}")
