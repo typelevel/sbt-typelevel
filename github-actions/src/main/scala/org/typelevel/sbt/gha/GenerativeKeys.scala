@@ -91,6 +91,9 @@ trait GenerativeKeys {
 
   lazy val githubWorkflowDependencyPatterns = settingKey[Seq[String]](
     "A list of file globes within the project which affect dependency information (default: [**/*.sbt, project/build.properties])")
+  lazy val githubWorkflowTriggers = settingKey[WorkflowTriggers](
+    "The triggers to use for the workflow. The default is derived from githubWorkflowTargetBranches, githubWorkflowTargetTags, githubWorkflowTargetPaths, githubWorkflowPREventTypes. " +
+      "Setting this directly means the individual keys (githubWorkflowTargetBranches, etc.) are ignored.")
   lazy val githubWorkflowTargetBranches = settingKey[Seq[String]](
     "A list of branch patterns on which to trigger push and PR builds (default: [*])")
   lazy val githubWorkflowTargetTags = settingKey[Seq[String]](
