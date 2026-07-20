@@ -18,10 +18,10 @@ package org.typelevel.sbt.gha
 
 import sbt.Keys._
 import sbt._
+import sbtcompat.PluginCompat._
 
 import java.nio.file.FileSystems
-import scala.io.Source
-
+import scala.annotation.nowarn
 object GenerativePlugin extends AutoPlugin {
 
   override def requires = plugins.JvmPlugin
@@ -702,7 +702,6 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
   private lazy val internalTargetAggregation =
     settingKey[Seq[File]]("Aggregates target directories from all subprojects")
 
-  private val macosGuard = Some("contains(runner.os, 'macos')")
   private val windowsGuard = Some("contains(runner.os, 'windows')")
 
   private val PlatformSep = FileSystems.getDefault.getSeparator
@@ -911,7 +910,7 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
     }
   }
 
-  private val generateCiContents = Def task {
+  private val generateCiContents: Def.Initialize[Task[String]] = Def task {
     compileWorkflow(
       "Continuous Integration",
       githubWorkflowTargetBranches.value.toList,
@@ -926,92 +925,88 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
     )
   }
 
-  private val readCleanContents = Def task {
-    val src = Source.fromURL(getClass.getResource("/clean.yml"))
-    try {
-      src.mkString
-    } finally {
-      src.close()
-    }
+  private val cleanResourceFile: Def.Initialize[Task[FileRef]] = Def.task {
+    val uri: java.net.URI = getClass.getResource("/clean.yml").toURI
+    val file = new File(uri)
+    implicit val conv: xsbti.FileConverter = fileConverter.value
+    toFileRef(file)
   }
 
-  private val workflowsDirTask = Def task {
-    val githubDir = baseDirectory.value / ".github"
-    val workflowsDir = githubDir / "workflows"
-
-    if (!githubDir.exists()) {
-      githubDir.mkdir()
-    }
-
-    if (!workflowsDir.exists()) {
-      workflowsDir.mkdir()
-    }
-
-    workflowsDir
+  private val readCleanContents: Def.Initialize[Task[String]] = Def task {
+    implicit val conv: xsbti.FileConverter = fileConverter.value
+    val src = IO.read(toFile(cleanResourceFile.value))
+    src
   }
 
-  private val ciYmlFile = Def task {
-    workflowsDirTask.value / "ci.yml"
+  private val ciYmlFile: Def.Initialize[Task[FileRef]] = Def task {
+    implicit val conv: xsbti.FileConverter = fileConverter.value
+    toFileRef(baseDirectory.value / ".github" / "workflows" / "ci.yml")
   }
 
-  private val cleanYmlFile = Def task {
-    workflowsDirTask.value / "clean.yml"
+  private val cleanYmlFile: Def.Initialize[Task[FileRef]] = Def task {
+    implicit val conv: xsbti.FileConverter = fileConverter.value
+    toFileRef(baseDirectory.value / ".github" / "workflows" / "clean.yml")
   }
 
-  override def projectSettings = Seq(
-    githubWorkflowArtifactUpload := publishArtifact.value,
-    Global / internalTargetAggregation ++= {
-      if (githubWorkflowArtifactUpload.value)
-        Seq(target.value)
-      else
-        Seq()
-    },
-    githubWorkflowGenerate / aggregate := false,
-    githubWorkflowCheck / aggregate := false,
-    githubWorkflowGenerate := {
-      val ciContents = generateCiContents.value
-      val includeClean = githubWorkflowIncludeClean.value
-      val cleanContents = readCleanContents.value
+  @nowarn()
+  override def projectSettings = {
+    import CacheImplicits.{given, _}
+    Seq(
+      githubWorkflowArtifactUpload := publishArtifact.value,
+      Global / internalTargetAggregation ++= {
+        if (githubWorkflowArtifactUpload.value)
+          Seq(target.value)
+        else
+          Seq()
+      },
+      githubWorkflowGenerate / aggregate := false,
+      githubWorkflowCheck / aggregate := false,
+      githubWorkflowGenerate := Def.uncached {
+        val ciContents = generateCiContents.value
+        val includeClean = githubWorkflowIncludeClean.value
+        val cleanContents = readCleanContents.value
 
-      val ciYml = ciYmlFile.value
-      val cleanYml = cleanYmlFile.value
+        implicit val conv: xsbti.FileConverter = fileConverter.value
+        val ciYml = toFile(ciYmlFile.value)
+        val cleanYml = toFile(cleanYmlFile.value)
 
-      IO.write(ciYml, ciContents)
+        IO.write(ciYml, ciContents)
 
-      if (includeClean)
-        IO.write(cleanYml, cleanContents)
-    },
-    githubWorkflowCheck := {
-      val expectedCiContents = generateCiContents.value
-      val includeClean = githubWorkflowIncludeClean.value
-      val expectedCleanContents = readCleanContents.value
+        if (includeClean)
+          IO.write(cleanYml, cleanContents)
+      },
+      githubWorkflowCheck := {
+        val expectedCiContents = generateCiContents.value
+        val includeClean = githubWorkflowIncludeClean.value
+        val expectedCleanContents = readCleanContents.value
 
-      val ciYml = ciYmlFile.value
-      val cleanYml = cleanYmlFile.value
+        implicit val conv: xsbti.FileConverter = fileConverter.value
+        val ciYml = toFile(ciYmlFile.value)
+        val cleanYml = toFile(cleanYmlFile.value)
 
-      val log = state.value.log
+        val log = state.value.log
 
-      def reportMismatch(file: File, expected: String, actual: String): Unit = {
-        log.error(s"Expected:\n$expected")
-        log.error(s"Actual:\n${diff(expected, actual)}")
-        sys.error(
-          s"${file.getName} does not contain contents that would have been generated by sbt-github-actions; try running githubWorkflowGenerate")
-      }
-
-      def compare(file: File, expected: String): Unit = {
-        val actual = IO.read(file)
-        if (expected != actual) {
-          reportMismatch(file, expected, actual)
+        def reportMismatch(file: File, expected: String, actual: String): Unit = {
+          log.error(s"Expected:\n$expected")
+          log.error(s"Actual:\n${diff(expected, actual)}")
+          sys.error(
+            s"${file.getName} does not contain contents that would have been generated by sbt-github-actions; try running githubWorkflowGenerate")
         }
+
+        def compare(file: File, expected: String): Unit = {
+          val actual = IO.read(file)
+          if (expected != actual) {
+            reportMismatch(file, expected, actual)
+          }
+        }
+
+        compare(ciYml, expectedCiContents)
+
+        if (includeClean)
+          compare(cleanYml, expectedCleanContents)
       }
-
-      compare(ciYml, expectedCiContents)
-
-      if (includeClean)
-        compare(cleanYml, expectedCleanContents)
-    }
-  )
-
+    )
+  }
   private[sbt] def expandMatrix(
       oses: List[String],
       scalas: List[String],
