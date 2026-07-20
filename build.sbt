@@ -202,7 +202,8 @@ lazy val mima = project
   .in(file("mima"))
   .enablePlugins(SbtPlugin)
   .settings(
-    name := "sbt-typelevel-mima"
+    name := "sbt-typelevel-mima",
+    sbt2Settings
   )
   .dependsOn(kernel)
 
