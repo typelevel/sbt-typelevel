@@ -176,7 +176,8 @@ lazy val githubActions = project
       ProblemFilters.exclude[DirectMissingMethodProblem]("org.typelevel.sbt.gha.*#*#Impl.*"),
       ProblemFilters.exclude[MissingTypesProblem]("org.typelevel.sbt.gha.*$Impl$"),
       ProblemFilters.exclude[MissingTypesProblem]("org.typelevel.sbt.gha.*$*$Impl$")
-    )
+    ),
+    sbt2Settings
   )
 
 lazy val mergify = project

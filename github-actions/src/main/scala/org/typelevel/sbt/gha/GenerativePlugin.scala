@@ -18,10 +18,11 @@ package org.typelevel.sbt.gha
 
 import sbt.Keys._
 import sbt._
+import sbtcompat.PluginCompat._
 
 import java.nio.file.FileSystems
 import scala.io.Source
-
+// TODO: Zainab - How can this be cross-built?
 object GenerativePlugin extends AutoPlugin {
 
   override def requires = plugins.JvmPlugin
@@ -702,7 +703,6 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
   private lazy val internalTargetAggregation =
     settingKey[Seq[File]]("Aggregates target directories from all subprojects")
 
-  private val macosGuard = Some("contains(runner.os, 'macos')")
   private val windowsGuard = Some("contains(runner.os, 'windows')")
 
   private val PlatformSep = FileSystems.getDefault.getSeparator
@@ -911,7 +911,7 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
     }
   }
 
-  private val generateCiContents = Def task {
+  private val generateCiContents: Def.Initialize[Task[String]] = Def task {
     compileWorkflow(
       "Continuous Integration",
       githubWorkflowTargetBranches.value.toList,
@@ -926,7 +926,7 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
     )
   }
 
-  private val readCleanContents = Def task {
+  private val readCleanContents: Def.Initialize[Task[String]] = Def task {
     val src = Source.fromURL(getClass.getResource("/clean.yml"))
     try {
       src.mkString
@@ -935,28 +935,18 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
     }
   }
 
-  private val workflowsDirTask = Def task {
-    val githubDir = baseDirectory.value / ".github"
-    val workflowsDir = githubDir / "workflows"
-
-    if (!githubDir.exists()) {
-      githubDir.mkdir()
-    }
-
-    if (!workflowsDir.exists()) {
-      workflowsDir.mkdir()
-    }
-
-    workflowsDir
+  private val ciYmlFile: Def.Initialize[Task[FileRef]] = Def task {
+    implicit val conv: xsbti.FileConverter = fileConverter.value
+    toFileRef(baseDirectory.value / ".github" / "workflows" / "ci.yml")
   }
 
-  private val ciYmlFile = Def task {
-    workflowsDirTask.value / "ci.yml"
+  private val cleanYmlFile: Def.Initialize[Task[FileRef]] = Def task {
+    implicit val conv: xsbti.FileConverter = fileConverter.value
+    toFileRef(baseDirectory.value / ".github" / "workflows" / "clean.yml")
   }
 
-  private val cleanYmlFile = Def task {
-    workflowsDirTask.value / "clean.yml"
-  }
+  private implicit val fileRefJsonFormat: sjsonnew.JsonFormat[FileRef] =
+    PluginCompat.fileRefJsonFormat
 
   override def projectSettings = Seq(
     githubWorkflowArtifactUpload := publishArtifact.value,
@@ -968,13 +958,14 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
     },
     githubWorkflowGenerate / aggregate := false,
     githubWorkflowCheck / aggregate := false,
-    githubWorkflowGenerate := {
+    githubWorkflowGenerate := Def.uncached {
       val ciContents = generateCiContents.value
       val includeClean = githubWorkflowIncludeClean.value
       val cleanContents = readCleanContents.value
 
-      val ciYml = ciYmlFile.value
-      val cleanYml = cleanYmlFile.value
+      implicit val conv: xsbti.FileConverter = fileConverter.value
+      val ciYml = toFile(ciYmlFile.value)
+      val cleanYml = toFile(cleanYmlFile.value)
 
       IO.write(ciYml, ciContents)
 
@@ -986,8 +977,9 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
       val includeClean = githubWorkflowIncludeClean.value
       val expectedCleanContents = readCleanContents.value
 
-      val ciYml = ciYmlFile.value
-      val cleanYml = cleanYmlFile.value
+      implicit val conv: xsbti.FileConverter = fileConverter.value
+      val ciYml = toFile(ciYmlFile.value)
+      val cleanYml = toFile(cleanYmlFile.value)
 
       val log = state.value.log
 
