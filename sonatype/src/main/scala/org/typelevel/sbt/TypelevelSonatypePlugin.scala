@@ -17,6 +17,7 @@
 package org.typelevel.sbt
 
 import com.typesafe.tools.mima.plugin.MimaPlugin
+import org.typelevel.sbt.sonatype.PluginCompat
 import sbt._
 
 import Keys._
@@ -72,8 +73,8 @@ object TypelevelSonatypePlugin extends AutoPlugin {
         scalaVersion.value,
         scalaBinaryVersion.value
       ).map { cross =>
-        url(
-          s"https://${hostname}/doc/${organization.value}/${cross(moduleName.value)}/${version.value}/")
+        PluginCompat.url(uri(
+          s"https://${hostname}/doc/${organization.value}/${cross(moduleName.value)}/${version.value}/"))
       }
     } else None
   }

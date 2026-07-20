@@ -211,7 +211,8 @@ lazy val sonatype = project
   .in(file("sonatype"))
   .enablePlugins(SbtPlugin)
   .settings(
-    name := "sbt-typelevel-sonatype"
+    name := "sbt-typelevel-sonatype",
+    sbt2Settings
   )
   .dependsOn(kernel)
 
