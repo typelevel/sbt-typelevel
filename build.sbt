@@ -122,12 +122,24 @@ lazy val `sbt-typelevel` = tlCrossRootProject.aggregate(
   docs
 )
 
+lazy val sbt2Settings = Seq(
+  scalaVersion := "2.12.21",
+  crossScalaVersions := Seq("2.12.21", "3.8.3"),
+  (pluginCrossBuild / sbtVersion) := {
+    scalaBinaryVersion.value match {
+      case "2.12" => "1.5.8"
+      case _ => "2.0.0-RC13"
+    }
+  }
+)
+
 lazy val kernel = project
   .in(file("kernel"))
   .enablePlugins(SbtPlugin)
   .settings(
     name := "sbt-typelevel-kernel",
-    libraryDependencies += "org.scalameta" %% "munit" % MunitVersion % Test
+    libraryDependencies += "org.scalameta" %% "munit" % MunitVersion % Test,
+    sbt2Settings
   )
 
 lazy val noPublish = project
