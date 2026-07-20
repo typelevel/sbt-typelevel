@@ -237,7 +237,8 @@ lazy val sonatypeCiRelease = project
   .in(file("sonatype-ci-release"))
   .enablePlugins(SbtPlugin)
   .settings(
-    name := "sbt-typelevel-sonatype-ci-release"
+    name := "sbt-typelevel-sonatype-ci-release",
+    sbt2Settings
   )
   .dependsOn(sonatype, githubActions)
 
