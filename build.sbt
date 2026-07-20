@@ -193,7 +193,8 @@ lazy val versioning = project
   .in(file("versioning"))
   .enablePlugins(SbtPlugin)
   .settings(
-    name := "sbt-typelevel-versioning"
+    name := "sbt-typelevel-versioning",
+    sbt2Settings
   )
   .dependsOn(kernel)
 
