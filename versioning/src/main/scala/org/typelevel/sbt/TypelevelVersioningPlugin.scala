@@ -22,11 +22,9 @@ import org.typelevel.sbt.TypelevelKernelPlugin._
 import org.typelevel.sbt.kernel.GitHelper
 import org.typelevel.sbt.kernel.V
 import sbt._
-import sbt._
 
 import scala.util.Try
 
-import Keys._
 import Keys._
 
 object TypelevelVersioningPlugin extends AutoPlugin {
@@ -50,7 +48,7 @@ object TypelevelVersioningPlugin extends AutoPlugin {
 
   import autoImport._
 
-  override def buildSettings: Seq[Setting[_]] = Seq(
+  override def buildSettings: Seq[Setting[?]] = Seq(
     versionScheme := Some("early-semver"),
     tlUntaggedAreSnapshots := true,
     isSnapshot := {
