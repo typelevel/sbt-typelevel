@@ -19,6 +19,8 @@ package org.typelevel.sbt
 import sbt._
 import scalafix.sbt._
 
+import scala.annotation.nowarn
+
 import Keys._
 import ScalafixTestkitPlugin.autoImport._
 
@@ -32,7 +34,8 @@ final class ScalafixProject private (
 
   lazy val componentProjects = Seq(rules, input, output, tests)
 
-  def componentProjectReferences = componentProjects.map(x => x: ProjectReference)
+  def componentProjectReferences =
+    componentProjects.map(x => LocalProject(x.id): ProjectReference)
 
   def in(dir: File): ScalafixProject =
     new ScalafixProject(
@@ -44,21 +47,21 @@ final class ScalafixProject private (
     )
 
   def rulesSettings(ss: Def.SettingsDefinition*): ScalafixProject =
-    rulesConfigure(_.settings(ss: _*))
+    rulesConfigure(_.settings(ss*))
 
   def inputSettings(ss: Def.SettingsDefinition*): ScalafixProject =
-    inputConfigure(_.settings(ss: _*))
+    inputConfigure(_.settings(ss*))
 
   def outputSettings(ss: Def.SettingsDefinition*): ScalafixProject =
-    outputConfigure(_.settings(ss: _*))
+    outputConfigure(_.settings(ss*))
 
   def testsSettings(ss: Def.SettingsDefinition*): ScalafixProject =
-    testsConfigure(_.settings(ss: _*))
+    testsConfigure(_.settings(ss*))
 
   def rulesConfigure(transforms: (Project => Project)*): ScalafixProject =
     new ScalafixProject(
       name,
-      rules.configure(transforms: _*),
+      rules.configure(transforms*),
       input,
       output,
       tests
@@ -68,7 +71,7 @@ final class ScalafixProject private (
     new ScalafixProject(
       name,
       rules,
-      input.configure(transforms: _*),
+      input.configure(transforms*),
       output,
       tests
     )
@@ -78,7 +81,7 @@ final class ScalafixProject private (
       name,
       rules,
       input,
-      output.configure(transforms: _*),
+      output.configure(transforms*),
       tests
     )
 
@@ -88,13 +91,17 @@ final class ScalafixProject private (
       rules,
       input,
       output,
-      tests.configure(transforms: _*)
+      tests.configure(transforms*)
     )
 
 }
 
 object ScalafixProject {
+
+  @nowarn()
   def apply(name: String): ScalafixProject = {
+
+    import sbtcompat.PluginCompat._
 
     lazy val rules = Project(s"$name-rules", file(s"$name/rules")).settings(
       libraryDependencies += "ch.epfl.scala" %% "scalafix-core" % _root_
@@ -112,13 +119,19 @@ object ScalafixProject {
 
     lazy val tests = Project(s"$name-tests", file(s"$name/tests"))
       .settings(
-        scalafixTestkitOutputSourceDirectories := (output / Compile / unmanagedSourceDirectories).value,
-        scalafixTestkitInputSourceDirectories := (input / Compile / unmanagedSourceDirectories).value,
-        scalafixTestkitInputClasspath := (input / Compile / fullClasspath).value,
-        scalafixTestkitInputScalacOptions := (input / Compile / scalacOptions).value,
-        scalafixTestkitInputScalaVersion := (input / Compile / scalaVersion).value
+        scalafixTestkitOutputSourceDirectories := (LocalProject(
+          output.id) / Compile / unmanagedSourceDirectories).value,
+        scalafixTestkitInputSourceDirectories := (LocalProject(
+          input.id) / Compile / unmanagedSourceDirectories).value,
+        scalafixTestkitInputClasspath := Def.uncached {
+          (LocalProject(input.id) / Compile / fullClasspath).value
+        },
+        scalafixTestkitInputScalacOptions := (LocalProject(
+          input.id) / Compile / scalacOptions).value,
+        scalafixTestkitInputScalaVersion := (LocalProject(
+          input.id) / Compile / scalaVersion).value
       )
-      .dependsOn(rules)
+      .dependsOn(LocalProject(rules.id))
       .enablePlugins(NoPublishPlugin, ScalafixTestkitPlugin)
 
     new ScalafixProject(name, rules, input, output, tests)
