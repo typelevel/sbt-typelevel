@@ -221,7 +221,8 @@ lazy val scalafix = project
   .enablePlugins(SbtPlugin)
   .settings(
     name := "sbt-typelevel-scalafix",
-    tlVersionIntroduced := Map("2.12" -> "0.4.10")
+    tlVersionIntroduced := Map("2.12" -> "0.4.10"),
+    sbt2Settings
   )
   .dependsOn(noPublish)
 
