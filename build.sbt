@@ -247,7 +247,8 @@ lazy val ci = project
   .in(file("ci"))
   .enablePlugins(SbtPlugin)
   .settings(
-    name := "sbt-typelevel-ci"
+    name := "sbt-typelevel-ci",
+    sbt2Settings
   )
   .dependsOn(noPublish, kernel, githubActions)
 
