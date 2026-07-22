@@ -17,7 +17,12 @@
 package org.typelevel.sbt
 
 import scala.annotation.tailrec
+import scala.language.experimental.macros
 import scala.reflect.macros.blackbox
+
+trait CrossRootProjectMacros {
+  def tlCrossRootProject: CrossRootProject = macro CrossRootProjectMacros.crossRootProjectImpl
+}
 
 private[sbt] object CrossRootProjectMacros {
 

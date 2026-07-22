@@ -23,16 +23,14 @@ import org.typelevel.sbt.gha.GitHubActionsPlugin
 import org.typelevel.sbt.gha.WorkflowStep
 import sbt._
 
-import scala.language.experimental.macros
+import scala.annotation.nowarn
 
 object TypelevelCiPlugin extends AutoPlugin {
 
   override def requires = GitHubActionsPlugin && GenerativePlugin
   override def trigger = allRequirements
 
-  object autoImport {
-    def tlCrossRootProject: CrossRootProject = macro CrossRootProjectMacros.crossRootProjectImpl
-
+  object autoImport extends CrossRootProjectMacros {
     lazy val tlCiHeaderCheck =
       settingKey[Boolean]("Whether to do header check in CI (default: false)")
     lazy val tlCiScalafmtCheck =
@@ -190,23 +188,59 @@ object TypelevelCiPlugin extends AutoPlugin {
     }
   )
 
-  override def projectSettings: Seq[Setting[_]] = Seq(
-    Test / Keys.executeTests := {
-      val results: Tests.Output = (Test / Keys.executeTests).value
-      GitHubActionsPlugin.appendToStepSummary(
-        renderTestResults(Keys.thisProject.value.id, Keys.scalaVersion.value, results)
-      )
-      results
-    }
+  @nowarn("msg=unused import")
+  override def projectSettings: Seq[Setting[?]] = {
+    import sbtcompat.PluginCompat._
+    Seq(
+      Test / Keys.executeTests := Def.uncached {
+        val results = (Test / Keys.executeTests).value
+        val events = results.events.map {
+          case (id, v) =>
+            (
+              id,
+              SuiteResult(
+                v.result,
+                v.passedCount,
+                v.failureCount,
+                v.errorCount,
+                v.skippedCount,
+                v.ignoredCount,
+                v.canceledCount,
+                v.pendingCount
+              ))
+        }
+        GitHubActionsPlugin.appendToStepSummary(
+          renderTestResults(
+            Keys.thisProject.value.id,
+            Keys.scalaVersion.value,
+            results.overall,
+            events)
+        )
+        results
+      }
+    )
+  }
+
+  case class SuiteResult(
+      result: TestResult,
+      passedCount: Int,
+      failureCount: Int,
+      errorCount: Int,
+      skippedCount: Int,
+      ignoredCount: Int,
+      canceledCount: Int,
+      pendingCount: Int
   )
 
   private def renderTestResults(
       projectName: String,
       scalaVersion: String,
-      results: Tests.Output): String = {
+      overall: TestResult,
+      events: Map[String, SuiteResult]
+  ): String = {
 
     val testHeader: String =
-      s"""|### ${projectName} Tests Results: ${results.overall}
+      s"""|### ${projectName} Tests Results: ${overall}
           |To run them locally use `++${scalaVersion} ${projectName}/test`
           |""".stripMargin
 
@@ -217,7 +251,7 @@ object TypelevelCiPlugin extends AutoPlugin {
           ||-:|-|-|-|-|-|-|-|-|
           |""".stripMargin
 
-    val tableBody = results.events.map {
+    val tableBody = events.map {
       case (suiteName, suiteResult) =>
         List(
           suiteName,
@@ -234,7 +268,7 @@ object TypelevelCiPlugin extends AutoPlugin {
 
     val table: String = tableBody.mkString(tableHeader, "\n", "\n</details>\n\n")
 
-    if (results.events.nonEmpty)
+    if (events.nonEmpty)
       testHeader + table
     else ""
   }

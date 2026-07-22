@@ -36,23 +36,23 @@ final class CrossRootProject private (
 
   def settings(ss: Def.SettingsDefinition*): CrossRootProject =
     new CrossRootProject(
-      all.settings(ss: _*),
-      jvm.settings(ss: _*),
-      js.settings(ss: _*),
-      native.settings(ss: _*)
+      all.settings(ss*),
+      jvm.settings(ss*),
+      js.settings(ss*),
+      native.settings(ss*)
     )
 
   def configure(transforms: (Project => Project)*): CrossRootProject =
     new CrossRootProject(
-      all.configure(transforms: _*),
-      jvm.configure(transforms: _*),
-      js.configure(transforms: _*),
-      native.configure(transforms: _*)
+      all.configure(transforms*),
+      jvm.configure(transforms*),
+      js.configure(transforms*),
+      native.configure(transforms*)
     )
 
   def configureRoot(transforms: (Project => Project)*): CrossRootProject =
     new CrossRootProject(
-      all.configure(transforms: _*),
+      all.configure(transforms*),
       jvm,
       js,
       native
@@ -61,7 +61,7 @@ final class CrossRootProject private (
   def configureJVM(transforms: (Project => Project)*): CrossRootProject =
     new CrossRootProject(
       all,
-      jvm.configure(transforms: _*),
+      jvm.configure(transforms*),
       js,
       native
     )
@@ -70,7 +70,7 @@ final class CrossRootProject private (
     new CrossRootProject(
       all,
       jvm,
-      js.configure(transforms: _*),
+      js.configure(transforms*),
       native
     )
 
@@ -79,27 +79,27 @@ final class CrossRootProject private (
       all,
       jvm,
       js,
-      native.configure(transforms: _*)
+      native.configure(transforms*)
     )
 
   def enablePlugins(ns: Plugins*): CrossRootProject =
     new CrossRootProject(
-      all.enablePlugins(ns: _*),
-      jvm.enablePlugins(ns: _*),
-      js.enablePlugins(ns: _*),
-      native.enablePlugins(ns: _*)
+      all.enablePlugins(ns*),
+      jvm.enablePlugins(ns*),
+      js.enablePlugins(ns*),
+      native.enablePlugins(ns*)
     )
 
   def disablePlugins(ps: AutoPlugin*): CrossRootProject =
     new CrossRootProject(
-      all.disablePlugins(ps: _*),
-      jvm.disablePlugins(ps: _*),
-      js.disablePlugins(ps: _*),
-      native.disablePlugins(ps: _*)
+      all.disablePlugins(ps*),
+      jvm.disablePlugins(ps*),
+      js.disablePlugins(ps*),
+      native.disablePlugins(ps*)
     )
 
   def aggregate(projects: CompositeProject*): CrossRootProject =
-    aggregateImpl(projects.flatMap(_.componentProjects): _*)
+    aggregateImpl(projects.flatMap(_.componentProjects)*)
 
   private def aggregateImpl(projects: Project*): CrossRootProject = {
     val jsProjects =
@@ -112,16 +112,19 @@ final class CrossRootProject private (
     val jvmProjects = projects.diff(jsProjects).diff(nativeProjects)
 
     new CrossRootProject(
-      all.aggregate(projects.map(_.project): _*),
+      all.aggregate(projects.map(p => LocalProject(p.id))*),
       if (jvmProjects.nonEmpty)
-        jvm.aggregate(jvmProjects.map(_.project): _*).enablePlugins(TypelevelCiJVMPlugin)
+        jvm
+          .aggregate(jvmProjects.map(p => LocalProject(p.id))*)
+          .enablePlugins(TypelevelCiJVMPlugin)
       else jvm,
       if (jsProjects.nonEmpty)
-        js.aggregate(jsProjects.map(_.project): _*).enablePlugins(TypelevelCiJSPlugin)
+        js.aggregate(jsProjects.map(p => LocalProject(p.id))*)
+          .enablePlugins(TypelevelCiJSPlugin)
       else js,
       if (nativeProjects.nonEmpty)
         native
-          .aggregate(nativeProjects.map(_.project): _*)
+          .aggregate(nativeProjects.map(p => LocalProject(p.id))*)
           .enablePlugins(TypelevelCiNativePlugin)
       else native
     )
@@ -169,7 +172,7 @@ object TypelevelCiCrossPlugin extends AutoPlugin {
 object TypelevelCiJVMPlugin extends AutoPlugin with RootProjectId {
   override def requires = TypelevelCiCrossPlugin
 
-  override def buildSettings: Seq[Setting[_]] = Seq(
+  override def buildSettings: Seq[Setting[?]] = Seq(
     githubWorkflowBuildMatrixAdditions := {
       val matrix = githubWorkflowBuildMatrixAdditions.value
       matrix.updated("project", matrix("project") ::: s"${rootProjectId.value}JVM" :: Nil)
@@ -180,7 +183,7 @@ object TypelevelCiJVMPlugin extends AutoPlugin with RootProjectId {
 object TypelevelCiJSPlugin extends AutoPlugin with RootProjectId {
   override def requires = TypelevelCiCrossPlugin
 
-  override def buildSettings: Seq[Setting[_]] = Seq(
+  override def buildSettings: Seq[Setting[?]] = Seq(
     githubWorkflowBuildMatrixAdditions := {
       val matrix = githubWorkflowBuildMatrixAdditions.value
       matrix.updated("project", matrix("project") ::: s"${rootProjectId.value}JS" :: Nil)
@@ -211,7 +214,7 @@ object TypelevelCiJSPlugin extends AutoPlugin with RootProjectId {
 object TypelevelCiNativePlugin extends AutoPlugin with RootProjectId {
   override def requires = TypelevelCiCrossPlugin
 
-  override def buildSettings: Seq[Setting[_]] = Seq(
+  override def buildSettings: Seq[Setting[?]] = Seq(
     githubWorkflowBuildMatrixAdditions := {
       val matrix = githubWorkflowBuildMatrixAdditions.value
       matrix.updated("project", matrix("project") ::: s"${rootProjectId.value}Native" :: Nil)
