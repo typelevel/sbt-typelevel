@@ -702,7 +702,6 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
   private lazy val internalTargetAggregation =
     settingKey[Seq[File]]("Aggregates target directories from all subprojects")
 
-  private val macosGuard = Some("contains(runner.os, 'macos')")
   private val windowsGuard = Some("contains(runner.os, 'windows')")
 
   private val PlatformSep = FileSystems.getDefault.getSeparator
@@ -940,11 +939,11 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
     val workflowsDir = githubDir / "workflows"
 
     if (!githubDir.exists()) {
-      githubDir.mkdir()
+      githubDir.mkdir(): Unit
     }
 
     if (!workflowsDir.exists()) {
-      workflowsDir.mkdir()
+      workflowsDir.mkdir(): Unit
     }
 
     workflowsDir

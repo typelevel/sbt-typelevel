@@ -122,19 +122,32 @@ lazy val `sbt-typelevel` = tlCrossRootProject.aggregate(
   docs
 )
 
+lazy val sbt2Settings = Seq(
+  scalaVersion := "2.12.21",
+  crossScalaVersions := Seq("2.12.21", "3.8.3"),
+  (pluginCrossBuild / sbtVersion) := {
+    scalaBinaryVersion.value match {
+      case "2.12" => "1.5.8"
+      case _ => "2.0.0-RC13"
+    }
+  }
+)
+
 lazy val kernel = project
   .in(file("kernel"))
   .enablePlugins(SbtPlugin)
   .settings(
     name := "sbt-typelevel-kernel",
-    libraryDependencies += "org.scalameta" %% "munit" % MunitVersion % Test
+    libraryDependencies += "org.scalameta" %% "munit" % MunitVersion % Test,
+    sbt2Settings
   )
 
 lazy val noPublish = project
   .in(file("no-publish"))
   .enablePlugins(SbtPlugin)
   .settings(
-    name := "sbt-typelevel-no-publish"
+    name := "sbt-typelevel-no-publish",
+    sbt2Settings
   )
 
 lazy val settings = project
@@ -163,7 +176,8 @@ lazy val githubActions = project
       ProblemFilters.exclude[DirectMissingMethodProblem]("org.typelevel.sbt.gha.*#*#Impl.*"),
       ProblemFilters.exclude[MissingTypesProblem]("org.typelevel.sbt.gha.*$Impl$"),
       ProblemFilters.exclude[MissingTypesProblem]("org.typelevel.sbt.gha.*$*$Impl$")
-    )
+    ),
+    sbt2Settings
   )
 
 lazy val mergify = project
@@ -179,7 +193,8 @@ lazy val versioning = project
   .in(file("versioning"))
   .enablePlugins(SbtPlugin)
   .settings(
-    name := "sbt-typelevel-versioning"
+    name := "sbt-typelevel-versioning",
+    sbt2Settings
   )
   .dependsOn(kernel)
 
@@ -187,7 +202,8 @@ lazy val mima = project
   .in(file("mima"))
   .enablePlugins(SbtPlugin)
   .settings(
-    name := "sbt-typelevel-mima"
+    name := "sbt-typelevel-mima",
+    sbt2Settings
   )
   .dependsOn(kernel)
 
@@ -195,7 +211,8 @@ lazy val sonatype = project
   .in(file("sonatype"))
   .enablePlugins(SbtPlugin)
   .settings(
-    name := "sbt-typelevel-sonatype"
+    name := "sbt-typelevel-sonatype",
+    sbt2Settings
   )
   .dependsOn(kernel)
 
@@ -204,7 +221,8 @@ lazy val scalafix = project
   .enablePlugins(SbtPlugin)
   .settings(
     name := "sbt-typelevel-scalafix",
-    tlVersionIntroduced := Map("2.12" -> "0.4.10")
+    tlVersionIntroduced := Map("2.12" -> "0.4.10"),
+    sbt2Settings
   )
   .dependsOn(noPublish)
 
@@ -220,7 +238,8 @@ lazy val sonatypeCiRelease = project
   .in(file("sonatype-ci-release"))
   .enablePlugins(SbtPlugin)
   .settings(
-    name := "sbt-typelevel-sonatype-ci-release"
+    name := "sbt-typelevel-sonatype-ci-release",
+    sbt2Settings
   )
   .dependsOn(sonatype, githubActions)
 
@@ -228,7 +247,8 @@ lazy val ci = project
   .in(file("ci"))
   .enablePlugins(SbtPlugin)
   .settings(
-    name := "sbt-typelevel-ci"
+    name := "sbt-typelevel-ci",
+    sbt2Settings
   )
   .dependsOn(noPublish, kernel, githubActions)
 
@@ -271,7 +291,8 @@ lazy val unidoc = project
   .in(file("unidoc"))
   .enablePlugins(TypelevelUnidocPlugin)
   .settings(
-    name := "sbt-typelevel-docs"
+    name := "sbt-typelevel-docs",
+    sbt2Settings
   )
 
 lazy val docs = project
