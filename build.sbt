@@ -127,7 +127,7 @@ lazy val sbt2Settings = Seq(
   crossScalaVersions := Seq("2.12.21", "3.8.3"),
   (pluginCrossBuild / sbtVersion) := {
     scalaBinaryVersion.value match {
-      case "2.12" => "1.5.8"
+      case "2.12" => "1.11.7"
       case _ => "2.0.0-RC13"
     }
   }
@@ -293,6 +293,22 @@ lazy val unidoc = project
   .settings(
     name := "sbt-typelevel-docs",
     sbt2Settings
+  )
+
+lazy val sbt2 = project
+  .in(file("sbt2"))
+  .aggregate(
+    kernel,
+    mima,
+    noPublish,
+    versioning,
+    sonatype,
+    sonatypeCiRelease,
+    ci,
+    githubActions
+  ).settings(
+    scalaVersion := "3.8.3",
+    ThisBuild / version := "1.1.1"
   )
 
 lazy val docs = project
