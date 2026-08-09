@@ -689,7 +689,7 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
       else
         scalas
     },
-    githubWorkflowOSes := Seq("ubuntu-22.04"),
+    githubWorkflowOSes := Seq("ubuntu-24.04"),
     githubWorkflowDependencyPatterns := Seq("**/*.sbt", "project/build.properties"),
     githubWorkflowTargetBranches := Seq("**"),
     githubWorkflowTargetTags := Seq(),
