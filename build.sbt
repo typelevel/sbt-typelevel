@@ -289,7 +289,7 @@ lazy val docs = project
           TextLink.external("https://www.scala-sbt.org/", "sbt"),
           TextLink
             .external("https://github.com/portable-scala/sbt-crossproject", "sbt-crossproject"),
-          TextLink.external("https://github.com/lightbend/mima", "MiMa"),
+          TextLink.external("https://github.com/scala-garden/mima", "MiMa"),
           TextLink.external("https://scalameta.org/mdoc/", "mdoc"),
           TextLink.external("https://typelevel.org/Laika/", "Laika"),
           TextLink.external("https://github.com/sbt/sbt-unidoc", "sbt-unidoc"),
