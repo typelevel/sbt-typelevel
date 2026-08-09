@@ -31,6 +31,21 @@ object GenerativePlugin extends AutoPlugin {
     type WorkflowJob = org.typelevel.sbt.gha.WorkflowJob
     val WorkflowJob = org.typelevel.sbt.gha.WorkflowJob
 
+    type WorkflowTriggers = org.typelevel.sbt.gha.WorkflowTriggers
+    val WorkflowTriggers = org.typelevel.sbt.gha.WorkflowTriggers
+
+    type PushTrigger = org.typelevel.sbt.gha.PushTrigger
+    val PushTrigger = org.typelevel.sbt.gha.PushTrigger
+
+    type PullRequestTrigger = org.typelevel.sbt.gha.PullRequestTrigger
+    val PullRequestTrigger = org.typelevel.sbt.gha.PullRequestTrigger
+
+    type MergeGroupTrigger = org.typelevel.sbt.gha.MergeGroupTrigger
+    val MergeGroupTrigger = org.typelevel.sbt.gha.MergeGroupTrigger
+
+    type MergeGroupEventType = org.typelevel.sbt.gha.MergeGroupEventType
+    val MergeGroupEventType = org.typelevel.sbt.gha.MergeGroupEventType
+
     type Concurrency = org.typelevel.sbt.gha.Concurrency
     val Concurrency = org.typelevel.sbt.gha.Concurrency
 
@@ -145,6 +160,52 @@ object GenerativePlugin extends AutoPlugin {
       case ReviewRequested => "review_requested"
       case ReviewRequestRemoved => "review_request_removed"
     }
+  }
+
+  def compileMergeGroupEventType(tpe: MergeGroupEventType): String =
+    tpe match {
+      case MergeGroupEventType.ChecksRequested => "checks_requested"
+    }
+
+  private def whenNonEmpty(items: List[String])(f: List[String] => String): String =
+    if (items.isEmpty) "" else f(items)
+
+  private def compilePushOrPullRequestTrigger(trigger: PushOrPullRequestTrigger): String = {
+    val branches = whenNonEmpty(trigger.branches)(b => s"\n    branches:${compileList(b, 3)}")
+    val branchesIgnore =
+      whenNonEmpty(trigger.branchesIgnore)(b => s"\n    branches-ignore:${compileList(b, 3)}")
+    val paths = whenNonEmpty(trigger.paths)(p => s"\n    paths:${compileList(p, 3)}")
+    val pathsIgnore =
+      whenNonEmpty(trigger.pathsIgnore)(p => s"\n    paths-ignore:${compileList(p, 3)}")
+    s"$branches$branchesIgnore$paths$pathsIgnore"
+  }
+
+  def compilePullRequestTrigger(pull: PullRequestTrigger): String = {
+    val base = compilePushOrPullRequestTrigger(pull)
+    val types =
+      whenNonEmpty(pull.types.map(compilePREventType))(t => s"\n    types:${compileList(t, 3)}")
+    s"$base$types"
+  }
+
+  def compilePushTrigger(push: PushTrigger): String = {
+    val base = compilePushOrPullRequestTrigger(push)
+    val tags = whenNonEmpty(push.tags)(t => s"\n    tags:${compileList(t, 3)}")
+    val tagsIgnore =
+      whenNonEmpty(push.tagsIgnore)(t => s"\n    tags-ignore:${compileList(t, 3)}")
+    s"$base$tags$tagsIgnore"
+  }
+
+  def compileMergeGroupTrigger(merge: MergeGroupTrigger): String =
+    whenNonEmpty(merge.types.map(compileMergeGroupEventType))(t =>
+      s"\n    types:${compileList(t, 3)}")
+
+  def compileWorkflowTrigger(trigger: WorkflowTriggers): String = {
+    val pullRequest =
+      trigger.pullRequest.fold("")(t => s"\n  pull_request:${compilePullRequestTrigger(t)}")
+    val push = trigger.push.fold("")(t => s"\n  push:${compilePushTrigger(t)}")
+    val mergeGroup =
+      trigger.mergeGroup.fold("")(t => s"\n  merge_group:${compileMergeGroupTrigger(t)}")
+    s"on:$pullRequest$push$mergeGroup"
   }
 
   def compileRef(ref: Ref): String = ref match {
@@ -590,6 +651,23 @@ ${indent(job.steps.map(compileStep(_, sbt, job.sbtStepPreamble, declareShell = d
       env: Map[String, String],
       concurrency: Option[Concurrency],
       jobs: List[WorkflowJob],
+      sbt: String): String =
+    compileWorkflow(
+      name,
+      createTriggers(branches, tags, paths, prEventTypes),
+      permissions,
+      env,
+      concurrency,
+      jobs,
+      sbt)
+
+  def compileWorkflow(
+      name: String,
+      triggers: WorkflowTriggers,
+      permissions: Option[Permissions],
+      env: Map[String, String],
+      concurrency: Option[Concurrency],
+      jobs: List[WorkflowJob],
       sbt: String): String = {
 
     val renderedPermissionsPre = compilePermissions(permissions)
@@ -608,29 +686,6 @@ ${indent(job.steps.map(compileStep(_, sbt, job.sbtStepPreamble, declareShell = d
     val renderedConcurrency =
       concurrency.map(compileConcurrency).map("\n" + _ + "\n\n").getOrElse("")
 
-    val renderedTypesPre = prEventTypes.map(compilePREventType).mkString("[", ", ", "]")
-    val renderedTypes =
-      if (prEventTypes.sortBy(_.toString) == PREventType.Defaults)
-        ""
-      else
-        "\n" + indent("types: " + renderedTypesPre, 2)
-
-    val renderedTags =
-      if (tags.isEmpty)
-        ""
-      else
-        s"""
-    tags: [${tags.map(wrap).mkString(", ")}]"""
-
-    val renderedPaths = paths match {
-      case Paths.None =>
-        ""
-      case Paths.Include(paths) =>
-        "\n" + indent(s"""paths: [${paths.map(wrap).mkString(", ")}]""", 2)
-      case Paths.Ignore(paths) =>
-        "\n" + indent(s"""paths-ignore: [${paths.map(wrap).mkString(", ")}]""", 2)
-    }
-
     s"""# This file was automatically generated by sbt-github-actions using the
 # githubWorkflowGenerate task. You should add and commit this file to
 # your git repository. It goes without saying that you shouldn't edit
@@ -640,15 +695,45 @@ ${indent(job.steps.map(compileStep(_, sbt, job.sbtStepPreamble, declareShell = d
 
 name: ${wrap(name)}
 
-on:
-  pull_request:
-    branches: [${branches.map(wrap).mkString(", ")}]$renderedTypes$renderedPaths
-  push:
-    branches: [${branches.map(wrap).mkString(", ")}]$renderedTags$renderedPaths
+${compileWorkflowTrigger(triggers)}
 
 ${renderedPerm}${renderedEnv}${renderedConcurrency}jobs:
 ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
 """
+  }
+
+  private def createTriggers(
+      branches: List[String],
+      tags: List[String],
+      paths: Paths,
+      prEventTypes: List[PREventType]): WorkflowTriggers = {
+    val (pathsInclude, pathsIgnore) = paths match {
+      case Paths.Include(ps) => (ps, Nil)
+      case Paths.Ignore(ps) => (Nil, ps)
+      case Paths.None => (Nil, Nil)
+    }
+
+    val types = {
+      if (prEventTypes.sortBy(_.toString) == PREventType.Defaults) Nil
+      else prEventTypes
+    }
+
+    WorkflowTriggers(
+      push = Some(
+        PushTrigger(
+          branches = branches,
+          tags = tags,
+          paths = pathsInclude,
+          pathsIgnore = pathsIgnore
+        )),
+      pullRequest = Some(
+        PullRequestTrigger(
+          branches = branches,
+          types = types,
+          paths = pathsInclude,
+          pathsIgnore = pathsIgnore
+        ))
+    )
   }
 
   val settingDefaults = Seq(
@@ -676,6 +761,13 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
     githubWorkflowPublishPostamble := Seq(),
     githubWorkflowPublish := Seq(
       WorkflowStep.Sbt(List("+publish"), name = Some("Publish project"))),
+
+    githubWorkflowTriggers := createTriggers(
+      githubWorkflowTargetBranches.value.toList,
+      githubWorkflowTargetTags.value.toList,
+      githubWorkflowTargetPaths.value,
+      githubWorkflowPREventTypes.value.toList
+    ),
     githubWorkflowPublishTargetBranches := Seq(RefPredicate.Equals(Ref.Branch("main"))),
     githubWorkflowPublishCond := None,
     githubWorkflowPublishTimeoutMinutes := None,
@@ -914,10 +1006,7 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
   private val generateCiContents = Def task {
     compileWorkflow(
       "Continuous Integration",
-      githubWorkflowTargetBranches.value.toList,
-      githubWorkflowTargetTags.value.toList,
-      githubWorkflowTargetPaths.value,
-      githubWorkflowPREventTypes.value.toList,
+      githubWorkflowTriggers.value,
       githubWorkflowPermissions.value,
       githubWorkflowEnv.value,
       githubWorkflowConcurrency.value,
