@@ -162,7 +162,8 @@ lazy val github = project
   .in(file("github"))
   .enablePlugins(SbtPlugin)
   .settings(
-    name := "sbt-typelevel-github"
+    name := "sbt-typelevel-github",
+    sbt2Settings
   )
   .dependsOn(kernel)
 
