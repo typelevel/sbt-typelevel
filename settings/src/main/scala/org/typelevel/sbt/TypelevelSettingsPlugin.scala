@@ -18,7 +18,9 @@ package org.typelevel.sbt
 
 import com.github.sbt.git.GitPlugin
 import org.typelevel.sbt.kernel.V
+import org.typelevel.sbt.settings.PluginCompat
 import sbt._
+import sbtcompat.PluginCompat._
 import sbtcrossproject.CrossPlugin.autoImport._
 
 import java.io.File
@@ -61,7 +63,7 @@ object TypelevelSettingsPlugin extends AutoPlugin {
           Seq(
             compilerPlugin("com.olegpy" %% "better-monadic-for" % "0.3.1"),
             compilerPlugin(
-              "org.typelevel" % "kind-projector" % "0.13.4" cross CrossVersion.full)
+              ("org.typelevel" % "kind-projector" % "0.13.4").cross(CrossVersion.full))
           )
 
       val scalacCompat =
@@ -359,11 +361,12 @@ object TypelevelSettingsPlugin extends AutoPlugin {
       }
     },
     packageSrc / mappings ++= {
+      implicit val conv: xsbti.FileConverter = fileConverter.value
       val bases = managedSourceDirectories.value
       managedSources.value.map { file =>
         bases
           .map(b => file.relativeTo(b))
-          .collectFirst { case Some(relative) => file -> relative.getPath }
+          .collectFirst { case Some(relative) => toFileRef(file) -> relative.getPath }
           .getOrElse {
             throw new RuntimeException(
               s"""|Expected managed sources in:
@@ -399,30 +402,34 @@ object TypelevelSettingsPlugin extends AutoPlugin {
 
   private val javaApiMappings = {
     // scaladoc doesn't support this automatically before 2.13
-    doc / apiMappings := {
+    doc / apiMappings := Def.uncached {
       val old = (doc / apiMappings).value
 
       val baseUrl = tlJdkRelease.value.getOrElse(javaMajorVersion) match {
-        case v if v < 11 => url(s"https://docs.oracle.com/javase/${v}/docs/api/")
-        case v => url(s"https://docs.oracle.com/en/java/javase/${v}/docs/api/java.base/")
+        case v if v < 11 =>
+          PluginCompat.url(uri(s"https://docs.oracle.com/javase/${v}/docs/api/"))
+        case v =>
+          PluginCompat.url(
+            uri(s"https://docs.oracle.com/en/java/javase/${v}/docs/api/java.base/"))
       }
 
       val runtimeMXBean = ManagementFactory.getRuntimeMXBean
+      implicit val conv: xsbti.FileConverter = fileConverter.value
       val oldSchool = Try(
         if (runtimeMXBean.isBootClassPathSupported)
           runtimeMXBean
             .getBootClassPath
             .split(File.pathSeparatorChar)
-            .map(file(_) -> baseUrl)
+            .map(x => toFileRef(file(x)) -> baseUrl)
             .toMap
         else Map.empty
       ).getOrElse(Map.empty)
-      val newSchool = Map(file("/modules/java.base") -> baseUrl)
+      val newSchool = Map(toFileRef(file("/modules/java.base")) -> baseUrl)
       // Latest one wins.  We are providing a fallback.
       oldSchool ++ newSchool ++ old
     }
   }
 
-  @nowarn("cat=unused")
-  private[this] def unused(): Unit = ()
+  @nowarn()
+  private def unused(): Unit = ()
 }
