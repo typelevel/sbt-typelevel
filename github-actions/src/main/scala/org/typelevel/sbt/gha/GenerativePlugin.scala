@@ -558,11 +558,15 @@ ${indent(rendered.mkString("\n"), 1)}"""
 
     val renderedFailFast = job.matrixFailFast.fold("")("\n  fail-fast: " + _)
 
+    // TODO: Zainab - The simplest approach for project matrix support is to replace "2.12" with "2_12" in the scala matrix.
+    // We may want to keep "2.12" as-is and replace the dot in the build-specific step.
+    val scalas = job.scalas.map(_.replaceAll("\\.", "_"))
+
     // format: off
     val body = s"""name: ${wrap(job.name)}${renderedNeeds}${renderedCond}
 strategy:${renderedFailFast}
   matrix:
-${buildMatrix(2, "os" -> job.oses, "scala" -> job.scalas, "java" -> job.javas.map(_.render))}${renderedMatrices}
+${buildMatrix(2, "os" -> job.oses, "scala" -> scalas, "java" -> job.javas.map(_.render))}${renderedMatrices}
 runs-on: ${runsOn}${renderedEnvironment}${renderedContainer}${renderedPerm}${renderedEnv}${renderedConcurrency}${renderedOutputs}${renderedTimeoutMinutes}
 steps:
 ${indent(job.steps.map(compileStep(_, sbt, job.sbtStepPreamble, declareShell = declareShell)).mkString("\n\n"), 1)}"""
@@ -670,7 +674,7 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
     githubWorkflowBuildTimeoutMinutes := Some(60),
     githubWorkflowBuildPreamble := Seq(),
     githubWorkflowBuildPostamble := Seq(),
-    githubWorkflowBuildSbtStepPreamble := Seq(s"++ $${{ matrix.scala }}"),
+    githubWorkflowBuildSbtStepPreamble := Nil,
     githubWorkflowBuild := Seq(WorkflowStep.Sbt(List("test"), name = Some("Build project"))),
     githubWorkflowPublishPreamble := Seq(),
     githubWorkflowPublishPostamble := Seq(),
@@ -792,7 +796,7 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
           Nil,
           exclusions
         ).map {
-          case _ :: scala :: _ :: tail => scala :: tail
+          case _ :: scala :: _ :: tail => scala.replaceAll("\\.", "_") :: tail
           case _ => sys.error("Bug generating artifact download steps") // shouldn't happen
         }
 

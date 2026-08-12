@@ -18,6 +18,7 @@ package org.typelevel.sbt
 
 import org.typelevel.sbt.gha.GenerativePlugin.autoImport._
 import sbt._
+import sbt.internal.ProjectMatrix
 
 import Keys._
 
@@ -27,29 +28,34 @@ import Keys._
  */
 final class CrossRootProject private (
     val all: Project,
-    val jvm: Project,
-    val js: Project,
-    val native: Project
+    val jvm: Map[String, Project],
+    val js: Map[String, Project],
+    val native: Map[String, Project]
 ) extends CompositeProject {
 
-  override def componentProjects: Seq[Project] = Seq(all, jvm, js, native)
+  override def componentProjects: Seq[Project] =
+    Seq(all) ++
+      jvm.values ++
+      js.values ++
+      native.values
 
   def settings(ss: Def.SettingsDefinition*): CrossRootProject =
     new CrossRootProject(
       all.settings(ss: _*),
-      jvm.settings(ss: _*),
-      js.settings(ss: _*),
-      native.settings(ss: _*)
+      mapProject(jvm)(_.settings(ss: _*)),
+      mapProject(js)(_.settings(ss: _*)),
+      mapProject(native)(_.settings(ss: _*))
     )
 
   def configure(transforms: (Project => Project)*): CrossRootProject =
     new CrossRootProject(
       all.configure(transforms: _*),
-      jvm.configure(transforms: _*),
-      js.configure(transforms: _*),
-      native.configure(transforms: _*)
+      mapProject(jvm)(_.configure(transforms: _*)),
+      mapProject(js)(_.configure(transforms: _*)),
+      mapProject(native)(_.configure(transforms: _*))
     )
 
+  // TODO: Zainab - See Laika and feral builds to understand how "all" is used.
   def configureRoot(transforms: (Project => Project)*): CrossRootProject =
     new CrossRootProject(
       all.configure(transforms: _*),
@@ -61,7 +67,7 @@ final class CrossRootProject private (
   def configureJVM(transforms: (Project => Project)*): CrossRootProject =
     new CrossRootProject(
       all,
-      jvm.configure(transforms: _*),
+      mapProject(jvm)(_.configure(transforms: _*)),
       js,
       native
     )
@@ -70,7 +76,7 @@ final class CrossRootProject private (
     new CrossRootProject(
       all,
       jvm,
-      js.configure(transforms: _*),
+      mapProject(js)(_.configure(transforms: _*)),
       native
     )
 
@@ -79,67 +85,132 @@ final class CrossRootProject private (
       all,
       jvm,
       js,
-      native.configure(transforms: _*)
+      mapProject(native)(_.configure(transforms: _*))
     )
 
   def enablePlugins(ns: Plugins*): CrossRootProject =
     new CrossRootProject(
       all.enablePlugins(ns: _*),
-      jvm.enablePlugins(ns: _*),
-      js.enablePlugins(ns: _*),
-      native.enablePlugins(ns: _*)
+      mapProject(jvm)(_.enablePlugins(ns: _*)),
+      mapProject(js)(_.enablePlugins(ns: _*)),
+      mapProject(native)(_.enablePlugins(ns: _*))
     )
 
   def disablePlugins(ps: AutoPlugin*): CrossRootProject =
     new CrossRootProject(
       all.disablePlugins(ps: _*),
-      jvm.disablePlugins(ps: _*),
-      js.disablePlugins(ps: _*),
-      native.disablePlugins(ps: _*)
+      mapProject(jvm)(_.disablePlugins(ps: _*)),
+      mapProject(js)(_.disablePlugins(ps: _*)),
+      mapProject(native)(_.disablePlugins(ps: _*))
     )
 
-  def aggregate(projects: CompositeProject*): CrossRootProject =
-    aggregateImpl(projects.flatMap(_.componentProjects): _*)
+  def aggregate(projects: ProjectMatrix*): CrossRootProject = {
+    aggregateImpl(projects)
+  }
 
-  private def aggregateImpl(projects: Project*): CrossRootProject = {
+  def aggregate(scalaVersion: String, projects: Project*): CrossRootProject = {
+    val componentProjects = projects.flatMap(_.componentProjects)
     val jsProjects =
-      projects.filter(_.plugins.toString.contains("org.scalajs.sbtplugin.ScalaJSPlugin"))
-
+      componentProjects.filter(
+        _.plugins.toString.contains("org.scalajs.sbtplugin.ScalaJSPlugin"))
     val nativeProjects =
-      projects.filter(
+      componentProjects.filter(
         _.plugins.toString.contains("scala.scalanative.sbtplugin.ScalaNativePlugin"))
-
-    val jvmProjects = projects.diff(jsProjects).diff(nativeProjects)
-
-    new CrossRootProject(
-      all.aggregate(projects.map(_.project): _*),
-      if (jvmProjects.nonEmpty)
-        jvm.aggregate(jvmProjects.map(_.project): _*).enablePlugins(TypelevelCiJVMPlugin)
-      else jvm,
-      if (jsProjects.nonEmpty)
-        js.aggregate(jsProjects.map(_.project): _*).enablePlugins(TypelevelCiJSPlugin)
-      else js,
-      if (nativeProjects.nonEmpty)
-        native
-          .aggregate(nativeProjects.map(_.project): _*)
-          .enablePlugins(TypelevelCiNativePlugin)
-      else native
+    val jvmProjects =
+      projects.diff(jsProjects).diff(nativeProjects)
+    aggregateForScalaVersion(
+      scalaVersion,
+      jvmProjects,
+      jsProjects,
+      nativeProjects
     )
   }
 
+  private def mapProject(kvs: Map[String, Project])(
+      f: Project => Project): Map[String, Project] =
+    kvs.map { case (k, v) => k -> f(v) }
+
+  private def aggregateImpl(matrices: Seq[ProjectMatrix]): CrossRootProject = {
+
+    def projectsForScalaVersion(scalaVersion: String, axis: VirtualAxis): Seq[Project] = {
+      matrices.flatMap { matrix =>
+        matrix.allProjects().collect {
+          case (project, axes)
+              if axes.contains(axis) &&
+                axes.exists {
+                  case VirtualAxis.ScalaVersionAxis(_, scalaBinaryVersion) =>
+                    scalaBinaryVersion == scalaVersion
+                  case _ => false
+                } =>
+            project
+        }
+      }
+    }
+    val scalaVersions = jvm.keys.toList
+    scalaVersions.foldLeft(this) { (crossRootProj, scalaVersion) =>
+      crossRootProj.aggregateForScalaVersion(
+        scalaVersion,
+        jvmProjects = projectsForScalaVersion(scalaVersion, VirtualAxis.jvm),
+        jsProjects = projectsForScalaVersion(scalaVersion, VirtualAxis.js),
+        nativeProjects = projectsForScalaVersion(scalaVersion, VirtualAxis.native)
+      )
+    }
+  }
+
+  private def aggregateForScalaVersion(
+      scalaVersion: String,
+      jvmProjects: Seq[Project],
+      jsProjects: Seq[Project],
+      nativeProjects: Seq[Project]): CrossRootProject = {
+    val allProjects = jvmProjects ++ jsProjects ++ nativeProjects
+    new CrossRootProject(
+      all.aggregate(allProjects.map(_.project): _*),
+      jvm = addProjects(jvm, scalaVersion, jvmProjects, TypelevelCiJVMPlugin),
+      js = addProjects(js, scalaVersion, jsProjects, TypelevelCiJSPlugin),
+      native = addProjects(native, scalaVersion, nativeProjects, TypelevelCiNativePlugin)
+    )
+  }
+
+  private def addProjects(
+      existingProjects: Map[String, Project],
+      scalaVersion: String,
+      additionalProjects: Seq[Project],
+      plugin: AutoPlugin): Map[String, Project] = {
+    if (additionalProjects.nonEmpty) {
+      existingProjects + (scalaVersion -> existingProjects(scalaVersion)
+        .aggregate(additionalProjects.map(_.project): _*)
+        .enablePlugins(plugin))
+    } else {
+      existingProjects
+    }
+  }
 }
 
 object CrossRootProject {
-  def unapply(rootProject: CrossRootProject): Some[(Project, Project, Project, Project)] =
-    Some((rootProject.all, rootProject.jvm, rootProject.js, rootProject.native))
 
-  def apply(id: String): CrossRootProject = new CrossRootProject(
+  private val defaultScalaVersions: Seq[String] = Seq("2.12", "2.13", "3")
+
+  // TODO: Zainab - Add a field for scala versions into the macro, or extract it from crossScalaVersions if possible.
+  def apply(id: String): CrossRootProject =
+    apply(id, defaultScalaVersions)
+
+  def apply(id: String, scalaVersions: Seq[String]): CrossRootProject = new CrossRootProject(
     Project(id, file("."))
       .settings(crossScalaVersions := Nil, scalaVersion := (ThisBuild / scalaVersion).value),
-    Project(s"${id}JVM", file(".jvm")),
-    Project(s"${id}JS", file(".js")),
-    Project(s"${id}Native", file(".native"))
+    platformProject(id, scalaVersions, "JVM"),
+    platformProject(id, scalaVersions, "JS"),
+    platformProject(id, scalaVersions, "Native")
   ).enablePlugins(NoPublishPlugin, TypelevelCiCrossPlugin)
+
+  private def platformProject(
+      id: String,
+      scalaVersions: Seq[String],
+      platform: String): Map[String, Project] = {
+    scalaVersions.map { version =>
+      val suffix = version.replace(".", "_")
+      version -> Project(s"${id}${platform}$suffix", file(s".${platform.toLowerCase}$suffix"))
+    }.toMap
+  }
 }
 
 /**
@@ -158,7 +229,9 @@ object TypelevelCiCrossPlugin extends AutoPlugin {
   override def requires = TypelevelCiPlugin
 
   override def buildSettings = Seq(
-    githubWorkflowBuildSbtStepPreamble ~= { s"project $${{ matrix.project }}" +: _ },
+    githubWorkflowBuildSbtStepPreamble ~= {
+      s"project $${{ matrix.project }}$${{ matrix.scala }}" +: _
+    },
     githubWorkflowBuildMatrixAdditions += "project" -> Nil,
     githubWorkflowArtifactDownloadExtraKeys += "project"
   )
