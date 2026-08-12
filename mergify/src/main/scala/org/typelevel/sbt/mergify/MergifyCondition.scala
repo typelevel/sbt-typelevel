@@ -46,6 +46,6 @@ object MergifyCondition {
     implicit def encoder: Encoder[Or] = Encoder.forProduct1("or")(_.conditions)
   }
 
-  @nowarn("cat=unused")
-  private[this] final object Dummy extends MergifyCondition // break exhaustivity checking
+  @nowarn()
+  private object Dummy extends MergifyCondition // break exhaustivity checking
 }
