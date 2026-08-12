@@ -154,7 +154,8 @@ lazy val settings = project
   .in(file("settings"))
   .enablePlugins(SbtPlugin)
   .settings(
-    name := "sbt-typelevel-settings"
+    name := "sbt-typelevel-settings",
+    sbt2Settings
   )
   .dependsOn(kernel)
 
