@@ -40,7 +40,7 @@ object TypelevelMimaPlugin extends AutoPlugin {
 
   import autoImport._
 
-  override def buildSettings = Seq[Setting[_]](
+  override def buildSettings = Seq[Setting[?]](
     tlVersionIntroduced := Map.empty,
     tlMimaPreviousVersions := {
       require(
@@ -61,7 +61,7 @@ object TypelevelMimaPlugin extends AutoPlugin {
     }
   )
 
-  override def projectSettings = Seq[Setting[_]](
+  override def projectSettings = Seq[Setting[?]](
     mimaReportBinaryIssues := {
       if (!publishArtifact.value) ()
       else mimaReportBinaryIssues.value

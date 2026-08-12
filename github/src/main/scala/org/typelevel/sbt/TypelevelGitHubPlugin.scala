@@ -72,32 +72,33 @@ object TypelevelGitHubPlugin extends AutoPlugin {
     }
   )
 
-  override def projectSettings: Seq[Setting[_]] = Seq(
-    Compile / doc / scalacOptions ++= {
-      val tagOrHash =
-        GitHelper.getTagOrHash(git.gitCurrentTags.value, git.gitHeadCommit.value)
-      val userRepo = gitHubUserRepo.value
-      val infoOpt = scmInfo.value
+  private val sourceUrlOptions = Def.task {
+    val tagOrHash =
+      GitHelper.getTagOrHash(git.gitCurrentTags.value, git.gitHeadCommit.value)
+    val userRepo = gitHubUserRepo.value
+    val infoOpt = scmInfo.value
 
-      tagOrHash.toSeq flatMap { vh =>
-        scalaVersion.value match {
-          case V(V(3, _, _, _)) =>
-            userRepo.toSeq flatMap {
-              case (user, repo) =>
-                Seq(s"-source-links:github://${user}/${repo}", "-revision", vh)
-            }
-          case V(V(2, minor, patch, _)) =>
-            infoOpt.toSeq flatMap { info =>
-              val path =
-                // see https://github.com/scala/bug/issues/12867#issuecomment-1718481858
-                if (minor > 13 || minor == 13 && patch.forall(_ >= 12))
-                  s"${info.browseUrl}/blob/${vh}/€{FILE_PATH}.scala"
-                else s"${info.browseUrl}/blob/${vh}€{FILE_PATH}.scala"
-              Seq("-doc-source-url", path)
-            }
-        }
+    tagOrHash.toSeq flatMap { vh =>
+      scalaVersion.value match {
+        case V(V(3, _, _, _)) =>
+          userRepo.toSeq flatMap {
+            case (user, repo) =>
+              Seq(s"-source-links:github://${user}/${repo}", "-revision", vh)
+          }
+        case V(V(2, minor, patch, _)) =>
+          infoOpt.toSeq flatMap { info =>
+            val path =
+              // see https://github.com/scala/bug/issues/12867#issuecomment-1718481858
+              if (minor > 13 || minor == 13 && patch.forall(_ >= 12))
+                s"${info.browseUrl}/blob/${vh}/€{FILE_PATH}.scala"
+              else s"${info.browseUrl}/blob/${vh}€{FILE_PATH}.scala"
+            Seq("-doc-source-url", path)
+          }
       }
     }
+  }
+  override def projectSettings: Seq[Setting[?]] = Seq(
+    Compile / doc / scalacOptions ++= sourceUrlOptions.value
   )
 
   private def gitHubScmInfo(user: String, repo: String) =

@@ -17,8 +17,9 @@ val modules = List(
   "versioning"
 )
 
-Compile / unmanagedSourceDirectories ++= modules.map { module =>
-  baseDirectory.value.getParentFile / module / "src" / "main" / "scala"
+Compile / unmanagedSourceDirectories ++= modules.flatMap { module =>
+  val moduleDir = baseDirectory.value.getParentFile / module / "src" / "main"
+  Seq(moduleDir / "scala", moduleDir / "scala-2.12")
 }
 
 Compile / unmanagedResourceDirectories ++= modules.map { module =>
