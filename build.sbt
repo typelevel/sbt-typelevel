@@ -187,7 +187,8 @@ lazy val mergify = project
   .enablePlugins(SbtPlugin)
   .settings(
     name := "sbt-typelevel-mergify",
-    tlVersionIntroduced := Map("2.12" -> "0.4.6")
+    tlVersionIntroduced := Map("2.12" -> "0.4.6"),
+    sbt2Settings
   )
   .dependsOn(githubActions)
 
@@ -308,7 +309,8 @@ lazy val sbt2 = project
     sonatypeCiRelease,
     ci,
     githubActions
-  ).settings(
+  )
+  .settings(
     scalaVersion := "3.8.3",
     ThisBuild / version := "1.1.1"
   )

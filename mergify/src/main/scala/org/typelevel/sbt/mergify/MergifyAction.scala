@@ -81,43 +81,43 @@ object MergifyAction {
       new RequestReviews(users, teams, usersFromTeams, randomCount) {}
 
     def withUsers(user: String, users: String*): RequestReviews =
-      copy(users = Unweighted(NonEmptyList.of(user, users: _*)).some)
+      copy(users = Unweighted(NonEmptyList.of(user, users*)).some)
 
     def withUsers(user: (String, Int), users: (String, Int)*): RequestReviews =
-      copy(users = Weighted(NonEmptyList.of(user, users: _*)).some)
+      copy(users = Weighted(NonEmptyList.of(user, users*)).some)
 
     def withTeams(team: String, teams: String*): RequestReviews =
-      copy(teams = Unweighted(NonEmptyList.of(team, teams: _*)).some)
+      copy(teams = Unweighted(NonEmptyList.of(team, teams*)).some)
 
     def withTeams(team: (String, Int), teams: (String, Int)*): RequestReviews =
-      copy(teams = Weighted(NonEmptyList.of(team, teams: _*)).some)
+      copy(teams = Weighted(NonEmptyList.of(team, teams*)).some)
 
     def withUsersFromTeams(team: String, teams: String*): RequestReviews =
-      copy(usersFromTeams = Unweighted(NonEmptyList.of(team, teams: _*)).some)
+      copy(usersFromTeams = Unweighted(NonEmptyList.of(team, teams*)).some)
 
     def withUsersFromTeams(team: (String, Int), teams: (String, Int)*): RequestReviews =
-      copy(usersFromTeams = Weighted(NonEmptyList.of(team, teams: _*)).some)
+      copy(usersFromTeams = Weighted(NonEmptyList.of(team, teams*)).some)
 
     def withRandomCount(count: Int): RequestReviews =
       copy(randomCount = Option(count))
 
     def withDevelopers(developers: List[Developer]): RequestReviews =
-      copy(users = NonEmptyList.fromList(developers.map(_.id)).map(Unweighted))
+      copy(users = NonEmptyList.fromList(developers.map(_.id)).map(Unweighted(_)))
   }
 
   object RequestReviews {
     def fromUsers(user: String, users: String*) =
-      new RequestReviews(Unweighted(NonEmptyList.of(user, users: _*)).some, None, None, None)
+      new RequestReviews(Unweighted(NonEmptyList.of(user, users*)).some, None, None, None)
     def fromUsers(user: (String, Int), users: (String, Int)*) =
-      new RequestReviews(Weighted(NonEmptyList.of(user, users: _*)).some, None, None, None)
+      new RequestReviews(Weighted(NonEmptyList.of(user, users*)).some, None, None, None)
     def fromTeams(team: String, teams: String*) =
-      new RequestReviews(None, Unweighted(NonEmptyList.of(team, teams: _*)).some, None, None)
+      new RequestReviews(None, Unweighted(NonEmptyList.of(team, teams*)).some, None, None)
     def fromTeams(team: (String, Int), teams: (String, Int)*) =
-      new RequestReviews(None, Weighted(NonEmptyList.of(team, teams: _*)).some, None, None)
+      new RequestReviews(None, Weighted(NonEmptyList.of(team, teams*)).some, None, None)
     def fromUsersOfTeams(team: String, teams: String*) =
-      new RequestReviews(None, None, Unweighted(NonEmptyList.of(team, teams: _*)).some, None)
+      new RequestReviews(None, None, Unweighted(NonEmptyList.of(team, teams*)).some, None)
     def fromUsersOfTeams(team: (String, Int), teams: (String, Int)*) =
-      new RequestReviews(None, None, Weighted(NonEmptyList.of(team, teams: _*)).some, None)
+      new RequestReviews(None, None, Weighted(NonEmptyList.of(team, teams*)).some, None)
 
     def apply(developers: List[Developer]) =
       new RequestReviews(
@@ -161,6 +161,6 @@ object MergifyAction {
       Encoder[JsonObject].contramap(_ => JsonObject.empty)
   }
 
-  @nowarn("cat=unused")
-  private[this] object Dummy extends MergifyAction
+  @nowarn()
+  private object Dummy extends MergifyAction
 }
