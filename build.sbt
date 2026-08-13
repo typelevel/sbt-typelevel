@@ -260,7 +260,8 @@ lazy val ciRelease = project
   .in(file("ci-release"))
   .enablePlugins(SbtPlugin)
   .settings(
-    name := "sbt-typelevel-ci-release"
+    name := "sbt-typelevel-ci-release",
+    sbt2Settings
   )
   .dependsOn(
     noPublish,
@@ -310,7 +311,8 @@ lazy val sbt2 = project
     sonatypeCiRelease,
     ci,
     githubActions,
-    ciSigning
+    ciSigning,
+    ciRelease
   )
   .settings(
     scalaVersion := "3.8.3",
