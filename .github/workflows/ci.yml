@@ -400,6 +400,19 @@ jobs:
         os: [ubuntu-22.04]
         java: [temurin@8]
     runs-on: ${{ matrix.os }}
+    permissions:
+      actions: none
+      checks: none
+      contents: write
+      deployments: none
+      id-token: none
+      issues: none
+      packages: read
+      pages: none
+      pull-requests: none
+      repository-projects: none
+      security-events: none
+      statuses: none
     steps:
       - name: Ignore line ending differences in git
         if: contains(runner.os, 'windows')
