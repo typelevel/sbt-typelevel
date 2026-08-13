@@ -31,7 +31,7 @@ object TypelevelCiPlugin extends AutoPlugin {
   override def trigger = allRequirements
 
   object autoImport {
-    def tlCrossRootProject: CrossRootProject = macro CrossRootProjectMacros.crossRootProjectImpl
+    def tlCrossRootProject: CrossRootProject = CrossRootProject("myproj")
 
     lazy val tlCiHeaderCheck =
       settingKey[Boolean]("Whether to do header check in CI (default: false)")
