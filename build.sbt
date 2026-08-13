@@ -277,7 +277,8 @@ lazy val core = project
   .in(file("core"))
   .enablePlugins(SbtPlugin)
   .settings(
-    name := "sbt-typelevel"
+    name := "sbt-typelevel",
+    sbt2Settings
   )
   .dependsOn(
     ciRelease,
@@ -312,7 +313,8 @@ lazy val sbt2 = project
     ci,
     githubActions,
     ciSigning,
-    ciRelease
+    ciRelease,
+    core
   )
   .settings(
     scalaVersion := "3.8.3",

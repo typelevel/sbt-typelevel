@@ -16,10 +16,11 @@
 
 package org.typelevel.sbt
 
-import de.heikoseeberger.sbtheader.HeaderPlugin
+import org.typelevel.sbt.core.PluginCompat
 import org.typelevel.sbt.gha.GenerativePlugin
 import org.typelevel.sbt.gha.GitHubActionsPlugin
 import sbt._
+import sbtheader.HeaderPlugin
 
 import Keys._
 import TypelevelKernelPlugin.autoImport._
@@ -57,7 +58,7 @@ object TypelevelPlugin extends AutoPlugin {
     organizationHomepage := {
       organizationHomepage.?.value.flatten.orElse {
         if (organizationName.value == "Typelevel")
-          Some(url("https://typelevel.org"))
+          Some(PluginCompat.url(uri("https://typelevel.org")))
         else None
       }
     },
