@@ -233,7 +233,8 @@ lazy val ciSigning = project
   .in(file("ci-signing"))
   .enablePlugins(SbtPlugin)
   .settings(
-    name := "sbt-typelevel-ci-signing"
+    name := "sbt-typelevel-ci-signing",
+    sbt2Settings
   )
   .dependsOn(githubActions)
 
@@ -308,7 +309,8 @@ lazy val sbt2 = project
     sonatype,
     sonatypeCiRelease,
     ci,
-    githubActions
+    githubActions,
+    ciSigning
   )
   .settings(
     scalaVersion := "3.8.3",
