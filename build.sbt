@@ -128,7 +128,7 @@ lazy val sbt2Settings = Seq(
   (pluginCrossBuild / sbtVersion) := {
     scalaBinaryVersion.value match {
       case "2.12" => "1.11.7"
-      case _ => "2.0.0-RC13"
+      case _ => "2.0.6"
     }
   }
 )
@@ -289,7 +289,8 @@ lazy val site = project
   .in(file("site"))
   .enablePlugins(SbtPlugin)
   .settings(
-    name := "sbt-typelevel-site"
+    name := "sbt-typelevel-site",
+    sbt2Settings
   )
   .dependsOn(kernel, github, githubActions, noPublish)
 

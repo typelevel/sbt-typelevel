@@ -37,9 +37,10 @@ object TypelevelSiteSettings {
   val defaultFooter: Initialize[Seq[Span]] = setting {
     val title = gitHubUserRepo.value.map(_._2)
     title.fold(Seq[Span]()) { title =>
-      val licensePhrase = licenses.value.headOption.fold("") {
-        case (name, url) =>
-          s""" distributed under the <a href="${url.toString}">$name</a> license"""
+      val licensePhrase = licenses.value.headOption.fold("") { license =>
+        val name = PluginCompat.name(license)
+        val url = PluginCompat.uri(license)
+        s""" distributed under the <a href="${url.toString}">$name</a> license"""
       }
       Seq(TemplateString(
         s"""$title is a <a href="https://typelevel.org/">Typelevel</a> project$licensePhrase."""
@@ -96,9 +97,9 @@ object TypelevelSiteSettings {
       .darkMode
       .disabled
       .site
-      .favIcons(favIcons: _*)
+      .favIcons(favIcons*)
       .site
-      .footer(defaultFooter.value: _*)
+      .footer(defaultFooter.value*)
       .site
       .topNavigationBar(
         homeLink = defaultHomeLink,

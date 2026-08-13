@@ -41,7 +41,7 @@ object TypelevelSitePlugin extends AutoPlugin {
       settingKey[Option[TypelevelProject]](
         "Indicates whether the generated site should be pre-populated with UI elements specific to Typelevel Organization or Affiliate projects (default: None)")
 
-    lazy val tlSiteApiUrl = settingKey[Option[URL]]("URL to the API docs")
+    lazy val tlSiteApiUrl = settingKey[Option[URI]]("URL to the API docs")
     lazy val tlSiteApiModule =
       settingKey[Option[ModuleID]]("The module that publishes API docs")
     lazy val tlSiteApiPackage = settingKey[Option[String]](
@@ -99,8 +99,9 @@ object TypelevelSitePlugin extends AutoPlugin {
     },
     homepage := {
       gitHubUserRepo.value.map {
-        case ("typelevel", repo) => url(s"https://typelevel.org/$repo")
-        case (user, repo) => url(s"https://$user.github.io/$repo")
+        case ("typelevel", repo) =>
+          PluginCompat.homepageURL(uri(s"https://typelevel.org/$repo"))
+        case (user, repo) => PluginCompat.homepageURL(uri(s"https://$user.github.io/$repo"))
       }
     }
   )
@@ -111,7 +112,7 @@ object TypelevelSitePlugin extends AutoPlugin {
         mdoc.toTask(""),
         laikaSite
       )
-      .value: @nowarn("cat=other-pure-statement"),
+      .value: @nowarn(),
     tlSitePreview := previewTask.value,
     Laika / sourceDirectories := Seq(mdocOut.value),
     laikaTheme := tlSiteHelium.value.build,
@@ -148,12 +149,12 @@ object TypelevelSitePlugin extends AutoPlugin {
         val n = cross(moduleId.name)
         val v = version
         val p = tlSiteApiPackage.value.fold("")(_.replace('.', '/') + "/index.html")
-        url(s"https://www.javadoc.io/doc/$o/$n/$v/$p")
+        uri(s"https://www.javadoc.io/doc/$o/$n/$v/$p")
       }
       lazy val fallbackUrl = for {
         moduleId <- (ThisProject / tlSiteApiModule).value
         apiURL <- moduleId.extraAttributes.get("e:info.apiURL")
-      } yield url(apiURL)
+      } yield uri(apiURL)
 
       tlSiteApiUrl.value.orElse(javadocioUrl).orElse(fallbackUrl)
     },
