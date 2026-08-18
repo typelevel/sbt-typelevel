@@ -19,7 +19,7 @@ val modules = List(
 
 Compile / unmanagedSourceDirectories ++= modules.flatMap { module =>
   val moduleDir = baseDirectory.value.getParentFile / module / "src" / "main"
-  Seq(moduleDir / "scala", moduleDir / "scala-2.12")
+  Seq(moduleDir / "scala", moduleDir / "scala-3")
 }
 
 Compile / unmanagedResourceDirectories ++= modules.map { module =>
@@ -27,5 +27,5 @@ Compile / unmanagedResourceDirectories ++= modules.map { module =>
 }
 
 libraryDependencies ++= Seq(
-  "io.get-coursier" %% "coursier" % "2.1.24"
+  // "io.get-coursier" %% "coursier" % "2.1.24"
 )

@@ -1,4 +1,4 @@
-name := "sbt-typelevel"
+// name := "sbt-typelevel"
 
 import org.typelevel.sbt.gha.{PermissionScope, PermissionValue, Permissions}
 import com.typesafe.tools.mima.core._
@@ -122,6 +122,7 @@ lazy val `sbt-typelevel` = tlCrossRootProject.aggregate(
   docs
 )
 
+ThisBuild / crossScalaVersions := Seq("2.12.21", "3.8.3")
 lazy val sbt2Settings = Seq(
   scalaVersion := "2.12.21",
   crossScalaVersions := Seq("2.12.21", "3.8.3"),
@@ -300,26 +301,6 @@ lazy val unidoc = project
   .settings(
     name := "sbt-typelevel-docs",
     sbt2Settings
-  )
-
-lazy val sbt2 = project
-  .in(file("sbt2"))
-  .aggregate(
-    kernel,
-    mima,
-    noPublish,
-    versioning,
-    sonatype,
-    sonatypeCiRelease,
-    ci,
-    githubActions,
-    ciSigning,
-    ciRelease,
-    core
-  )
-  .settings(
-    scalaVersion := "3.8.3",
-    ThisBuild / version := "1.1.1"
   )
 
 lazy val docs = project
