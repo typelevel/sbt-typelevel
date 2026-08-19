@@ -22,6 +22,8 @@ import sbtcompat.PluginCompat._
 
 import java.nio.file.FileSystems
 import scala.annotation.nowarn
+import scala.io.Source
+
 object GenerativePlugin extends AutoPlugin {
 
   override def requires = plugins.JvmPlugin
@@ -925,17 +927,14 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
     )
   }
 
-  private val cleanResourceFile: Def.Initialize[Task[FileRef]] = Def.task {
-    val uri: java.net.URI = getClass.getResource("/clean.yml").toURI
-    val file = new File(uri)
-    implicit val conv: xsbti.FileConverter = fileConverter.value
-    toFileRef(file)
-  }
-
+  // TODO: Zainab - This should probably be cached properly.
   private val readCleanContents: Def.Initialize[Task[String]] = Def task {
-    implicit val conv: xsbti.FileConverter = fileConverter.value
-    val src = IO.read(toFile(cleanResourceFile.value))
-    src
+    val src = Source.fromURL(getClass.getResource("/clean.yml"))
+    try {
+      src.mkString
+    } finally {
+      src.close()
+    }
   }
 
   private val ciYmlFile: Def.Initialize[Task[FileRef]] = Def task {
