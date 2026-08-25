@@ -16,17 +16,16 @@
 
 package org.typelevel.sbt
 
-import io.crashbox.gpg.SbtGpg
+import com.jsuereth.sbtpgp.SbtPgp
+import com.jsuereth.sbtpgp.SbtPgp.autoImport.useGpgAgent
 import org.typelevel.sbt.gha.GenerativePlugin
 import org.typelevel.sbt.gha.GenerativePlugin.autoImport._
 import org.typelevel.sbt.gha.GitHubActionsPlugin
 import sbt._
 
-import Keys._
-
 object TypelevelCiSigningPlugin extends AutoPlugin {
 
-  override def requires = SbtGpg && GitHubActionsPlugin && GenerativePlugin
+  override def requires = SbtPgp && GitHubActionsPlugin && GenerativePlugin
 
   override def trigger = allRequirements
 
@@ -55,10 +54,8 @@ object TypelevelCiSigningPlugin extends AutoPlugin {
     )
   )
 
-  import SbtGpg.autoImport._
-
   override def projectSettings = Seq(
-    gpgWarnOnFailure := isSnapshot.value
+    useGpgAgent := false
   )
 
   private val env = Map(

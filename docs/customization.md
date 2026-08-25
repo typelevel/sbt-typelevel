@@ -14,7 +14,7 @@ Instead of using the super-plugins, for finer-grained control you can always add
 
 - `tlIsScala3` (setting): `true`, if `scalaVersion` is 3.x.
 - `tlCommandAliases` (setting): Command aliases defined for this build.
-- `tlReleaseLocal` (command): Alias for `+publishLocal`.
+- `tlReleaseLocal` (command): Alias for `+publishLocalSigned`.
 
 ### sbt-typelevel-versioning
 `TypelevelVersioningPlugin`: Establishes a git-based, early semantic versioning scheme.
@@ -31,7 +31,7 @@ Instead of using the super-plugins, for finer-grained control you can always add
 ### sbt-typelevel-sonatype
 `TypelevelSonatypePlugin`: Sets up publishing to Sonatype/Maven.
 
-- `tlRelease` (command): Check binary-compatibility and `+publish` to Sonatype.
+- `tlRelease` (command): Check binary-compatibility and `+publishSigned` to Sonatype.
 
 `TypelevelUnidocPlugin`: Sets up publishing a Scaladoc-only artifact to Sonatype/Maven.
 
