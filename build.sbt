@@ -122,10 +122,10 @@ lazy val `sbt-typelevel` = tlCrossRootProject.aggregate(
   docs
 )
 
-ThisBuild / crossScalaVersions := Seq("2.12.21", "3.8.3")
+ThisBuild / crossScalaVersions := Seq("2.12.21", "3.8.4")
 lazy val sbt2Settings = Seq(
   scalaVersion := "2.12.21",
-  crossScalaVersions := Seq("2.12.21", "3.8.3"),
+  crossScalaVersions := Seq("2.12.21", "3.8.4"),
   (pluginCrossBuild / sbtVersion) := {
     scalaBinaryVersion.value match {
       case "2.12" => "1.11.7"
