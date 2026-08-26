@@ -22,8 +22,15 @@ import org.typelevel.sbt.gha.GenerativePlugin
 import org.typelevel.sbt.gha.GenerativePlugin.autoImport._
 import org.typelevel.sbt.gha.GitHubActionsPlugin
 import sbt._
+import com.jsuereth.sbtpgp.PgpKeys
+import com.jsuereth.sbtpgp.PgpKeys._
+import sbt.Keys._
+import sbtcompat.PluginCompat._
 
 object TypelevelCiSigningPlugin extends AutoPlugin {
+  // TODO: Zainab - Workaround for https://github.com/sbt/sbt-pgp/issues/246
+  private def deliverPattern(outputPath: File): String =
+    (outputPath / "[artifact]-[revision](-[classifier]).[ext]").absolutePath
 
   override def requires = SbtPgp && GitHubActionsPlugin && GenerativePlugin
 
@@ -55,7 +62,26 @@ object TypelevelCiSigningPlugin extends AutoPlugin {
   )
 
   override def projectSettings = Seq(
-    useGpgAgent := false
+    useGpgAgent := false,
+    // TODO: Zainab - Workaround for https://github.com/sbt/sbt-pgp/issues/246
+    publishLocalSignedConfiguration := {
+      println("Using our one.")
+      implicit val conv: xsbti.FileConverter = fileConverter.value
+      Classpaths.publishConfig(
+        publishMavenStyle.value,
+        deliverPattern(crossTarget.value),
+        if (isSnapshot.value) "integration" else "release",
+        ivyConfigurations.value.map(c => ConfigRef(c.name)).toVector,
+        PgpKeys.signedArtifacts.value.toVector.map { case (a, x) =>
+          a -> toFile(x)
+        },
+        (publishLocal / checksums).value.toVector,
+        resolverName = "local",
+        logging = ivyLoggingLevel.value,
+        overwrite = publishConfiguration.value.overwrite
+      )
+    },
+
   )
 
   private val env = Map(
