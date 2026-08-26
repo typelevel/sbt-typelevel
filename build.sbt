@@ -1,3 +1,5 @@
+// TODO: Zainab - This name is used as the name of each project in the cross root project matrix.
+// This causes the error "Overlapping output directories". Investigate why projects don't have their own name.
 // name := "sbt-typelevel"
 
 import org.typelevel.sbt.gha.{PermissionScope, PermissionValue, Permissions}
