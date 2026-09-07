@@ -78,3 +78,28 @@ The error disappears after deleting all target directories, including `project/t
 This has been raised in [sbt-pgp](https://github.com/sbt/sbt-pgp/issues/246). 
 
 As a workaround, use `publishLocal` instead.
+
+### Warning: `gitDescribedVersion` is not used by any other settings/tasks
+
+This needs further investigation.
+
+```sh
+[warn] there are 5 keys that are not used by any other settings/tasks:
+[warn]
+[warn] * core / gitDescribedVersion
+[warn]   +- gitDescribedVersion := {
+[warn]       val projectPatterns = gitDescribePatterns.value
+[warn]       val buildPatterns = (ThisBuild / gitDescribePatterns).value
+[warn]       val projectTagToVersionNumber = gitTagToVersionNumber.value
+[warn]       val buildTagToVersionNumber = (ThisBuild / gitTagToVersionNumber).value
+[warn]       if (projectPatterns == buildPatterns && projectTagToVersionNumber == buildTagToVersionNumber)
+[warn]         (ThisBuild / gitDescribedVersion).value
+[warn]       else gitReader.value.withGit(_.describedVersion(projectPatterns)).map(v => projectTagToVersionNumber(v).getOrElse(v))
+[warn]     }:167
+```
+
+As a workaround, add `gitDescribedVersion` to `excludeLintKeys`.
+
+```scala
+Global / excludeLintKeys += git.gitDescribedVersion
+```
