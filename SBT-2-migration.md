@@ -66,8 +66,22 @@ You may see this error on attempting to enter the SBT shell.
 [error] java.lang.RuntimeException: Conflicting cross-version suffixes in: com.github.plokhotnyuk.jsoniter-scala:jsoniter-scala-core, org
 ```
 
-The error disappears after deleting all target directories, including `project/target`. 
+This needs further investigation.
 
+As a workaround, add the `2.13` dependencies to `excludeDependencies`.
+
+```scala
+ excludeDependencies ++= {
+   Seq(
+     ExclusionRule(
+       "org.scala-lang.modules",
+       "scala-collection-compat_2.13"
+     ),
+     ExclusionRule("org.scala-lang.modules", "scala-xml_2.13"),
+     ExclusionRule("com.github.plokhotnyuk.jsoniter-scala", "jsoniter-scala-core_2.13")
+   )
+ }
+```
 
 ### `tlReleaseLocal` fails with `deliver/makeIvyXml requires an Ivy-based publishing plugin`
 
