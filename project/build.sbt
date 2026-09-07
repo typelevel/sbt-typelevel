@@ -27,5 +27,6 @@ Compile / unmanagedResourceDirectories ++= modules.map { module =>
 }
 
 libraryDependencies ++= Seq(
+  // TODO: Zainab - Coursier doesn't seem to be published for Scala 3. Check whether this dependency is needed.
   // "io.get-coursier" %% "coursier" % "2.1.24"
 )

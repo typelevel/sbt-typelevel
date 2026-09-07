@@ -336,7 +336,7 @@ lazy val docs = project
       ))
     },
     mdocVariables ++= {
-      import coursier.complete.Complete
+      // import coursier.complete.Complete
       import java.time._
       import scala.concurrent._
       import scala.concurrent.duration._
@@ -344,16 +344,16 @@ lazy val docs = project
 
       val startYear = YearMonth.now().getYear.toString
 
-      def getLatestVersion(dep: String) = {
-        import scala.util.Try
-        val fut = Complete().withInput(dep).complete().future()
-        Try(Await.result(fut, 5.seconds)._2.last).toOption
-      }
+      // def getLatestVersion(dep: String) = {
+      //   import scala.util.Try
+      //   val fut = Complete().withInput(dep).complete().future()
+      //   Try(Await.result(fut, 5.seconds)._2.last).toOption
+      // }
 
-      val latestScalaJSVersion =
-        getLatestVersion(s"org.scala-js:scalajs-library_2.13:").getOrElse(scalaJSVersion)
-      val latestNativeVersion =
-        getLatestVersion(s"org.scala-native:nativelib_native0.5_3:").getOrElse(nativeVersion)
+      val latestScalaJSVersion = scalaJSVersion
+        // getLatestVersion(s"org.scala-js:scalajs-library_2.13:").getOrElse(scalaJSVersion)
+      val latestNativeVersion = nativeVersion
+        // getLatestVersion(s"org.scala-native:nativelib_native0.5_3:").getOrElse(nativeVersion)
 
       Map(
         "START_YEAR" -> startYear,
