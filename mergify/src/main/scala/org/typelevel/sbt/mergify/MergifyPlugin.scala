@@ -19,6 +19,7 @@ package org.typelevel.sbt.mergify
 import org.typelevel.sbt.gha._
 import sbt._
 import sbtcrossproject.CrossPlugin.autoImport._
+import scala.annotation.nowarn
 
 import java.nio.file.Path
 
@@ -62,6 +63,7 @@ object MergifyPlugin extends AutoPlugin {
   import autoImport._
   import GenerativePlugin.autoImport._
 
+  @nowarn()
   override def buildSettings: Seq[Setting[?]] = Seq(
     mergifyStewardConfig := Some(MergifyStewardConfig()),
     mergifyRequiredJobs := Seq("build"),
@@ -108,7 +110,6 @@ object MergifyPlugin extends AutoPlugin {
       compare(mergifyYaml.value, generateMergifyContents.value)
     }
   )
-
   override def projectSettings: Seq[Setting[?]] = Seq(
     mergifyGenerate / aggregate := false,
     mergifyCheck / aggregate := false,
