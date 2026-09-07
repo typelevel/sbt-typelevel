@@ -66,9 +66,9 @@ You may see this error on attempting to enter the SBT shell.
 [error] java.lang.RuntimeException: Conflicting cross-version suffixes in: com.github.plokhotnyuk.jsoniter-scala:jsoniter-scala-core, org
 ```
 
-This needs further investigation.
+If you depend on `sbt-scalafmt`, ensure your dependency version is `2.6.2`.
 
-As a workaround, add the `2.13` dependencies to `excludeDependencies`.
+If this doesn't work, add the `2.13` dependencies to `excludeDependencies` as a workaround.
 
 ```scala
  excludeDependencies ++= {
