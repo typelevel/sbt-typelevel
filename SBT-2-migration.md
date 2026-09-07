@@ -118,3 +118,12 @@ As a workaround, add `gitDescribedVersion` to `excludeLintKeys`.
 ```scala
 Global / excludeLintKeys += git.gitDescribedVersion
 ```
+
+### `import de.heikoseeberger.sbtheader.HeaderPlugin` not found
+
+The `sbt-header` organization and package have changed. Remove the `de.heikoseeberger` prefix.
+
+```diff
+- import de.heikoseeberger.sbtheader.HeaderPlugin
++ import sbtheader.HeaderPlugin
+```
