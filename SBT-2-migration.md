@@ -95,7 +95,6 @@ As a workaround, use `publishLocal` instead.
 
 ### Warning: `gitDescribedVersion` is not used by any other settings/tasks
 
-This needs further investigation.
 
 ```sh
 [warn] there are 5 keys that are not used by any other settings/tasks:
@@ -111,6 +110,8 @@ This needs further investigation.
 [warn]       else gitReader.value.withGit(_.describedVersion(projectPatterns)).map(v => projectTagToVersionNumber(v).getOrElse(v))
 [warn]     }:167
 ```
+
+This has been raised in [sbt-git](https://github.com/sbt/sbt-git/issues/379).
 
 As a workaround, add `gitDescribedVersion` to `excludeLintKeys`.
 
