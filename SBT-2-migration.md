@@ -127,3 +127,22 @@ The `sbt-header` organization and package have changed. Remove the `de.heikoseeb
 - import de.heikoseeberger.sbtheader.HeaderPlugin
 + import sbtheader.HeaderPlugin
 ```
+
+### Version conflicts in library dependencies in Native builds
+
+```
+[error] (coreNative / update) found version conflict(s) in library dependencies; some are suspected to be binary incompatible:
+[error] 	* org.scala-native:test-interface_native0.5_3:0.5.11 (strict) is selected over 0.5.8 for test
+[error] 	    +- org.typelevel:discipline-core_native0.5_3:1.7.0-112-07d9dad-20260908T094537Z-SNAPSHOT (depends on 0.5.11)
+[error] 	    +- org.scalacheck:scalacheck_native0.5_3:1.19.0       (depends on 0.5.8)
+```
+
+SBT 2.0 enables strict eviction checks for test dependencies. This surfaces eviction errors that would have otherwise been surpressed in SBT 1. 
+
+Resolve these by upgrading dependencies. In the example above, `scalacheck` must be upgraded.
+
+As a workaround, specify a different dependency scheme for `test-interface_native0.5`.
+
+```scala
+ThisBuild / libraryDependencySchemes += "org.scala-native" %% "test-interface_native0.5" % VersionScheme.EarlySemVer
+```
