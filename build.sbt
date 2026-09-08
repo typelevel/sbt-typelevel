@@ -4,8 +4,6 @@
 
 import org.typelevel.sbt.gha.{PermissionScope, PermissionValue, Permissions}
 import com.typesafe.tools.mima.core._
-// TODO: Zainab - The build raises warnings that gitDescribedVersion is unused. Is this important?
-Global / excludeLintKeys += git.gitDescribedVersion
 ThisBuild / tlBaseVersion := "0.8"
 ThisBuild / crossScalaVersions := Seq("2.12.21")
 ThisBuild / developers ++= List(
