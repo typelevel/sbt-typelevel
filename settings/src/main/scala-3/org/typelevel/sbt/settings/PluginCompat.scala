@@ -16,8 +16,9 @@
 
 package org.typelevel.sbt.settings
 
+import sbt.*
 import java.net.URI
 object PluginCompat {
   def url(uri: URI): URI = uri
-
+  def jvmPlatform(moduleID: ModuleID): ModuleID = moduleID.platform(Platform.jvm)
 }

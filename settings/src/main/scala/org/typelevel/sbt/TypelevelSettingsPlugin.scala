@@ -66,9 +66,10 @@ object TypelevelSettingsPlugin extends AutoPlugin {
               ("org.typelevel" % "kind-projector" % "0.13.4").cross(CrossVersion.full))
           )
 
+      // TODO: Zainab - This is causing problems in discipline build for JS and Native.
       val scalacCompat =
         if (Set("2.12", "2.13", "3").contains(scalaBinaryVersion.value))
-          Seq("org.typelevel" %% "scalac-compat-annotation" % "0.1.5" % Provided)
+          Seq(PluginCompat.jvmPlatform("org.typelevel" %% "scalac-compat-annotation" % "0.1.5" % Provided))
         else
           Nil
 
