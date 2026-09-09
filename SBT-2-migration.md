@@ -17,7 +17,7 @@ It uses a local snapshot of Laika on SBT 2 to build site modules.
 
 You can use the local snapshot to test out `sbt-typelevel` on other projects. Change the SBT version of your project to `2.0.8`, and upgrade the version of `sbt-typelevel` to your local snapshot. 
 
-Consult the `Known issues` section below on any errors.
+Consult the `Known issues` and `SBT Migration Issues` sections below on any errors.
 
 ## Known issues
 
@@ -126,6 +126,34 @@ The `sbt-header` organization and package have changed. Remove the `de.heikoseeb
 ```diff
 - import de.heikoseeberger.sbtheader.HeaderPlugin
 + import sbtheader.HeaderPlugin
+```
+
+### Generated GitHub workflows steps are in a different order
+
+The ordering of Native, JS and JVM build steps may differ. This shouldn't cause CI issues, but makes it difficult to judge whether the workflow is correct.
+
+Why the steps are out of order, and whether this is deterministic, requires investigation. It may be a behaviour change in SBT 2's application of `buildSettings`.
+
+## SBT migration issues
+
+### `sbt.librarymanagement.ResolveException`: Error downloading a library dependency
+
+```
+// [error] (coreJS / update) sbt.librarymanagement.ResolveException: Error downloading org.scala-js:scalajs-test-interface_sjs1_2.13:1.22.0
+// [error]   Not found
+// [error]   Not found
+// [error]   not found: https://repo1.maven.org/maven2/org/scala-js/scalajs-test-interface_sjs1_2.13/1.22.0/scalajs-test-interface_sjs1_2.13-1.22.0.pom
+```
+
+The behaviour of `%%` has changed to apply to all platforms. This means that SBT 2 will resolve `js` and `native` artifacts, when an artifact is only published for JVM.
+
+Verify that the dependency URL is correct. In this example, it is incorrect as `scalajs-test-interface_sjs1_2.13` should be `scalajs-test-interface_2.13`.
+
+Specify `.platform(Platform.jvm)` to indicate that the module is JVM-specific.
+
+```diff
+libraryDependencies += ("org.scala-js" %% "scalajs-test-interface" % scalaJSVersion)
++    .platform(Platform.jvm)
 ```
 
 ### Version conflicts in library dependencies in Native builds
