@@ -111,7 +111,7 @@ As a workaround, use `publishLocal` instead.
 [warn]     }:167
 ```
 
-This originates from `sbt-git`. If you explicitly include the `sbt-git` plugin, update it to the snapshot `2.1.0+147-7ef2ceb1-SNAPSHOT`.
+This originates from `sbt-git`. If you explicitly include the `sbt-git` plugin, update it to `2.2.0`.
 
 As a workaround, add `gitDescribedVersion` to `excludeLintKeys`.
 
