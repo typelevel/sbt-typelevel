@@ -114,6 +114,8 @@ object TypelevelSitePlugin extends AutoPlugin {
       )
       .value: @nowarn(),
     tlSitePreview := previewTask.value,
+    // TODO: Zainab - mdocOut needs to exist before laikaSite is run. This should happen with Def.sequential.
+      // Perhaps the way source directories are specified is incorrect?
     Laika / sourceDirectories := Seq(mdocOut.value),
     laikaTheme := tlSiteHelium.value.build,
     mdocVariables := {
