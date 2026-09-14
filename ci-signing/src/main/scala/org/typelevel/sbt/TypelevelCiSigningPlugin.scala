@@ -72,16 +72,16 @@ object TypelevelCiSigningPlugin extends AutoPlugin {
         deliverPattern(crossTarget.value),
         if (isSnapshot.value) "integration" else "release",
         ivyConfigurations.value.map(c => ConfigRef(c.name)).toVector,
-        PgpKeys.signedArtifacts.value.toVector.map { case (a, x) =>
-          a -> toFile(x)
+        PgpKeys.signedArtifacts.value.toVector.map {
+          case (a, x) =>
+            a -> toFile(x)
         },
         (publishLocal / checksums).value.toVector,
         resolverName = "local",
         logging = ivyLoggingLevel.value,
         overwrite = publishConfiguration.value.overwrite
       )
-    },
-
+    }
   )
 
   private val env = Map(
