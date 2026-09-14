@@ -128,7 +128,8 @@ lazy val sbt2Settings = Seq(
       case "2.12" => "1.11.7"
       case _ => "2.0.6"
     }
-  }
+  },
+  tlVersionIntroduced := Map("3" -> "0.9.0")
 )
 
 lazy val kernel = project
