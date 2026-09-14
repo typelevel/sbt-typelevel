@@ -301,8 +301,6 @@ lazy val unidoc = project
   .enablePlugins(TypelevelUnidocPlugin)
   .settings(
     name := "sbt-typelevel-docs",
-    // TODO: Zainab - semanticdb adds an invalid option -P:semanticdb:targetroot/some/directory . Investigate why.
-    semanticdbEnabled := false,
     sbt2Settings
   )
 
