@@ -19,8 +19,6 @@ package org.typelevel.sbt.mergify
 import io.circe.Encoder
 import io.circe.syntax._
 
-import scala.annotation.nowarn
-
 sealed abstract class MergifyCondition
 
 object MergifyCondition {
@@ -46,6 +44,5 @@ object MergifyCondition {
     implicit def encoder: Encoder[Or] = Encoder.forProduct1("or")(_.conditions)
   }
 
-  @nowarn()
   private object Dummy extends MergifyCondition // break exhaustivity checking
 }

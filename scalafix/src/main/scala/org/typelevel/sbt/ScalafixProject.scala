@@ -98,7 +98,7 @@ final class ScalafixProject private (
 
 object ScalafixProject {
 
-  @nowarn()
+  @nowarn("msg=unused import")
   def apply(name: String): ScalafixProject = {
 
     import sbtcompat.PluginCompat._

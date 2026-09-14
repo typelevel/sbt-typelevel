@@ -107,12 +107,14 @@ object TypelevelSitePlugin extends AutoPlugin {
   )
 
   override def projectSettings = Seq(
-    tlSite := Def
-      .sequential(
-        mdoc.toTask(""),
-        laikaSite
-      )
-      .value: @nowarn(),
+    tlSite := {
+      val _ = Def
+        .sequential(
+          mdoc.toTask(""),
+          laikaSite
+        )
+        .value
+    },
     tlSitePreview := previewTask.value,
     Laika / sourceDirectories := Seq(mdocOut.value),
     laikaTheme := tlSiteHelium.value.build,

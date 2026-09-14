@@ -63,7 +63,7 @@ object MergifyPlugin extends AutoPlugin {
   import autoImport._
   import GenerativePlugin.autoImport._
 
-  @nowarn()
+  @nowarn("msg=transient key state is excluded from the cache input")
   override def buildSettings: Seq[Setting[?]] = Seq(
     mergifyStewardConfig := Some(MergifyStewardConfig()),
     mergifyRequiredJobs := Seq("build"),

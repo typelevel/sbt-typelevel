@@ -430,6 +430,6 @@ object TypelevelSettingsPlugin extends AutoPlugin {
     }
   }
 
-  @nowarn()
+  @nowarn("msg=unused private member")
   private def unused(): Unit = ()
 }
