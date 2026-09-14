@@ -927,14 +927,14 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
     )
   }
 
-  // TODO: Zainab - This should probably be cached properly.
-  private val readCleanContents: Def.Initialize[Task[String]] = Def task {
+  private val readCleanContents: Def.Initialize[Task[String]] = Def.uncached { Def task {
     val src = Source.fromURL(getClass.getResource("/clean.yml"))
     try {
       src.mkString
     } finally {
       src.close()
     }
+  }
   }
 
   private val ciYmlFile: Def.Initialize[Task[FileRef]] = Def task {
