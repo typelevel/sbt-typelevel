@@ -26,7 +26,4 @@ Compile / unmanagedResourceDirectories ++= modules.map { module =>
   baseDirectory.value.getParentFile / module / "src" / "main" / "resources"
 }
 
-libraryDependencies ++= Seq(
-  // TODO: Zainab - Coursier doesn't seem to be published for Scala 3. Check whether this dependency is needed.
-  // "io.get-coursier" %% "coursier" % "2.1.24"
-)
+addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.7.0")
