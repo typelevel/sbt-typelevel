@@ -20,7 +20,7 @@ import java.net.URI
 import java.net.URL
 import sbt.*
 
-object PluginCompat {
+private[sbt] object PluginCompat {
   def url(uri: URI): URL = uri.toURL
   def jvmPlatform(moduleID: ModuleID): ModuleID = moduleID
 }

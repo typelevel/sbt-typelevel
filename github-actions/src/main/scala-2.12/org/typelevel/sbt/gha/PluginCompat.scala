@@ -16,7 +16,7 @@
 
 package org.typelevel.sbt.gha
 
-object PluginCompat {
+private object PluginCompat {
   type IterableOnce[+A] = scala.TraversableOnce[A]
 
 }

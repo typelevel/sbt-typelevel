@@ -19,7 +19,7 @@ package org.typelevel.sbt.site
 import sbt.*
 
 import java.net.URI
-object PluginCompat {
+private[sbt] object PluginCompat {
   def name(license: License): String = license.spdxId
   def uri(license: License): URI = license.uri
 

@@ -18,6 +18,6 @@ package org.typelevel.sbt.github
 
 import java.net.URI
 import java.net.URL
-object PluginCompat {
+private[sbt] object PluginCompat {
   def url(uri: URI): URL = uri.toURL
 }

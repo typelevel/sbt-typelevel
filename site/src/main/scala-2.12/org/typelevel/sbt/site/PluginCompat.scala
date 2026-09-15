@@ -20,7 +20,7 @@ import sbt._
 
 import java.net.URI
 import java.net.URL
-object PluginCompat {
+private[sbt] object PluginCompat {
   def name(license: (String, URL)): String = license._1
   def uri(license: (String, URL)): URI = license._2.toURI
 
