@@ -676,7 +676,7 @@ jobs:
         uses: peaceiris/actions-gh-pages@v4.0.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: target/out/jvm/scala-3.8.3/docs/docs/site
+          publish_dir: target/out/jvm/scala-3.8.4/docs/docs/site
           keep_files: true
 
   greeter:
