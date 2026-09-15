@@ -19,6 +19,7 @@ import scala.annotation.tailrec
 import scala.quoted.*
 
 private[sbt] trait CrossRootProjectMacros {
+  // Adapted from sbt.std.KeyMacro.projectImpl
   inline def tlCrossRootProject: CrossRootProject = ${
     CrossRootProjectMacros.crossRootProjectImpl
   }
@@ -49,3 +50,4 @@ private[sbt] object CrossRootProjectMacros {
   private def errorMsg: String =
     "tlCrossRootProject must be directly assigned to a val, such as `val x = tlCrossRootProject`. Alternatively, you can use `org.typelevel.sbt.CrossRootProject.apply`"
 }
+
