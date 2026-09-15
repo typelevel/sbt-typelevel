@@ -38,7 +38,7 @@ object JavaSpec {
 
   sealed abstract class Distribution(val rendering: String) extends Product with Serializable
 
-  @nowarn("cat=deprecation")
+  @nowarn("msg=object OpenJ9 in object Distribution is deprecated since 0.5.0: Use `semeru`")
   object Distribution {
     case object Temurin extends Distribution("temurin")
     case object Corretto extends Distribution("corretto")
