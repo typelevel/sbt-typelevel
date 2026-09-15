@@ -1,7 +1,7 @@
 import org.typelevel.sbt.gha.{PermissionScope, PermissionValue, Permissions}
 import com.typesafe.tools.mima.core._
 ThisBuild / tlBaseVersion := "0.8"
-ThisBuild / crossScalaVersions := Seq("2.12.21")
+ThisBuild / crossScalaVersions := Seq("2.12.21", "3.8.4")
 ThisBuild / developers ++= List(
   tlGitHubDev("armanbilge", "Arman Bilge"),
   tlGitHubDev("rossabaker", "Ross A. Baker"),
@@ -119,10 +119,8 @@ lazy val `sbt-typelevel` = tlCrossRootProject.aggregate(
   docs
 )
 
-ThisBuild / crossScalaVersions := Seq("2.12.21", "3.8.4")
 lazy val sbt2Settings = Seq(
   scalaVersion := "2.12.21",
-  crossScalaVersions := Seq("2.12.21", "3.8.4"),
   (pluginCrossBuild / sbtVersion) := {
     scalaBinaryVersion.value match {
       case "2.12" => "1.11.7"
