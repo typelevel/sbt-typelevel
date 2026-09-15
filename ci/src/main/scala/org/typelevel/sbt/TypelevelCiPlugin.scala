@@ -221,7 +221,8 @@ object TypelevelCiPlugin extends AutoPlugin {
     )
   }
 
-  case class SuiteResult(
+  // Adapted from sbt.SuiteResult
+  private case class SuiteResult(
       result: TestResult,
       passedCount: Int,
       failureCount: Int,
