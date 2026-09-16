@@ -51,19 +51,19 @@ jobs:
           - graalvm@21
           - corretto@17
           - semeru@17
-        project: [sbt-typelevelJVM]
+        project: [sbtTypelevelJVM]
         exclude:
-          - scala: 2.12
+          - scala: 3
             java: temurin@11
-          - scala: 2.12
+          - scala: 3
             java: temurin@17
-          - scala: 2.12
+          - scala: 3
             java: graal_22.3.2@11
-          - scala: 2.12
+          - scala: 3
             java: graalvm@21
-          - scala: 2.12
+          - scala: 3
             java: corretto@17
-          - scala: 2.12
+          - scala: 3
             java: semeru@17
           - java: temurin@11
             os: macos-latest
@@ -242,12 +242,12 @@ jobs:
       - name: Make target directories
         if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main')
         shell: bash
-        run: mkdir -p target/out/jvm/scala-2.12.21/sbt-typelevel-versioning target/out/jvm/scala-2.12.21/sbt-typelevel-ci-release target/out/jvm/scala-2.12.21/sbt-typelevel-scalafix target/out/jvm/scala-2.12.21/sbt-typelevel-docs target/out/jvm/scala-2.12.21/sbt-typelevel-mima target/out/jvm/scala-2.12.21/sbt-typelevel-no-publish target/out/jvm/scala-2.12.21/sbt-typelevel-sonatype-ci-release target/out/jvm/scala-2.12.21/sbt-typelevel target/out/jvm/scala-2.12.21/sbt-typelevel-settings target/out/jvm/scala-2.12.21/sbt-typelevel-github target/out/jvm/scala-2.12.21/sbt-typelevel-github-actions target/out/jvm/scala-2.12.21/sbt-typelevel-kernel target/out/jvm/scala-2.12.21/sbt-typelevel-site target/out/jvm/scala-2.12.21/sbt-typelevel-ci-signing target/out/jvm/scala-2.12.21/sbt-typelevel-mergify target/out/jvm/scala-2.12.21/sbt-typelevel-sonatype target/out/jvm/scala-2.12.21/sbt-typelevel-ci project/target
+        run: mkdir -p target/out/jvm/scala-2.12.21/sbt-typelevel-versioning target/out/jvm/scala-2.12.21/sbt-typelevel-ci-release target/out/jvm/scala-2.12.21/sbt-typelevel-scalafix target/out/jvm/scala-2.12.21/sbt-typelevel-docs target/out/jvm/scala-2.12.21/sbt-typelevel-mima target/out/jvm/scala-2.12.21/sbt-typelevel-sonatype-ci-release target/out/jvm/scala-2.12.21/sbt-typelevel target/out/jvm/scala-2.12.21/sbt-typelevel-settings target/out/jvm/scala-2.12.21/sbt-typelevel-github target/out/jvm/scala-2.12.21/sbt-typelevel-github-actions target/out/jvm/scala-2.12.21/sbt-typelevel-kernel target/out/jvm/scala-2.12.21/sbt-typelevel-site target/out/jvm/scala-2.12.21/sbt-typelevel-ci-signing target/out/jvm/scala-2.12.21/sbt-typelevel-mergify target/out/jvm/scala-2.12.21/sbt-typelevel-no-publish target/out/jvm/scala-2.12.21/sbt-typelevel-sonatype target/out/jvm/scala-2.12.21/sbt-typelevel-ci project/target
 
       - name: Compress target directories
         if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main')
         shell: bash
-        run: tar cf targets.tar target/out/jvm/scala-2.12.21/sbt-typelevel-versioning target/out/jvm/scala-2.12.21/sbt-typelevel-ci-release target/out/jvm/scala-2.12.21/sbt-typelevel-scalafix target/out/jvm/scala-2.12.21/sbt-typelevel-docs target/out/jvm/scala-2.12.21/sbt-typelevel-mima target/out/jvm/scala-2.12.21/sbt-typelevel-no-publish target/out/jvm/scala-2.12.21/sbt-typelevel-sonatype-ci-release target/out/jvm/scala-2.12.21/sbt-typelevel target/out/jvm/scala-2.12.21/sbt-typelevel-settings target/out/jvm/scala-2.12.21/sbt-typelevel-github target/out/jvm/scala-2.12.21/sbt-typelevel-github-actions target/out/jvm/scala-2.12.21/sbt-typelevel-kernel target/out/jvm/scala-2.12.21/sbt-typelevel-site target/out/jvm/scala-2.12.21/sbt-typelevel-ci-signing target/out/jvm/scala-2.12.21/sbt-typelevel-mergify target/out/jvm/scala-2.12.21/sbt-typelevel-sonatype target/out/jvm/scala-2.12.21/sbt-typelevel-ci project/target
+        run: tar cf targets.tar target/out/jvm/scala-2.12.21/sbt-typelevel-versioning target/out/jvm/scala-2.12.21/sbt-typelevel-ci-release target/out/jvm/scala-2.12.21/sbt-typelevel-scalafix target/out/jvm/scala-2.12.21/sbt-typelevel-docs target/out/jvm/scala-2.12.21/sbt-typelevel-mima target/out/jvm/scala-2.12.21/sbt-typelevel-sonatype-ci-release target/out/jvm/scala-2.12.21/sbt-typelevel target/out/jvm/scala-2.12.21/sbt-typelevel-settings target/out/jvm/scala-2.12.21/sbt-typelevel-github target/out/jvm/scala-2.12.21/sbt-typelevel-github-actions target/out/jvm/scala-2.12.21/sbt-typelevel-kernel target/out/jvm/scala-2.12.21/sbt-typelevel-site target/out/jvm/scala-2.12.21/sbt-typelevel-ci-signing target/out/jvm/scala-2.12.21/sbt-typelevel-mergify target/out/jvm/scala-2.12.21/sbt-typelevel-no-publish target/out/jvm/scala-2.12.21/sbt-typelevel-sonatype target/out/jvm/scala-2.12.21/sbt-typelevel-ci project/target
 
       - name: Upload target directories
         if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main')
@@ -370,22 +370,22 @@ jobs:
         if: matrix.java == 'semeru@17' && steps.setup-java-semeru-17.outputs.cache-hit == 'false'
         run: sbt +update
 
-      - name: Download target directories (2.12, sbt-typelevelJVM)
+      - name: Download target directories (2.12, sbtTypelevelJVM)
         uses: actions/download-artifact@v6
         with:
-          name: target-${{ matrix.os }}-${{ matrix.java }}-2.12-sbt-typelevelJVM
+          name: target-${{ matrix.os }}-${{ matrix.java }}-2.12-sbtTypelevelJVM
 
-      - name: Inflate target directories (2.12, sbt-typelevelJVM)
+      - name: Inflate target directories (2.12, sbtTypelevelJVM)
         run: |
           tar xf targets.tar
           rm targets.tar
 
-      - name: Download target directories (3, sbt-typelevelJVM)
+      - name: Download target directories (3, sbtTypelevelJVM)
         uses: actions/download-artifact@v6
         with:
-          name: target-${{ matrix.os }}-${{ matrix.java }}-3-sbt-typelevelJVM
+          name: target-${{ matrix.os }}-${{ matrix.java }}-3-sbtTypelevelJVM
 
-      - name: Inflate target directories (3, sbt-typelevelJVM)
+      - name: Inflate target directories (3, sbtTypelevelJVM)
         run: |
           tar xf targets.tar
           rm targets.tar
@@ -529,7 +529,7 @@ jobs:
       - name: Submit Dependencies
         uses: scalacenter/sbt-dependency-submission@v2
         with:
-          modules-ignore: sbt-typeleveljvm_2.12 sbt-typeleveljvm_3 sbt-typelevelnative_2.12 sbt-typelevelnative_3 docs_2.12 docs_3 sbt-typeleveljs_2.12 sbt-typeleveljs_3
+          modules-ignore: sbttypeleveljs_2.12 sbttypeleveljs_3 sbttypelevelnative_2.12 sbttypelevelnative_3 docs_2.12 docs_3 sbttypeleveljvm_2.12 sbttypeleveljvm_3
           configs-ignore: test scala-tool scala-doc-tool test-internal
 
   validate-steward:
@@ -556,6 +556,29 @@ jobs:
           apps: scala-steward
 
       - run: scala-steward validate-repo-config .scala-steward.conf
+
+  greeter:
+    name: Generate some output
+    strategy:
+      matrix:
+        os: [ubuntu-22.04]
+    runs-on: ${{ matrix.os }}
+    outputs:
+      greeting: ${{ steps.greet.outputs.msg }}
+    steps:
+      - id: greet
+        run: echo "msg=Hello" >> "$GITHUB_OUTPUT"
+
+  consume-output:
+    name: Consume output from greeter job
+    needs: [greeter]
+    if: ${{ needs.greeter.outputs.greeting != 'Hello' }}
+    strategy:
+      matrix:
+        os: [ubuntu-22.04]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - run: exit 1
 
   site:
     name: Generate Site
@@ -676,28 +699,5 @@ jobs:
         uses: peaceiris/actions-gh-pages@v4.0.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: target/out/jvm/scala-3.8.4/docs/docs/site
+          publish_dir: target/out/jvm/scala-2.12.21/docs/docs/site
           keep_files: true
-
-  greeter:
-    name: Generate some output
-    strategy:
-      matrix:
-        os: [ubuntu-22.04]
-    runs-on: ${{ matrix.os }}
-    outputs:
-      greeting: ${{ steps.greet.outputs.msg }}
-    steps:
-      - id: greet
-        run: echo "msg=Hello" >> "$GITHUB_OUTPUT"
-
-  consume-output:
-    name: Consume output from greeter job
-    needs: [greeter]
-    if: ${{ needs.greeter.outputs.greeting != 'Hello' }}
-    strategy:
-      matrix:
-        os: [ubuntu-22.04]
-    runs-on: ${{ matrix.os }}
-    steps:
-      - run: exit 1

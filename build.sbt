@@ -2,6 +2,7 @@ import org.typelevel.sbt.gha.{PermissionScope, PermissionValue, Permissions}
 import com.typesafe.tools.mima.core._
 ThisBuild / tlBaseVersion := "0.8"
 ThisBuild / crossScalaVersions := Seq("2.12.21", "3.8.4")
+ThisBuild / scalaVersion := "2.12.21"
 ThisBuild / developers ++= List(
   tlGitHubDev("armanbilge", "Arman Bilge"),
   tlGitHubDev("rossabaker", "Ross A. Baker"),
@@ -98,7 +99,7 @@ ThisBuild / githubWorkflowPermissions := Some(Permissions.Specify.defaultPermiss
 
 val MunitVersion = "1.3.6"
 
-lazy val `sbt-typelevel` = tlCrossRootProject.aggregate(
+lazy val sbtTypelevel = tlCrossRootProject.aggregate(
   kernel,
   noPublish,
   settings,
