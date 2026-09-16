@@ -15,7 +15,15 @@ It uses a local snapshot of Laika on SBT 2 to build site modules.
 
 # How to upgrade projects
 
-You can use the local snapshot to test out `sbt-typelevel` on other projects. Change the SBT version of your project to `2.0.8`, and upgrade the version of `sbt-typelevel` to your local snapshot. 
+You can use the local snapshot to test out `sbt-typelevel` on other projects. Change the SBT version of your project to `2.0.8`, and upgrade the version of `sbt-typelevel` to your local snapshot. You may need to upgrade other plugins.
+
+Check that you can do the following:
+ - Enter the SBT shell
+ - Run `compile` and `test`
+ - Run `scalafix` and `scalafmt`
+ - Run `githubWorkflowGenerate`
+ - Run `publishLocal`
+ - Run `tlSite`, if you have a docs site.
 
 Consult the `Known issues` and `SBT Migration Issues` sections below on any errors.
 
@@ -174,3 +182,16 @@ As a workaround, specify a different dependency scheme for `test-interface_nativ
 ```scala
 ThisBuild / libraryDependencySchemes += "org.scala-native" %% "test-interface_native0.5" % VersionScheme.EarlySemVer
 ```
+
+# `java.io.File` and `Path` are not valid output types for a cached task
+
+```
+-- Error: /Users/zainab/dev/typelevel/cats/build.sbt:31:2 ----------------------
+ 31 |  doctestGenTests := Seq.empty,
+    |  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |java.io.File and Path are not valid output types for a cached task.
+```
+
+Any usages of the `File` and `Path` types must be updated to support caching.
+
+In this example, the `doctestGenTests` task key is defined incorrectly in `sbt-doctest`. This was fixed in a `sbt-doctest` version `0.13.0`. Upgrading `sbt-doctest` resolves the issue.
