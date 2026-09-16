@@ -948,7 +948,7 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
     toFileRef(baseDirectory.value / ".github" / "workflows" / "clean.yml")
   }
 
-  @nowarn("msg=unused import|transient key state is excluded from the cache input")
+  @nowarn("msg=Unused import|transient key state is excluded from the cache input")
   override def projectSettings = {
     import CacheImplicits.{given, _}
     Seq(

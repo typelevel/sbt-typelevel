@@ -28,8 +28,8 @@ import org.typelevel.sbt.gha.GenerativePlugin.autoImport._
 import org.typelevel.sbt.site._
 import sbt.Keys._
 import sbt._
+import sbtcompat.PluginCompat._
 
-import scala.annotation.nowarn
 import scala.util.Try
 
 object TypelevelSitePlugin extends AutoPlugin {
@@ -235,24 +235,23 @@ object TypelevelSitePlugin extends AutoPlugin {
     }
   )
 
-  private def previewTask = Def
-    .taskDyn {
-      import cats.effect.unsafe.implicits._
+  private def previewTask = Def.taskDyn {
+        import cats.effect.unsafe.implicits._
 
-      val logger = streams.value.log
-      logger.info("Initializing server...")
+        val logger = streams.value.log
+        logger.info("Initializing server...")
 
-      val (server, cancel) = Tasks.buildPreviewServer.value.allocated.unsafeRunSync()
+        val (server, cancel) = Tasks.buildPreviewServer.value.allocated.unsafeRunSync()
 
-      logger.info(s"Preview server started at ${server.baseUri}")
+        logger.info(s"Preview server started at ${server.baseUri}")
 
-      // watch but no-livereload b/c we don't need an mdoc server
-      mdoc.toTask(" --watch --no-livereload").andFinally {
-        logger.info(s"Shutting down preview server...")
-        cancel.unsafeRunSync()
+        // watch but no-livereload b/c we don't need an mdoc server
+        mdoc.toTask(" --watch --no-livereload").andFinally {
+          logger.info(s"Shutting down preview server...")
+          cancel.unsafeRunSync()
+        }
       }
-    }
-    // initial run of mdoc to bootstrap laikaPreview
-    .dependsOn(mdoc.toTask(""))
+      // initial run of mdoc to bootstrap laikaPreview
+      .dependsOn(mdoc.toTask(""))
 
 }
