@@ -15,7 +15,6 @@
  */
 
 package org.typelevel.sbt
-
 import laika.helium.Helium
 import laika.sbt.LaikaPlugin
 import laika.sbt.LaikaPlugin.autoImport._
@@ -26,6 +25,7 @@ import org.typelevel.sbt.TypelevelKernelPlugin._
 import org.typelevel.sbt.gha.GenerativePlugin
 import org.typelevel.sbt.gha.GenerativePlugin.autoImport._
 import org.typelevel.sbt.site._
+import org.typelevel.scalaccompat.annotation._
 import sbt.Keys._
 import sbt._
 
@@ -106,14 +106,12 @@ object TypelevelSitePlugin extends AutoPlugin {
   )
 
   override def projectSettings = Seq(
-    tlSite := {
-      val _ = Def
-        .sequential(
-          mdoc.toTask(""),
-          laikaSite
-        )
-        .value
-    },
+    tlSite := Def
+      .sequential(
+        mdoc.toTask(""),
+        laikaSite
+      )
+      .value: @nowarn2("cat=other-pure-statement") @nowarn3("msg=discarded non-Unit value"),
     tlSitePreview := previewTask.value,
     Laika / sourceDirectories := Seq(mdocOut.value),
     laikaTheme := tlSiteHelium.value.build,
@@ -234,23 +232,24 @@ object TypelevelSitePlugin extends AutoPlugin {
     }
   )
 
-  private def previewTask = Def.taskDyn {
-        import cats.effect.unsafe.implicits._
+  private def previewTask = Def
+    .taskDyn {
+      import cats.effect.unsafe.implicits._
 
-        val logger = streams.value.log
-        logger.info("Initializing server...")
+      val logger = streams.value.log
+      logger.info("Initializing server...")
 
-        val (server, cancel) = Tasks.buildPreviewServer.value.allocated.unsafeRunSync()
+      val (server, cancel) = Tasks.buildPreviewServer.value.allocated.unsafeRunSync()
 
-        logger.info(s"Preview server started at ${server.baseUri}")
+      logger.info(s"Preview server started at ${server.baseUri}")
 
-        // watch but no-livereload b/c we don't need an mdoc server
-        mdoc.toTask(" --watch --no-livereload").andFinally {
-          logger.info(s"Shutting down preview server...")
-          cancel.unsafeRunSync()
-        }
+      // watch but no-livereload b/c we don't need an mdoc server
+      mdoc.toTask(" --watch --no-livereload").andFinally {
+        logger.info(s"Shutting down preview server...")
+        cancel.unsafeRunSync()
       }
-      // initial run of mdoc to bootstrap laikaPreview
-      .dependsOn(mdoc.toTask(""))
+    }
+    // initial run of mdoc to bootstrap laikaPreview
+    .dependsOn(mdoc.toTask(""))
 
 }

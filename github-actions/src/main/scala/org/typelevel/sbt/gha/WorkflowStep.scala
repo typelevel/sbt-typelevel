@@ -15,6 +15,7 @@
  */
 
 package org.typelevel.sbt.gha
+import PluginCompat.IterableOnce
 
 sealed abstract class WorkflowStep extends Product with Serializable {
   def id: Option[String]
@@ -32,7 +33,7 @@ sealed abstract class WorkflowStep extends Product with Serializable {
   def withContinueOnError(continueOnError: Boolean): WorkflowStep
 
   def updatedEnv(name: String, value: String): WorkflowStep
-  def concatEnv(env: Seq[(String, String)]): WorkflowStep
+  def concatEnv(env: IterableOnce[(String, String)]): WorkflowStep
 }
 
 object WorkflowStep {
@@ -132,9 +133,9 @@ object WorkflowStep {
     def withWorkingDirectory(workingDirectory: Option[String]): Run
 
     def updatedEnv(name: String, value: String): Run
-    def concatEnv(env: Seq[(String, String)]): Run
+    def concatEnv(env: IterableOnce[(String, String)]): Run
     def updatedParams(name: String, value: String): Run
-    def concatParams(params: Seq[(String, String)]): Run
+    def concatParams(params: IterableOnce[(String, String)]): Run
   }
 
   object Run {
@@ -206,9 +207,9 @@ object WorkflowStep {
       def withWorkingDirectory(workingDirectory: Option[String]) = copy(workingDirectory = workingDirectory)
 
       def updatedEnv(name: String, value: String) = copy(env = this.env.updated(name, value))
-      def concatEnv(env: Seq[(String, String)]) = copy(env = this.env ++ env)
+      def concatEnv(env: IterableOnce[(String, String)]) = copy(env = this.env ++ env)
       def updatedParams(name: String, value: String) = copy(params = this.params.updated(name, value))
-      def concatParams(params: Seq[(String, String)]) = copy(params = this.params ++ params)
+      def concatParams(params: IterableOnce[(String, String)]) = copy(params = this.params ++ params)
       // scalafmt: { maxColumn = 96 }
     }
   }
@@ -223,9 +224,9 @@ object WorkflowStep {
     def withPreamble(preamble: Boolean): Sbt
 
     def updatedEnv(name: String, value: String): Sbt
-    def concatEnv(env: Seq[(String, String)]): Sbt
+    def concatEnv(env: IterableOnce[(String, String)]): Sbt
     def updatedParams(name: String, value: String): Sbt
-    def concatParams(params: Seq[(String, String)]): Sbt
+    def concatParams(params: IterableOnce[(String, String)]): Sbt
   }
 
   object Sbt {
@@ -279,9 +280,9 @@ object WorkflowStep {
       def withPreamble(preamble: Boolean) = copy(preamble = preamble)
 
       def updatedEnv(name: String, value: String) = copy(env = this.env.updated(name, value))
-      def concatEnv(env: Seq[(String, String)]) = copy(env = this.env ++ env)
+      def concatEnv(env: IterableOnce[(String, String)]) = copy(env = this.env ++ env)
       def updatedParams(name: String, value: String) = copy(params = params.updated(name, value))
-      def concatParams(params: Seq[(String, String)]) = copy(params = this.params ++ params)
+      def concatParams(params: IterableOnce[(String, String)]) = copy(params = this.params ++ params)
       // scalafmt: { maxColumn = 96 }
     }
   }
@@ -294,9 +295,9 @@ object WorkflowStep {
     def withParams(params: Map[String, String]): Use
 
     def updatedEnv(name: String, value: String): Use
-    def concatEnv(env: Seq[(String, String)]): Use
+    def concatEnv(env: IterableOnce[(String, String)]): Use
     def updatedParams(name: String, value: String): Use
-    def concatParams(params: Seq[(String, String)]): Use
+    def concatParams(params: IterableOnce[(String, String)]): Use
   }
 
   object Use {
@@ -356,9 +357,9 @@ object WorkflowStep {
       def withParams(params: Map[String, String]) = copy(params = params)
 
       def updatedEnv(name: String, value: String) = copy(env = this.env.updated(name, value))
-      def concatEnv(env: Seq[(String, String)]) = copy(env = this.env ++ env)
+      def concatEnv(env: IterableOnce[(String, String)]) = copy(env = this.env ++ env)
       def updatedParams(name: String, value: String) = copy(params = params.updated(name, value))
-      def concatParams(params: Seq[(String, String)]) = copy(params = this.params ++ params)
+      def concatParams(params: IterableOnce[(String, String)]) = copy(params = this.params ++ params)
       // scalafmt: { maxColumn = 96 }
     }
   }

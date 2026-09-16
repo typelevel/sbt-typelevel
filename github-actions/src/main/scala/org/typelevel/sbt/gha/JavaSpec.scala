@@ -15,7 +15,7 @@
  */
 
 package org.typelevel.sbt.gha
-import scala.annotation.nowarn
+import org.typelevel.scalaccompat.annotation._
 final case class JavaSpec(dist: JavaSpec.Distribution, version: String) {
   def render: String = dist match {
     case JavaSpec.Distribution.GraalVM(gversion) => s"graal_$gversion@$version"
@@ -38,7 +38,7 @@ object JavaSpec {
 
   sealed abstract class Distribution(val rendering: String) extends Product with Serializable
 
-  @nowarn("msg=object OpenJ9 in object Distribution is deprecated since 0.5.0: Use `semeru`")
+  @nowarn3("msg=object OpenJ9 in object Distribution is deprecated since 0.5.0: Use `semeru`")
   object Distribution {
     case object Temurin extends Distribution("temurin")
     case object Corretto extends Distribution("corretto")

@@ -16,12 +16,12 @@
 
 package org.typelevel.sbt.gha
 
+import org.typelevel.scalaccompat.annotation._
 import sbt.Keys._
 import sbt._
 import sbtcompat.PluginCompat._
 
 import java.nio.file.FileSystems
-import scala.annotation.nowarn
 import scala.io.Source
 
 object GenerativePlugin extends AutoPlugin {
@@ -948,7 +948,8 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
     toFileRef(baseDirectory.value / ".github" / "workflows" / "clean.yml")
   }
 
-  @nowarn("msg=Unused import|transient key state is excluded from the cache input")
+  @nowarn3("msg=unused import|transient key state is excluded from the cache input")
+  @nowarn2("msg=Unused import")
   override def projectSettings = {
     import CacheImplicits.{given, _}
     Seq(

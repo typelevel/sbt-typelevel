@@ -17,10 +17,10 @@
 package org.typelevel.sbt.mergify
 
 import org.typelevel.sbt.gha._
+import org.typelevel.scalaccompat.annotation._
 import sbt._
 import sbtcompat.PluginCompat._
 import sbtcrossproject.CrossPlugin.autoImport._
-import scala.annotation.nowarn
 
 import java.nio.file.Path
 
@@ -64,7 +64,8 @@ object MergifyPlugin extends AutoPlugin {
   import autoImport._
   import GenerativePlugin.autoImport._
 
-  @nowarn("msg=Unused import|transient key state is excluded from the cache input")
+  @nowarn3("msg=unused import|transient key state is excluded from the cache input")
+  @nowarn2("msg=Unused import")
   override def buildSettings: Seq[Setting[?]] = {
     import CacheImplicits.{given, _}
     Seq(

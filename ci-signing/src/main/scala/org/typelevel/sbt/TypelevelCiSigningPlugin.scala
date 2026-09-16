@@ -16,15 +16,15 @@
 
 package org.typelevel.sbt
 
+import com.jsuereth.sbtpgp.PgpKeys
+import com.jsuereth.sbtpgp.PgpKeys._
 import com.jsuereth.sbtpgp.SbtPgp
 import com.jsuereth.sbtpgp.SbtPgp.autoImport.useGpgAgent
 import org.typelevel.sbt.gha.GenerativePlugin
 import org.typelevel.sbt.gha.GenerativePlugin.autoImport._
 import org.typelevel.sbt.gha.GitHubActionsPlugin
-import sbt._
-import com.jsuereth.sbtpgp.PgpKeys
-import com.jsuereth.sbtpgp.PgpKeys._
 import sbt.Keys._
+import sbt._
 import sbtcompat.PluginCompat._
 
 object TypelevelCiSigningPlugin extends AutoPlugin {

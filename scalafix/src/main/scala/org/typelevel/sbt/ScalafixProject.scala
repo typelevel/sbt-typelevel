@@ -16,10 +16,9 @@
 
 package org.typelevel.sbt
 
+import org.typelevel.scalaccompat.annotation._
 import sbt._
 import scalafix.sbt._
-
-import scala.annotation.nowarn
 
 import Keys._
 import ScalafixTestkitPlugin.autoImport._
@@ -98,7 +97,7 @@ final class ScalafixProject private (
 
 object ScalafixProject {
 
-  @nowarn("msg=unused import")
+  @nowarn3("msg=unused import")
   def apply(name: String): ScalafixProject = {
 
     import sbtcompat.PluginCompat._

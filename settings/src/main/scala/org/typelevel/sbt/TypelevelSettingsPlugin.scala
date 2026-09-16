@@ -19,13 +19,13 @@ package org.typelevel.sbt
 import com.github.sbt.git.GitPlugin
 import org.typelevel.sbt.kernel.V
 import org.typelevel.sbt.settings.PluginCompat
+import org.typelevel.scalaccompat.annotation._
 import sbt._
 import sbtcompat.PluginCompat._
 import sbtcrossproject.CrossPlugin.autoImport._
 
 import java.io.File
 import java.lang.management.ManagementFactory
-import scala.annotation.nowarn
 import scala.util.Try
 
 import Keys._
@@ -432,6 +432,6 @@ object TypelevelSettingsPlugin extends AutoPlugin {
     }
   }
 
-  @nowarn("msg=unused private member")
+  @unused
   private def unused(): Unit = ()
 }

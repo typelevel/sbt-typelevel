@@ -21,9 +21,8 @@ import org.typelevel.sbt.gha.GenerativePlugin
 import org.typelevel.sbt.gha.GenerativePlugin.autoImport._
 import org.typelevel.sbt.gha.GitHubActionsPlugin
 import org.typelevel.sbt.gha.WorkflowStep
+import org.typelevel.scalaccompat.annotation._
 import sbt._
-
-import scala.annotation.nowarn
 
 object TypelevelCiPlugin extends AutoPlugin {
 
@@ -188,7 +187,7 @@ object TypelevelCiPlugin extends AutoPlugin {
     }
   )
 
-  @nowarn("msg=unused import")
+  @nowarn3("msg=unused import")
   override def projectSettings: Seq[Setting[?]] = {
     import sbtcompat.PluginCompat._
     Seq(
