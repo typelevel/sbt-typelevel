@@ -18,6 +18,7 @@ package org.typelevel.sbt.mergify
 
 import org.typelevel.sbt.gha._
 import sbt._
+import sbtcompat.PluginCompat._
 import sbtcrossproject.CrossPlugin.autoImport._
 import scala.annotation.nowarn
 
@@ -87,8 +88,10 @@ object MergifyPlugin extends AutoPlugin {
         }
       stewardRule ++ labelRules
     },
-    mergifyGenerate := {
-      IO.write(mergifyYaml.value, generateMergifyContents.value)
+    mergifyGenerate := Def.uncached {
+      implicit val conv: xsbti.FileConverter = fileConverter.value
+      val mergifyYml = toFile(mergifyYmlFile.value)
+      IO.write(mergifyYml, generateMergifyContents.value)
     },
     mergifyCheck := {
       val log = state.value.log
@@ -107,7 +110,10 @@ object MergifyPlugin extends AutoPlugin {
         }
       }
 
-      compare(mergifyYaml.value, generateMergifyContents.value)
+      implicit val conv: xsbti.FileConverter = fileConverter.value
+      val mergifyYml = toFile(mergifyYmlFile.value)
+
+      compare(mergifyYml, generateMergifyContents.value)
     }
   )
   override def projectSettings: Seq[Setting[?]] = Seq(
@@ -172,8 +178,9 @@ object MergifyPlugin extends AutoPlugin {
       .foldLeft(java.nio.file.Paths.get("/"))(_.resolve(_))
   }
 
-  private lazy val mergifyYaml = Def.setting {
-    (ThisBuild / baseDirectory).value / ".mergify.yml"
+  private val mergifyYmlFile: Def.Initialize[Task[FileRef]] = Def task {
+    implicit val conv: xsbti.FileConverter = fileConverter.value
+    toFileRef(baseDirectory.value / ".mergify.yml")
   }
 
   private lazy val generateMergifyContents = Def.task {
