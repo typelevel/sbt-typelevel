@@ -28,7 +28,6 @@ import org.typelevel.sbt.gha.GenerativePlugin.autoImport._
 import org.typelevel.sbt.site._
 import sbt.Keys._
 import sbt._
-import sbtcompat.PluginCompat._
 
 import scala.util.Try
 
