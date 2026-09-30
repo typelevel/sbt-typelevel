@@ -27,3 +27,5 @@ Compile / unmanagedResourceDirectories ++= modules.map { module =>
 }
 
 addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.7.0")
+
+libraryDependencies += "org.typelevel" %% "scalac-compat-annotation" % "0.1.4" % Provided
