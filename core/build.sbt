@@ -1,4 +1,4 @@
 addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.5.6")
 addSbtPlugin("de.heikoseeberger" % "sbt-header" % "5.10.0")
-addSbtPlugin("org.portable-scala" % "sbt-scalajs-crossproject" % "1.3.2")
-addSbtPlugin("org.portable-scala" % "sbt-scala-native-crossproject" % "1.3.2")
+addSbtPlugin("org.scala-native" % "sbt-scala-native" % "0.3.7")
+addSbtPlugin("com.eed3si9n" % "sbt-projectmatrix" % "0.11.0")

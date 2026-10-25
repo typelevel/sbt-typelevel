@@ -17,18 +17,18 @@
 package org.typelevel.sbt
 
 import sbt.Keys._
+import sbt.VirtualAxis.PlatformAxis
 import sbt._
-import sbtcrossproject.CrossPlugin
-import sbtcrossproject.CrossPlugin.autoImport._
-import sbtcrossproject.Platform
+import sbtprojectmatrix.ProjectMatrixKeys.virtualAxes
+import sbtprojectmatrix.ProjectMatrixPlugin
 
 object TypelevelBspPlugin extends AutoPlugin {
   override def trigger = allRequirements
-  override def requires: Plugins = CrossPlugin
+  override def requires: Plugins = ProjectMatrixPlugin
 
   object autoImport {
-    lazy val tlBspCrossProjectPlatforms: SettingKey[Set[Platform]] =
-      settingKey[Set[Platform]](
+    lazy val tlBspCrossProjectPlatforms: SettingKey[Set[PlatformAxis]] =
+      settingKey[Set[PlatformAxis]](
         "A set of platforms for which BSP should be enabled (default: not initialized)")
   }
 
@@ -38,20 +38,13 @@ object TypelevelBspPlugin extends AutoPlugin {
     bspEnabled := {
       val oldValue = bspEnabled.value
 
-      // We have to check if `crossProjectCrossType` and `crossProjectPlatform`
-      // are initialized. Otherwise, the `sbt-typelevel` won't load itself.
-      (
-        crossProjectCrossType.?.value,
-        crossProjectPlatform.?.value,
-        tlBspCrossProjectPlatforms.?.value
-      ) match {
-        // `tlBspCrossProjectPlatforms` is set by a user explicitly.
-        case (_, Some(projectPlatform), Some(bspPlatforms)) =>
-          bspPlatforms.contains(projectPlatform)
-        // If `CrossType` is `Pure` then enable BSP for the JVM platform only.
-        case (Some(CrossType.Pure), Some(projectPlatform), None) =>
-          projectPlatform == JVMPlatform
-        // Otherwise simply return the old value.
+      (virtualAxes.?.value, tlBspCrossProjectPlatforms.?.value) match {
+        // This is a multi-platform project and `tlBspCrossProjectPlatforms` is set by a user explicitly.
+        case (Some(axes), Some(bspPlatforms)) =>
+          axes.exists {
+            case projectPlatform: PlatformAxis => bspPlatforms.contains(projectPlatform)
+            case _ => false
+          }
         case _ => oldValue
       }
     }

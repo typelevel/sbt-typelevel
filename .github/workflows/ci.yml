@@ -42,7 +42,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-22.04, macos-latest, windows-2022]
-        scala: [2.12]
+        scala: [2_12]
         java:
           - temurin@8
           - temurin@11
@@ -198,26 +198,26 @@ jobs:
       - name: Check headers and formatting
         if: matrix.java == 'temurin@8' && matrix.os == 'ubuntu-22.04'
         shell: bash
-        run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' headerCheckAll scalafmtCheckAll 'project /' scalafmtSbtCheck
+        run: sbt 'project ${{ matrix.project }}${{ matrix.scala }}' headerCheckAll scalafmtCheckAll 'project /' scalafmtSbtCheck
 
       - name: Check scalafix lints
         if: matrix.java == 'temurin@8' && matrix.os == 'ubuntu-22.04'
         shell: bash
-        run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' 'scalafixAll --check'
+        run: sbt 'project ${{ matrix.project }}${{ matrix.scala }}' 'scalafixAll --check'
 
       - name: Test
         shell: bash
-        run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' test
+        run: sbt 'project ${{ matrix.project }}${{ matrix.scala }}' test
 
       - name: Check binary compatibility
         if: matrix.java == 'temurin@8' && matrix.os == 'ubuntu-22.04'
         shell: bash
-        run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' mimaReportBinaryIssues
+        run: sbt 'project ${{ matrix.project }}${{ matrix.scala }}' mimaReportBinaryIssues
 
       - name: Generate API documentation
         if: matrix.java == 'temurin@8' && matrix.os == 'ubuntu-22.04'
         shell: bash
-        run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' doc
+        run: sbt 'project ${{ matrix.project }}${{ matrix.scala }}' doc
 
       - shell: bash
         working-directory: project
@@ -358,12 +358,12 @@ jobs:
         if: matrix.java == 'semeru@17' && steps.setup-java-semeru-17.outputs.cache-hit == 'false'
         run: sbt +update
 
-      - name: Download target directories (2.12, sbt-typelevelJVM)
+      - name: Download target directories (2_12, sbt-typelevelJVM)
         uses: actions/download-artifact@v6
         with:
-          name: target-${{ matrix.os }}-${{ matrix.java }}-2.12-sbt-typelevelJVM
+          name: target-${{ matrix.os }}-${{ matrix.java }}-2_12-sbt-typelevelJVM
 
-      - name: Inflate target directories (2.12, sbt-typelevelJVM)
+      - name: Inflate target directories (2_12, sbt-typelevelJVM)
         run: |
           tar xf targets.tar
           rm targets.tar
@@ -507,7 +507,7 @@ jobs:
       - name: Submit Dependencies
         uses: scalacenter/sbt-dependency-submission@v2
         with:
-          modules-ignore: sbt-typeleveljvm_2.12 docs_2.12 sbt-typelevelnative_2.12 sbt-typeleveljs_2.12
+          modules-ignore: docs_2.12 sbt-typeleveljvm2_12_2.12 sbt-typelevelnative2_12_2.12 sbt-typeleveljs2_12_2.12
           configs-ignore: test scala-tool scala-doc-tool test-internal
 
   validate-steward:

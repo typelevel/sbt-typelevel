@@ -19,7 +19,7 @@ package org.typelevel.sbt
 import com.github.sbt.git.GitPlugin
 import org.typelevel.sbt.kernel.V
 import sbt._
-import sbtcrossproject.CrossPlugin.autoImport._
+import sbtprojectmatrix.ProjectMatrixKeys.projectMatrixBaseDirectory
 
 import java.io.File
 import java.lang.management.ManagementFactory
@@ -49,7 +49,8 @@ object TypelevelSettingsPlugin extends AutoPlugin {
     Def.derive(scalaVersion := crossScalaVersions.value.last, default = true)
   )
 
-  private def onlyScala3 = Def.setting(crossScalaVersions.value.forall(_.startsWith("3.")))
+  private def onlyScala3 =
+    Def.setting((ThisBuild / crossScalaVersions).value.forall(_.startsWith("3.")))
 
   override def projectSettings = Seq(
     pomIncludeRepository := { _ => false },
@@ -337,20 +338,14 @@ object TypelevelSettingsPlugin extends AutoPlugin {
         old.filterNot(_ == flag)
     },
     unmanagedSourceDirectories ++= {
+      val rootBaseDirectory = (LocalRootProject / baseDirectory).value
+      val baseDir = projectMatrixBaseDirectory
+        .?
+        .value
+        .map(matrixDir => rootBaseDirectory / matrixDir.toString)
+        .getOrElse(baseDirectory.value)
       def extraDirs(suffix: String) =
-        crossProjectCrossType.?.value match {
-          case Some(crossType) =>
-            crossType
-              .sharedSrcDir(baseDirectory.value, Defaults.nameForSrc(configuration.value.name))
-              .toList
-              .map(f => file(f.getPath + suffix))
-          case None =>
-            List(
-              baseDirectory.value / "src" /
-                Defaults.nameForSrc(configuration.value.name) / s"scala$suffix"
-            )
-        }
-
+        List(baseDir / "src" / Defaults.nameForSrc(configuration.value.name) / s"scala$suffix")
       CrossVersion.partialVersion(scalaVersion.value) match {
         case Some((2, y)) if y <= 12 => extraDirs("-2.12-")
         case Some((2, y)) if y >= 13 => extraDirs("-2.13+")
