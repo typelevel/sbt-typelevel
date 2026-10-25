@@ -16,10 +16,10 @@
 
 package org.typelevel.sbt
 
-import de.heikoseeberger.sbtheader.HeaderPlugin
 import org.typelevel.sbt.gha.GenerativePlugin
 import org.typelevel.sbt.gha.GitHubActionsPlugin
 import sbt._
+import sbtheader.HeaderPlugin
 
 import Keys._
 import TypelevelKernelPlugin.autoImport._
