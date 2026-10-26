@@ -62,7 +62,7 @@ object MergifyPlugin extends AutoPlugin {
   import autoImport._
   import GenerativePlugin.autoImport._
 
-  override def buildSettings: Seq[Setting[_]] = Seq(
+  override def buildSettings: Seq[Setting[?]] = Seq(
     mergifyStewardConfig := Some(MergifyStewardConfig()),
     mergifyRequiredJobs := Seq("build"),
     mergifyLabelPaths := internallyCalculatedMergifyLabelPaths.value,
@@ -109,7 +109,7 @@ object MergifyPlugin extends AutoPlugin {
     }
   )
 
-  override def projectSettings: Seq[Setting[_]] = Seq(
+  override def projectSettings: Seq[Setting[?]] = Seq(
     mergifyGenerate / aggregate := false,
     mergifyCheck / aggregate := false,
     githubWorkflowGenerate := githubWorkflowGenerate

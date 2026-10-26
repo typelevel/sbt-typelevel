@@ -21,6 +21,7 @@ import org.typelevel.sbt.kernel.V
 import sbt.Keys._
 import sbt._
 import sbt.plugins.JvmPlugin
+import sbtcompat.PluginCompat._
 
 import scala.annotation.nowarn
 
@@ -50,7 +51,7 @@ object TypelevelKernelPlugin extends AutoPlugin {
       "0.6.1")
     def tlReplaceCommandAlias(name: String, contents: String): Seq[Setting[State => State]] =
       Seq(GlobalScope / onLoad ~= { (f: State => State) =>
-        f andThen { s: State =>
+        f andThen { (s: State) =>
           BasicCommands.addAlias(BasicCommands.removeAlias(s, name), name, contents)
         }
       })
@@ -84,7 +85,10 @@ object TypelevelKernelPlugin extends AutoPlugin {
   @nowarn("cat=deprecation")
   override def projectSettings = Seq(
     ivyConfigurations += CompileTime,
-    Compile / unmanagedClasspath ++= update.value.select(configurationFilter(CompileTime.name))
+    Compile / unmanagedClasspath ++= Def.uncached {
+      implicit val conv: xsbti.FileConverter = fileConverter.value
+      toAttributedFiles(update.value.select(configurationFilter(CompileTime.name)))
+    }
   )
 
   private[sbt] def mkCommand(commands: List[String]): String = commands.mkString("; ", "; ", "")
@@ -112,7 +116,7 @@ object TypelevelKernelPlugin extends AutoPlugin {
     previousReleases.value.headOption.map(_.toString)
   }
 
-  private[this] lazy val previousReleases: Def.Initialize[List[V]] = Def.setting {
+  private lazy val previousReleases: Def.Initialize[List[V]] = Def.setting {
     val currentVersion = V(version.value).map(_.copy(prerelease = None))
     GitHelper.previousReleases(fromHead = true, strict = false).filter { v =>
       currentVersion.forall(v.copy(prerelease = None) <= _)

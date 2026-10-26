@@ -30,26 +30,27 @@ object TypelevelScalaJSGitHubPlugin extends AutoPlugin {
   import TypelevelKernelPlugin.autoImport._
   import ScalaJSPlugin.autoImport._
 
-  override def projectSettings = Seq(
-    scalacOptions ++= {
-      val flag = if (tlIsScala3.value) "-scalajs-mapSourceURI:" else "-P:scalajs:mapSourceURI:"
+  private val sourceMapOptions = Def.task {
+    val flag = if (tlIsScala3.value) "-scalajs-mapSourceURI:" else "-P:scalajs:mapSourceURI:"
 
-      val tagOrHash =
-        GitHelper
-          .getTagOrHash(git.gitCurrentTags.value, git.gitHeadCommit.value)
-          // Don't include the flag if there are uncommitted changes, since the tag or hash would be inaccurate
-          .filterNot(_ => git.gitUncommittedChanges.value)
+    val tagOrHash =
+      GitHelper
+        .getTagOrHash(git.gitCurrentTags.value, git.gitHeadCommit.value)
+        // Don't include the flag if there are uncommitted changes, since the tag or hash would be inaccurate
+        .filterNot(_ => git.gitUncommittedChanges.value)
 
-      val l = (LocalRootProject / baseDirectory).value.toURI.toString
+    val l = (LocalRootProject / baseDirectory).value.toURI.toString
 
-      tagOrHash.flatMap { v =>
-        scmInfo.value.map { info =>
-          val g =
-            s"${info.browseUrl.toString.replace("github.com", "raw.githubusercontent.com")}/$v/"
-          s"$flag$l->$g"
-        }
+    tagOrHash.flatMap { v =>
+      scmInfo.value.map { info =>
+        val g =
+          s"${info.browseUrl.toString.replace("github.com", "raw.githubusercontent.com")}/$v/"
+        s"$flag$l->$g"
       }
-    },
+    }
+  }
+  override def projectSettings = Seq(
+    scalacOptions ++= sourceMapOptions.value,
     scalaJSLinkerConfig := {
       scalaJSLinkerConfig.value.withBatchMode(sys.env.get("GITHUB_ACTIONS").contains("true"))
     }
