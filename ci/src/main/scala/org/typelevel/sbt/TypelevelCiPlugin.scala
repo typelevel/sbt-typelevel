@@ -176,7 +176,9 @@ object TypelevelCiPlugin extends AutoPlugin {
         WorkflowJob(
           "validate-steward",
           "Validate Steward Config",
-          WorkflowStep.Checkout ::
+          WorkflowStep.checkout(
+            full = false,
+            persistCredentials = githubWorkflowCheckoutPersistCredentials.value) ::
             WorkflowStep.SetupJava(List(JavaSpec.temurin("17")), false) :::
             WorkflowStep.Use(
               UseRef.Public("coursier", "setup-action", "v1"),
