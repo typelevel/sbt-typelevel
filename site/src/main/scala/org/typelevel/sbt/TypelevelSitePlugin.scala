@@ -215,7 +215,10 @@ object TypelevelSitePlugin extends AutoPlugin {
 
       val extraJava =
         if (!githubWorkflowJavaVersions.value.contains(tlSiteJavaVersion.value))
-          WorkflowStep.SetupJava(List(tlSiteJavaVersion.value))
+          WorkflowStep.SetupJava(
+            List(tlSiteJavaVersion.value),
+            enableCaching = true,
+            cacheCond = GenerativePlugin.compileCacheCond(githubWorkflowCacheOn.value))
         else Nil
 
       WorkflowJob(

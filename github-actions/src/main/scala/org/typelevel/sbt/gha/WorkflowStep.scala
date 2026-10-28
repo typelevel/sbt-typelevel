@@ -37,21 +37,39 @@ sealed abstract class WorkflowStep extends Product with Serializable {
 
 object WorkflowStep {
 
-  val CheckoutFull: WorkflowStep = Use(
-    UseRef.Public("actions", "checkout", "v6"),
-    name = Some("Checkout current branch (full)"),
-    params = Map("fetch-depth" -> "0"))
+  val CheckoutFull: WorkflowStep = checkout(full = true, persistCredentials = true)
 
-  val Checkout: WorkflowStep = Use(
-    UseRef.Public("actions", "checkout", "v6"),
-    name = Some("Checkout current branch (fast)"))
+  val Checkout: WorkflowStep = checkout(full = false, persistCredentials = true)
+
+  private[sbt] def checkout(full: Boolean, persistCredentials: Boolean): WorkflowStep = {
+    val fetchDepth = if (full) Map("fetch-depth" -> "0") else Map.empty[String, String]
+    val credentials =
+      if (persistCredentials) Map.empty[String, String]
+      else Map("persist-credentials" -> "false")
+    Use(
+      UseRef.Public("actions", "checkout", "v6"),
+      name = Some(s"Checkout current branch (${if (full) "full" else "fast"})"),
+      params = fetchDepth ++ credentials)
+  }
 
   val SetupSbt: WorkflowStep = WorkflowStep.Use(
     UseRef.Public("sbt", "setup-sbt", "v1"),
     name = Some("Setup sbt")
   )
 
-  def SetupJava(versions: List[JavaSpec], enableCaching: Boolean = true): List[WorkflowStep] = {
+  def SetupJava(versions: List[JavaSpec], enableCaching: Boolean = true): List[WorkflowStep] =
+    SetupJava(versions, enableCaching, cacheCond = None)
+
+  /**
+   * @param cacheCond
+   *   a GitHub Actions expression, written without the surrounding delimiters. When set, the
+   *   sbt dependency cache is used only in the runs where it holds. It is placed in front of
+   *   `&&`, so wrap it in parentheses if it contains `||`.
+   */
+  def SetupJava(
+      versions: List[JavaSpec],
+      enableCaching: Boolean,
+      cacheCond: Option[String]): List[WorkflowStep] = {
     def sbtUpdateStep(cond: String, setupId: String) =
       if (enableCaching)
         List(
@@ -63,7 +81,14 @@ object WorkflowStep {
           ))
       else Nil
 
-    val sbtCacheParams = if (enableCaching) Map("cache" -> "sbt") else Map.empty
+    // An empty cache input disables both the restore and the save of the cache.
+    val sbtCacheParams =
+      if (!enableCaching) Map.empty[String, String]
+      else
+        cacheCond match {
+          case None => Map("cache" -> "sbt")
+          case Some(cond) => Map("cache" -> s"$${{ $cond && 'sbt' || '' }}")
+        }
 
     versions flatMap {
       case jv @ JavaSpec(JavaSpec.Distribution.GraalVM(graalVersion), javaVersion) =>

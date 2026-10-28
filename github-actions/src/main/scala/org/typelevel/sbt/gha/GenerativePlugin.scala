@@ -43,6 +43,9 @@ object GenerativePlugin extends AutoPlugin {
     type RefPredicate = org.typelevel.sbt.gha.RefPredicate
     val RefPredicate = org.typelevel.sbt.gha.RefPredicate
 
+    type RunPredicate = org.typelevel.sbt.gha.RunPredicate
+    val RunPredicate = org.typelevel.sbt.gha.RunPredicate
+
     type Ref = org.typelevel.sbt.gha.Ref
     val Ref = org.typelevel.sbt.gha.Ref
 
@@ -170,6 +173,31 @@ object GenerativePlugin extends AutoPlugin {
 
     case RefPredicate.EndsWith(Ref.Branch(name)) =>
       s"(startsWith($target, 'refs/heads/') && endsWith($target, '$name'))"
+  }
+
+  def compileRunPredicate(pred: RunPredicate): String = pred match {
+    case RunPredicate.Always => "true"
+    case RunPredicate.Never => "false"
+    case RunPredicate.Ref(predicate) => compileBranchPredicate("github.ref", predicate)
+    case RunPredicate.Event(name) => s"github.event_name == '$name'"
+    case RunPredicate.Custom(expression) => s"($expression)"
+    case RunPredicate.And(left, right) =>
+      s"(${compileRunPredicate(left)} && ${compileRunPredicate(right)})"
+    case RunPredicate.Or(left, right) =>
+      s"(${compileRunPredicate(left)} || ${compileRunPredicate(right)})"
+    case RunPredicate.Not(predicate) =>
+      predicate match {
+        // these already render inside parentheses
+        case _: RunPredicate.And | _: RunPredicate.Or | _: RunPredicate.Custom =>
+          "!" + compileRunPredicate(predicate)
+        case _ => s"!(${compileRunPredicate(predicate)})"
+      }
+  }
+
+  // None means the cache is used in every run, which keeps the plain `cache: sbt` output.
+  def compileCacheCond(pred: RunPredicate): Option[String] = pred match {
+    case RunPredicate.Always => None
+    case other => Some(compileRunPredicate(other))
   }
 
   def compileConcurrency(concurrency: Concurrency): String =
@@ -696,7 +724,9 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
     githubWorkflowTargetPaths := Paths.None,
     githubWorkflowEnv := Map("GITHUB_TOKEN" -> s"$${{ secrets.GITHUB_TOKEN }}"),
     githubWorkflowPermissions := None,
-    githubWorkflowAddedJobs := Seq()
+    githubWorkflowAddedJobs := Seq(),
+    githubWorkflowCheckoutPersistCredentials := true,
+    githubWorkflowCacheOn := RunPredicate.Always
   )
 
   private lazy val internalTargetAggregation =
@@ -831,9 +861,14 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
       }
 
       autoCrlfOpt :::
-        List(WorkflowStep.CheckoutFull) :::
+        WorkflowStep.checkout(
+          full = true,
+          persistCredentials = githubWorkflowCheckoutPersistCredentials.value) ::
         WorkflowStep.SetupSbt ::
-        WorkflowStep.SetupJava(githubWorkflowJavaVersions.value.toList) :::
+        WorkflowStep.SetupJava(
+          githubWorkflowJavaVersions.value.toList,
+          enableCaching = true,
+          cacheCond = compileCacheCond(githubWorkflowCacheOn.value)) :::
         githubWorkflowGeneratedCacheSteps.value.toList
     },
     githubWorkflowGeneratedCI := {
