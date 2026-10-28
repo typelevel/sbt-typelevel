@@ -42,6 +42,12 @@ ThisBuild / githubWorkflowBuildMatrixExclusions ++= {
 ThisBuild / githubWorkflowPublishTimeoutMinutes := Some(45)
 ThisBuild / githubWorkflowPublishNeeds += "validate-steward"
 
+ThisBuild / githubWorkflowCheckoutPersistCredentials := false
+ThisBuild / githubWorkflowCacheOn := {
+  val publishing = RunPredicate.Ref.anyOf(githubWorkflowPublishTargetBranches.value)
+  !publishing
+}
+
 ThisBuild / githubWorkflowBuild ++= Seq(
   WorkflowStep.Run(
     List("pwd"),
