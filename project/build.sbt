@@ -26,6 +26,6 @@ Compile / unmanagedResourceDirectories ++= modules.map { module =>
   baseDirectory.value.getParentFile / module / "src" / "main" / "resources"
 }
 
-addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.7.0")
+addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.7.1")
 
 libraryDependencies += "org.typelevel" %% "scalac-compat-annotation" % "0.1.4" % Provided
