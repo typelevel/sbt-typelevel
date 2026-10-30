@@ -163,9 +163,7 @@ lazy val core = crossProject(...)
   )
 ```
 
-@:callout(todo)
-See https://www.scala-sbt.org/2.x/docs/en/changes/migrating-from-sbt-1.x.html . Should this use LocalProject
-@:@
+Note that in SBT 2, no settings should be unscoped. See the [SBT migration guide](https://www.scala-sbt.org/2.x/docs/en/changes/migrating-from-sbt-1.x.html#bare-settings-changes) for instructions on how to scope other settings with `LocalRootProject`.
 
 ### Modules were resolved with conflicting cross-version suffixes
 
@@ -297,4 +295,31 @@ The following problems are under investigation.
 
 ## `tlSitePreview` on `sbtn` does not host a site
 
-This is under investigation.
+This occurs in the `sbt-typelevel` repository when using `sbt` without `--server` argument. It occurs under the latest version `2.1.0-RC2`.
+
+According to the console, the server is up and running:
+```
+sbt:sbtTypelevel> docs/tlSitePreview
+[info] running (fork) mdoc.SbtMain
+info: Compiling 16 files to sbt-typelevel/target/out/jvm/scala-2.12.21/docs/mdoc
+info: Compiled in 0.33s (0 errors)
+[success] ok
+[info] Initializing server...
+[info] Initializing server...
+[info] Preview server started at http://127.0.0.1:4242/
+[info] running (fork) mdoc.SbtMain --watch --no-livereload
+info: Compiling 16 files to sbt-typelevel/target/out/jvm/scala-2.12.21/docs/mdoc
+info: Compiled in 0.39s (0 errors)
+Waiting for file changes (press enter to interrupt)
+```
+
+However nothing runs on port `4242`.
+
+The global log under `target/global-logging` shows that the preview server has been shut down.
+
+```
+[info] Shutting down preview server...
+[debug] jsonRpcNotify: JsonRpcNotificationMessage(2.0, build/logMessage, {"type":3,"message":"Shutting down preview server..."})
+```
+
+This message is never printed in the console.
