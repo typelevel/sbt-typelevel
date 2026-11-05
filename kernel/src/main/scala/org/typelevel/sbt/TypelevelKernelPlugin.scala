@@ -62,7 +62,7 @@ object TypelevelKernelPlugin extends AutoPlugin {
   override def globalSettings = Seq(
     Def.derive(tlIsScala3 := scalaVersion.value.startsWith("3.")),
     tlCommandAliases := Map(
-      "tlReleaseLocal" -> List("reload", "project /", "+publishLocal")
+      "tlReleaseLocal" -> List("reload", "project /", "+publishLocalSigned")
     ),
     onLoad := {
       val aliases = tlCommandAliases.value
