@@ -20,6 +20,8 @@ import org.typelevel.sbt.NoPublishGlobalPlugin.noPublishModulesIgnore
 import org.typelevel.sbt.gha.GenerativePlugin
 import org.typelevel.sbt.gha.GenerativePlugin.autoImport._
 import org.typelevel.sbt.gha.GitHubActionsPlugin
+import org.typelevel.sbt.gha.PermissionValue
+import org.typelevel.sbt.gha.Permissions
 import org.typelevel.sbt.gha.WorkflowStep
 import sbt._
 
@@ -49,6 +51,10 @@ object TypelevelCiPlugin extends AutoPlugin {
     lazy val tlCiDependencyGraphJob =
       settingKey[Boolean]("Whether to add a job to submit dependencies to GH (default: true)")
 
+    lazy val tlCiDependencyGraphOnPullRequest =
+      settingKey[Boolean](
+        "Whether to run the dependency-submission job on same-repo pull requests (default: true)")
+
     lazy val tlCiStewardValidateConfig = settingKey[Option[File]](
       "The location of the Scala Steward config to validate (default: `.scala-steward.conf`, if exists)")
 
@@ -68,6 +74,7 @@ object TypelevelCiPlugin extends AutoPlugin {
     tlCiMimaBinaryIssueCheck := false,
     tlCiDocCheck := false,
     tlCiDependencyGraphJob := true,
+    tlCiDependencyGraphOnPullRequest := true,
     tlCiForkCondition := "github.event.repository.fork == false",
     githubWorkflowTargetBranches ++= Seq(
       "!update/**", // ignore steward branches
@@ -144,8 +151,14 @@ object TypelevelCiPlugin extends AutoPlugin {
     },
     githubWorkflowJavaVersions := Seq(JavaSpec.temurin("8")),
     githubWorkflowAddedJobs ++= {
-      val ghEventCond = "github.event_name != 'pull_request'"
-      val jobCond = s"${tlCiForkCondition.value} && $ghEventCond"
+      val sameRepoPrCond =
+        "github.event.pull_request.head.repo.full_name == github.repository"
+      val ghEventCond =
+        if (tlCiDependencyGraphOnPullRequest.value)
+          s"github.event_name != 'pull_request' || $sameRepoPrCond"
+        else
+          "github.event_name != 'pull_request'"
+      val jobCond = s"${tlCiForkCondition.value} && ($ghEventCond)"
 
       val dependencySubmission =
         if (tlCiDependencyGraphJob.value)
@@ -163,7 +176,9 @@ object TypelevelCiPlugin extends AutoPlugin {
                   Some(List("test", "scala-tool", "scala-doc-tool", "test-internal")),
                   None
                 ),
-              cond = Some(jobCond)
+              cond = Some(jobCond),
+              permissions =
+                Some(Permissions.Specify.defaultRestrictive.withContents(PermissionValue.Write))
             ))
         else Nil
 
