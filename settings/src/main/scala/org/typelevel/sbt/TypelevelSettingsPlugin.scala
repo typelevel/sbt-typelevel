@@ -38,6 +38,8 @@ object TypelevelSettingsPlugin extends AutoPlugin {
     lazy val tlJdkRelease =
       settingKey[Option[Int]](
         "JVM target version for the compiled bytecode, None results in default scalac and javac behavior (no compiler flag is added) (default: Some(8))")
+    lazy val tlKindProjectorUnderscores =
+      settingKey[Boolean]("Use _ instead of * for kind-projector (default: false)")
   }
 
   import autoImport._
@@ -46,6 +48,7 @@ object TypelevelSettingsPlugin extends AutoPlugin {
   override def globalSettings = Seq(
     tlFatalWarnings := false,
     tlJdkRelease := Some(8),
+    tlKindProjectorUnderscores := false,
     Def.derive(scalaVersion := crossScalaVersions.value.last, default = true)
   )
 
@@ -193,16 +196,18 @@ object TypelevelSettingsPlugin extends AutoPlugin {
       }
     },
     scalacOptions ++= {
+      val underscores = tlKindProjectorUnderscores.value || onlyScala3.value
       scalaVersion.value match {
         case V(V(3, minor, _, _)) =>
           val kpFlag = if (minor >= 5) "-Xkind-projector" else "-Ykind-projector"
-          if (onlyScala3.value)
+          if (underscores)
             Seq(s"$kpFlag:underscores")
           else
             Seq("-language:implicitConversions", kpFlag)
 
         case V(V(2, minor, _, _)) if minor >= 12 =>
-          Seq("-language:_", "-Xsource:3")
+          val kp = if (underscores) Seq("-P:kind-projector:underscore-placeholders") else Nil
+          Seq("-language:_", "-Xsource:3") ++ kp
 
         case _ => Seq("-language:_")
       }
