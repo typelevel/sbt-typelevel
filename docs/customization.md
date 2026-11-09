@@ -67,6 +67,7 @@ Both plugins are documented in [**sbt-typelevel-github-actions**](gha.md).
 - `tlCiDocCheck` (setting): Whether to build API docs in CI (default: `false`).
 - `tlCiDependencyGraphJob` (setting): Whether to add a job to submit dependencies to GH (default: `true`).
 - `tlCiForkCondition` (setting): Condition for checking on CI whether this project is a fork of another (default: `github.event.repository.fork == false`).
+- `tlCiLintCommands` (setting): sbt commands run in the "Check headers and formatting" CI step. Defaults are derived from `tlCiHeaderCheck`, `tlCiScalafmtCheck`, and `tlCiJavafmtCheck`. Append your own check (e.g. `tlCiLintCommands += "myLintCheckAll"`) to fold it into the same step. Scalafix is gated separately via `tlCiScalafixCheck` and runs as its own step.
 - `tlCiStewardValidateConfig` (setting): The location of the Scala Steward config to validate (default: `.scala-steward.conf`, if exists).
 - `tlCrossRootProject` (method): helper to create a `root` project that can aggregate both `Project`s and `CrossProject`s. Automatically creates separate jobs in the CI matrix for each platform (JVM, JS, etc.).
 
