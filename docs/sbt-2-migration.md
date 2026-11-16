@@ -4,10 +4,9 @@ This branch of sbt-typelevel supports SBT 2.x. Follow these steps to upgrade you
 
 ## Publish a local snapshot
 
-sbt-typelevel and its Laika dependency are not yet published. You will need to build and publish them locally.
+sbt-typelevel is not yet published. You will need to publish it locally.
 
-1. Check out [the Laika SBT 2.0 PR branch](https://github.com/typelevel/Laika/pull/774) and publish it locally with `tlReleaseLocal`. This will publish Laika for both Scala 2.12 and 3 (SBT 1 and 2 respectively).
-2. Check out this branch of sbt-typelevel. Upgrade the version in `site/build.sbt` to your local Laika snapshot.
+2. Check out this branch of sbt-typelevel.
 2. Enter the shell with `sbt`. The `sbt-typelevel` build is self-referential, so this will build `sbt-typevel` on SBT 2.
 3. Publish jars for Scala 2.12 and 3 with `tlReleaseLocal`.
 
