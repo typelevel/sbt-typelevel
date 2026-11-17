@@ -14,7 +14,7 @@ ThisBuild / startYear := Some(2022)
 val temurin17 = JavaSpec.temurin("17")
 
 ThisBuild / githubWorkflowJavaVersions ++= Seq(
-  JavaSpec(JavaSpec.Distribution.GraalVM("22.3.2"), "11"),
+  JavaSpec(JavaSpec.Distribution.GraalVM("22.3.2"), "17"),
   JavaSpec.graalvm("21"),
   JavaSpec.corretto("17"),
   JavaSpec.semeru("17")

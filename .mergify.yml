@@ -13,7 +13,7 @@ pull_request_rules:
     - body~=labels:.*early-semver-patch
     - body~=labels:.*early-semver-minor
   - status-success=Test (ubuntu-22.04, 2.12, temurin@17, sbtTypelevelJVM)
-  - status-success=Test (ubuntu-22.04, 2.12, graal_22.3.2@11, sbtTypelevelJVM)
+  - status-success=Test (ubuntu-22.04, 2.12, graal_22.3.2@17, sbtTypelevelJVM)
   - status-success=Test (ubuntu-22.04, 2.12, graalvm@21, sbtTypelevelJVM)
   - status-success=Test (ubuntu-22.04, 2.12, corretto@17, sbtTypelevelJVM)
   - status-success=Test (ubuntu-22.04, 2.12, semeru@17, sbtTypelevelJVM)

@@ -45,23 +45,23 @@ jobs:
         scala: [2.12, 3]
         java:
           - temurin@17
-          - graal_22.3.2@11
+          - graal_22.3.2@17
           - graalvm@21
           - corretto@17
           - semeru@17
         project: [sbtTypelevelJVM]
         exclude:
           - scala: 3
-            java: graal_22.3.2@11
+            java: graal_22.3.2@17
           - scala: 3
             java: graalvm@21
           - scala: 3
             java: corretto@17
           - scala: 3
             java: semeru@17
-          - java: graal_22.3.2@11
+          - java: graal_22.3.2@17
             os: macos-latest
-          - java: graal_22.3.2@11
+          - java: graal_22.3.2@17
             os: windows-2022
           - java: graalvm@21
             os: macos-latest
@@ -105,17 +105,17 @@ jobs:
         shell: bash
         run: sbt +update
 
-      - name: Setup GraalVM (graal_22.3.2@11)
-        id: setup-graalvm-22_3_2-11
-        if: matrix.java == 'graal_22.3.2@11'
+      - name: Setup GraalVM (graal_22.3.2@17)
+        id: setup-graalvm-22_3_2-17
+        if: matrix.java == 'graal_22.3.2@17'
         uses: graalvm/setup-graalvm@v1
         with:
           version: 22.3.2
-          java-version: 11
+          java-version: 17
           cache: sbt
 
       - name: sbt update
-        if: matrix.java == 'graal_22.3.2@11' && steps.setup-graalvm-22_3_2-11.outputs.cache-hit == 'false'
+        if: matrix.java == 'graal_22.3.2@17' && steps.setup-graalvm-22_3_2-17.outputs.cache-hit == 'false'
         shell: bash
         run: sbt +update
 
@@ -250,17 +250,17 @@ jobs:
         if: matrix.java == 'temurin@17' && steps.setup-java-temurin-17.outputs.cache-hit == 'false'
         run: sbt +update
 
-      - name: Setup GraalVM (graal_22.3.2@11)
-        id: setup-graalvm-22_3_2-11
-        if: matrix.java == 'graal_22.3.2@11'
+      - name: Setup GraalVM (graal_22.3.2@17)
+        id: setup-graalvm-22_3_2-17
+        if: matrix.java == 'graal_22.3.2@17'
         uses: graalvm/setup-graalvm@v1
         with:
           version: 22.3.2
-          java-version: 11
+          java-version: 17
           cache: sbt
 
       - name: sbt update
-        if: matrix.java == 'graal_22.3.2@11' && steps.setup-graalvm-22_3_2-11.outputs.cache-hit == 'false'
+        if: matrix.java == 'graal_22.3.2@17' && steps.setup-graalvm-22_3_2-17.outputs.cache-hit == 'false'
         run: sbt +update
 
       - name: Setup Java (graalvm@21)
@@ -380,17 +380,17 @@ jobs:
         if: matrix.java == 'temurin@17' && steps.setup-java-temurin-17.outputs.cache-hit == 'false'
         run: sbt +update
 
-      - name: Setup GraalVM (graal_22.3.2@11)
-        id: setup-graalvm-22_3_2-11
-        if: matrix.java == 'graal_22.3.2@11'
+      - name: Setup GraalVM (graal_22.3.2@17)
+        id: setup-graalvm-22_3_2-17
+        if: matrix.java == 'graal_22.3.2@17'
         uses: graalvm/setup-graalvm@v1
         with:
           version: 22.3.2
-          java-version: 11
+          java-version: 17
           cache: sbt
 
       - name: sbt update
-        if: matrix.java == 'graal_22.3.2@11' && steps.setup-graalvm-22_3_2-11.outputs.cache-hit == 'false'
+        if: matrix.java == 'graal_22.3.2@17' && steps.setup-graalvm-22_3_2-17.outputs.cache-hit == 'false'
         run: sbt +update
 
       - name: Setup Java (graalvm@21)
@@ -519,17 +519,17 @@ jobs:
         if: matrix.java == 'temurin@17' && steps.setup-java-temurin-17.outputs.cache-hit == 'false'
         run: sbt +update
 
-      - name: Setup GraalVM (graal_22.3.2@11)
-        id: setup-graalvm-22_3_2-11
-        if: matrix.java == 'graal_22.3.2@11'
+      - name: Setup GraalVM (graal_22.3.2@17)
+        id: setup-graalvm-22_3_2-17
+        if: matrix.java == 'graal_22.3.2@17'
         uses: graalvm/setup-graalvm@v1
         with:
           version: 22.3.2
-          java-version: 11
+          java-version: 17
           cache: sbt
 
       - name: sbt update
-        if: matrix.java == 'graal_22.3.2@11' && steps.setup-graalvm-22_3_2-11.outputs.cache-hit == 'false'
+        if: matrix.java == 'graal_22.3.2@17' && steps.setup-graalvm-22_3_2-17.outputs.cache-hit == 'false'
         run: sbt +update
 
       - name: Setup Java (graalvm@21)
