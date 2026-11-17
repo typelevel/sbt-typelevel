@@ -11,12 +11,9 @@ ThisBuild / developers ++= List(
 )
 ThisBuild / startYear := Some(2022)
 
-val temurin8 = JavaSpec.temurin("8")
 val temurin17 = JavaSpec.temurin("17")
 
 ThisBuild / githubWorkflowJavaVersions ++= Seq(
-  JavaSpec.temurin("11"),
-  temurin17,
   JavaSpec(JavaSpec.Distribution.GraalVM("22.3.2"), "11"),
   JavaSpec.graalvm("21"),
   JavaSpec.corretto("17"),
@@ -28,13 +25,10 @@ val macOS = "macos-latest"
 ThisBuild / githubWorkflowOSes ++= Seq(macOS, "windows-2022")
 
 ThisBuild / githubWorkflowBuildMatrixExclusions ++= {
-  val exclusions = for {
+  for {
     java <- githubWorkflowJavaVersions.value.tail
     os <- githubWorkflowOSes.value.tail
-    if !(java == temurin17 && os == macOS) // keep this one
   } yield MatrixExclude(Map("java" -> java.render, "os" -> os))
-
-  exclusions :+ MatrixExclude(Map("java" -> temurin8.render, "os" -> macOS))
 }
 
 ThisBuild / githubWorkflowPublishTimeoutMinutes := Some(45)
