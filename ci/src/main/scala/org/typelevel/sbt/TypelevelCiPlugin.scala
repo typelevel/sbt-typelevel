@@ -181,7 +181,7 @@ object TypelevelCiPlugin extends AutoPlugin {
               Map("apps" -> "scala-steward")
             ) ::
             WorkflowStep.Run(List(s"scala-steward validate-repo-config $config")) :: Nil,
-          scalas = List.empty,
+          scalas = List.empty
           // javas = List(JavaSpec.temurin("17"))
         )
       }

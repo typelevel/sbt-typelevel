@@ -50,4 +50,3 @@ private[sbt] object CrossRootProjectMacros {
   private def errorMsg: String =
     "tlCrossRootProject must be directly assigned to a val, such as `val x = tlCrossRootProject`. Alternatively, you can use `org.typelevel.sbt.CrossRootProject.apply`"
 }
-

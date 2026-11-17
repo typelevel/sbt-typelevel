@@ -38,7 +38,7 @@ object TypelevelUnidocPlugin extends AutoPlugin {
     mimaPreviousArtifacts := Set.empty,
     // tell the site plugin about us, without forcing the dependency!
     ThisBuild / SettingKey[Option[ModuleID]]("tlSiteApiModule") := Some(projectID.value),
-    semanticdbEnabled := false,
+    semanticdbEnabled := false
   )
 
 }
