@@ -18,4 +18,6 @@ package org.typelevel.sbt.gha
 
 private object PluginCompat {
   type IterableOnce[+A] = scala.IterableOnce[A]
+
+  val githubWorkflowJavaVersion: JavaSpec = JavaSpec.temurin("17")
 }

@@ -16,8 +16,13 @@
 
 package org.typelevel.sbt.core
 
+import org.typelevel.sbt.gha.JavaSpec
+
 import java.net.URI
 import java.net.URL
 private[sbt] object PluginCompat {
   def url(uri: URI): URL = uri.toURL
+
+  def githubWorkflowJavaVersion(tlJdkRelease: Option[Int]): JavaSpec =
+    JavaSpec.temurin(tlJdkRelease.getOrElse(8).toString)
 }

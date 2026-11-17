@@ -17,6 +17,7 @@
 package org.typelevel.sbt
 
 import org.typelevel.sbt.NoPublishGlobalPlugin.noPublishModulesIgnore
+import org.typelevel.sbt.ci.PluginCompat
 import org.typelevel.sbt.gha.GenerativePlugin
 import org.typelevel.sbt.gha.GenerativePlugin.autoImport._
 import org.typelevel.sbt.gha.GitHubActionsPlugin
@@ -139,7 +140,7 @@ object TypelevelCiPlugin extends AutoPlugin {
 
       style ++ scalafix ++ test ++ mima ++ doc
     },
-    githubWorkflowJavaVersions := Seq(JavaSpec.temurin("8")),
+    githubWorkflowJavaVersions := Seq(PluginCompat.githubWorkflowJavaVersion),
     githubWorkflowAddedJobs ++= {
       val ghEventCond = "github.event_name != 'pull_request'"
       val jobCond = s"${tlCiForkCondition.value} && $ghEventCond"

@@ -15,8 +15,13 @@
  */
 
 package org.typelevel.sbt.core
+import org.typelevel.sbt.gha.JavaSpec
+import org.typelevel.scalaccompat.annotation.*
 
 import java.net.URI
 private[sbt] object PluginCompat {
   def url(uri: URI): URI = uri
+
+  @unused
+  def githubWorkflowJavaVersion(tlJdkRelease: Option[Int]): JavaSpec = JavaSpec.temurin("17")
 }

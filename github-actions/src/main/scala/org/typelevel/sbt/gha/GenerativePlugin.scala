@@ -682,7 +682,7 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
     githubWorkflowPublishCond := None,
     githubWorkflowPublishTimeoutMinutes := None,
     githubWorkflowPublishNeeds := Seq("build"),
-    githubWorkflowJavaVersions := Seq(JavaSpec.temurin("11")),
+    githubWorkflowJavaVersions := Seq(PluginCompat.githubWorkflowJavaVersion),
     githubWorkflowScalaVersions := {
       val scalas = crossScalaVersions.value
       val binaryScalas = scalas.map(CrossVersion.binaryScalaVersion(_))

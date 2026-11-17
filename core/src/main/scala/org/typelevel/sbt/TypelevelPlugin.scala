@@ -68,7 +68,7 @@ object TypelevelPlugin extends AutoPlugin {
     tlCiReleaseBranches := Seq("main"),
     Def.derive(tlFatalWarnings := githubIsWorkflowBuild.value),
     githubWorkflowJavaVersions := {
-      Seq(JavaSpec.temurin(tlJdkRelease.value.getOrElse(8).toString))
+      Seq(PluginCompat.githubWorkflowJavaVersion(tlJdkRelease.value))
     },
     githubWorkflowBuildMatrixExclusions ++= {
       val defaultScala = (ThisBuild / scalaVersion).value
