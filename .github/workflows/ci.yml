@@ -103,7 +103,7 @@ jobs:
       - name: sbt update
         if: matrix.java == 'temurin@17' && steps.setup-java-temurin-17.outputs.cache-hit == 'false'
         shell: bash
-        run: sbt +update
+        run: sbt '+update'
 
       - name: Setup GraalVM (graal_22.3.2@17)
         id: setup-graalvm-22_3_2-17
@@ -117,7 +117,7 @@ jobs:
       - name: sbt update
         if: matrix.java == 'graal_22.3.2@17' && steps.setup-graalvm-22_3_2-17.outputs.cache-hit == 'false'
         shell: bash
-        run: sbt +update
+        run: sbt '+update'
 
       - name: Setup Java (graalvm@21)
         id: setup-java-graalvm-21
@@ -131,7 +131,7 @@ jobs:
       - name: sbt update
         if: matrix.java == 'graalvm@21' && steps.setup-java-graalvm-21.outputs.cache-hit == 'false'
         shell: bash
-        run: sbt +update
+        run: sbt '+update'
 
       - name: Setup Java (corretto@17)
         id: setup-java-corretto-17
@@ -145,7 +145,7 @@ jobs:
       - name: sbt update
         if: matrix.java == 'corretto@17' && steps.setup-java-corretto-17.outputs.cache-hit == 'false'
         shell: bash
-        run: sbt +update
+        run: sbt '+update'
 
       - name: Setup Java (semeru@17)
         id: setup-java-semeru-17
@@ -159,7 +159,7 @@ jobs:
       - name: sbt update
         if: matrix.java == 'semeru@17' && steps.setup-java-semeru-17.outputs.cache-hit == 'false'
         shell: bash
-        run: sbt +update
+        run: sbt '+update'
 
       - name: Check that workflows are up to date
         shell: bash
@@ -168,26 +168,26 @@ jobs:
       - name: Check headers and formatting
         if: matrix.java == 'temurin@17' && matrix.os == 'ubuntu-22.04'
         shell: bash
-        run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' headerCheckAll scalafmtCheckAll 'project /' scalafmtSbtCheck
+        run: sbt 'project ${{ matrix.project }}; ++ ${{ matrix.scala }}; headerCheckAll; scalafmtCheckAll; project /; scalafmtSbtCheck'
 
       - name: Check scalafix lints
         if: matrix.java == 'temurin@17' && matrix.os == 'ubuntu-22.04'
         shell: bash
-        run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' 'scalafixAll --check'
+        run: sbt 'project ${{ matrix.project }}; ++ ${{ matrix.scala }}; scalafixAll --check'
 
       - name: Test
         shell: bash
-        run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' test
+        run: sbt 'project ${{ matrix.project }}; ++ ${{ matrix.scala }}; test'
 
       - name: Check binary compatibility
         if: matrix.java == 'temurin@17' && matrix.os == 'ubuntu-22.04'
         shell: bash
-        run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' mimaReportBinaryIssues
+        run: sbt 'project ${{ matrix.project }}; ++ ${{ matrix.scala }}; mimaReportBinaryIssues'
 
       - name: Generate API documentation
         if: matrix.java == 'temurin@17' && matrix.os == 'ubuntu-22.04'
         shell: bash
-        run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' doc
+        run: sbt 'project ${{ matrix.project }}; ++ ${{ matrix.scala }}; doc'
 
       - shell: bash
         working-directory: project
@@ -248,7 +248,7 @@ jobs:
 
       - name: sbt update
         if: matrix.java == 'temurin@17' && steps.setup-java-temurin-17.outputs.cache-hit == 'false'
-        run: sbt +update
+        run: sbt '+update'
 
       - name: Setup GraalVM (graal_22.3.2@17)
         id: setup-graalvm-22_3_2-17
@@ -261,7 +261,7 @@ jobs:
 
       - name: sbt update
         if: matrix.java == 'graal_22.3.2@17' && steps.setup-graalvm-22_3_2-17.outputs.cache-hit == 'false'
-        run: sbt +update
+        run: sbt '+update'
 
       - name: Setup Java (graalvm@21)
         id: setup-java-graalvm-21
@@ -274,7 +274,7 @@ jobs:
 
       - name: sbt update
         if: matrix.java == 'graalvm@21' && steps.setup-java-graalvm-21.outputs.cache-hit == 'false'
-        run: sbt +update
+        run: sbt '+update'
 
       - name: Setup Java (corretto@17)
         id: setup-java-corretto-17
@@ -287,7 +287,7 @@ jobs:
 
       - name: sbt update
         if: matrix.java == 'corretto@17' && steps.setup-java-corretto-17.outputs.cache-hit == 'false'
-        run: sbt +update
+        run: sbt '+update'
 
       - name: Setup Java (semeru@17)
         id: setup-java-semeru-17
@@ -300,7 +300,7 @@ jobs:
 
       - name: sbt update
         if: matrix.java == 'semeru@17' && steps.setup-java-semeru-17.outputs.cache-hit == 'false'
-        run: sbt +update
+        run: sbt '+update'
 
       - name: Download target directories (2.12, sbtTypelevelJVM)
         uses: actions/download-artifact@v6
@@ -344,7 +344,7 @@ jobs:
           SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
           SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
           SONATYPE_CREDENTIAL_HOST: ${{ secrets.SONATYPE_CREDENTIAL_HOST }}
-        run: sbt tlCiRelease
+        run: sbt 'tlCiRelease'
 
   dependency-submission:
     name: Submit Dependencies
@@ -378,7 +378,7 @@ jobs:
 
       - name: sbt update
         if: matrix.java == 'temurin@17' && steps.setup-java-temurin-17.outputs.cache-hit == 'false'
-        run: sbt +update
+        run: sbt '+update'
 
       - name: Setup GraalVM (graal_22.3.2@17)
         id: setup-graalvm-22_3_2-17
@@ -391,7 +391,7 @@ jobs:
 
       - name: sbt update
         if: matrix.java == 'graal_22.3.2@17' && steps.setup-graalvm-22_3_2-17.outputs.cache-hit == 'false'
-        run: sbt +update
+        run: sbt '+update'
 
       - name: Setup Java (graalvm@21)
         id: setup-java-graalvm-21
@@ -404,7 +404,7 @@ jobs:
 
       - name: sbt update
         if: matrix.java == 'graalvm@21' && steps.setup-java-graalvm-21.outputs.cache-hit == 'false'
-        run: sbt +update
+        run: sbt '+update'
 
       - name: Setup Java (corretto@17)
         id: setup-java-corretto-17
@@ -417,7 +417,7 @@ jobs:
 
       - name: sbt update
         if: matrix.java == 'corretto@17' && steps.setup-java-corretto-17.outputs.cache-hit == 'false'
-        run: sbt +update
+        run: sbt '+update'
 
       - name: Setup Java (semeru@17)
         id: setup-java-semeru-17
@@ -430,7 +430,7 @@ jobs:
 
       - name: sbt update
         if: matrix.java == 'semeru@17' && steps.setup-java-semeru-17.outputs.cache-hit == 'false'
-        run: sbt +update
+        run: sbt '+update'
 
       - name: Submit Dependencies
         uses: scalacenter/sbt-dependency-submission@v2
@@ -517,7 +517,7 @@ jobs:
 
       - name: sbt update
         if: matrix.java == 'temurin@17' && steps.setup-java-temurin-17.outputs.cache-hit == 'false'
-        run: sbt +update
+        run: sbt '+update'
 
       - name: Setup GraalVM (graal_22.3.2@17)
         id: setup-graalvm-22_3_2-17
@@ -530,7 +530,7 @@ jobs:
 
       - name: sbt update
         if: matrix.java == 'graal_22.3.2@17' && steps.setup-graalvm-22_3_2-17.outputs.cache-hit == 'false'
-        run: sbt +update
+        run: sbt '+update'
 
       - name: Setup Java (graalvm@21)
         id: setup-java-graalvm-21
@@ -543,7 +543,7 @@ jobs:
 
       - name: sbt update
         if: matrix.java == 'graalvm@21' && steps.setup-java-graalvm-21.outputs.cache-hit == 'false'
-        run: sbt +update
+        run: sbt '+update'
 
       - name: Setup Java (corretto@17)
         id: setup-java-corretto-17
@@ -556,7 +556,7 @@ jobs:
 
       - name: sbt update
         if: matrix.java == 'corretto@17' && steps.setup-java-corretto-17.outputs.cache-hit == 'false'
-        run: sbt +update
+        run: sbt '+update'
 
       - name: Setup Java (semeru@17)
         id: setup-java-semeru-17
@@ -569,10 +569,10 @@ jobs:
 
       - name: sbt update
         if: matrix.java == 'semeru@17' && steps.setup-java-semeru-17.outputs.cache-hit == 'false'
-        run: sbt +update
+        run: sbt '+update'
 
       - name: Generate site
-        run: sbt docs/tlSite
+        run: sbt 'docs/tlSite'
 
       - name: Publish site
         if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'

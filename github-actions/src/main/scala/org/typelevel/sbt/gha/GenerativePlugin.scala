@@ -317,7 +317,7 @@ ${indent(rendered.mkString("\n"), 1)}"""
         import sbtStep.commands
 
         val preamble = if (sbtStep.preamble) sbtStepPreamble else Nil
-        val sbtClientMode = sbt.matches("""sbt.* --client($| .*)""")
+        val sbtClientMode = PluginCompat.sbtClientMode(sbt)
         val safeCommands =
           if (sbtClientMode)
             s"'${(preamble ::: commands).mkString("; ")}'"

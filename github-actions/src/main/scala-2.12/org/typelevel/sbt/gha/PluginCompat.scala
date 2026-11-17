@@ -20,4 +20,6 @@ private object PluginCompat {
   type IterableOnce[+A] = scala.TraversableOnce[A]
 
   val githubWorkflowJavaVersion: JavaSpec = JavaSpec.temurin("11")
+  def sbtClientMode(sbt: String): Boolean = sbt.matches("""sbt.* --client($| .*)""")
+
 }
