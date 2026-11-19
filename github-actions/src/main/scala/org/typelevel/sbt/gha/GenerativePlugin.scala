@@ -908,7 +908,7 @@ ${indent(jobs.map(compileJob(_, sbt)).mkString("\n\n"), 1)}
     if (githubWorkflowUseSbtThinClient.value) {
       githubWorkflowSbtCommand.value + " --client"
     } else {
-      githubWorkflowSbtCommand.value
+      githubWorkflowSbtCommand.value + PluginCompat.sbtServerMode
     }
   }
 

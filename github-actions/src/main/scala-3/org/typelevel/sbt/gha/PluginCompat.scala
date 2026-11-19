@@ -15,13 +15,13 @@
  */
 
 package org.typelevel.sbt.gha
-import org.typelevel.scalaccompat.annotation.*
 
 private object PluginCompat {
   type IterableOnce[+A] = scala.IterableOnce[A]
 
   val githubWorkflowJavaVersion: JavaSpec = JavaSpec.temurin("17")
 
-  @unused
-  def sbtClientMode(sbt: String): Boolean = true
+  def sbtClientMode(sbt: String): Boolean = !sbt.matches("""sbt.* --server($| .*)""")
+  def sbtServerMode: String = " --server"
+
 }

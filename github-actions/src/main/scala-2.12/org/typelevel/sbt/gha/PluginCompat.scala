@@ -21,5 +21,6 @@ private object PluginCompat {
 
   val githubWorkflowJavaVersion: JavaSpec = JavaSpec.temurin("11")
   def sbtClientMode(sbt: String): Boolean = sbt.matches("""sbt.* --client($| .*)""")
+  def sbtServerMode: String = ""
 
 }
