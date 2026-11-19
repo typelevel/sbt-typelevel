@@ -49,6 +49,9 @@ object TypelevelCiPlugin extends AutoPlugin {
     lazy val tlCiDependencyGraphJob =
       settingKey[Boolean]("Whether to add a job to submit dependencies to GH (default: true)")
 
+    lazy val tlCiDependencyConfigsIgnore = settingKey[Seq[String]](
+      "The configurations to ignore when submitting dependencies to GH (default: `test`, `scala-tool`, `scala-doc-tool`, `test-internal`)")
+
     lazy val tlCiStewardValidateConfig = settingKey[Option[File]](
       "The location of the Scala Steward config to validate (default: `.scala-steward.conf`, if exists)")
 
@@ -68,6 +71,7 @@ object TypelevelCiPlugin extends AutoPlugin {
     tlCiMimaBinaryIssueCheck := false,
     tlCiDocCheck := false,
     tlCiDependencyGraphJob := true,
+    tlCiDependencyConfigsIgnore := Seq("test", "scala-tool", "scala-doc-tool", "test-internal"),
     tlCiForkCondition := "github.event.repository.fork == false",
     githubWorkflowTargetBranches ++= Seq(
       "!update/**", // ignore steward branches
@@ -160,7 +164,7 @@ object TypelevelCiPlugin extends AutoPlugin {
                 WorkflowStep.DependencySubmission(
                   None,
                   Some(noPublishModulesIgnore.value.toList),
-                  Some(List("test", "scala-tool", "scala-doc-tool", "test-internal")),
+                  Some(tlCiDependencyConfigsIgnore.value.toList),
                   None
                 ),
               cond = Some(jobCond)
