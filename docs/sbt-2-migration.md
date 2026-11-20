@@ -27,9 +27,9 @@ This version contains binary-incompatible changes:
 
 Upgrade all other plugin dependencies to their latest versions. The SBT 2.x plugin ecosystem is currently very active, so bugs are still being addressed.
 
-## Upgrade SBT to `2.1.0-RC1`
+## Upgrade SBT to `2.1.0`
 
-Upgrade your `build.properties` to `2.1.0-RC1` or later.
+Upgrade your `build.properties` to `2.1.0` or later.
 
 Attempt to enter the sbt shell. You will almost certainly encounter issues.
 
@@ -294,7 +294,7 @@ The following problems are under investigation.
 
 ## `tlSitePreview` on `sbtn` does not host a site
 
-This occurs in the `sbt-typelevel` repository when using `sbt` without `--server` argument. It occurs under the latest version `2.1.0-RC2`.
+This occurs in the `sbt-typelevel` repository when using `sbt` without `--server` argument. It occurs under the latest version `2.1.0`.
 
 According to the console, the server is up and running:
 ```
