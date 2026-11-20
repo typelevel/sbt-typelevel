@@ -1,10 +1,8 @@
-name := "sbt-typelevel"
-
 import org.typelevel.sbt.gha.{PermissionScope, PermissionValue, Permissions}
 import com.typesafe.tools.mima.core._
-
 ThisBuild / tlBaseVersion := "0.8"
-ThisBuild / crossScalaVersions := Seq("2.12.21")
+ThisBuild / crossScalaVersions := Seq("2.12.21", "3.9.0")
+ThisBuild / scalaVersion := "2.12.21"
 ThisBuild / developers ++= List(
   tlGitHubDev("armanbilge", "Arman Bilge"),
   tlGitHubDev("rossabaker", "Ross A. Baker"),
@@ -13,13 +11,10 @@ ThisBuild / developers ++= List(
 )
 ThisBuild / startYear := Some(2022)
 
-val temurin8 = JavaSpec.temurin("8")
 val temurin17 = JavaSpec.temurin("17")
 
 ThisBuild / githubWorkflowJavaVersions ++= Seq(
-  JavaSpec.temurin("11"),
-  temurin17,
-  JavaSpec(JavaSpec.Distribution.GraalVM("22.3.2"), "11"),
+  JavaSpec(JavaSpec.Distribution.GraalVM("22.3.2"), "17"),
   JavaSpec.graalvm("21"),
   JavaSpec.corretto("17"),
   JavaSpec.semeru("17")
@@ -30,13 +25,10 @@ val macOS = "macos-latest"
 ThisBuild / githubWorkflowOSes ++= Seq(macOS, "windows-2022")
 
 ThisBuild / githubWorkflowBuildMatrixExclusions ++= {
-  val exclusions = for {
+  for {
     java <- githubWorkflowJavaVersions.value.tail
     os <- githubWorkflowOSes.value.tail
-    if !(java == temurin17 && os == macOS) // keep this one
   } yield MatrixExclude(Map("java" -> java.render, "os" -> os))
-
-  exclusions :+ MatrixExclude(Map("java" -> temurin8.render, "os" -> macOS))
 }
 
 ThisBuild / githubWorkflowPublishTimeoutMinutes := Some(45)
@@ -101,7 +93,7 @@ ThisBuild / githubWorkflowPermissions := Some(Permissions.Specify.defaultPermiss
 
 val MunitVersion = "1.3.6"
 
-lazy val `sbt-typelevel` = tlCrossRootProject.aggregate(
+lazy val sbtTypelevel = tlCrossRootProject.aggregate(
   kernel,
   noPublish,
   settings,
@@ -122,26 +114,41 @@ lazy val `sbt-typelevel` = tlCrossRootProject.aggregate(
   docs
 )
 
+lazy val sbt2Settings = Seq(
+  scalaVersion := "2.12.21",
+  crossScalaVersions := Seq("2.12.21", "3.9.0"),
+  (pluginCrossBuild / sbtVersion) := {
+    scalaBinaryVersion.value match {
+      case "2.12" => "1.11.7"
+      case _ => "2.1.0"
+    }
+  },
+  tlVersionIntroduced := Map("3" -> "0.9.0")
+)
+
 lazy val kernel = project
   .in(file("kernel"))
   .enablePlugins(SbtPlugin)
   .settings(
     name := "sbt-typelevel-kernel",
-    libraryDependencies += "org.scalameta" %% "munit" % MunitVersion % Test
+    libraryDependencies += "org.scalameta" %% "munit" % MunitVersion % Test,
+    sbt2Settings
   )
 
 lazy val noPublish = project
   .in(file("no-publish"))
   .enablePlugins(SbtPlugin)
   .settings(
-    name := "sbt-typelevel-no-publish"
+    name := "sbt-typelevel-no-publish",
+    sbt2Settings
   )
 
 lazy val settings = project
   .in(file("settings"))
   .enablePlugins(SbtPlugin)
   .settings(
-    name := "sbt-typelevel-settings"
+    name := "sbt-typelevel-settings",
+    sbt2Settings
   )
   .dependsOn(kernel)
 
@@ -149,7 +156,8 @@ lazy val github = project
   .in(file("github"))
   .enablePlugins(SbtPlugin)
   .settings(
-    name := "sbt-typelevel-github"
+    name := "sbt-typelevel-github",
+    sbt2Settings
   )
   .dependsOn(kernel)
 
@@ -163,7 +171,8 @@ lazy val githubActions = project
       ProblemFilters.exclude[DirectMissingMethodProblem]("org.typelevel.sbt.gha.*#*#Impl.*"),
       ProblemFilters.exclude[MissingTypesProblem]("org.typelevel.sbt.gha.*$Impl$"),
       ProblemFilters.exclude[MissingTypesProblem]("org.typelevel.sbt.gha.*$*$Impl$")
-    )
+    ),
+    sbt2Settings
   )
 
 lazy val mergify = project
@@ -171,7 +180,8 @@ lazy val mergify = project
   .enablePlugins(SbtPlugin)
   .settings(
     name := "sbt-typelevel-mergify",
-    tlVersionIntroduced := Map("2.12" -> "0.4.6")
+    tlVersionIntroduced := Map("2.12" -> "0.4.6"),
+    sbt2Settings
   )
   .dependsOn(githubActions)
 
@@ -179,7 +189,8 @@ lazy val versioning = project
   .in(file("versioning"))
   .enablePlugins(SbtPlugin)
   .settings(
-    name := "sbt-typelevel-versioning"
+    name := "sbt-typelevel-versioning",
+    sbt2Settings
   )
   .dependsOn(kernel)
 
@@ -187,7 +198,8 @@ lazy val mima = project
   .in(file("mima"))
   .enablePlugins(SbtPlugin)
   .settings(
-    name := "sbt-typelevel-mima"
+    name := "sbt-typelevel-mima",
+    sbt2Settings
   )
   .dependsOn(kernel)
 
@@ -195,7 +207,8 @@ lazy val sonatype = project
   .in(file("sonatype"))
   .enablePlugins(SbtPlugin)
   .settings(
-    name := "sbt-typelevel-sonatype"
+    name := "sbt-typelevel-sonatype",
+    sbt2Settings
   )
   .dependsOn(kernel)
 
@@ -204,7 +217,8 @@ lazy val scalafix = project
   .enablePlugins(SbtPlugin)
   .settings(
     name := "sbt-typelevel-scalafix",
-    tlVersionIntroduced := Map("2.12" -> "0.4.10")
+    tlVersionIntroduced := Map("2.12" -> "0.4.10"),
+    sbt2Settings
   )
   .dependsOn(noPublish)
 
@@ -212,7 +226,8 @@ lazy val ciSigning = project
   .in(file("ci-signing"))
   .enablePlugins(SbtPlugin)
   .settings(
-    name := "sbt-typelevel-ci-signing"
+    name := "sbt-typelevel-ci-signing",
+    sbt2Settings
   )
   .dependsOn(githubActions)
 
@@ -220,7 +235,8 @@ lazy val sonatypeCiRelease = project
   .in(file("sonatype-ci-release"))
   .enablePlugins(SbtPlugin)
   .settings(
-    name := "sbt-typelevel-sonatype-ci-release"
+    name := "sbt-typelevel-sonatype-ci-release",
+    sbt2Settings
   )
   .dependsOn(sonatype, githubActions)
 
@@ -228,7 +244,8 @@ lazy val ci = project
   .in(file("ci"))
   .enablePlugins(SbtPlugin)
   .settings(
-    name := "sbt-typelevel-ci"
+    name := "sbt-typelevel-ci",
+    sbt2Settings
   )
   .dependsOn(noPublish, kernel, githubActions)
 
@@ -236,7 +253,8 @@ lazy val ciRelease = project
   .in(file("ci-release"))
   .enablePlugins(SbtPlugin)
   .settings(
-    name := "sbt-typelevel-ci-release"
+    name := "sbt-typelevel-ci-release",
+    sbt2Settings
   )
   .dependsOn(
     noPublish,
@@ -252,7 +270,8 @@ lazy val core = project
   .in(file("core"))
   .enablePlugins(SbtPlugin)
   .settings(
-    name := "sbt-typelevel"
+    name := "sbt-typelevel",
+    sbt2Settings
   )
   .dependsOn(
     ciRelease,
@@ -263,7 +282,8 @@ lazy val site = project
   .in(file("site"))
   .enablePlugins(SbtPlugin)
   .settings(
-    name := "sbt-typelevel-site"
+    name := "sbt-typelevel-site",
+    sbt2Settings
   )
   .dependsOn(kernel, github, githubActions, noPublish)
 
@@ -271,7 +291,8 @@ lazy val unidoc = project
   .in(file("unidoc"))
   .enablePlugins(TypelevelUnidocPlugin)
   .settings(
-    name := "sbt-typelevel-docs"
+    name := "sbt-typelevel-docs",
+    sbt2Settings
   )
 
 lazy val docs = project
@@ -302,24 +323,14 @@ lazy val docs = project
       ))
     },
     mdocVariables ++= {
-      import coursier.complete.Complete
       import java.time._
-      import scala.concurrent._
-      import scala.concurrent.duration._
-      import scala.concurrent.ExecutionContext.Implicits._
 
       val startYear = YearMonth.now().getYear.toString
 
-      def getLatestVersion(dep: String) = {
-        import scala.util.Try
-        val fut = Complete().withInput(dep).complete().future()
-        Try(Await.result(fut, 5.seconds)._2.last).toOption
-      }
-
       val latestScalaJSVersion =
-        getLatestVersion(s"org.scala-js:scalajs-library_2.13:").getOrElse(scalaJSVersion)
+        LatestVersion("org.scala-js", "scalajs-library_2.13", scalaJSVersion)
       val latestNativeVersion =
-        getLatestVersion(s"org.scala-native:nativelib_native0.5_3:").getOrElse(nativeVersion)
+        LatestVersion("org.scala-native", "nativelib_native0.5_3", nativeVersion)
 
       Map(
         "START_YEAR" -> startYear,

@@ -19,8 +19,6 @@ package org.typelevel.sbt
 import sbt._
 import scalafix.sbt.ScalafixPlugin
 
-import scala.language.experimental.macros
-
 import Keys._
 import ScalafixPlugin.autoImport._
 
@@ -30,17 +28,15 @@ object TypelevelScalafixPlugin extends AutoPlugin {
 
   override def trigger = allRequirements
 
-  object autoImport {
+  object autoImport extends ScalafixProjectMacros {
     val tlTypelevelScalafixVersion = settingKey[Option[String]](
       "The version of typelevel-scalafix to add to the scalafix dependency classpath, or None to omit the dependency entirely."
     )
-
-    def tlScalafixProject: ScalafixProject = macro ScalafixProjectMacros.scalafixProjectImpl
   }
 
   import autoImport._
 
-  override def buildSettings = Seq[Setting[_]](
+  override def buildSettings = Seq[Setting[?]](
     semanticdbEnabled := true,
     semanticdbVersion := scalafixSemanticdb.revision,
     SettingKey[Boolean]("tlCiScalafixCheck") := true,

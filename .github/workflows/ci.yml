@@ -42,26 +42,26 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-22.04, macos-latest, windows-2022]
-        scala: [2.12]
+        scala: [2.12, 3]
         java:
-          - temurin@8
-          - temurin@11
           - temurin@17
-          - graal_22.3.2@11
+          - graal_22.3.2@17
           - graalvm@21
           - corretto@17
           - semeru@17
-        project: [sbt-typelevelJVM]
+        project: [sbtTypelevelJVM]
         exclude:
-          - java: temurin@11
+          - scala: 3
+            java: graal_22.3.2@17
+          - scala: 3
+            java: graalvm@21
+          - scala: 3
+            java: corretto@17
+          - scala: 3
+            java: semeru@17
+          - java: graal_22.3.2@17
             os: macos-latest
-          - java: temurin@11
-            os: windows-2022
-          - java: temurin@17
-            os: windows-2022
-          - java: graal_22.3.2@11
-            os: macos-latest
-          - java: graal_22.3.2@11
+          - java: graal_22.3.2@17
             os: windows-2022
           - java: graalvm@21
             os: macos-latest
@@ -75,8 +75,6 @@ jobs:
             os: macos-latest
           - java: semeru@17
             os: windows-2022
-          - java: temurin@8
-            os: macos-latest
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
     steps:
@@ -93,34 +91,6 @@ jobs:
       - name: Setup sbt
         uses: sbt/setup-sbt@v1
 
-      - name: Setup Java (temurin@8)
-        id: setup-java-temurin-8
-        if: matrix.java == 'temurin@8'
-        uses: actions/setup-java@v5
-        with:
-          distribution: temurin
-          java-version: 8
-          cache: sbt
-
-      - name: sbt update
-        if: matrix.java == 'temurin@8' && steps.setup-java-temurin-8.outputs.cache-hit == 'false'
-        shell: bash
-        run: sbt +update
-
-      - name: Setup Java (temurin@11)
-        id: setup-java-temurin-11
-        if: matrix.java == 'temurin@11'
-        uses: actions/setup-java@v5
-        with:
-          distribution: temurin
-          java-version: 11
-          cache: sbt
-
-      - name: sbt update
-        if: matrix.java == 'temurin@11' && steps.setup-java-temurin-11.outputs.cache-hit == 'false'
-        shell: bash
-        run: sbt +update
-
       - name: Setup Java (temurin@17)
         id: setup-java-temurin-17
         if: matrix.java == 'temurin@17'
@@ -133,21 +103,21 @@ jobs:
       - name: sbt update
         if: matrix.java == 'temurin@17' && steps.setup-java-temurin-17.outputs.cache-hit == 'false'
         shell: bash
-        run: sbt +update
+        run: sbt --server +update
 
-      - name: Setup GraalVM (graal_22.3.2@11)
-        id: setup-graalvm-22_3_2-11
-        if: matrix.java == 'graal_22.3.2@11'
+      - name: Setup GraalVM (graal_22.3.2@17)
+        id: setup-graalvm-22_3_2-17
+        if: matrix.java == 'graal_22.3.2@17'
         uses: graalvm/setup-graalvm@v1
         with:
           version: 22.3.2
-          java-version: 11
+          java-version: 17
           cache: sbt
 
       - name: sbt update
-        if: matrix.java == 'graal_22.3.2@11' && steps.setup-graalvm-22_3_2-11.outputs.cache-hit == 'false'
+        if: matrix.java == 'graal_22.3.2@17' && steps.setup-graalvm-22_3_2-17.outputs.cache-hit == 'false'
         shell: bash
-        run: sbt +update
+        run: sbt --server +update
 
       - name: Setup Java (graalvm@21)
         id: setup-java-graalvm-21
@@ -161,7 +131,7 @@ jobs:
       - name: sbt update
         if: matrix.java == 'graalvm@21' && steps.setup-java-graalvm-21.outputs.cache-hit == 'false'
         shell: bash
-        run: sbt +update
+        run: sbt --server +update
 
       - name: Setup Java (corretto@17)
         id: setup-java-corretto-17
@@ -175,7 +145,7 @@ jobs:
       - name: sbt update
         if: matrix.java == 'corretto@17' && steps.setup-java-corretto-17.outputs.cache-hit == 'false'
         shell: bash
-        run: sbt +update
+        run: sbt --server +update
 
       - name: Setup Java (semeru@17)
         id: setup-java-semeru-17
@@ -189,35 +159,35 @@ jobs:
       - name: sbt update
         if: matrix.java == 'semeru@17' && steps.setup-java-semeru-17.outputs.cache-hit == 'false'
         shell: bash
-        run: sbt +update
+        run: sbt --server +update
 
       - name: Check that workflows are up to date
         shell: bash
-        run: sbt githubWorkflowCheck
+        run: sbt --server githubWorkflowCheck
 
       - name: Check headers and formatting
-        if: matrix.java == 'temurin@8' && matrix.os == 'ubuntu-22.04'
+        if: matrix.java == 'temurin@17' && matrix.os == 'ubuntu-22.04'
         shell: bash
-        run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' headerCheckAll scalafmtCheckAll 'project /' scalafmtSbtCheck
+        run: sbt --server 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' headerCheckAll scalafmtCheckAll 'project /' scalafmtSbtCheck
 
       - name: Check scalafix lints
-        if: matrix.java == 'temurin@8' && matrix.os == 'ubuntu-22.04'
+        if: matrix.java == 'temurin@17' && matrix.os == 'ubuntu-22.04'
         shell: bash
-        run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' 'scalafixAll --check'
+        run: sbt --server 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' 'scalafixAll --check'
 
       - name: Test
         shell: bash
-        run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' test
+        run: sbt --server 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' test
 
       - name: Check binary compatibility
-        if: matrix.java == 'temurin@8' && matrix.os == 'ubuntu-22.04'
+        if: matrix.java == 'temurin@17' && matrix.os == 'ubuntu-22.04'
         shell: bash
-        run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' mimaReportBinaryIssues
+        run: sbt --server 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' mimaReportBinaryIssues
 
       - name: Generate API documentation
-        if: matrix.java == 'temurin@8' && matrix.os == 'ubuntu-22.04'
+        if: matrix.java == 'temurin@17' && matrix.os == 'ubuntu-22.04'
         shell: bash
-        run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' doc
+        run: sbt --server 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' doc
 
       - shell: bash
         working-directory: project
@@ -230,12 +200,12 @@ jobs:
       - name: Make target directories
         if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main')
         shell: bash
-        run: mkdir -p github/target github-actions/target kernel/target versioning/target ci-release/target scalafix/target site/target ci-signing/target mergify/target unidoc/target mima/target no-publish/target sonatype/target ci/target sonatype-ci-release/target core/target settings/target project/target
+        run: mkdir -p target/out/jvm/scala-2.12.21/sbt-typelevel-versioning target/out/jvm/scala-2.12.21/sbt-typelevel-ci-release target/out/jvm/scala-2.12.21/sbt-typelevel-scalafix target/out/jvm/scala-2.12.21/sbt-typelevel-docs target/out/jvm/scala-2.12.21/sbt-typelevel-mima target/out/jvm/scala-2.12.21/sbt-typelevel-sonatype-ci-release target/out/jvm/scala-2.12.21/sbt-typelevel target/out/jvm/scala-2.12.21/sbt-typelevel-settings target/out/jvm/scala-2.12.21/sbt-typelevel-github target/out/jvm/scala-2.12.21/sbt-typelevel-github-actions target/out/jvm/scala-2.12.21/sbt-typelevel-kernel target/out/jvm/scala-2.12.21/sbt-typelevel-site target/out/jvm/scala-2.12.21/sbt-typelevel-ci-signing target/out/jvm/scala-2.12.21/sbt-typelevel-mergify target/out/jvm/scala-2.12.21/sbt-typelevel-no-publish target/out/jvm/scala-2.12.21/sbt-typelevel-sonatype target/out/jvm/scala-2.12.21/sbt-typelevel-ci project/target
 
       - name: Compress target directories
         if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main')
         shell: bash
-        run: tar cf targets.tar github/target github-actions/target kernel/target versioning/target ci-release/target scalafix/target site/target ci-signing/target mergify/target unidoc/target mima/target no-publish/target sonatype/target ci/target sonatype-ci-release/target core/target settings/target project/target
+        run: tar cf targets.tar target/out/jvm/scala-2.12.21/sbt-typelevel-versioning target/out/jvm/scala-2.12.21/sbt-typelevel-ci-release target/out/jvm/scala-2.12.21/sbt-typelevel-scalafix target/out/jvm/scala-2.12.21/sbt-typelevel-docs target/out/jvm/scala-2.12.21/sbt-typelevel-mima target/out/jvm/scala-2.12.21/sbt-typelevel-sonatype-ci-release target/out/jvm/scala-2.12.21/sbt-typelevel target/out/jvm/scala-2.12.21/sbt-typelevel-settings target/out/jvm/scala-2.12.21/sbt-typelevel-github target/out/jvm/scala-2.12.21/sbt-typelevel-github-actions target/out/jvm/scala-2.12.21/sbt-typelevel-kernel target/out/jvm/scala-2.12.21/sbt-typelevel-site target/out/jvm/scala-2.12.21/sbt-typelevel-ci-signing target/out/jvm/scala-2.12.21/sbt-typelevel-mergify target/out/jvm/scala-2.12.21/sbt-typelevel-no-publish target/out/jvm/scala-2.12.21/sbt-typelevel-sonatype target/out/jvm/scala-2.12.21/sbt-typelevel-ci project/target
 
       - name: Upload target directories
         if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main')
@@ -251,7 +221,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-22.04]
-        java: [temurin@8]
+        java: [temurin@17]
     runs-on: ${{ matrix.os }}
     timeout-minutes: 45
     steps:
@@ -267,32 +237,6 @@ jobs:
       - name: Setup sbt
         uses: sbt/setup-sbt@v1
 
-      - name: Setup Java (temurin@8)
-        id: setup-java-temurin-8
-        if: matrix.java == 'temurin@8'
-        uses: actions/setup-java@v5
-        with:
-          distribution: temurin
-          java-version: 8
-          cache: sbt
-
-      - name: sbt update
-        if: matrix.java == 'temurin@8' && steps.setup-java-temurin-8.outputs.cache-hit == 'false'
-        run: sbt +update
-
-      - name: Setup Java (temurin@11)
-        id: setup-java-temurin-11
-        if: matrix.java == 'temurin@11'
-        uses: actions/setup-java@v5
-        with:
-          distribution: temurin
-          java-version: 11
-          cache: sbt
-
-      - name: sbt update
-        if: matrix.java == 'temurin@11' && steps.setup-java-temurin-11.outputs.cache-hit == 'false'
-        run: sbt +update
-
       - name: Setup Java (temurin@17)
         id: setup-java-temurin-17
         if: matrix.java == 'temurin@17'
@@ -304,20 +248,20 @@ jobs:
 
       - name: sbt update
         if: matrix.java == 'temurin@17' && steps.setup-java-temurin-17.outputs.cache-hit == 'false'
-        run: sbt +update
+        run: sbt --server +update
 
-      - name: Setup GraalVM (graal_22.3.2@11)
-        id: setup-graalvm-22_3_2-11
-        if: matrix.java == 'graal_22.3.2@11'
+      - name: Setup GraalVM (graal_22.3.2@17)
+        id: setup-graalvm-22_3_2-17
+        if: matrix.java == 'graal_22.3.2@17'
         uses: graalvm/setup-graalvm@v1
         with:
           version: 22.3.2
-          java-version: 11
+          java-version: 17
           cache: sbt
 
       - name: sbt update
-        if: matrix.java == 'graal_22.3.2@11' && steps.setup-graalvm-22_3_2-11.outputs.cache-hit == 'false'
-        run: sbt +update
+        if: matrix.java == 'graal_22.3.2@17' && steps.setup-graalvm-22_3_2-17.outputs.cache-hit == 'false'
+        run: sbt --server +update
 
       - name: Setup Java (graalvm@21)
         id: setup-java-graalvm-21
@@ -330,7 +274,7 @@ jobs:
 
       - name: sbt update
         if: matrix.java == 'graalvm@21' && steps.setup-java-graalvm-21.outputs.cache-hit == 'false'
-        run: sbt +update
+        run: sbt --server +update
 
       - name: Setup Java (corretto@17)
         id: setup-java-corretto-17
@@ -343,7 +287,7 @@ jobs:
 
       - name: sbt update
         if: matrix.java == 'corretto@17' && steps.setup-java-corretto-17.outputs.cache-hit == 'false'
-        run: sbt +update
+        run: sbt --server +update
 
       - name: Setup Java (semeru@17)
         id: setup-java-semeru-17
@@ -356,14 +300,24 @@ jobs:
 
       - name: sbt update
         if: matrix.java == 'semeru@17' && steps.setup-java-semeru-17.outputs.cache-hit == 'false'
-        run: sbt +update
+        run: sbt --server +update
 
-      - name: Download target directories (2.12, sbt-typelevelJVM)
+      - name: Download target directories (2.12, sbtTypelevelJVM)
         uses: actions/download-artifact@v6
         with:
-          name: target-${{ matrix.os }}-${{ matrix.java }}-2.12-sbt-typelevelJVM
+          name: target-${{ matrix.os }}-${{ matrix.java }}-2.12-sbtTypelevelJVM
 
-      - name: Inflate target directories (2.12, sbt-typelevelJVM)
+      - name: Inflate target directories (2.12, sbtTypelevelJVM)
+        run: |
+          tar xf targets.tar
+          rm targets.tar
+
+      - name: Download target directories (3, sbtTypelevelJVM)
+        uses: actions/download-artifact@v6
+        with:
+          name: target-${{ matrix.os }}-${{ matrix.java }}-3-sbtTypelevelJVM
+
+      - name: Inflate target directories (3, sbtTypelevelJVM)
         run: |
           tar xf targets.tar
           rm targets.tar
@@ -390,7 +344,7 @@ jobs:
           SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
           SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
           SONATYPE_CREDENTIAL_HOST: ${{ secrets.SONATYPE_CREDENTIAL_HOST }}
-        run: sbt tlCiRelease
+        run: sbt --server tlCiRelease
 
   dependency-submission:
     name: Submit Dependencies
@@ -398,7 +352,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-22.04]
-        java: [temurin@8]
+        java: [temurin@17]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Ignore line ending differences in git
@@ -413,32 +367,6 @@ jobs:
       - name: Setup sbt
         uses: sbt/setup-sbt@v1
 
-      - name: Setup Java (temurin@8)
-        id: setup-java-temurin-8
-        if: matrix.java == 'temurin@8'
-        uses: actions/setup-java@v5
-        with:
-          distribution: temurin
-          java-version: 8
-          cache: sbt
-
-      - name: sbt update
-        if: matrix.java == 'temurin@8' && steps.setup-java-temurin-8.outputs.cache-hit == 'false'
-        run: sbt +update
-
-      - name: Setup Java (temurin@11)
-        id: setup-java-temurin-11
-        if: matrix.java == 'temurin@11'
-        uses: actions/setup-java@v5
-        with:
-          distribution: temurin
-          java-version: 11
-          cache: sbt
-
-      - name: sbt update
-        if: matrix.java == 'temurin@11' && steps.setup-java-temurin-11.outputs.cache-hit == 'false'
-        run: sbt +update
-
       - name: Setup Java (temurin@17)
         id: setup-java-temurin-17
         if: matrix.java == 'temurin@17'
@@ -450,20 +378,20 @@ jobs:
 
       - name: sbt update
         if: matrix.java == 'temurin@17' && steps.setup-java-temurin-17.outputs.cache-hit == 'false'
-        run: sbt +update
+        run: sbt --server +update
 
-      - name: Setup GraalVM (graal_22.3.2@11)
-        id: setup-graalvm-22_3_2-11
-        if: matrix.java == 'graal_22.3.2@11'
+      - name: Setup GraalVM (graal_22.3.2@17)
+        id: setup-graalvm-22_3_2-17
+        if: matrix.java == 'graal_22.3.2@17'
         uses: graalvm/setup-graalvm@v1
         with:
           version: 22.3.2
-          java-version: 11
+          java-version: 17
           cache: sbt
 
       - name: sbt update
-        if: matrix.java == 'graal_22.3.2@11' && steps.setup-graalvm-22_3_2-11.outputs.cache-hit == 'false'
-        run: sbt +update
+        if: matrix.java == 'graal_22.3.2@17' && steps.setup-graalvm-22_3_2-17.outputs.cache-hit == 'false'
+        run: sbt --server +update
 
       - name: Setup Java (graalvm@21)
         id: setup-java-graalvm-21
@@ -476,7 +404,7 @@ jobs:
 
       - name: sbt update
         if: matrix.java == 'graalvm@21' && steps.setup-java-graalvm-21.outputs.cache-hit == 'false'
-        run: sbt +update
+        run: sbt --server +update
 
       - name: Setup Java (corretto@17)
         id: setup-java-corretto-17
@@ -489,7 +417,7 @@ jobs:
 
       - name: sbt update
         if: matrix.java == 'corretto@17' && steps.setup-java-corretto-17.outputs.cache-hit == 'false'
-        run: sbt +update
+        run: sbt --server +update
 
       - name: Setup Java (semeru@17)
         id: setup-java-semeru-17
@@ -502,12 +430,12 @@ jobs:
 
       - name: sbt update
         if: matrix.java == 'semeru@17' && steps.setup-java-semeru-17.outputs.cache-hit == 'false'
-        run: sbt +update
+        run: sbt --server +update
 
       - name: Submit Dependencies
         uses: scalacenter/sbt-dependency-submission@v2
         with:
-          modules-ignore: sbt-typeleveljvm_2.12 docs_2.12 sbt-typelevelnative_2.12 sbt-typeleveljs_2.12
+          modules-ignore: sbttypeleveljs_2.12 sbttypeleveljs_3 sbttypelevelnative_2.12 sbttypelevelnative_3 docs_2.12 docs_3 sbttypeleveljvm_2.12 sbttypeleveljvm_3
           configs-ignore: test scala-tool scala-doc-tool test-internal
 
   validate-steward:
@@ -535,128 +463,6 @@ jobs:
 
       - run: scala-steward validate-repo-config .scala-steward.conf
 
-  site:
-    name: Generate Site
-    strategy:
-      matrix:
-        os: [ubuntu-22.04]
-        java: [temurin@11]
-    runs-on: ${{ matrix.os }}
-    steps:
-      - name: Ignore line ending differences in git
-        if: contains(runner.os, 'windows')
-        run: git config --global core.autocrlf false
-
-      - name: Checkout current branch (full)
-        uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-
-      - name: Setup sbt
-        uses: sbt/setup-sbt@v1
-
-      - name: Setup Java (temurin@8)
-        id: setup-java-temurin-8
-        if: matrix.java == 'temurin@8'
-        uses: actions/setup-java@v5
-        with:
-          distribution: temurin
-          java-version: 8
-          cache: sbt
-
-      - name: sbt update
-        if: matrix.java == 'temurin@8' && steps.setup-java-temurin-8.outputs.cache-hit == 'false'
-        run: sbt +update
-
-      - name: Setup Java (temurin@11)
-        id: setup-java-temurin-11
-        if: matrix.java == 'temurin@11'
-        uses: actions/setup-java@v5
-        with:
-          distribution: temurin
-          java-version: 11
-          cache: sbt
-
-      - name: sbt update
-        if: matrix.java == 'temurin@11' && steps.setup-java-temurin-11.outputs.cache-hit == 'false'
-        run: sbt +update
-
-      - name: Setup Java (temurin@17)
-        id: setup-java-temurin-17
-        if: matrix.java == 'temurin@17'
-        uses: actions/setup-java@v5
-        with:
-          distribution: temurin
-          java-version: 17
-          cache: sbt
-
-      - name: sbt update
-        if: matrix.java == 'temurin@17' && steps.setup-java-temurin-17.outputs.cache-hit == 'false'
-        run: sbt +update
-
-      - name: Setup GraalVM (graal_22.3.2@11)
-        id: setup-graalvm-22_3_2-11
-        if: matrix.java == 'graal_22.3.2@11'
-        uses: graalvm/setup-graalvm@v1
-        with:
-          version: 22.3.2
-          java-version: 11
-          cache: sbt
-
-      - name: sbt update
-        if: matrix.java == 'graal_22.3.2@11' && steps.setup-graalvm-22_3_2-11.outputs.cache-hit == 'false'
-        run: sbt +update
-
-      - name: Setup Java (graalvm@21)
-        id: setup-java-graalvm-21
-        if: matrix.java == 'graalvm@21'
-        uses: actions/setup-java@v5
-        with:
-          distribution: graalvm
-          java-version: 21
-          cache: sbt
-
-      - name: sbt update
-        if: matrix.java == 'graalvm@21' && steps.setup-java-graalvm-21.outputs.cache-hit == 'false'
-        run: sbt +update
-
-      - name: Setup Java (corretto@17)
-        id: setup-java-corretto-17
-        if: matrix.java == 'corretto@17'
-        uses: actions/setup-java@v5
-        with:
-          distribution: corretto
-          java-version: 17
-          cache: sbt
-
-      - name: sbt update
-        if: matrix.java == 'corretto@17' && steps.setup-java-corretto-17.outputs.cache-hit == 'false'
-        run: sbt +update
-
-      - name: Setup Java (semeru@17)
-        id: setup-java-semeru-17
-        if: matrix.java == 'semeru@17'
-        uses: actions/setup-java@v5
-        with:
-          distribution: semeru
-          java-version: 17
-          cache: sbt
-
-      - name: sbt update
-        if: matrix.java == 'semeru@17' && steps.setup-java-semeru-17.outputs.cache-hit == 'false'
-        run: sbt +update
-
-      - name: Generate site
-        run: sbt docs/tlSite
-
-      - name: Publish site
-        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
-        uses: peaceiris/actions-gh-pages@v4.0.0
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: mdocs/target/docs/site
-          keep_files: true
-
   greeter:
     name: Generate some output
     strategy:
@@ -679,3 +485,99 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - run: exit 1
+
+  site:
+    name: Generate Site
+    strategy:
+      matrix:
+        os: [ubuntu-22.04]
+        java: [temurin@17]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Ignore line ending differences in git
+        if: contains(runner.os, 'windows')
+        run: git config --global core.autocrlf false
+
+      - name: Checkout current branch (full)
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Setup sbt
+        uses: sbt/setup-sbt@v1
+
+      - name: Setup Java (temurin@17)
+        id: setup-java-temurin-17
+        if: matrix.java == 'temurin@17'
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 17
+          cache: sbt
+
+      - name: sbt update
+        if: matrix.java == 'temurin@17' && steps.setup-java-temurin-17.outputs.cache-hit == 'false'
+        run: sbt --server +update
+
+      - name: Setup GraalVM (graal_22.3.2@17)
+        id: setup-graalvm-22_3_2-17
+        if: matrix.java == 'graal_22.3.2@17'
+        uses: graalvm/setup-graalvm@v1
+        with:
+          version: 22.3.2
+          java-version: 17
+          cache: sbt
+
+      - name: sbt update
+        if: matrix.java == 'graal_22.3.2@17' && steps.setup-graalvm-22_3_2-17.outputs.cache-hit == 'false'
+        run: sbt --server +update
+
+      - name: Setup Java (graalvm@21)
+        id: setup-java-graalvm-21
+        if: matrix.java == 'graalvm@21'
+        uses: actions/setup-java@v5
+        with:
+          distribution: graalvm
+          java-version: 21
+          cache: sbt
+
+      - name: sbt update
+        if: matrix.java == 'graalvm@21' && steps.setup-java-graalvm-21.outputs.cache-hit == 'false'
+        run: sbt --server +update
+
+      - name: Setup Java (corretto@17)
+        id: setup-java-corretto-17
+        if: matrix.java == 'corretto@17'
+        uses: actions/setup-java@v5
+        with:
+          distribution: corretto
+          java-version: 17
+          cache: sbt
+
+      - name: sbt update
+        if: matrix.java == 'corretto@17' && steps.setup-java-corretto-17.outputs.cache-hit == 'false'
+        run: sbt --server +update
+
+      - name: Setup Java (semeru@17)
+        id: setup-java-semeru-17
+        if: matrix.java == 'semeru@17'
+        uses: actions/setup-java@v5
+        with:
+          distribution: semeru
+          java-version: 17
+          cache: sbt
+
+      - name: sbt update
+        if: matrix.java == 'semeru@17' && steps.setup-java-semeru-17.outputs.cache-hit == 'false'
+        run: sbt --server +update
+
+      - name: Generate site
+        run: sbt --server docs/tlSite
+
+      - name: Publish site
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        uses: peaceiris/actions-gh-pages@v4.0.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: target/out/jvm/scala-2.12.21/docs/docs/site
+          keep_files: true

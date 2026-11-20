@@ -17,14 +17,15 @@ val modules = List(
   "versioning"
 )
 
-Compile / unmanagedSourceDirectories ++= modules.map { module =>
-  baseDirectory.value.getParentFile / module / "src" / "main" / "scala"
+Compile / unmanagedSourceDirectories ++= modules.flatMap { module =>
+  val moduleDir = baseDirectory.value.getParentFile / module / "src" / "main"
+  Seq(moduleDir / "scala", moduleDir / "scala-3")
 }
 
 Compile / unmanagedResourceDirectories ++= modules.map { module =>
   baseDirectory.value.getParentFile / module / "src" / "main" / "resources"
 }
 
-libraryDependencies ++= Seq(
-  "io.get-coursier" %% "coursier" % "2.1.24"
-)
+addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.7.1")
+
+libraryDependencies += "org.typelevel" %% "scalac-compat-annotation" % "0.1.4" % Provided

@@ -17,6 +17,7 @@
 package org.typelevel.sbt
 
 import com.github.sbt.git.SbtGit.git
+import org.typelevel.sbt.github.PluginCompat
 import org.typelevel.sbt.kernel.GitHelper
 import org.typelevel.sbt.kernel.V
 import sbt._
@@ -36,7 +37,7 @@ object TypelevelGitHubPlugin extends AutoPlugin {
      * Helper to create a `Developer` entry from a GitHub username.
      */
     def tlGitHubDev(user: String, fullName: String): Developer = {
-      Developer(user, fullName, s"@$user", url(s"https://github.com/$user"))
+      Developer(user, fullName, s"@$user", PluginCompat.url(uri(s"https://github.com/$user")))
     }
 
     lazy val tlGitHubRepo = settingKey[Option[String]]("The name of this repository on GitHub")
@@ -56,7 +57,7 @@ object TypelevelGitHubPlugin extends AutoPlugin {
       val tag = git.gitCurrentTags.value.headOption
       gitHubUserRepo.value.flatMap {
         case (user, repo) =>
-          tag.map(v => url(s"https://github.com/$user/$repo/releases/tag/$v"))
+          tag.map(v => PluginCompat.url(uri(s"https://github.com/$user/$repo/releases/tag/$v")))
       }
     },
     developers := {
@@ -66,43 +67,44 @@ object TypelevelGitHubPlugin extends AutoPlugin {
             user,
             s"$repo contributors",
             s"@$user",
-            url(s"https://github.com/$user/$repo/contributors")
+            PluginCompat.url(uri(s"https://github.com/$user/$repo/contributors"))
           )
       }
     }
   )
 
-  override def projectSettings: Seq[Setting[_]] = Seq(
-    Compile / doc / scalacOptions ++= {
-      val tagOrHash =
-        GitHelper.getTagOrHash(git.gitCurrentTags.value, git.gitHeadCommit.value)
-      val userRepo = gitHubUserRepo.value
-      val infoOpt = scmInfo.value
+  private val sourceUrlOptions = Def.task {
+    val tagOrHash =
+      GitHelper.getTagOrHash(git.gitCurrentTags.value, git.gitHeadCommit.value)
+    val userRepo = gitHubUserRepo.value
+    val infoOpt = scmInfo.value
 
-      tagOrHash.toSeq flatMap { vh =>
-        scalaVersion.value match {
-          case V(V(3, _, _, _)) =>
-            userRepo.toSeq flatMap {
-              case (user, repo) =>
-                Seq(s"-source-links:github://${user}/${repo}", "-revision", vh)
-            }
-          case V(V(2, minor, patch, _)) =>
-            infoOpt.toSeq flatMap { info =>
-              val path =
-                // see https://github.com/scala/bug/issues/12867#issuecomment-1718481858
-                if (minor > 13 || minor == 13 && patch.forall(_ >= 12))
-                  s"${info.browseUrl}/blob/${vh}/€{FILE_PATH}.scala"
-                else s"${info.browseUrl}/blob/${vh}€{FILE_PATH}.scala"
-              Seq("-doc-source-url", path)
-            }
-        }
+    tagOrHash.toSeq flatMap { vh =>
+      scalaVersion.value match {
+        case V(V(3, _, _, _)) =>
+          userRepo.toSeq flatMap {
+            case (user, repo) =>
+              Seq(s"-source-links:github://${user}/${repo}", "-revision", vh)
+          }
+        case V(V(2, minor, patch, _)) =>
+          infoOpt.toSeq flatMap { info =>
+            val path =
+              // see https://github.com/scala/bug/issues/12867#issuecomment-1718481858
+              if (minor > 13 || minor == 13 && patch.forall(_ >= 12))
+                s"${info.browseUrl}/blob/${vh}/€{FILE_PATH}.scala"
+              else s"${info.browseUrl}/blob/${vh}€{FILE_PATH}.scala"
+            Seq("-doc-source-url", path)
+          }
       }
     }
+  }
+  override def projectSettings: Seq[Setting[?]] = Seq(
+    Compile / doc / scalacOptions ++= sourceUrlOptions.value
   )
 
   private def gitHubScmInfo(user: String, repo: String) =
     ScmInfo(
-      url(s"https://github.com/$user/$repo"),
+      PluginCompat.url(uri(s"https://github.com/$user/$repo")),
       s"scm:git:https://github.com/$user/$repo.git",
       s"scm:git:git@github.com:$user/$repo.git"
     )

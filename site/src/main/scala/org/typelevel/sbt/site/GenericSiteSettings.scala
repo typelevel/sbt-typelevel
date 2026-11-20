@@ -37,7 +37,7 @@ import sbt.Keys.developers
 import sbt.Keys.scmInfo
 import sbt.Keys.version
 
-import java.net.URL
+import java.net.URI
 
 object GenericSiteSettings {
 
@@ -85,7 +85,7 @@ object GenericSiteSettings {
       )
   }
 
-  private def htmlForwarder(to: URL) =
+  private def htmlForwarder(to: URI) =
     s"""|<!DOCTYPE html>
         |<meta charset="utf-8">
         |<meta http-equiv="refresh" content="0; URL=$to">

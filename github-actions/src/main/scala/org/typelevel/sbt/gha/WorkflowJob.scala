@@ -16,6 +16,7 @@
 
 package org.typelevel.sbt.gha
 
+import PluginCompat.IterableOnce
 sealed abstract class WorkflowJob {
   def id: String
   def name: String
@@ -62,9 +63,9 @@ sealed abstract class WorkflowJob {
   def withOutputs(outputs: Map[String, String]): WorkflowJob
 
   def updatedEnv(name: String, value: String): WorkflowJob
-  def concatEnv(envs: TraversableOnce[(String, String)]): WorkflowJob
+  def concatEnv(envs: IterableOnce[(String, String)]): WorkflowJob
   def appendedStep(step: WorkflowStep): WorkflowJob
-  def concatSteps(suffixSteps: TraversableOnce[WorkflowStep]): WorkflowJob
+  def concatSteps(suffixSteps: IterableOnce[WorkflowStep]): WorkflowJob
 }
 
 object WorkflowJob {
@@ -208,9 +209,9 @@ object WorkflowJob {
     override def withOutputs(outputs: Map[String, String]): WorkflowJob = copy(outputs = outputs)
 
     def updatedEnv(name: String, value: String): WorkflowJob = copy(env = env.updated(name, value))
-    def concatEnv(envs: TraversableOnce[(String, String)]): WorkflowJob = copy(env = this.env ++ envs)
+    def concatEnv(envs: IterableOnce[(String, String)]): WorkflowJob = copy(env = this.env ++ envs)
     def appendedStep(step: WorkflowStep): WorkflowJob = copy(steps = this.steps :+ step)
-    def concatSteps(suffixSteps: TraversableOnce[WorkflowStep]): WorkflowJob = copy(steps = this.steps ++ suffixSteps)
+    def concatSteps(suffixSteps: IterableOnce[WorkflowStep]): WorkflowJob = copy(steps = this.steps ++ suffixSteps)
     // scalafmt: { maxColumn = 96 }
 
     override def productPrefix = "WorkflowJob"

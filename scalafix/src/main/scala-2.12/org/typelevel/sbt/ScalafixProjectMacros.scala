@@ -17,9 +17,14 @@
 package org.typelevel.sbt
 
 import scala.annotation.tailrec
+import scala.language.experimental.macros
 import scala.reflect.macros.blackbox
 
-private[sbt] object CrossRootProjectMacros {
+trait ScalafixProjectMacros {
+  def tlScalafixProject: ScalafixProject = macro ScalafixProjectMacros.scalafixProjectImpl
+}
+
+private[sbt] object ScalafixProjectMacros {
 
   // Copied from sbt.std.KeyMacro
   def definingValName(c: blackbox.Context, invalidEnclosingTree: String => String): String = {
@@ -52,17 +57,17 @@ private[sbt] object CrossRootProjectMacros {
       .enclosingContextChain
       .map(_.tree.asInstanceOf[c.Tree])
 
-  def crossRootProjectImpl(c: blackbox.Context): c.Expr[CrossRootProject] = {
+  def scalafixProjectImpl(c: blackbox.Context): c.Expr[ScalafixProject] = {
     import c.universe._
 
     val enclosingValName = definingValName(
       c,
       methodName =>
-        s"""$methodName must be directly assigned to a val, such as `val x = $methodName`. Alternatively, you can use `org.typelevel.sbt.CrossRootProject.apply`"""
+        s"""$methodName must be directly assigned to a val, such as `val x = $methodName`. Alternatively, you can use `org.typelevel.sbt.ScalafixProject.apply`"""
     )
 
     val name = c.Expr[String](Literal(Constant(enclosingValName)))
 
-    reify { CrossRootProject(name.splice) }
+    reify { ScalafixProject(name.splice) }
   }
 }

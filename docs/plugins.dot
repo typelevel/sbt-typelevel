@@ -4,7 +4,7 @@ digraph {
   fix[label="sbt-scalafix"]
   fmt[label="sbt-scalafmt"]
   git[label="sbt-git"]
-  gpg[label="sbt-gpg"]
+  pgp[label="sbt-pgp"]
   header[label="sbt-header"]
   laika[label="laika-sbt"]
   mdoc[label="sbt-mdoc"]
@@ -47,7 +47,7 @@ digraph {
 
   tlcisigning[label="sbt-typelevel-ci-signing"];
   tlcisigning -> tlgha;
-  tlcisigning -> gpg;
+  tlcisigning -> pgp;
 
   tlsonatypecirelease[label="sbt-typelevel-sonatype-ci-release"];
   tlsonatypecirelease -> tlsonatype;
